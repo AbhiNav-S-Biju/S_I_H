@@ -6,10 +6,27 @@ import 'app/providers/accessibility_providers.dart';
 import 'app/router/app_router.dart';
 import 'app/theme/elder_theme.dart';
 import 'core/config/supabase_config.dart';
+import 'database/hive_database.dart';
+import 'features/reminders/services/notification_service.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Initialize Hive offline database
+  try {
+    await HiveDatabase.init();
+  } catch (e) {
+    debugPrint('⚠️ HiveDatabase initialization error: $e');
+  }
+
+  // 2. Initialize local notification service
+  try {
+    final notificationService = NotificationService();
+    await notificationService.initialize();
+  } catch (e) {
+    debugPrint('⚠️ NotificationService initialization error: $e');
+  }
 
   // Initialize Supabase if credentials are provided in SupabaseConfig
   if (SupabaseConfig.isConfigured) {

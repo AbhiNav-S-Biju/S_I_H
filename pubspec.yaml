@@ -41,6 +41,12 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  hive_flutter: ^1.1.0
+  connectivity_plus: ^6.1.4
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+  hive: ^2.2.3
+  supabase: ^2.13.4
 
 dev_dependencies:
   flutter_test:

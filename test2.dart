@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:supabase/supabase.dart';
 import 'lib/core/config/supabase_config.dart';
 
