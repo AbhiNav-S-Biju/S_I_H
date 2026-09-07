@@ -55,6 +55,8 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
   @override
   Widget build(BuildContext context) {
     final state = _controller.state;
+    // 0 = shopping list phase, 1 = shelf (recall) phase
+    final phaseIndex = state.isListPhase ? 0 : 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -76,18 +78,23 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
           ),
 
           // Main Interactive Area
+          //
+          // WHY IndexedStack instead of AnimatedSwitcher:
+          // AnimatedSwitcher uses a loose-constraint Stack internally.
+          // A Column containing Expanded(GridView) needs TIGHT (bounded)
+          // height constraints, which a loose Stack cannot guarantee during
+          // the animation frame. IndexedStack is constrained tightly by
+          // Expanded and always passes those tight constraints to every
+          // child, so Expanded+GridView always has a valid finite height.
           Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              // Use default layoutBuilder (loose constraints via Stack with
-              // alignment: center). The custom StackFit.expand layoutBuilder
-              // was passing tight constraints to previous children that are
-              // SingleChildScrollView widgets, causing:
-              //   "BoxConstraints forces an infinite width"
-              //   "RenderBox was not laid out"
-              child: state.isListPhase
-                  ? _buildShoppingListView(state)
-                  : _buildShelfView(state),
+            child: IndexedStack(
+              index: phaseIndex,
+              children: [
+                // Phase 0: Shopping List
+                _buildShoppingListView(state),
+                // Phase 1: Shelf (Recall)
+                _buildShelfView(state),
+              ],
             ),
           ),
         ],
@@ -100,7 +107,6 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildShoppingListView(GroceryMemoryState state) {
     return SingleChildScrollView(
-      key: const ValueKey('grocery_list_phase'),
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -214,151 +220,131 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
     final collectedCount = state.basketItemIds.length;
     final totalListCount = state.shoppingList.length;
 
-    // Defensive guard: if shelfItems is somehow empty, show a safe state.
-    if (state.shelfItems.isEmpty) {
-      return const SizedBox.expand(
-        key: ValueKey('grocery_shelf_phase'),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Text(
-              'Getting ready…',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+    // IndexedStack always gives this widget tight constraints (finite width
+    // and finite height). The Column + Expanded(GridView) pattern works
+    // correctly when the parent provides tight bounds.
+    return Column(
+      children: [
+        // Feedback bar
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+          color: const Color(0xFFF1F5F9),
+          child: Text(
+            state.lastFeedback ??
+                'Tap items from your list to put them in your cart:',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 17.0,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1E293B),
             ),
           ),
         ),
-      );
-    }
 
-    // SizedBox.expand gives the Column a finite size matching the Expanded
-    // parent, which is required because AnimatedSwitcher (without a custom
-    // layoutBuilder) uses a loose-constraint Stack. Without SizedBox.expand,
-    // the Column would try to shrink-wrap, and the inner Expanded/GridView
-    // would receive unbounded height.
-    return SizedBox.expand(
-      key: const ValueKey('grocery_shelf_phase'),
-      child: Column(
-        children: [
-          // Feedback bar
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 14.0,
-            ),
-            color: const Color(0xFFF1F5F9),
-            child: Text(
-              state.lastFeedback ??
-                  'Tap items from your list to put them in your cart:',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 17.0,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1E293B),
-              ),
-            ),
-          ),
+        // Supermarket Shelf Grid — receives finite height from Column+Expanded
+        // because IndexedStack provides tight constraints to this whole widget.
+        Expanded(
+          child: state.shelfItems.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Getting ready…',
+                    style: TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+                  ),
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 16.0,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16.0,
+                    mainAxisSpacing: 16.0,
+                    childAspectRatio: 1.05,
+                  ),
+                  itemCount: state.shelfItems.length,
+                  itemBuilder: (context, index) {
+                    final item = state.shelfItems[index];
+                    final isInBasket = state.basketItemIds.contains(item.id);
+                    final isHint = state.hintHighlightedItemId == item.id;
 
-          // Supermarket Shelf Grid — receives finite constraints from Column + SizedBox.expand
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 16.0,
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-                childAspectRatio: 1.05,
-              ),
-              itemCount: state.shelfItems.length,
-              itemBuilder: (context, index) {
-                final item = state.shelfItems[index];
-                final isInBasket = state.basketItemIds.contains(item.id);
-                final isHint = state.hintHighlightedItemId == item.id;
-
-                return ElderGameCard(
-                  title: item.name,
-                  emoji: item.emoji,
-                  fallbackIcon: item.fallbackIcon,
-                  iconColor: item.tintColor,
-                  isSelected: isInBasket,
-                  isHighlightedAsHint: isHint,
-                  onTap: () {
-                    setState(() {
-                      _controller.toggleBasketItem(item.id);
-                    });
+                    return ElderGameCard(
+                      title: item.name,
+                      emoji: item.emoji,
+                      fallbackIcon: item.fallbackIcon,
+                      iconColor: item.tintColor,
+                      isSelected: isInBasket,
+                      isHighlightedAsHint: isHint,
+                      onTap: () {
+                        setState(() {
+                          _controller.toggleBasketItem(item.id);
+                        });
+                      },
+                    );
                   },
-                );
-              },
-            ),
-          ),
+                ),
+        ),
 
-          // Bottom Action Bar
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 16.0,
-            ),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
-              ),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Row(
-                children: [
-                  // In Cart Counter
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.shopping_cart_rounded,
-                          color: Color(0xFF0F766E),
-                          size: 28.0,
-                        ),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'Cart: $collectedCount / $totalListCount',
-                          style: const TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF334155),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12.0),
-                  // Finish / Checkout Button — not wrapped in Expanded so it uses
-                  // its own intrinsic width (minWidth: 140 from ConstrainedBox)
-                  ElderGameButton(
-                    label: 'Done',
-                    icon: Icons.check_circle_rounded,
-                    onPressed: collectedCount > 0
-                        ? () {
-                            final session = _controller.completeGame();
-                            GameCompletionDialog.show(
-                              context,
-                              session: session,
-                              onFinish: () {
-                                Navigator.of(context).pop();
-                                _handleCompletion(session);
-                              },
-                            );
-                          }
-                        : null,
-                  ),
-                ],
-              ),
+        // Bottom Action Bar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
             ),
           ),
-        ],
-      ),
+          child: SafeArea(
+            top: false,
+            child: Row(
+              children: [
+                // In Cart Counter
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.shopping_cart_rounded,
+                        color: Color(0xFF0F766E),
+                        size: 28.0,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        'Cart: $collectedCount / $totalListCount',
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF334155),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12.0),
+                // Finish / Checkout Button — not wrapped in Expanded so it uses
+                // its own intrinsic width (minWidth: 140 from ConstrainedBox)
+                ElderGameButton(
+                  label: 'Done',
+                  icon: Icons.check_circle_rounded,
+                  onPressed: collectedCount > 0
+                      ? () {
+                          final session = _controller.completeGame();
+                          GameCompletionDialog.show(
+                            context,
+                            session: session,
+                            onFinish: () {
+                              Navigator.of(context).pop();
+                              _handleCompletion(session);
+                            },
+                          );
+                        }
+                      : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
