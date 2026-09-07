@@ -1,34 +1,61 @@
 import 'package:flutter/material.dart';
-import 'features/games/games.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+import 'app/providers/accessibility_providers.dart';
+import 'app/router/app_router.dart';
+import 'app/theme/elder_theme.dart';
+import 'core/config/supabase_config.dart';
+import 'l10n/app_localizations.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const NirvanaApp());
+
+  // Initialize Supabase if credentials are provided in SupabaseConfig
+  if (SupabaseConfig.isConfigured) {
+    try {
+      await Supabase.initialize(
+        url: SupabaseConfig.supabaseUrl,
+        // ignore: deprecated_member_use
+        anonKey: SupabaseConfig.supabaseAnonKey,
+      );
+      debugPrint('✅ Supabase initialized successfully.');
+    } catch (e) {
+      debugPrint('⚠️ Supabase init warning (running in offline mode): $e');
+    }
+  } else {
+    debugPrint('ℹ️ Supabase not configured yet. App is operating in 100% Offline Mode.');
+  }
+
+  runApp(
+    const ProviderScope(
+      child: NirvanaApp(),
+    ),
+  );
 }
 
-class NirvanaApp extends StatelessWidget {
+class NirvanaApp extends ConsumerWidget {
   const NirvanaApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isHighContrast = ref.watch(highContrastProvider);
+    final textScale = ref.watch(textScaleProvider);
+    final activeLocale = ref.watch(localeProvider);
+    final router = ref.watch(appRouterProvider);
+
+    final theme = isHighContrast
+        ? ElderTheme.buildHighContrastTheme(fontScaleFactor: textScale.scale)
+        : ElderTheme.buildStandardTheme(fontScaleFactor: textScale.scale);
+
+    return MaterialApp.router(
       title: 'NIRVANA',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0F766E),
-          primary: const Color(0xFF0F766E),
-          surface: const Color(0xFFF8FAFC),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-        fontFamily: 'Roboto',
-      ),
-      home: GamesHubScreen(
-        onSessionCompleted: (GameSession session) {
-          debugPrint('Game Session Completed: $session');
-        },
-      ),
+      theme: theme,
+      locale: activeLocale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
     );
   }
 }

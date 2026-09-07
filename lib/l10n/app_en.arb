@@ -1,0 +1,223 @@
+{
+  "@@locale": "en",
+  "appName": "NIRVANA",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "welcomeTitle": "Welcome to Nirvana",
+  "@welcomeTitle": {
+    "description": "Greeting on onboarding and home screen"
+  },
+  "welcomeSubtitle": "A calm, gentle space designed for your comfort, memory, and peace of mind.",
+  "@welcomeSubtitle": {
+    "description": "Warm subtitle welcoming the user"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Button to begin onboarding"
+  },
+  "continueButton": "Continue",
+  "@continueButton": {
+    "description": "Next button in multi-step flows"
+  },
+  "backButton": "Back",
+  "@backButton": {
+    "description": "Button to go back to previous screen"
+  },
+  "homeNavLabel": "Home",
+  "@homeNavLabel": {
+    "description": "Navigation label for Home screen"
+  },
+  "activitiesNavLabel": "Activities",
+  "@activitiesNavLabel": {
+    "description": "Navigation label for Activities / Games Hub"
+  },
+  "settingsNavLabel": "Settings",
+  "@settingsNavLabel": {
+    "description": "Navigation label for Settings screen"
+  },
+  "todayGreetingMorning": "Good Morning",
+  "@todayGreetingMorning": {
+    "description": "Morning greeting"
+  },
+  "todayGreetingAfternoon": "Good Afternoon",
+  "@todayGreetingAfternoon": {
+    "description": "Afternoon greeting"
+  },
+  "todayGreetingEvening": "Good Evening",
+  "@todayGreetingEvening": {
+    "description": "Evening greeting"
+  },
+  "dailyActivitiesCardTitle": "Today's Activities",
+  "@dailyActivitiesCardTitle": {
+    "description": "Card title to start today's games"
+  },
+  "dailyActivitiesCardSubtitle": "Gentle memory and recognition games made for you.",
+  "@dailyActivitiesCardSubtitle": {
+    "description": "Card subtitle for activities"
+  },
+  "startActivitiesButton": "Start Activities",
+  "@startActivitiesButton": {
+    "description": "Primary action button to start activities"
+  },
+  "dailySupportiveMessage": "Take your time. There is no rush, and you are doing wonderful.",
+  "@dailySupportiveMessage": {
+    "description": "Daily comforting message on the home screen"
+  },
+  "exploreMemoriesTitle": "My Memories & Photos",
+  "@exploreMemoriesTitle": {
+    "description": "Title for memories section"
+  },
+  "exploreMemoriesSubtitle": "Look at familiar faces and cherished moments.",
+  "@exploreMemoriesSubtitle": {
+    "description": "Subtitle for memories section"
+  },
+  "viewMemoriesButton": "View Memories",
+  "@viewMemoriesButton": {
+    "description": "Button to view memories"
+  },
+  "settingsTitle": "App Settings & Comfort",
+  "@settingsTitle": {
+    "description": "Title for the settings screen"
+  },
+  "settingsSubtitle": "Adjust the app to make it easy and comfortable for your eyes.",
+  "@settingsSubtitle": {
+    "description": "Subtitle for settings screen"
+  },
+  "accessibilitySectionTitle": "Visual & Motion Comfort",
+  "@accessibilitySectionTitle": {
+    "description": "Header for accessibility settings section"
+  },
+  "reducedMotionTitle": "Reduced Motion",
+  "@reducedMotionTitle": {
+    "description": "Setting title for reduced motion"
+  },
+  "reducedMotionSubtitle": "Turns off moving effects and animations for a steadier screen.",
+  "@reducedMotionSubtitle": {
+    "description": "Explanation of reduced motion"
+  },
+  "highContrastTitle": "High Contrast Mode",
+  "@highContrastTitle": {
+    "description": "Setting title for high contrast"
+  },
+  "highContrastSubtitle": "Bolder text and stronger outlines for easier reading.",
+  "@highContrastSubtitle": {
+    "description": "Explanation of high contrast"
+  },
+  "textSizeTitle": "Text Size",
+  "@textSizeTitle": {
+    "description": "Setting title for text size"
+  },
+  "textSizeSubtitle": "Make words and numbers larger and clearer.",
+  "@textSizeSubtitle": {
+    "description": "Explanation of text size setting"
+  },
+  "textSizeStandard": "Large (Standard)",
+  "@textSizeStandard": {
+    "description": "Standard large text option"
+  },
+  "textSizeExtraLarge": "Extra Large",
+  "@textSizeExtraLarge": {
+    "description": "Extra large text option"
+  },
+  "textSizeMaximum": "Maximum Clarity",
+  "@textSizeMaximum": {
+    "description": "Maximum text size option"
+  },
+  "languageTitle": "Language / भाषा / Idioma",
+  "@languageTitle": {
+    "description": "Setting title for language selection"
+  },
+  "languageSubtitle": "Select your preferred language.",
+  "@languageSubtitle": {
+    "description": "Explanation of language selection"
+  },
+  "selectLanguageTitle": "Choose Your Language",
+  "@selectLanguageTitle": {
+    "description": "Header on language selection screen"
+  },
+  "selectLanguageSubtitle": "Tap the language you feel most comfortable using.",
+  "@selectLanguageSubtitle": {
+    "description": "Subtitle on language selection screen"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language name"
+  },
+  "spanish": "Español",
+  "@spanish": {
+    "description": "Spanish language name"
+  },
+  "hindi": "हिन्दी (Hindi)",
+  "@hindi": {
+    "description": "Hindi language name"
+  },
+  "saveAndApply": "Apply Selection",
+  "@saveAndApply": {
+    "description": "Button to confirm settings or language"
+  },
+  "onboardingStep1Title": "A Gentle Companion",
+  "@onboardingStep1Title": {
+    "description": "Onboarding step 1 title"
+  },
+  "onboardingStep1Body": "Nirvana is here to help keep your mind active with simple, pleasant daily moments.",
+  "@onboardingStep1Body": {
+    "description": "Onboarding step 1 body"
+  },
+  "onboardingStep2Title": "Designed for Easy Reading",
+  "@onboardingStep2Title": {
+    "description": "Onboarding step 2 title"
+  },
+  "onboardingStep2Body": "Everything is sized generously with clear buttons and no confusing menus.",
+  "@onboardingStep2Body": {
+    "description": "Onboarding step 2 body"
+  },
+  "onboardingStep3Title": "Ready Whenever You Are",
+  "@onboardingStep3Title": {
+    "description": "Onboarding step 3 title"
+  },
+  "onboardingStep3Body": "Take things at your own pace. There are no timers or penalties here.",
+  "@onboardingStep3Body": {
+    "description": "Onboarding step 3 body"
+  },
+  "onboardingFinishButton": "Enter Nirvana",
+  "@onboardingFinishButton": {
+    "description": "Button to complete onboarding"
+  },
+  "loadingMessage": "Getting everything ready for you...",
+  "@loadingMessage": {
+    "description": "Supportive loading message"
+  },
+  "emptyStateTitle": "Nothing Here Right Now",
+  "@emptyStateTitle": {
+    "description": "Empty state title"
+  },
+  "emptyStateMessage": "Check back a little later or explore another activity.",
+  "@emptyStateMessage": {
+    "description": "Empty state supportive text"
+  },
+  "errorStateTitle": "Let's Take a Gentle Pause",
+  "@errorStateTitle": {
+    "description": "Gentle error title avoiding harsh red words"
+  },
+  "errorStateMessage": "We ran into a small hiccup. Everything is safe. Would you like to try again?",
+  "@errorStateMessage": {
+    "description": "Supportive error message"
+  },
+  "tryAgainButton": "Try Again",
+  "@tryAgainButton": {
+    "description": "Button to retry an action"
+  },
+  "goHomeButton": "Return Home",
+  "@goHomeButton": {
+    "description": "Button to return to home screen"
+  },
+  "aboutAppTitle": "About Nirvana",
+  "@aboutAppTitle": {
+    "description": "About section title"
+  },
+  "aboutAppVersion": "Version 1.0.0 • Compassionate Cognitive Care",
+  "@aboutAppVersion": {
+    "description": "About app version info"
+  }
+}

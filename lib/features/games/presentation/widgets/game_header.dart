@@ -65,7 +65,10 @@ class GameHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2.0),
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 6.0,
+                    runSpacing: 2.0,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
@@ -82,7 +85,6 @@ class GameHeader extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8.0),
                       const Text(
                         '• Activity',
                         style: TextStyle(
