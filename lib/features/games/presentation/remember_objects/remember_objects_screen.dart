@@ -34,7 +34,9 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = RememberObjectsController(initialDifficulty: widget.difficulty);
+    _controller = RememberObjectsController(
+      initialDifficulty: widget.difficulty,
+    );
   }
 
   void _handleExit() {
@@ -65,11 +67,13 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
             title: GameType.rememberObjects.displayName,
             difficulty: state.difficulty,
             onExit: _handleExit,
-            onHint: !state.isMemorizationPhase ? () {
-              setState(() {
-                _controller.useHint();
-              });
-            } : null,
+            onHint: !state.isMemorizationPhase
+                ? () {
+                    setState(() {
+                      _controller.useHint();
+                    });
+                  }
+                : null,
             isHintAvailable: !state.isMemorizationPhase,
           ),
 
@@ -77,15 +81,12 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
-              layoutBuilder: (currentChild, previousChildren) {
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ...previousChildren,
-                    if (currentChild != null) currentChild,
-                  ],
-                );
-              },
+              // Use default layoutBuilder (loose constraints via Stack with
+              // alignment: center). The custom StackFit.expand layoutBuilder
+              // was passing tight constraints to previous children that are
+              // SingleChildScrollView widgets, causing:
+              //   "BoxConstraints forces an infinite width"
+              //   "RenderBox was not laid out"
               child: state.isMemorizationPhase
                   ? _buildMemorizationView(state)
                   : _buildRecallView(state),
@@ -116,7 +117,11 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.visibility_rounded, color: Color(0xFF16A34A), size: 32.0),
+                const Icon(
+                  Icons.visibility_rounded,
+                  color: Color(0xFF16A34A),
+                  size: 32.0,
+                ),
                 const SizedBox(width: 14.0),
                 Expanded(
                   child: Text(
@@ -180,103 +185,140 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
     final selectedCount = state.selectedItemIds.length;
     final totalTargetCount = state.targetItems.length;
 
-    return Column(
+    // Defensive guard: if selectionOptions is somehow empty, show a safe state.
+    if (state.selectionOptions.isEmpty) {
+      return const SizedBox.expand(
+        key: ValueKey('recall_phase'),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(32.0),
+            child: Text(
+              'Getting ready…',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // SizedBox.expand gives the Column a finite size matching the Expanded
+    // parent, which is required because AnimatedSwitcher (without a custom
+    // layoutBuilder) uses a loose-constraint Stack. Without SizedBox.expand,
+    // the Column would try to shrink-wrap, and the inner Expanded/GridView
+    // would receive unbounded height.
+    return SizedBox.expand(
       key: const ValueKey('recall_phase'),
-      children: [
-        // Supportive Feedback Header
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-          color: const Color(0xFFF1F5F9),
-          child: Text(
-            state.lastFeedback ?? 'Which items did you see? Tap them below:',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 17.0,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1E293B),
+      child: Column(
+        children: [
+          // Supportive Feedback Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 14.0,
+            ),
+            color: const Color(0xFFF1F5F9),
+            child: Text(
+              state.lastFeedback ?? 'Which items did you see? Tap them below:',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 17.0,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1E293B),
+              ),
             ),
           ),
-        ),
 
-        // Selection Grid
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
-              childAspectRatio: 1.05,
+          // Selection Grid — receives finite constraints from Column + SizedBox.expand
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 16.0,
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+                childAspectRatio: 1.05,
+              ),
+              itemCount: state.selectionOptions.length,
+              itemBuilder: (context, index) {
+                final item = state.selectionOptions[index];
+                final isSelected = state.selectedItemIds.contains(item.id);
+                final isHint = state.hintHighlightedItemId == item.id;
+
+                return ElderGameCard(
+                  title: item.name,
+                  emoji: item.emoji,
+                  fallbackIcon: item.fallbackIcon,
+                  iconColor: item.tintColor,
+                  isSelected: isSelected,
+                  isHighlightedAsHint: isHint,
+                  onTap: () {
+                    setState(() {
+                      _controller.toggleItemSelection(item.id);
+                    });
+                  },
+                );
+              },
             ),
-            itemCount: state.selectionOptions.length,
-            itemBuilder: (context, index) {
-              final item = state.selectionOptions[index];
-              final isSelected = state.selectedItemIds.contains(item.id);
-              final isHint = state.hintHighlightedItemId == item.id;
-
-              return ElderGameCard(
-                title: item.name,
-                emoji: item.emoji,
-                fallbackIcon: item.fallbackIcon,
-                iconColor: item.tintColor,
-                isSelected: isSelected,
-                isHighlightedAsHint: isHint,
-                onTap: () {
-                  setState(() {
-                    _controller.toggleItemSelection(item.id);
-                  });
-                },
-              );
-            },
           ),
-        ),
 
-        // Bottom Action Bar
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Row(
-              children: [
-                // Selected Counter
-                Expanded(
-                  child: Text(
-                    'Chosen: $selectedCount of $totalTargetCount',
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF334155),
+          // Bottom Action Bar
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 16.0,
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+              ),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Row(
+                children: [
+                  // Selected Counter
+                  Expanded(
+                    child: Text(
+                      'Chosen: $selectedCount of $totalTargetCount',
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF334155),
+                      ),
                     ),
                   ),
-                ),
-                // Finish Button
-                ElderGameButton(
-                  label: 'Finish',
-                  icon: Icons.done_all_rounded,
-                  onPressed: selectedCount > 0
-                      ? () {
-                          final session = _controller.completeGame();
-                          GameCompletionDialog.show(
-                            context,
-                            session: session,
-                            onFinish: () {
-                              Navigator.of(context).pop(); // close dialog
-                              _handleCompletion(session);
-                            },
-                          );
-                        }
-                      : null,
-                ),
-              ],
+                  const SizedBox(width: 12.0),
+                  // Finish Button — not wrapped in Expanded so it uses
+                  // its own intrinsic width (minWidth: 140 from ConstrainedBox)
+                  ElderGameButton(
+                    label: 'Finish',
+                    icon: Icons.done_all_rounded,
+                    onPressed: selectedCount > 0
+                        ? () {
+                            final session = _controller.completeGame();
+                            GameCompletionDialog.show(
+                              context,
+                              session: session,
+                              onFinish: () {
+                                Navigator.of(context).pop(); // close dialog
+                                _handleCompletion(session);
+                              },
+                            );
+                          }
+                        : null,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
