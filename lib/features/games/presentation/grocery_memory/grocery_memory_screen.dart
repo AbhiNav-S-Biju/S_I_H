@@ -208,10 +208,10 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
     // and finite height). The Column + Expanded(GridView) pattern works
     // correctly when the parent provides tight bounds.
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Feedback bar
         Container(
-          width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
           color: const Color(0xFFF1F5F9),
           child: Text(

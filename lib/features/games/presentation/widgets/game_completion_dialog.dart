@@ -41,20 +41,22 @@ class GameCompletionDialog extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Cheerful celebratory badge
-            Container(
-              width: 84.0,
-              height: 84.0,
-              decoration: const BoxDecoration(
-                color: Color(0xFFDCFCE7), // Soft mint green
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check_circle_rounded,
-                size: 56.0,
-                color: Color(0xFF16A34A),
+            Center(
+              child: Container(
+                width: 84.0,
+                height: 84.0,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFDCFCE7), // Soft mint green
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  size: 56.0,
+                  color: Color(0xFF16A34A),
+                ),
               ),
             ),
             const SizedBox(height: 20.0),
@@ -114,13 +116,10 @@ class GameCompletionDialog extends StatelessWidget {
             const SizedBox(height: 28.0),
 
             // Finish Button
-            SizedBox(
-              width: double.infinity,
-              child: ElderGameButton(
-                label: 'All Done',
-                icon: Icons.arrow_forward_rounded,
-                onPressed: onFinish,
-              ),
+            ElderGameButton(
+              label: 'All Done',
+              icon: Icons.arrow_forward_rounded,
+              onPressed: onFinish,
             ),
           ],
         ),

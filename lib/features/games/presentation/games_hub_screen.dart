@@ -202,7 +202,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
       ),
       padding: const EdgeInsets.all(20.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
@@ -244,13 +244,10 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
             ],
           ),
           const SizedBox(height: 18.0),
-          SizedBox(
-            width: double.infinity,
-            child: ElderGameButton(
-              label: 'Play Activity ➔',
-              icon: Icons.play_arrow_rounded,
-              onPressed: onPlay,
-            ),
+          ElderGameButton(
+            label: 'Play Activity ➔',
+            icon: Icons.play_arrow_rounded,
+            onPressed: onPlay,
           ),
         ],
       ),
