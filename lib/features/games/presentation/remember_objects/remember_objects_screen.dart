@@ -57,8 +57,6 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = _controller.state;
-    // 0 = memorization phase, 1 = recall phase
-    final phaseIndex = state.isMemorizationPhase ? 0 : 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -80,24 +78,10 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
           ),
 
           // Main Interactive Area
-          //
-          // WHY IndexedStack instead of AnimatedSwitcher:
-          // AnimatedSwitcher uses a loose-constraint Stack internally.
-          // A Column containing Expanded(GridView) needs TIGHT (bounded)
-          // height constraints, which a loose Stack cannot guarantee during
-          // the animation frame. IndexedStack is constrained tightly by
-          // Expanded and always passes those tight constraints to every
-          // child, so Expanded+GridView always has a valid finite height.
           Expanded(
-            child: IndexedStack(
-              index: phaseIndex,
-              children: [
-                // Phase 0: Memorization
-                _buildMemorizationView(state),
-                // Phase 1: Recall
-                _buildRecallView(state),
-              ],
-            ),
+            child: state.isMemorizationPhase
+                ? _buildMemorizationView(state)
+                : _buildRecallView(state),
           ),
         ],
       ),

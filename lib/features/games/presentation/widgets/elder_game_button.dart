@@ -72,16 +72,14 @@ class ElderGameButton extends StatelessWidget {
                 Icon(icon, size: 28.0, color: fg),
                 const SizedBox(width: 12.0),
               ],
-              Flexible(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
-                    color: fg,
-                  ),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.3,
+                  color: fg,
                 ),
               ),
             ],

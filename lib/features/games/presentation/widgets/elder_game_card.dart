@@ -59,12 +59,11 @@ class ElderGameCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(20.0),
           child: Container(
-            constraints: BoxConstraints(minHeight: minHeight),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),
               border: Border.all(color: borderColor, width: borderWidth),
             ),
-            padding: const EdgeInsets.all(14.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,8 +74,8 @@ class ElderGameCard extends StatelessWidget {
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      width: 68.0,
-                      height: 68.0,
+                      width: 60.0,
+                      height: 60.0,
                       decoration: BoxDecoration(
                         color: (iconColor ?? const Color(0xFF0F766E)).withAlpha(25),
                         shape: BoxShape.circle,
@@ -85,11 +84,11 @@ class ElderGameCard extends StatelessWidget {
                       child: emoji != null
                           ? Text(
                               emoji!,
-                              style: const TextStyle(fontSize: 36.0),
+                              style: const TextStyle(fontSize: 32.0),
                             )
                           : Icon(
                               fallbackIcon ?? Icons.category_rounded,
-                              size: 36.0,
+                              size: 32.0,
                               color: iconColor ?? const Color(0xFF0F766E),
                             ),
                     ),
@@ -129,7 +128,7 @@ class ElderGameCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 10.0),
+                const SizedBox(height: 8.0),
                 // Title
                 Text(
                   title,
@@ -137,7 +136,7 @@ class ElderGameCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 18.0,
+                    fontSize: 17.0,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF0F172A),
                   ),
@@ -148,7 +147,7 @@ class ElderGameCard extends StatelessWidget {
                     subtitle!,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 13.0,
                       fontWeight: FontWeight.w500,
                       color: Color(0xFF64748B),
                     ),

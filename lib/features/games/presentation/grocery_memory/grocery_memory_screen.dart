@@ -55,8 +55,6 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
   @override
   Widget build(BuildContext context) {
     final state = _controller.state;
-    // 0 = shopping list phase, 1 = shelf (recall) phase
-    final phaseIndex = state.isListPhase ? 0 : 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -78,24 +76,10 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
           ),
 
           // Main Interactive Area
-          //
-          // WHY IndexedStack instead of AnimatedSwitcher:
-          // AnimatedSwitcher uses a loose-constraint Stack internally.
-          // A Column containing Expanded(GridView) needs TIGHT (bounded)
-          // height constraints, which a loose Stack cannot guarantee during
-          // the animation frame. IndexedStack is constrained tightly by
-          // Expanded and always passes those tight constraints to every
-          // child, so Expanded+GridView always has a valid finite height.
           Expanded(
-            child: IndexedStack(
-              index: phaseIndex,
-              children: [
-                // Phase 0: Shopping List
-                _buildShoppingListView(state),
-                // Phase 1: Shelf (Recall)
-                _buildShelfView(state),
-              ],
-            ),
+            child: state.isListPhase
+                ? _buildShoppingListView(state)
+                : _buildShelfView(state),
           ),
         ],
       ),
