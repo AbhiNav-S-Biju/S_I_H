@@ -77,6 +77,15 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
+              layoutBuilder: (currentChild, previousChildren) {
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ...previousChildren,
+                    if (currentChild != null) currentChild,
+                  ],
+                );
+              },
               child: state.isListPhase
                   ? _buildShoppingListView(state)
                   : _buildShelfView(state),

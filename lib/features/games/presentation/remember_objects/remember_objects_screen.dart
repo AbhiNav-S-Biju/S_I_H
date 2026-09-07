@@ -77,6 +77,15 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
+              layoutBuilder: (currentChild, previousChildren) {
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ...previousChildren,
+                    if (currentChild != null) currentChild,
+                  ],
+                );
+              },
               child: state.isMemorizationPhase
                   ? _buildMemorizationView(state)
                   : _buildRecallView(state),
