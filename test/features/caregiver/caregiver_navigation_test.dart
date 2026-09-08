@@ -31,6 +31,14 @@ class MockCaregiverRepository implements ICaregiverRepository {
   ];
 
   @override
+  Future<CaregiverProfile> register({
+    required String email,
+    required String password,
+    required String fullName,
+    String? phone,
+  }) async => profile;
+
+  @override
   Future<CaregiverProfile> login({
     required String email,
     required String password,

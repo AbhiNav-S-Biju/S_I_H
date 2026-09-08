@@ -6,6 +6,14 @@
 import '../models/caregiver_models.dart';
 
 abstract class ICaregiverRepository {
+  /// Registers a new caregiver via Supabase Auth, then creates a profiles row
+  Future<CaregiverProfile> register({
+    required String email,
+    required String password,
+    required String fullName,
+    String? phone,
+  });
+
   /// Authenticates a caregiver
   Future<CaregiverProfile> login({
     required String email,

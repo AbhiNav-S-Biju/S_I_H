@@ -42,6 +42,26 @@ class CaregiverAuthNotifier
     }
   }
 
+  Future<void> register({
+    required String email,
+    required String password,
+    required String fullName,
+    String? phone,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final profile = await _repository.register(
+        email: email,
+        password: password,
+        fullName: fullName,
+        phone: phone,
+      );
+      state = AsyncValue.data(profile);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> logout() async {
     state = const AsyncValue.loading();
     await _repository.logout();

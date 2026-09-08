@@ -192,6 +192,28 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Create Account link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'New caregiver? ',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.go('/caregiver/register'),
+                          child: Text(
+                            'Create Account',
+                            style: TextStyle(
+                              color: ElderColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
                     // Offline Info Note
                     Center(
                       child: Text(

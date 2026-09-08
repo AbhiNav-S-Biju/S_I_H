@@ -32,9 +32,32 @@ final GlobalKey<NavigatorState> _settingsNavigatorKey =
 final appRouterProvider = Provider<GoRouter>((ref) {
   final isOnboardingCompleted = ref.read(onboardingCompletedProvider);
 
+  // Read the auth state to apply the redirect guard
+  final authNotifier = ref.watch(caregiverAuthProvider);
+
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: isOnboardingCompleted ? '/home' : '/onboarding',
+    redirect: (context, state) {
+      final isCaregiverRoute = state.matchedLocation.startsWith('/caregiver');
+      final isDashboard = state.matchedLocation == '/caregiver/dashboard';
+      final isAuthenticated = authNotifier.value != null;
+
+      // Guard the dashboard — redirect to login if not authenticated
+      if (isDashboard && !isAuthenticated) {
+        return '/caregiver/login';
+      }
+
+      // If already authenticated and trying to visit login/register, skip ahead
+      if (isCaregiverRoute &&
+          (state.matchedLocation == '/caregiver/login' ||
+              state.matchedLocation == '/caregiver/register') &&
+          isAuthenticated) {
+        return '/caregiver/dashboard';
+      }
+
+      return null; // no redirect
+    },
     routes: [
       // 1. Onboarding Flow (Full screen)
       GoRoute(
@@ -47,6 +70,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/caregiver/login',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const CaregiverLoginScreen(),
+      ),
+      GoRoute(
+        path: '/caregiver/register',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CaregiverRegisterScreen(),
       ),
       GoRoute(
         path: '/caregiver/dashboard',
