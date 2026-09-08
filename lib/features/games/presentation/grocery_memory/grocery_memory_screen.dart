@@ -1,9 +1,8 @@
-// ==============================================================================
-// NIRVANA - Grocery Memory Screen
-// Description: Offline cognitive engagement game: Everyday shopping list recall
-// ==============================================================================
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/providers/accessibility_providers.dart';
+import '../../../../core/network/audio_service.dart';
+import '../../../../core/widgets/voice_helper.dart';
 import '../../controllers/grocery_memory_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
@@ -12,7 +11,7 @@ import '../widgets/elder_game_card.dart';
 import '../widgets/game_completion_dialog.dart';
 import '../widgets/game_header.dart';
 
-class GroceryMemoryScreen extends StatefulWidget {
+class GroceryMemoryScreen extends ConsumerStatefulWidget {
   final GameDifficulty difficulty;
   final ValueChanged<GameSession>? onGameCompleted;
   final VoidCallback? onExit;
@@ -25,40 +24,69 @@ class GroceryMemoryScreen extends StatefulWidget {
   });
 
   @override
-  State<GroceryMemoryScreen> createState() => _GroceryMemoryScreenState();
+  ConsumerState<GroceryMemoryScreen> createState() =>
+      _GroceryMemoryScreenState();
 }
 
-class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
+class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
   late final GroceryMemoryController _controller;
 
   @override
   void initState() {
     super.initState();
     _controller = GroceryMemoryController(initialDifficulty: widget.difficulty);
+    _speakShoppingList();
+  }
+
+  void _speakShoppingList() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final voiceEnabled = ref.read(voiceEnabledProvider);
+      if (voiceEnabled) {
+        final items = _controller.state.shoppingList.map((e) => e.name).join(', ');
+        final locale = ref.read(localeProvider);
+        ref.read(audioServiceProvider).speak(
+              'Here is your shopping list: $items. Review what to get.',
+              languageCode: locale.languageCode,
+            );
+      }
+    });
+  }
+
+  void _speakShelfPrompt() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final voiceEnabled = ref.read(voiceEnabledProvider);
+      if (voiceEnabled) {
+        final locale = ref.read(localeProvider);
+        ref.read(audioServiceProvider).speak(
+              'Tap items from your list to put them in your cart.',
+              languageCode: locale.languageCode,
+            );
+      }
+    });
   }
 
   void _handleExit() {
     if (widget.onExit != null) {
       widget.onExit!();
-    } else if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
+    } else {
+      Navigator.of(context).maybePop();
     }
   }
 
-  Future<void> _handleCompletion(GameSession session) async {
-    await GameCompletionDialog.show(
+  void _handleCompletion(GameSession session) {
+    GameCompletionDialog.show(
       context,
       session: session,
+      onFinish: () {
+        Navigator.of(context).pop();
+        if (widget.onGameCompleted != null) {
+          widget.onGameCompleted!(session);
+        }
+        Navigator.of(context).maybePop(session);
+      },
     );
-    if (!mounted) return;
-    if (widget.onGameCompleted != null) {
-      widget.onGameCompleted!(session);
-    }
-    if (widget.onExit != null) {
-      widget.onExit!();
-    } else if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop(session);
-    }
   }
 
   @override
@@ -79,6 +107,14 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
                     setState(() {
                       _controller.useHint();
                     });
+                    final hint = _controller.state.lastFeedback;
+                    if (hint != null && ref.read(voiceEnabledProvider)) {
+                      final locale = ref.read(localeProvider);
+                      ref.read(audioServiceProvider).speak(
+                            hint,
+                            languageCode: locale.languageCode,
+                          );
+                    }
                   }
                 : null,
             isHintAvailable: !state.isListPhase,
@@ -99,12 +135,13 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
   // Phase 1: Shopping List View
   // ---------------------------------------------------------------------------
   Widget _buildShoppingListView(GroceryMemoryState state) {
+    final itemsText = state.shoppingList.map((e) => e.name).join(', ');
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Gentle Instruction Banner
+          // Gentle Instruction Banner with SpeakButton
           Container(
             padding: const EdgeInsets.all(18.0),
             decoration: BoxDecoration(
@@ -129,6 +166,10 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
                       color: Color(0xFF92400E),
                     ),
                   ),
+                ),
+                SpeakButton(
+                  text: 'Here is your shopping list: $itemsText.',
+                  size: 36.0,
                 ),
               ],
             ),
@@ -207,6 +248,7 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
               setState(() {
                 _controller.proceedToShelf();
               });
+              _speakShelfPrompt();
             },
           ),
           const SizedBox(height: 20.0),
@@ -221,152 +263,122 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
   Widget _buildShelfView(GroceryMemoryState state) {
     final collectedCount = state.basketItemIds.length;
     final totalListCount = state.shoppingList.length;
+    final feedbackText = state.lastFeedback ??
+        'Tap items from your list to put them in your cart:';
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Feedback / Instruction banner
-          Container(
-            padding: const EdgeInsets.all(18.0),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFBEB),
-              borderRadius: BorderRadius.circular(16.0),
-              border: Border.all(color: const Color(0xFFFDE68A), width: 1.5),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Feedback bar with SpeakButton
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+          color: const Color(0xFFF1F5F9),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  feedbackText,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17.0,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+              ),
+              SpeakButton(
+                text: feedbackText,
+                size: 34.0,
+              ),
+            ],
+          ),
+        ),
+
+        // Supermarket Shelf Grid
+        Expanded(
+          child: state.shelfItems.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Getting ready…',
+                    style: TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+                  ),
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 16.0,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16.0,
+                    mainAxisSpacing: 16.0,
+                    childAspectRatio: 0.95,
+                  ),
+                  itemCount: state.shelfItems.length,
+                  itemBuilder: (context, index) {
+                    final item = state.shelfItems[index];
+                    final isInBasket = state.basketItemIds.contains(item.id);
+                    final isHint = state.hintHighlightedItemId == item.id;
+
+                    return ElderGameCard(
+                      title: item.name,
+                      imagePath: item.imagePath,
+                      emoji: item.emoji,
+                      fallbackIcon: item.fallbackIcon,
+                      iconColor: item.tintColor,
+                      isSelected: isInBasket,
+                      isHighlightedAsHint: isHint,
+                      onTap: () {
+                        setState(() {
+                          _controller.toggleBasketItem(item.id);
+                        });
+                      },
+                    );
+                  },
+                ),
+        ),
+
+        // Bottom Action Bar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
             ),
+          ),
+          child: SafeArea(
+            top: false,
             child: Row(
               children: [
-                const Icon(
-                  Icons.shopping_cart_rounded,
-                  color: Color(0xFFD97706),
-                  size: 32.0,
-                ),
-                const SizedBox(width: 14.0),
+                // Basket Counter
                 Expanded(
                   child: Text(
-                    state.lastFeedback ??
-                        'Tap items from your list to put them in your cart:',
+                    'In Cart: $collectedCount of $totalListCount',
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF92400E),
+                      color: Color(0xFF334155),
                     ),
                   ),
+                ),
+                const SizedBox(width: 12.0),
+                // Finish / Checkout Button
+                ElderGameButton(
+                  label: 'Complete Shopping ➔',
+                  icon: Icons.check_circle_rounded,
+                  onPressed: collectedCount > 0
+                      ? () {
+                          final session = _controller.completeGame();
+                          _handleCompletion(session);
+                        }
+                      : null,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16.0),
-
-          // Cart Status Card
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 18.0,
-              vertical: 14.0,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16.0),
-              border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'In Your Cart:',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF334155),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 6.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: collectedCount >= totalListCount
-                        ? const Color(0xFFDCFCE7)
-                        : const Color(0xFFE0F2FE),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Text(
-                    '$collectedCount of $totalListCount items',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w800,
-                      color: collectedCount >= totalListCount
-                          ? const Color(0xFF166534)
-                          : const Color(0xFF0369A1),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20.0),
-
-          // Supermarket Shelf Grid
-          if (state.shelfItems.isEmpty)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.0),
-                child: Text(
-                  'Getting ready…',
-                  style: TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
-                ),
-              ),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-                childAspectRatio: 0.95,
-              ),
-              itemCount: state.shelfItems.length,
-              itemBuilder: (context, index) {
-                final item = state.shelfItems[index];
-                final isInBasket = state.basketItemIds.contains(item.id);
-                final isHint = state.hintHighlightedItemId == item.id;
-
-                return ElderGameCard(
-                  title: item.name,
-                  imagePath: item.imagePath,
-                  emoji: item.emoji,
-                  fallbackIcon: item.fallbackIcon,
-                  iconColor: item.tintColor,
-                  isSelected: isInBasket,
-                  isHighlightedAsHint: isHint,
-                  onTap: () {
-                    setState(() {
-                      _controller.toggleBasketItem(item.id);
-                    });
-                  },
-                );
-              },
-            ),
-          const SizedBox(height: 28.0),
-
-          // Done / Checkout Button
-          ElderGameButton(
-            label: 'Complete Shopping ➔',
-            icon: Icons.check_circle_rounded,
-            onPressed: collectedCount > 0
-                ? () {
-                    final session = _controller.completeGame();
-                    _handleCompletion(session);
-                  }
-                : null,
-          ),
-          const SizedBox(height: 24.0),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -11,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 
 import '../../../app/theme/elder_theme.dart';
 import '../../../app/widgets/widgets.dart';
+import '../../../core/widgets/voice_helper.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -31,6 +32,8 @@ class HomeScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final greeting = _getTimeGreeting(context, l10n);
+    final supportiveMsg = l10n?.dailySupportiveMessage ??
+        'Take your time. There is no rush, and you are doing wonderful.';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -62,12 +65,23 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Warm Greeting & Supportive Reassurance
-              Text(
-                greeting,
-                style: theme.textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: ElderColors.textPrimary,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text(
+                      greeting,
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: ElderColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  SpeakButton(
+                    text: '$greeting. $supportiveMsg',
+                    size: 40.0,
+                  ),
+                ],
               ),
               const SizedBox(height: 6.0),
               Text(

@@ -108,7 +108,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get textSizeMaximum => 'अत्यधिक स्पष्ट';
 
   @override
-  String get languageTitle => 'भाषा / Language / Idioma';
+  String get languageTitle => 'भाषा / Language / भाषा';
 
   @override
   String get languageSubtitle => 'अपनी पसंदीदा भाषा चुनें।';
@@ -124,10 +124,25 @@ class AppLocalizationsHi extends AppLocalizations {
   String get english => 'English (अंग्रेज़ी)';
 
   @override
-  String get spanish => 'Español (स्पैनिश)';
+  String get hindi => 'हिन्दी (Hindi)';
 
   @override
-  String get hindi => 'हिन्दी (Hindi)';
+  String get assamese => 'অসমীয়া (असमिया)';
+
+  @override
+  String get bengali => 'বাংলা (बंगाली)';
+
+  @override
+  String get manipuri => 'মৈতৈলোন্ (मणिपुरी / मेइतेइ)';
+
+  @override
+  String get khasi => 'Ka Ktien Khasi (खासी)';
+
+  @override
+  String get mizo => 'Mizo ṭawng (मिजो)';
+
+  @override
+  String get nepali => 'नेपाली (Nepali)';
 
   @override
   String get saveAndApply => 'लागू करें';

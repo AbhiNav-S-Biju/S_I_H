@@ -124,7 +124,7 @@
   "@textSizeMaximum": {
     "description": "Maximum text size option"
   },
-  "languageTitle": "Language / भाषा / Idioma",
+  "languageTitle": "Language / ভাষা / भाषा",
   "@languageTitle": {
     "description": "Setting title for language selection"
   },
@@ -144,13 +144,33 @@
   "@english": {
     "description": "English language name"
   },
-  "spanish": "Español",
-  "@spanish": {
-    "description": "Spanish language name"
-  },
   "hindi": "हिन्दी (Hindi)",
   "@hindi": {
     "description": "Hindi language name"
+  },
+  "assamese": "অসমীয়া (Assamese)",
+  "@assamese": {
+    "description": "Assamese language name"
+  },
+  "bengali": "বাংলা (Bengali)",
+  "@bengali": {
+    "description": "Bengali language name"
+  },
+  "manipuri": "মৈতৈলোন্ (Manipuri / Meitei)",
+  "@manipuri": {
+    "description": "Manipuri / Meitei language name"
+  },
+  "khasi": "Ka Ktien Khasi",
+  "@khasi": {
+    "description": "Khasi language name"
+  },
+  "mizo": "Mizo ṭawng",
+  "@mizo": {
+    "description": "Mizo language name"
+  },
+  "nepali": "नेपाली (Nepali)",
+  "@nepali": {
+    "description": "Nepali language name"
   },
   "saveAndApply": "Apply Selection",
   "@saveAndApply": {

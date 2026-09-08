@@ -1,9 +1,8 @@
-// ==============================================================================
-// NIRVANA - Who Is This? Screen
-// Description: Offline cognitive engagement game: Family face & relationship recall
-// ==============================================================================
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/providers/accessibility_providers.dart';
+import '../../../../core/network/audio_service.dart';
+import '../../../../core/widgets/voice_helper.dart';
 import '../../controllers/who_is_this_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
@@ -11,7 +10,7 @@ import '../widgets/elder_game_button.dart';
 import '../widgets/game_completion_dialog.dart';
 import '../widgets/game_header.dart';
 
-class WhoIsThisScreen extends StatefulWidget {
+class WhoIsThisScreen extends ConsumerStatefulWidget {
   final GameDifficulty difficulty;
   final ValueChanged<GameSession>? onGameCompleted;
   final VoidCallback? onExit;
@@ -24,40 +23,51 @@ class WhoIsThisScreen extends StatefulWidget {
   });
 
   @override
-  State<WhoIsThisScreen> createState() => _WhoIsThisScreenState();
+  ConsumerState<WhoIsThisScreen> createState() => _WhoIsThisScreenState();
 }
 
-class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
+class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
   late final WhoIsThisController _controller;
 
   @override
   void initState() {
     super.initState();
     _controller = WhoIsThisController(initialDifficulty: widget.difficulty);
+    _speakCurrentQuestion();
+  }
+
+  void _speakCurrentQuestion() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final voiceEnabled = ref.read(voiceEnabledProvider);
+      if (voiceEnabled) {
+        final currentMember = _controller.state.currentQuestion;
+        if (currentMember != null) {
+          final locale = ref.read(localeProvider);
+          ref
+              .read(audioServiceProvider)
+              .speak(
+                'Who is this? It is ${currentMember.name}. ${currentMember.voiceNoteTranscription}',
+                languageCode: locale.languageCode,
+              );
+        }
+      }
+    });
   }
 
   void _handleExit() {
     if (widget.onExit != null) {
       widget.onExit!();
-    } else if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
+    } else {
+      Navigator.of(context).maybePop();
     }
   }
 
-  Future<void> _handleCompletion(GameSession session) async {
-    await GameCompletionDialog.show(
-      context,
-      session: session,
-    );
-    if (!mounted) return;
+  void _handleCompletion(GameSession session) {
     if (widget.onGameCompleted != null) {
       widget.onGameCompleted!(session);
     }
-    if (widget.onExit != null) {
-      widget.onExit!();
-    } else if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop(session);
-    }
+    Navigator.of(context).maybePop(session);
   }
 
   @override
@@ -84,6 +94,13 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
               setState(() {
                 _controller.useHint();
               });
+              final hint = _controller.state.activeHintText;
+              if (hint != null && ref.read(voiceEnabledProvider)) {
+                final locale = ref.read(localeProvider);
+                ref
+                    .read(audioServiceProvider)
+                    .speak(hint, languageCode: locale.languageCode);
+              }
             },
             isHintAvailable: true,
           ),
@@ -180,7 +197,7 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                         ),
                         const SizedBox(height: 12.0),
 
-                        // Voice Prompt Banner
+                        // Voice Prompt Banner with Speak Button
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
@@ -188,7 +205,7 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(16.0),
                           ),
                           child: Row(
                             children: [
@@ -202,12 +219,16 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                                 child: Text(
                                   '"${currentMember.voiceNoteTranscription}"',
                                   style: const TextStyle(
-                                    fontSize: 15.0,
+                                    fontSize: 16.0,
                                     fontStyle: FontStyle.italic,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF334155),
                                   ),
                                 ),
+                              ),
+                              SpeakButton(
+                                text: currentMember.voiceNoteTranscription,
+                                size: 36.0,
                               ),
                             ],
                           ),
@@ -361,11 +382,19 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                         ? () {
                             if (state.isLastQuestion) {
                               final session = _controller.completeGame();
-                              _handleCompletion(session);
+                              GameCompletionDialog.show(
+                                context,
+                                session: session,
+                                onFinish: () {
+                                  Navigator.of(context).pop();
+                                  _handleCompletion(session);
+                                },
+                              );
                             } else {
                               setState(() {
                                 _controller.nextQuestion();
                               });
+                              _speakCurrentQuestion();
                             }
                           }
                         : null,

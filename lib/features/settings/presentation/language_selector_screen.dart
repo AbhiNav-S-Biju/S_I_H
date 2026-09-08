@@ -24,8 +24,13 @@ class LanguageSelectorScreen extends ConsumerWidget {
 
     final languages = [
       {'code': 'en', 'title': 'English', 'native': 'English'},
-      {'code': 'es', 'title': 'Spanish', 'native': 'Español'},
       {'code': 'hi', 'title': 'Hindi', 'native': 'हिन्दी'},
+      {'code': 'as', 'title': 'Assamese', 'native': 'অসমীয়া'},
+      {'code': 'bn', 'title': 'Bengali', 'native': 'বাংলা'},
+      {'code': 'mni', 'title': 'Manipuri / Meitei', 'native': 'মৈতৈলোন্'},
+      {'code': 'kha', 'title': 'Khasi', 'native': 'Ka Ktien Khasi'},
+      {'code': 'lus', 'title': 'Mizo', 'native': 'Mizo ṭawng'},
+      {'code': 'ne', 'title': 'Nepali', 'native': 'नेपाली'},
     ];
 
     return Scaffold(

@@ -42,19 +42,25 @@ void main() {
     // Verify initial values
     expect(container.read(reducedMotionProvider), isFalse);
     expect(container.read(highContrastProvider), isFalse);
+    expect(container.read(voiceEnabledProvider), isTrue);
 
     // Toggle Reduced Motion switch
     final switches = find.byType(Switch);
-    expect(switches, findsNWidgets(2));
+    expect(switches, findsNWidgets(3));
 
-    await tester.tap(switches.first);
+    await tester.tap(switches.at(0));
     await tester.pumpAndSettle();
     expect(container.read(reducedMotionProvider), isTrue);
 
     // Toggle High Contrast switch
-    await tester.tap(switches.last);
+    await tester.tap(switches.at(1));
     await tester.pumpAndSettle();
     expect(container.read(highContrastProvider), isTrue);
+
+    // Toggle Voice Assistance switch
+    await tester.tap(switches.at(2));
+    await tester.pumpAndSettle();
+    expect(container.read(voiceEnabledProvider), isFalse);
 
     // Tap Extra Large text size
     final extraLargeFinder = find.text('Extra Large');
