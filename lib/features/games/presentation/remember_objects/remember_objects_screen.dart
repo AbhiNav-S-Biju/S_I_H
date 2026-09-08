@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/remember_objects_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
@@ -42,16 +43,25 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
   void _handleExit() {
     if (widget.onExit != null) {
       widget.onExit!();
-    } else {
-      Navigator.of(context).maybePop();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
     }
   }
 
-  void _handleCompletion(GameSession session) {
+  Future<void> _handleCompletion(GameSession session) async {
+    await GameCompletionDialog.show(
+      context,
+      session: session,
+    );
+    if (!mounted) return;
     if (widget.onGameCompleted != null) {
       widget.onGameCompleted!(session);
     }
-    Navigator.of(context).maybePop(session);
+    if (widget.onExit != null) {
+      widget.onExit!();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop(session);
+    }
   }
 
   @override
@@ -143,6 +153,7 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
               final item = state.targetItems[index];
               return ElderGameCard(
                 title: item.name,
+                imagePath: item.imagePath,
                 emoji: item.emoji,
                 fallbackIcon: item.fallbackIcon,
                 iconColor: item.tintColor,
@@ -290,6 +301,7 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
 
                 return ElderGameCard(
                   title: item.name,
+                  imagePath: item.imagePath,
                   emoji: item.emoji,
                   fallbackIcon: item.fallbackIcon,
                   iconColor: item.tintColor,
@@ -312,14 +324,7 @@ class _RememberObjectsScreenState extends State<RememberObjectsScreen> {
             onPressed: selectedCount > 0
                 ? () {
                     final session = _controller.completeGame();
-                    GameCompletionDialog.show(
-                      context,
-                      session: session,
-                      onFinish: () {
-                        Navigator.of(context).pop();
-                        _handleCompletion(session);
-                      },
-                    );
+                    _handleCompletion(session);
                   }
                 : null,
           ),

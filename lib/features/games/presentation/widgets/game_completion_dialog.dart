@@ -9,24 +9,22 @@ import 'elder_game_button.dart';
 
 class GameCompletionDialog extends StatelessWidget {
   final GameSession session;
-  final VoidCallback onFinish;
+  final VoidCallback? onFinish;
 
-  const GameCompletionDialog({
-    super.key,
-    required this.session,
-    required this.onFinish,
-  });
+  const GameCompletionDialog({super.key, required this.session, this.onFinish});
 
-  static Future<void> show(
+  static Future<bool?> show(
     BuildContext context, {
     required GameSession session,
-    required VoidCallback onFinish,
+    VoidCallback? onFinish,
   }) {
-    return showDialog(
+    return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) =>
-          GameCompletionDialog(session: session, onFinish: onFinish),
+      builder: (ctx) => GameCompletionDialog(
+        session: session,
+        onFinish: onFinish ?? () => Navigator.of(ctx).pop(true),
+      ),
     );
   }
 
@@ -122,7 +120,7 @@ class GameCompletionDialog extends StatelessWidget {
             ElderGameButton(
               label: 'All Done',
               icon: Icons.arrow_forward_rounded,
-              onPressed: onFinish,
+              onPressed: onFinish ?? () => Navigator.of(context).pop(true),
             ),
           ],
         ),

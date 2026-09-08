@@ -1,6 +1,7 @@
 // ==============================================================================
 // NIRVANA - ElderGameCard Widget
-// Description: Tactile, large-touch visual card for items, groceries, and faces
+// Description: Tactile, large-touch visual card for real image assets, groceries,
+// and family faces with elder-accessible typography and high-contrast cues.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 class ElderGameCard extends StatelessWidget {
   final String title;
   final String? subtitle;
+  final String? imagePath;
   final String? emoji;
   final IconData? fallbackIcon;
   final Color? iconColor;
@@ -20,6 +22,7 @@ class ElderGameCard extends StatelessWidget {
     super.key,
     required this.title,
     this.subtitle,
+    this.imagePath,
     this.emoji,
     this.fallbackIcon,
     this.iconColor,
@@ -65,41 +68,46 @@ class ElderGameCard extends StatelessWidget {
               border: Border.all(color: borderColor, width: borderWidth),
             ),
             padding: const EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 10.0,
+              horizontal: 3.0,
+              vertical: 3.0,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Top icon / emoji / selection badge
+                // Top visual image / icon / selection badge
                 Stack(
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      width: 56.0,
-                      height: 56.0,
+                      width: 96.0,
+                      height: 96.0,
                       decoration: BoxDecoration(
                         color: (iconColor ?? const Color(0xFF0F766E)).withAlpha(
-                          25,
+                          18,
                         ),
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(18.0),
                       ),
                       alignment: Alignment.center,
-                      child: emoji != null
-                          ? Text(emoji!, style: const TextStyle(fontSize: 30.0))
-                          : Icon(
-                              fallbackIcon ?? Icons.category_rounded,
-                              size: 30.0,
-                              color: iconColor ?? const Color(0xFF0F766E),
-                            ),
+                      padding: const EdgeInsets.all(4.0),
+                      child: imagePath != null && imagePath!.isNotEmpty
+                          ? Image.asset(
+                              imagePath!,
+                              width: 88.0,
+                              height: 88.0,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return _buildFallback();
+                              },
+                            )
+                          : _buildFallback(),
                     ),
                     if (isSelected)
                       Positioned(
-                        top: -4,
-                        right: -4,
+                        top: -6,
+                        right: -6,
                         child: Container(
                           padding: const EdgeInsets.all(4.0),
                           decoration: const BoxDecoration(
@@ -108,15 +116,15 @@ class ElderGameCard extends StatelessWidget {
                           ),
                           child: const Icon(
                             Icons.check_rounded,
-                            size: 18.0,
+                            size: 20.0,
                             color: Colors.white,
                           ),
                         ),
                       ),
                     if (isHighlightedAsHint && !isSelected)
                       Positioned(
-                        top: -4,
-                        right: -4,
+                        top: -6,
+                        right: -6,
                         child: Container(
                           padding: const EdgeInsets.all(4.0),
                           decoration: const BoxDecoration(
@@ -125,14 +133,14 @@ class ElderGameCard extends StatelessWidget {
                           ),
                           child: const Icon(
                             Icons.lightbulb_rounded,
-                            size: 18.0,
+                            size: 20.0,
                             color: Colors.white,
                           ),
                         ),
                       ),
                   ],
                 ),
-                const SizedBox(height: 6.0),
+                const SizedBox(height: 10.0),
                 // Title
                 Text(
                   title,
@@ -140,9 +148,10 @@ class ElderGameCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 16.0,
+                    fontSize: 17.0,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF0F172A),
+                    height: 1.25,
                   ),
                 ),
                 if (subtitle != null) ...[
@@ -153,7 +162,7 @@ class ElderGameCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 13.0,
+                      fontSize: 14.0,
                       fontWeight: FontWeight.w500,
                       color: Color(0xFF64748B),
                     ),
@@ -164,6 +173,17 @@ class ElderGameCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildFallback() {
+    if (emoji != null && emoji!.isNotEmpty) {
+      return Text(emoji!, style: const TextStyle(fontSize: 36.0));
+    }
+    return Icon(
+      fallbackIcon ?? Icons.category_rounded,
+      size: 36.0,
+      color: iconColor ?? const Color(0xFF0F766E),
     );
   }
 }

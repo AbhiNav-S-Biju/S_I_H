@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/grocery_memory_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
@@ -40,16 +41,25 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
   void _handleExit() {
     if (widget.onExit != null) {
       widget.onExit!();
-    } else {
-      Navigator.of(context).maybePop();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
     }
   }
 
-  void _handleCompletion(GameSession session) {
+  Future<void> _handleCompletion(GameSession session) async {
+    await GameCompletionDialog.show(
+      context,
+      session: session,
+    );
+    if (!mounted) return;
     if (widget.onGameCompleted != null) {
       widget.onGameCompleted!(session);
     }
-    Navigator.of(context).maybePop(session);
+    if (widget.onExit != null) {
+      widget.onExit!();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop(session);
+    }
   }
 
   @override
@@ -146,16 +156,25 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
                 child: Row(
                   children: [
                     Container(
-                      width: 50.0,
-                      height: 50.0,
+                      width: 54.0,
+                      height: 54.0,
                       decoration: BoxDecoration(
-                        color: item.tintColor.withAlpha(30),
-                        shape: BoxShape.circle,
+                        color: item.tintColor.withAlpha(20),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                       alignment: Alignment.center,
-                      child: Text(
-                        item.emoji,
-                        style: const TextStyle(fontSize: 28.0),
+                      padding: const EdgeInsets.all(4.0),
+                      child: Image.asset(
+                        item.imagePath,
+                        width: 46.0,
+                        height: 46.0,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text(
+                            item.emoji,
+                            style: const TextStyle(fontSize: 28.0),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 16.0),
@@ -319,6 +338,7 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
 
                 return ElderGameCard(
                   title: item.name,
+                  imagePath: item.imagePath,
                   emoji: item.emoji,
                   fallbackIcon: item.fallbackIcon,
                   iconColor: item.tintColor,
@@ -341,14 +361,7 @@ class _GroceryMemoryScreenState extends State<GroceryMemoryScreen> {
             onPressed: collectedCount > 0
                 ? () {
                     final session = _controller.completeGame();
-                    GameCompletionDialog.show(
-                      context,
-                      session: session,
-                      onFinish: () {
-                        Navigator.of(context).pop();
-                        _handleCompletion(session);
-                      },
-                    );
+                    _handleCompletion(session);
                   }
                 : null,
           ),

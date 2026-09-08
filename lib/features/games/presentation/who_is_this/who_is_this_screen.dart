@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/who_is_this_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
@@ -39,16 +40,25 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
   void _handleExit() {
     if (widget.onExit != null) {
       widget.onExit!();
-    } else {
-      Navigator.of(context).maybePop();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
     }
   }
 
-  void _handleCompletion(GameSession session) {
+  Future<void> _handleCompletion(GameSession session) async {
+    await GameCompletionDialog.show(
+      context,
+      session: session,
+    );
+    if (!mounted) return;
     if (widget.onGameCompleted != null) {
       widget.onGameCompleted!(session);
     }
-    Navigator.of(context).maybePop(session);
+    if (widget.onExit != null) {
+      widget.onExit!();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop(session);
+    }
   }
 
   @override
@@ -352,14 +362,7 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                         ? () {
                             if (state.isLastQuestion) {
                               final session = _controller.completeGame();
-                              GameCompletionDialog.show(
-                                context,
-                                session: session,
-                                onFinish: () {
-                                  Navigator.of(context).pop();
-                                  _handleCompletion(session);
-                                },
-                              );
+                              _handleCompletion(session);
                             } else {
                               setState(() {
                                 _controller.nextQuestion();
