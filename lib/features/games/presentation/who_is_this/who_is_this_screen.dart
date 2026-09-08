@@ -379,17 +379,16 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                         ? Icons.check_rounded
                         : Icons.arrow_forward_rounded,
                     onPressed: state.selectedRelationship != null
-                        ? () {
+                        ? () async {
                             if (state.isLastQuestion) {
                               final session = _controller.completeGame();
-                              GameCompletionDialog.show(
+                              await GameCompletionDialog.show(
                                 context,
                                 session: session,
-                                onFinish: () {
-                                  Navigator.of(context).pop();
-                                  _handleCompletion(session);
-                                },
                               );
+                              if (mounted) {
+                                _handleCompletion(session);
+                              }
                             } else {
                               setState(() {
                                 _controller.nextQuestion();

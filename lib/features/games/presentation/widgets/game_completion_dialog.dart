@@ -165,7 +165,10 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
             ElderGameButton(
               label: 'All Done',
               icon: Icons.arrow_forward_rounded,
-              onPressed: widget.onFinish ?? () => Navigator.of(context).pop(),
+              onPressed: () {
+                Navigator.of(context).pop();
+                widget.onFinish?.call();
+              },
             ),
           ],
         ),

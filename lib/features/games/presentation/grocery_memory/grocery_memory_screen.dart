@@ -75,18 +75,16 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
     }
   }
 
-  void _handleCompletion(GameSession session) {
-    GameCompletionDialog.show(
+  void _handleCompletion(GameSession session) async {
+    await GameCompletionDialog.show(
       context,
       session: session,
-      onFinish: () {
-        Navigator.of(context).pop();
-        if (widget.onGameCompleted != null) {
-          widget.onGameCompleted!(session);
-        }
-        Navigator.of(context).maybePop(session);
-      },
     );
+    if (!mounted) return;
+    if (widget.onGameCompleted != null) {
+      widget.onGameCompleted!(session);
+    }
+    Navigator.of(context).maybePop(session);
   }
 
   @override

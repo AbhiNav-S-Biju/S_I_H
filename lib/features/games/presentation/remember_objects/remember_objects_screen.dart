@@ -322,21 +322,19 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                   ),
                 ),
                 const SizedBox(width: 12.0),
-                // Finish Button
                 ElderGameButton(
                   label: 'Complete Activity ➔',
                   icon: Icons.done_all_rounded,
                   onPressed: selectedCount > 0
-                      ? () {
+                      ? () async {
                           final session = _controller.completeGame();
-                          GameCompletionDialog.show(
+                          await GameCompletionDialog.show(
                             context,
                             session: session,
-                            onFinish: () {
-                              Navigator.of(context).pop();
-                              _handleCompletion(session);
-                            },
                           );
+                          if (mounted) {
+                            _handleCompletion(session);
+                          }
                         }
                       : null,
                 ),
