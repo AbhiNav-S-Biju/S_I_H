@@ -37,12 +37,12 @@ class HiveSyncEvent extends HiveObject {
   });
 
   Map<String, dynamic> toRpcPayload() => {
-        'event_id': eventId,
-        'patient_id': patientId,
-        'entity_type': entityType,
-        'entity_id': entityId,
-        'operation': operation,
-        'payload': payload,
-        'created_at': createdAt.toUtc().toIso8601String(),
-      };
+    'event_id': eventId,
+    'patient_id': patientId,
+    'entity_type': entityType,
+    'entity_id': entityId,
+    'operation': operation,
+    'payload': payload,
+    'created_at': createdAt.toUtc().toIso8601String(),
+  };
 }

@@ -8,40 +8,55 @@ import 'package:nirvana/features/games/games.dart';
 
 void main() {
   group('Grocery Memory Game Tests', () {
-    test('Difficulty settings accurately generate 3, 4, and 5 shopping list items', () {
-      final controllerEasy = GroceryMemoryController(initialDifficulty: GameDifficulty.easy);
-      expect(controllerEasy.state.shoppingList.length, equals(3));
-      expect(controllerEasy.state.shelfItems.length, equals(6));
+    test(
+      'Difficulty settings accurately generate 3, 4, and 5 shopping list items',
+      () {
+        final controllerEasy = GroceryMemoryController(
+          initialDifficulty: GameDifficulty.easy,
+        );
+        expect(controllerEasy.state.shoppingList.length, equals(3));
+        expect(controllerEasy.state.shelfItems.length, equals(6));
 
-      final controllerMedium = GroceryMemoryController(initialDifficulty: GameDifficulty.medium);
-      expect(controllerMedium.state.shoppingList.length, equals(4));
-      expect(controllerMedium.state.shelfItems.length, equals(8));
+        final controllerMedium = GroceryMemoryController(
+          initialDifficulty: GameDifficulty.medium,
+        );
+        expect(controllerMedium.state.shoppingList.length, equals(4));
+        expect(controllerMedium.state.shelfItems.length, equals(8));
 
-      final controllerHard = GroceryMemoryController(initialDifficulty: GameDifficulty.hard);
-      expect(controllerHard.state.shoppingList.length, equals(5));
-      expect(controllerHard.state.shelfItems.length, equals(10));
-    });
+        final controllerHard = GroceryMemoryController(
+          initialDifficulty: GameDifficulty.hard,
+        );
+        expect(controllerHard.state.shoppingList.length, equals(5));
+        expect(controllerHard.state.shelfItems.length, equals(10));
+      },
+    );
 
-    test('Phase transitions: cannot pick items during shopping list review phase', () {
-      final controller = GroceryMemoryController();
-      expect(controller.state.isListPhase, isTrue);
+    test(
+      'Phase transitions: cannot pick items during shopping list review phase',
+      () {
+        final controller = GroceryMemoryController();
+        expect(controller.state.isListPhase, isTrue);
 
-      final firstShelfItem = controller.state.shelfItems.first.id;
-      controller.toggleBasketItem(firstShelfItem);
-      expect(controller.state.basketItemIds, isEmpty);
+        final firstShelfItem = controller.state.shelfItems.first.id;
+        controller.toggleBasketItem(firstShelfItem);
+        expect(controller.state.basketItemIds, isEmpty);
 
-      // Advance to shelf phase
-      controller.proceedToShelf();
-      expect(controller.state.isListPhase, isFalse);
+        // Advance to shelf phase
+        controller.proceedToShelf();
+        expect(controller.state.isListPhase, isFalse);
 
-      // Now basket picking succeeds
-      controller.toggleBasketItem(firstShelfItem);
-      expect(controller.state.basketItemIds.contains(firstShelfItem), isTrue);
+        // Now basket picking succeeds
+        controller.toggleBasketItem(firstShelfItem);
+        expect(controller.state.basketItemIds.contains(firstShelfItem), isTrue);
 
-      // Toggling again removes from basket
-      controller.toggleBasketItem(firstShelfItem);
-      expect(controller.state.basketItemIds.contains(firstShelfItem), isFalse);
-    });
+        // Toggling again removes from basket
+        controller.toggleBasketItem(firstShelfItem);
+        expect(
+          controller.state.basketItemIds.contains(firstShelfItem),
+          isFalse,
+        );
+      },
+    );
 
     test('Invalid selections: selecting non-existent item id is ignored', () {
       final controller = GroceryMemoryController();
@@ -79,11 +94,16 @@ void main() {
       final hintUsed = controller.useHint();
       expect(hintUsed, isTrue);
       expect(controller.state.hintsUsed, equals(1));
-      expect(controller.state.lastFeedback, contains('Your basket contains all items'));
+      expect(
+        controller.state.lastFeedback,
+        contains('Your basket contains all items'),
+      );
     });
 
     test('Scoring and Completion: constructs valid GameSession', () {
-      final controller = GroceryMemoryController(initialDifficulty: GameDifficulty.easy);
+      final controller = GroceryMemoryController(
+        initialDifficulty: GameDifficulty.easy,
+      );
       controller.proceedToShelf();
 
       // Collect all 3 target items
@@ -107,9 +127,18 @@ void main() {
       expect(controller.state.isCompleted, isTrue);
 
       // Safety check
-      expect(session.supportiveFeedbackMessage.toLowerCase(), isNot(contains('dementia')));
-      expect(session.supportiveFeedbackMessage.toLowerCase(), isNot(contains('memory loss')));
-      expect(session.supportiveFeedbackMessage.toLowerCase(), isNot(contains('brain score')));
+      expect(
+        session.supportiveFeedbackMessage.toLowerCase(),
+        isNot(contains('dementia')),
+      );
+      expect(
+        session.supportiveFeedbackMessage.toLowerCase(),
+        isNot(contains('memory loss')),
+      );
+      expect(
+        session.supportiveFeedbackMessage.toLowerCase(),
+        isNot(contains('brain score')),
+      );
     });
 
     test('Post-completion interaction is blocked', () {

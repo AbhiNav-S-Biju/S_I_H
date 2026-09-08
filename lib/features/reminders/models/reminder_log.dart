@@ -50,12 +50,12 @@ class ReminderLog {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'reminder_id': reminderId,
-        'patient_id': patientId,
-        'action': action,
-        'action_timestamp': actionTimestamp.toUtc().toIso8601String(),
-        'created_at': createdAt.toUtc().toIso8601String(),
-        'metadata': metadata,
-      };
+    'id': id,
+    'reminder_id': reminderId,
+    'patient_id': patientId,
+    'action': action,
+    'action_timestamp': actionTimestamp.toUtc().toIso8601String(),
+    'created_at': createdAt.toUtc().toIso8601String(),
+    'metadata': metadata,
+  };
 }

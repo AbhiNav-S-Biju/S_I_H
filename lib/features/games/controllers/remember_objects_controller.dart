@@ -53,7 +53,8 @@ class RememberObjectsState {
       selectedItemIds: selectedItemIds ?? this.selectedItemIds,
       isMemorizationPhase: isMemorizationPhase ?? this.isMemorizationPhase,
       hintsUsed: hintsUsed ?? this.hintsUsed,
-      hintHighlightedItemId: hintHighlightedItemId ?? this.hintHighlightedItemId,
+      hintHighlightedItemId:
+          hintHighlightedItemId ?? this.hintHighlightedItemId,
       isCompleted: isCompleted ?? this.isCompleted,
       startTime: startTime ?? this.startTime,
       lastFeedback: lastFeedback ?? this.lastFeedback,
@@ -74,9 +75,9 @@ class RememberObjectsController {
     Random? random,
     Uuid? uuid,
     GameDifficulty initialDifficulty = GameDifficulty.easy,
-  })  : availableCatalogue = catalogue ?? GameItem.defaultEverydayItems,
-        _random = random ?? Random(),
-        _uuid = uuid ?? const Uuid() {
+  }) : availableCatalogue = catalogue ?? GameItem.defaultEverydayItems,
+       _random = random ?? Random(),
+       _uuid = uuid ?? const Uuid() {
     startNewGame(difficulty: initialDifficulty);
   }
 
@@ -90,7 +91,10 @@ class RememberObjectsController {
     final targets = shuffled.take(count).toList();
 
     // Prepare selection options including all targets + distractors
-    final distractors = shuffled.skip(count).take(totalOptions - count).toList();
+    final distractors = shuffled
+        .skip(count)
+        .take(totalOptions - count)
+        .toList();
     final allOptions = [...targets, ...distractors]..shuffle(_random);
 
     _state = RememberObjectsState(
@@ -103,7 +107,8 @@ class RememberObjectsController {
       hintHighlightedItemId: null,
       isCompleted: false,
       startTime: DateTime.now(),
-      lastFeedback: 'Look closely at these ${targets.length} items. Take all the time you need.',
+      lastFeedback:
+          'Look closely at these ${targets.length} items. Take all the time you need.',
     );
   }
 
@@ -150,7 +155,8 @@ class RememberObjectsController {
       // All correct items already selected
       _state = _state.copyWith(
         hintsUsed: _state.hintsUsed + 1,
-        lastFeedback: 'You have found all the items! Tap "Finish Activity" whenever you are ready.',
+        lastFeedback:
+            'You have found all the items! Tap "Finish Activity" whenever you are ready.',
       );
       return true;
     }
@@ -171,11 +177,14 @@ class RememberObjectsController {
 
     // Calculate correct answers
     final targetIds = _state.targetItems.map((e) => e.id).toSet();
-    final correctCount = _state.selectedItemIds.where((id) => targetIds.contains(id)).length;
+    final correctCount = _state.selectedItemIds
+        .where((id) => targetIds.contains(id))
+        .length;
     final totalRequired = _state.targetItems.length;
 
     // Non-clinical engagement score (e.g. 100 points per item found + consistency bonus)
-    final calculatedScore = (correctCount * 100) + (_state.hintsUsed == 0 ? 50 : 20);
+    final calculatedScore =
+        (correctCount * 100) + (_state.hintsUsed == 0 ? 50 : 20);
 
     final session = GameSession(
       id: _uuid.v4(),

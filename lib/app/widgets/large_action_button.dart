@@ -32,7 +32,8 @@ class LargeActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle = theme.textTheme.labelLarge ??
+    final textStyle =
+        theme.textTheme.labelLarge ??
         const TextStyle(fontSize: 22.0, fontWeight: FontWeight.w800);
 
     Color bg;
@@ -53,7 +54,10 @@ class LargeActionButton extends StatelessWidget {
       case LargeActionButtonVariant.gentleWarning:
         bg = ElderColors.supportiveBg;
         fg = ElderColors.supportiveText;
-        border = const BorderSide(color: ElderColors.supportiveBorder, width: 2.0);
+        border = const BorderSide(
+          color: ElderColors.supportiveBorder,
+          width: 2.0,
+        );
         break;
     }
 
@@ -78,7 +82,10 @@ class LargeActionButton extends StatelessWidget {
               minHeight: minHeight,
               minWidth: ElderTheme.minTouchTargetSize,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
             alignment: Alignment.center,
             child: isLoading
                 ? SizedBox(
@@ -94,7 +101,11 @@ class LargeActionButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (icon != null) ...[
-                        Icon(icon, size: 28.0, color: isEnabled ? fg : ElderColors.textMuted),
+                        Icon(
+                          icon,
+                          size: 28.0,
+                          color: isEnabled ? fg : ElderColors.textMuted,
+                        ),
                         const SizedBox(width: 12.0),
                       ],
                       Flexible(

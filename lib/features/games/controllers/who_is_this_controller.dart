@@ -38,8 +38,8 @@ class WhoIsThisState {
 
   FamilyMemberItem? get currentQuestion =>
       (currentQuestionIndex >= 0 && currentQuestionIndex < questions.length)
-          ? questions[currentQuestionIndex]
-          : null;
+      ? questions[currentQuestionIndex]
+      : null;
 
   bool get isLastQuestion => currentQuestionIndex >= questions.length - 1;
 
@@ -66,9 +66,12 @@ class WhoIsThisState {
           ? null
           : (selectedRelationship ?? this.selectedRelationship),
       answers: answers ?? this.answers,
-      eliminatedDistractors: eliminatedDistractors ?? this.eliminatedDistractors,
+      eliminatedDistractors:
+          eliminatedDistractors ?? this.eliminatedDistractors,
       hintsUsed: hintsUsed ?? this.hintsUsed,
-      activeHintText: clearActiveHintText ? null : (activeHintText ?? this.activeHintText),
+      activeHintText: clearActiveHintText
+          ? null
+          : (activeHintText ?? this.activeHintText),
       isCompleted: isCompleted ?? this.isCompleted,
       startTime: startTime ?? this.startTime,
       lastFeedback: lastFeedback ?? this.lastFeedback,
@@ -89,16 +92,20 @@ class WhoIsThisController {
     Random? random,
     Uuid? uuid,
     GameDifficulty initialDifficulty = GameDifficulty.easy,
-  })  : availableFamily = familyMembers ?? FamilyMemberItem.defaultFamilyMembers,
-        _random = random ?? Random(),
-        _uuid = uuid ?? const Uuid() {
+  }) : availableFamily = familyMembers ?? FamilyMemberItem.defaultFamilyMembers,
+       _random = random ?? Random(),
+       _uuid = uuid ?? const Uuid() {
     startNewGame(difficulty: initialDifficulty);
   }
 
   /// Initializes game questions based on difficulty tier
   void startNewGame({GameDifficulty difficulty = GameDifficulty.easy}) {
-    final count = min(difficulty.whoIsThisQuestionCount, availableFamily.length);
-    final shuffled = List<FamilyMemberItem>.from(availableFamily)..shuffle(_random);
+    final count = min(
+      difficulty.whoIsThisQuestionCount,
+      availableFamily.length,
+    );
+    final shuffled = List<FamilyMemberItem>.from(availableFamily)
+      ..shuffle(_random);
     final chosenQuestions = shuffled.take(count).toList();
 
     _state = WhoIsThisState(
@@ -131,7 +138,8 @@ class WhoIsThisController {
     final updatedAnswers = Map<int, String>.from(_state.answers);
     updatedAnswers[_state.currentQuestionIndex] = choice;
 
-    final isCorrect = choice.toLowerCase() == current.relationship.toLowerCase();
+    final isCorrect =
+        choice.toLowerCase() == current.relationship.toLowerCase();
 
     _state = _state.copyWith(
       selectedRelationship: choice,
@@ -149,9 +157,11 @@ class WhoIsThisController {
     if (current == null) return false;
 
     final wrongOptions = current.alternativeRelationshipOptions
-        .where((opt) =>
-            opt.toLowerCase() != current.relationship.toLowerCase() &&
-            !_state.eliminatedDistractors.contains(opt))
+        .where(
+          (opt) =>
+              opt.toLowerCase() != current.relationship.toLowerCase() &&
+              !_state.eliminatedDistractors.contains(opt),
+        )
         .toList();
 
     final updatedEliminated = Set<String>.from(_state.eliminatedDistractors);
@@ -196,7 +206,8 @@ class WhoIsThisController {
     }
 
     final totalQuestions = _state.questions.length;
-    final calculatedScore = (correctCount * 120) + (_state.hintsUsed == 0 ? 50 : 20);
+    final calculatedScore =
+        (correctCount * 120) + (_state.hintsUsed == 0 ? 50 : 20);
 
     final session = GameSession(
       id: _uuid.v4(),

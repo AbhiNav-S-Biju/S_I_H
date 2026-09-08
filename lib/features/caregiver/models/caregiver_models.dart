@@ -30,12 +30,12 @@ class CaregiverProfile {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'email': email,
-        'full_name': fullName,
-        'phone': phone,
-        'role': role,
-      };
+    'id': id,
+    'email': email,
+    'full_name': fullName,
+    'phone': phone,
+    'role': role,
+  };
 }
 
 class PatientSummary {
@@ -69,18 +69,19 @@ class PatientSummary {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'full_name': fullName,
-        'relationship': relationship,
-        'avatar_url': avatarUrl,
-        'primary_caregiver_id': primaryCaregiverId,
-        'last_active_at': lastActiveAt?.toIso8601String(),
-      };
+    'id': id,
+    'full_name': fullName,
+    'relationship': relationship,
+    'avatar_url': avatarUrl,
+    'primary_caregiver_id': primaryCaregiverId,
+    'last_active_at': lastActiveAt?.toIso8601String(),
+  };
 }
 
 class CaregiverGameRecord {
   final String id;
-  final String gameTitle; // e.g. "Remember Objects", "Who Is This?", "Grocery Memory"
+  final String
+  gameTitle; // e.g. "Remember Objects", "Who Is This?", "Grocery Memory"
   final String gameType;
   final String difficulty;
   final int score;

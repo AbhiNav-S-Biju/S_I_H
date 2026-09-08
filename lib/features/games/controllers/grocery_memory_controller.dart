@@ -53,7 +53,8 @@ class GroceryMemoryState {
       basketItemIds: basketItemIds ?? this.basketItemIds,
       isListPhase: isListPhase ?? this.isListPhase,
       hintsUsed: hintsUsed ?? this.hintsUsed,
-      hintHighlightedItemId: hintHighlightedItemId ?? this.hintHighlightedItemId,
+      hintHighlightedItemId:
+          hintHighlightedItemId ?? this.hintHighlightedItemId,
       isCompleted: isCompleted ?? this.isCompleted,
       startTime: startTime ?? this.startTime,
       lastFeedback: lastFeedback ?? this.lastFeedback,
@@ -74,9 +75,9 @@ class GroceryMemoryController {
     Random? random,
     Uuid? uuid,
     GameDifficulty initialDifficulty = GameDifficulty.easy,
-  })  : availableGroceries = groceries ?? GameItem.defaultGroceryItems,
-        _random = random ?? Random(),
-        _uuid = uuid ?? const Uuid() {
+  }) : availableGroceries = groceries ?? GameItem.defaultGroceryItems,
+       _random = random ?? Random(),
+       _uuid = uuid ?? const Uuid() {
     startNewGame(difficulty: initialDifficulty);
   }
 
@@ -88,7 +89,10 @@ class GroceryMemoryController {
     final shuffled = List<GameItem>.from(availableGroceries)..shuffle(_random);
     final targetList = shuffled.take(count).toList();
 
-    final shelfDistractors = shuffled.skip(count).take(totalShelf - count).toList();
+    final shelfDistractors = shuffled
+        .skip(count)
+        .take(totalShelf - count)
+        .toList();
     final allShelf = [...targetList, ...shelfDistractors]..shuffle(_random);
 
     _state = GroceryMemoryState(
@@ -101,7 +105,8 @@ class GroceryMemoryController {
       hintHighlightedItemId: null,
       isCompleted: false,
       startTime: DateTime.now(),
-      lastFeedback: 'Here is your shopping list with ${targetList.length} items. Review it at your own pace.',
+      lastFeedback:
+          'Here is your shopping list with ${targetList.length} items. Review it at your own pace.',
     );
   }
 
@@ -109,7 +114,8 @@ class GroceryMemoryController {
   void proceedToShelf() {
     _state = _state.copyWith(
       isListPhase: false,
-      lastFeedback: 'Tap items from your list to put them into your shopping cart.',
+      lastFeedback:
+          'Tap items from your list to put them into your shopping cart.',
     );
   }
 
@@ -146,7 +152,8 @@ class GroceryMemoryController {
     if (uncollected.isEmpty) {
       _state = _state.copyWith(
         hintsUsed: _state.hintsUsed + 1,
-        lastFeedback: 'Your basket contains all items from the list! Tap "Checkout" when ready.',
+        lastFeedback:
+            'Your basket contains all items from the list! Tap "Checkout" when ready.',
       );
       return true;
     }
@@ -155,7 +162,8 @@ class GroceryMemoryController {
     _state = _state.copyWith(
       hintsUsed: _state.hintsUsed + 1,
       hintHighlightedItemId: hintItem.id,
-      lastFeedback: 'Hint: Look for the ${hintItem.name} ${hintItem.emoji} on the shelf!',
+      lastFeedback:
+          'Hint: Look for the ${hintItem.name} ${hintItem.emoji} on the shelf!',
     );
     return true;
   }
@@ -166,10 +174,13 @@ class GroceryMemoryController {
     final duration = now.difference(_state.startTime).inSeconds.clamp(1, 7200);
 
     final listIds = _state.shoppingList.map((e) => e.id).toSet();
-    final correctCount = _state.basketItemIds.where((id) => listIds.contains(id)).length;
+    final correctCount = _state.basketItemIds
+        .where((id) => listIds.contains(id))
+        .length;
     final totalListItems = _state.shoppingList.length;
 
-    final calculatedScore = (correctCount * 100) + (_state.hintsUsed == 0 ? 50 : 20);
+    final calculatedScore =
+        (correctCount * 100) + (_state.hintsUsed == 0 ? 50 : 20);
 
     final session = GameSession(
       id: _uuid.v4(),

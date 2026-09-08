@@ -82,7 +82,10 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
           // Main Interactive Area
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 20.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -99,14 +102,20 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 4.0,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFE2E8F0),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         child: const Text(
                           'Family & Friends',
-                          style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
@@ -119,7 +128,10 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24.0),
-                      border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+                      border: Border.all(
+                        color: const Color(0xFFCBD5E1),
+                        width: 1.5,
+                      ),
                       boxShadow: const [
                         BoxShadow(
                           color: Colors.black12,
@@ -137,7 +149,10 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                           decoration: BoxDecoration(
                             color: currentMember.avatarColor.withAlpha(35),
                             shape: BoxShape.circle,
-                            border: Border.all(color: currentMember.avatarColor, width: 3.0),
+                            border: Border.all(
+                              color: currentMember.avatarColor,
+                              width: 3.0,
+                            ),
                           ),
                           child: Icon(
                             currentMember.avatarIcon,
@@ -158,14 +173,21 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
 
                         // Voice Prompt Banner
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 10.0,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF1F5F9),
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.volume_up_rounded, color: Color(0xFF0F766E), size: 24.0),
+                              const Icon(
+                                Icons.volume_up_rounded,
+                                color: Color(0xFF0F766E),
+                                size: 24.0,
+                              ),
                               const SizedBox(width: 10.0),
                               Expanded(
                                 child: Text(
@@ -190,11 +212,17 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                             decoration: BoxDecoration(
                               color: const Color(0xFFFFFBEB),
                               borderRadius: BorderRadius.circular(12.0),
-                              border: Border.all(color: const Color(0xFFFDE68A)),
+                              border: Border.all(
+                                color: const Color(0xFFFDE68A),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.lightbulb_rounded, color: Color(0xFFD97706), size: 22.0),
+                                const Icon(
+                                  Icons.lightbulb_rounded,
+                                  color: Color(0xFFD97706),
+                                  size: 22.0,
+                                ),
                                 const SizedBox(width: 8.0),
                                 Expanded(
                                   child: Text(
@@ -230,7 +258,9 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                   // Relationship Option Buttons
                   ...currentMember.alternativeRelationshipOptions.map((option) {
                     final isSelected = state.selectedRelationship == option;
-                    final isEliminated = state.eliminatedDistractors.contains(option);
+                    final isEliminated = state.eliminatedDistractors.contains(
+                      option,
+                    );
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
@@ -249,18 +279,23 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                           borderRadius: BorderRadius.circular(16.0),
                           child: Container(
                             constraints: const BoxConstraints(minHeight: 64.0),
-                            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                              vertical: 16.0,
+                            ),
                             decoration: BoxDecoration(
                               color: isEliminated
                                   ? const Color(0xFFF1F5F9)
-                                  : (isSelected ? const Color(0xFFF0FDF4) : Colors.white),
+                                  : (isSelected
+                                        ? const Color(0xFFF0FDF4)
+                                        : Colors.white),
                               borderRadius: BorderRadius.circular(16.0),
                               border: Border.all(
                                 color: isEliminated
                                     ? const Color(0xFFE2E8F0)
                                     : (isSelected
-                                        ? const Color(0xFF16A34A)
-                                        : const Color(0xFFCBD5E1)),
+                                          ? const Color(0xFF16A34A)
+                                          : const Color(0xFFCBD5E1)),
                                 width: isSelected ? 3.0 : 1.5,
                               ),
                             ),
@@ -270,13 +305,14 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
                                   isSelected
                                       ? Icons.check_circle_rounded
                                       : (isEliminated
-                                          ? Icons.block_rounded
-                                          : Icons.radio_button_unchecked_rounded),
+                                            ? Icons.block_rounded
+                                            : Icons
+                                                  .radio_button_unchecked_rounded),
                                   color: isEliminated
                                       ? const Color(0xFF94A3B8)
                                       : (isSelected
-                                          ? const Color(0xFF16A34A)
-                                          : const Color(0xFF64748B)),
+                                            ? const Color(0xFF16A34A)
+                                            : const Color(0xFF64748B)),
                                   size: 26.0,
                                 ),
                                 const SizedBox(width: 14.0),
@@ -306,8 +342,12 @@ class _WhoIsThisScreenState extends State<WhoIsThisScreen> {
 
                   // Navigation / Next Card Button
                   ElderGameButton(
-                    label: state.isLastQuestion ? 'Complete Activity ➔' : 'Next Person ➔',
-                    icon: state.isLastQuestion ? Icons.check_rounded : Icons.arrow_forward_rounded,
+                    label: state.isLastQuestion
+                        ? 'Complete Activity ➔'
+                        : 'Next Person ➔',
+                    icon: state.isLastQuestion
+                        ? Icons.check_rounded
+                        : Icons.arrow_forward_rounded,
                     onPressed: state.selectedRelationship != null
                         ? () {
                             if (state.isLastQuestion) {

@@ -41,8 +41,14 @@ class GameHeader extends StatelessWidget {
               tooltip: 'Exit Activity',
               iconSize: 32.0,
               padding: const EdgeInsets.all(8.0),
-              constraints: const BoxConstraints(minWidth: 54.0, minHeight: 54.0),
-              icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1E293B)),
+              constraints: const BoxConstraints(
+                minWidth: 54.0,
+                minHeight: 54.0,
+              ),
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                color: Color(0xFF1E293B),
+              ),
               onPressed: () {
                 _showExitConfirmDialog(context);
               },
@@ -71,7 +77,10 @@ class GameHeader extends StatelessWidget {
                     runSpacing: 2.0,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 2.0,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFE0F2FE),
                           borderRadius: BorderRadius.circular(6.0),
@@ -107,10 +116,16 @@ class GameHeader extends StatelessWidget {
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFFFFFBEB),
                     foregroundColor: const Color(0xFFB45309),
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14.0,
+                      vertical: 12.0,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      side: const BorderSide(color: Color(0xFFFDE68A), width: 1.5),
+                      side: const BorderSide(
+                        color: Color(0xFFFDE68A),
+                        width: 1.5,
+                      ),
                     ),
                     minimumSize: const Size(90.0, 50.0),
                   ),
@@ -118,7 +133,10 @@ class GameHeader extends StatelessWidget {
                   icon: const Icon(Icons.lightbulb_rounded, size: 22.0),
                   label: const Text(
                     'Hint',
-                    style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 17.0,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -132,7 +150,9 @@ class GameHeader extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
         title: const Text(
           'Leave Activity?',
           style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w800),
@@ -145,23 +165,37 @@ class GameHeader extends StatelessWidget {
         actions: [
           TextButton(
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18.0,
+                vertical: 12.0,
+              ),
             ),
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Keep Playing', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600)),
+            child: const Text(
+              'Keep Playing',
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF64748B),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 12.0,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
               onExit();
             },
-            child: const Text('Exit', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700)),
+            child: const Text(
+              'Exit',
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),

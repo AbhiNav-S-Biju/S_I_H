@@ -13,10 +13,7 @@ import '../theme/elder_theme.dart';
 class ElderAppShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
-  const ElderAppShell({
-    super.key,
-    required this.navigationShell,
-  });
+  const ElderAppShell({super.key, required this.navigationShell});
 
   void _onTap(int index) {
     navigationShell.goBranch(
@@ -106,7 +103,10 @@ class ElderAppShell extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.0),
             child: Container(
               constraints: const BoxConstraints(minHeight: 64.0),
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 4.0,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -123,7 +123,9 @@ class ElderAppShell extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 18.0,
-                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w600,
                       color: isSelected ? activeFg : inactiveFg,
                     ),
                   ),

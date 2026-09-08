@@ -13,8 +13,9 @@ import 'package:nirvana/features/settings/presentation/settings_screen.dart';
 import 'package:nirvana/l10n/app_localizations.dart';
 
 void main() {
-  testWidgets('SettingsScreen toggles Reduced Motion and High Contrast',
-      (WidgetTester tester) async {
+  testWidgets('SettingsScreen toggles Reduced Motion and High Contrast', (
+    WidgetTester tester,
+  ) async {
     tester.view.physicalSize = const Size(1080, 1920);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());

@@ -31,7 +31,9 @@ class LoadingState extends StatelessWidget {
               height: 56.0,
               child: CircularProgressIndicator(
                 strokeWidth: 4.5,
-                valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  theme.colorScheme.primary,
+                ),
               ),
             ),
             const SizedBox(height: 24.0),

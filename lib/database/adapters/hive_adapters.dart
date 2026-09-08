@@ -77,8 +77,12 @@ class HiveReminderAdapter extends TypeAdapter<HiveReminder> {
       isActive: fields[5] as bool? ?? true,
       isCompleted: fields[6] as bool? ?? false,
       createdAt: DateTime.parse(fields[7] as String),
-      completedAt: fields[8] != null ? DateTime.parse(fields[8] as String) : null,
-      snoozedUntil: fields[9] != null ? DateTime.parse(fields[9] as String) : null,
+      completedAt: fields[8] != null
+          ? DateTime.parse(fields[8] as String)
+          : null,
+      snoozedUntil: fields[9] != null
+          ? DateTime.parse(fields[9] as String)
+          : null,
       notificationId: fields[10] as int? ?? 0,
       recurrenceRule: fields[11] as String?,
     );
@@ -132,7 +136,9 @@ class HiveReminderLogAdapter extends TypeAdapter<HiveReminderLog> {
       action: fields[3] as String,
       actionTimestamp: DateTime.parse(fields[4] as String),
       createdAt: DateTime.parse(fields[5] as String),
-      metadata: fields[6] != null ? (fields[6] as Map).cast<String, dynamic>() : const {},
+      metadata: fields[6] != null
+          ? (fields[6] as Map).cast<String, dynamic>()
+          : const {},
     );
   }
 

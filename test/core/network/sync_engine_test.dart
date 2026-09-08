@@ -66,7 +66,10 @@ class MockSupabaseSyncRepository implements ISupabaseSyncRepository {
     }
 
     if (returnDuplicate) {
-      return {'status': 'duplicate', 'message': 'Event already applied idempotently'};
+      return {
+        'status': 'duplicate',
+        'message': 'Event already applied idempotently',
+      };
     }
 
     return {'status': 'success', 'applied': true};
@@ -103,7 +106,9 @@ void main() {
   });
 
   setUp(() async {
-    syncBox = await Hive.openBox<HiveSyncEvent>('sync_test_${DateTime.now().microsecondsSinceEpoch}');
+    syncBox = await Hive.openBox<HiveSyncEvent>(
+      'sync_test_${DateTime.now().microsecondsSinceEpoch}',
+    );
     mockMonitor = MockConnectivityMonitor();
     mockSyncRepo = MockSupabaseSyncRepository();
     syncEngine = SyncEngine(
@@ -121,77 +126,101 @@ void main() {
   });
 
   group('SyncEngine Offline & Queueing Tests', () {
-    test('enqueues event offline without throwing and stores status as pending', () async {
-      mockMonitor.currentStatus = NetworkStatus.offline;
+    test(
+      'enqueues event offline without throwing and stores status as pending',
+      () async {
+        mockMonitor.currentStatus = NetworkStatus.offline;
 
-      final event = HiveSyncEvent(
-        eventId: 'event-offline-1',
-        entityType: 'reminder',
-        entityId: 'rem-1',
-        operation: 'create',
-        payload: {'title': 'Hydration'},
-        createdAt: DateTime.now(),
-        patientId: 'pat-1',
-      );
+        final event = HiveSyncEvent(
+          eventId: 'event-offline-1',
+          entityType: 'reminder',
+          entityId: 'rem-1',
+          operation: 'create',
+          payload: {'title': 'Hydration'},
+          createdAt: DateTime.now(),
+          patientId: 'pat-1',
+        );
 
-      await syncEngine.enqueueEvent(event);
+        await syncEngine.enqueueEvent(event);
 
-      expect(syncBox.length, equals(1));
-      final stored = syncBox.get('event-offline-1');
-      expect(stored, isNotNull);
-      expect(stored!.syncStatus, equals(SyncStatus.pending));
-      expect(stored.retryCount, equals(0));
-      expect(mockSyncRepo.receivedCalls.isEmpty, isTrue);
-    });
+        expect(syncBox.length, equals(1));
+        final stored = syncBox.get('event-offline-1');
+        expect(stored, isNotNull);
+        expect(stored!.syncStatus, equals(SyncStatus.pending));
+        expect(stored.retryCount, equals(0));
+        expect(mockSyncRepo.receivedCalls.isEmpty, isTrue);
+      },
+    );
 
     test('calculates exponential backoff correctly', () {
       expect(syncEngine.calculateBackoff(0), equals(Duration.zero));
-      expect(syncEngine.calculateBackoff(1), equals(const Duration(seconds: 2)));
-      expect(syncEngine.calculateBackoff(2), equals(const Duration(seconds: 4)));
-      expect(syncEngine.calculateBackoff(3), equals(const Duration(seconds: 8)));
-      expect(syncEngine.calculateBackoff(4), equals(const Duration(seconds: 16)));
-      expect(syncEngine.calculateBackoff(5), equals(const Duration(seconds: 32)));
-      expect(syncEngine.calculateBackoff(6), equals(const Duration(seconds: 60))); // Capped at 60
+      expect(
+        syncEngine.calculateBackoff(1),
+        equals(const Duration(seconds: 2)),
+      );
+      expect(
+        syncEngine.calculateBackoff(2),
+        equals(const Duration(seconds: 4)),
+      );
+      expect(
+        syncEngine.calculateBackoff(3),
+        equals(const Duration(seconds: 8)),
+      );
+      expect(
+        syncEngine.calculateBackoff(4),
+        equals(const Duration(seconds: 16)),
+      );
+      expect(
+        syncEngine.calculateBackoff(5),
+        equals(const Duration(seconds: 32)),
+      );
+      expect(
+        syncEngine.calculateBackoff(6),
+        equals(const Duration(seconds: 60)),
+      ); // Capped at 60
     });
   });
 
   group('SyncEngine Synchronization & Idempotency Tests', () {
-    test('processes pending queue successfully when online and marks events synced', () async {
-      mockMonitor.currentStatus = NetworkStatus.online;
+    test(
+      'processes pending queue successfully when online and marks events synced',
+      () async {
+        mockMonitor.currentStatus = NetworkStatus.online;
 
-      final event1 = HiveSyncEvent(
-        eventId: 'event-1',
-        entityType: 'reminder',
-        entityId: 'rem-1',
-        operation: 'create',
-        payload: {'title': 'Meds'},
-        createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
-        patientId: 'pat-1',
-      );
+        final event1 = HiveSyncEvent(
+          eventId: 'event-1',
+          entityType: 'reminder',
+          entityId: 'rem-1',
+          operation: 'create',
+          payload: {'title': 'Meds'},
+          createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
+          patientId: 'pat-1',
+        );
 
-      final event2 = HiveSyncEvent(
-        eventId: 'event-2',
-        entityType: 'reminder_log',
-        entityId: 'log-1',
-        operation: 'create',
-        payload: {'action': 'done'},
-        createdAt: DateTime.now(),
-        patientId: 'pat-1',
-      );
+        final event2 = HiveSyncEvent(
+          eventId: 'event-2',
+          entityType: 'reminder_log',
+          entityId: 'log-1',
+          operation: 'create',
+          payload: {'action': 'done'},
+          createdAt: DateTime.now(),
+          patientId: 'pat-1',
+        );
 
-      await syncBox.put(event1.eventId, event1);
-      await syncBox.put(event2.eventId, event2);
+        await syncBox.put(event1.eventId, event1);
+        await syncBox.put(event2.eventId, event2);
 
-      final result = await syncEngine.processQueue();
+        final result = await syncEngine.processQueue();
 
-      expect(result.totalProcessed, equals(2));
-      expect(result.succeeded, equals(2));
-      expect(result.failed, equals(0));
+        expect(result.totalProcessed, equals(2));
+        expect(result.succeeded, equals(2));
+        expect(result.failed, equals(0));
 
-      expect(syncBox.get('event-1')!.syncStatus, equals(SyncStatus.synced));
-      expect(syncBox.get('event-2')!.syncStatus, equals(SyncStatus.synced));
-      expect(mockSyncRepo.receivedCalls.length, equals(2));
-    });
+        expect(syncBox.get('event-1')!.syncStatus, equals(SyncStatus.synced));
+        expect(syncBox.get('event-2')!.syncStatus, equals(SyncStatus.synced));
+        expect(mockSyncRepo.receivedCalls.length, equals(2));
+      },
+    );
 
     test('handles duplicate event IDs idempotently without error', () async {
       mockMonitor.currentStatus = NetworkStatus.online;
@@ -211,60 +240,69 @@ void main() {
       final result = await syncEngine.processQueue();
 
       expect(result.succeeded, equals(1));
-      expect(syncBox.get('event-duplicate-1')!.syncStatus, equals(SyncStatus.synced));
+      expect(
+        syncBox.get('event-duplicate-1')!.syncStatus,
+        equals(SyncStatus.synced),
+      );
     });
   });
 
   group('SyncEngine Retry & Dead Letter Tests', () {
-    test('increments retry count on network failure and preserves pending status', () async {
-      mockMonitor.currentStatus = NetworkStatus.online;
-      mockSyncRepo.shouldFail = true;
+    test(
+      'increments retry count on network failure and preserves pending status',
+      () async {
+        mockMonitor.currentStatus = NetworkStatus.online;
+        mockSyncRepo.shouldFail = true;
 
-      final event = HiveSyncEvent(
-        eventId: 'event-fail-1',
-        entityType: 'reminder',
-        entityId: 'rem-1',
-        operation: 'create',
-        payload: {},
-        createdAt: DateTime.now(),
-        patientId: 'pat-1',
-      );
+        final event = HiveSyncEvent(
+          eventId: 'event-fail-1',
+          entityType: 'reminder',
+          entityId: 'rem-1',
+          operation: 'create',
+          payload: {},
+          createdAt: DateTime.now(),
+          patientId: 'pat-1',
+        );
 
-      await syncBox.put(event.eventId, event);
-      final result = await syncEngine.processQueue();
+        await syncBox.put(event.eventId, event);
+        final result = await syncEngine.processQueue();
 
-      expect(result.failed, equals(1));
-      expect(result.succeeded, equals(0));
+        expect(result.failed, equals(1));
+        expect(result.succeeded, equals(0));
 
-      final stored = syncBox.get('event-fail-1')!;
-      expect(stored.retryCount, equals(1));
-      expect(stored.syncStatus, equals(SyncStatus.pending));
-    });
+        final stored = syncBox.get('event-fail-1')!;
+        expect(stored.retryCount, equals(1));
+        expect(stored.syncStatus, equals(SyncStatus.pending));
+      },
+    );
 
-    test('marks event as dead_letter when retry count reaches maxRetries', () async {
-      mockMonitor.currentStatus = NetworkStatus.online;
-      mockSyncRepo.shouldFail = true;
+    test(
+      'marks event as dead_letter when retry count reaches maxRetries',
+      () async {
+        mockMonitor.currentStatus = NetworkStatus.online;
+        mockSyncRepo.shouldFail = true;
 
-      final event = HiveSyncEvent(
-        eventId: 'event-deadletter-1',
-        entityType: 'reminder',
-        entityId: 'rem-1',
-        operation: 'create',
-        payload: {},
-        createdAt: DateTime.now(),
-        patientId: 'pat-1',
-        retryCount: 2, // maxRetries is 3 in setUp
-      );
+        final event = HiveSyncEvent(
+          eventId: 'event-deadletter-1',
+          entityType: 'reminder',
+          entityId: 'rem-1',
+          operation: 'create',
+          payload: {},
+          createdAt: DateTime.now(),
+          patientId: 'pat-1',
+          retryCount: 2, // maxRetries is 3 in setUp
+        );
 
-      await syncBox.put(event.eventId, event);
+        await syncBox.put(event.eventId, event);
 
-      // Attempt 3: should increment to 3 and mark deadLetter
-      final result = await syncEngine.processQueue();
+        // Attempt 3: should increment to 3 and mark deadLetter
+        final result = await syncEngine.processQueue();
 
-      expect(result.deadLettered, equals(1));
-      final stored = syncBox.get('event-deadletter-1')!;
-      expect(stored.retryCount, equals(3));
-      expect(stored.syncStatus, equals(SyncStatus.deadLetter));
-    });
+        expect(result.deadLettered, equals(1));
+        final stored = syncBox.get('event-deadletter-1')!;
+        expect(stored.retryCount, equals(3));
+        expect(stored.syncStatus, equals(SyncStatus.deadLetter));
+      },
+    );
   });
 }

@@ -99,7 +99,8 @@ class GameSession {
       hintsUsed: (json['hints_used'] as num?)?.toInt() ?? 0,
       durationSeconds: (json['duration_seconds'] as num?)?.toInt() ?? 0,
       completedAt: DateTime.parse(json['completed_at'] as String),
-      activityMetadata: (json['activity_metadata'] as Map<String, dynamic>?) ?? {},
+      activityMetadata:
+          (json['activity_metadata'] as Map<String, dynamic>?) ?? {},
     );
   }
 

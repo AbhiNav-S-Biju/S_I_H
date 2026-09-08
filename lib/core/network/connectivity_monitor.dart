@@ -8,10 +8,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum NetworkStatus {
-  online,
-  offline,
-}
+enum NetworkStatus { online, offline }
 
 abstract class IConnectivityMonitor {
   Stream<NetworkStatus> get statusStream;
@@ -22,7 +19,7 @@ class ConnectivityMonitor implements IConnectivityMonitor {
   final Connectivity _connectivity;
 
   ConnectivityMonitor({Connectivity? connectivity})
-      : _connectivity = connectivity ?? Connectivity();
+    : _connectivity = connectivity ?? Connectivity();
 
   @override
   Stream<NetworkStatus> get statusStream {
@@ -42,12 +39,14 @@ class ConnectivityMonitor implements IConnectivityMonitor {
         return NetworkStatus.offline;
       }
       // If there's an active connection along with none, it's online
-      final hasActive = results.any((r) =>
-          r == ConnectivityResult.mobile ||
-          r == ConnectivityResult.wifi ||
-          r == ConnectivityResult.ethernet ||
-          r == ConnectivityResult.vpn ||
-          r == ConnectivityResult.other);
+      final hasActive = results.any(
+        (r) =>
+            r == ConnectivityResult.mobile ||
+            r == ConnectivityResult.wifi ||
+            r == ConnectivityResult.ethernet ||
+            r == ConnectivityResult.vpn ||
+            r == ConnectivityResult.other,
+      );
       return hasActive ? NetworkStatus.online : NetworkStatus.offline;
     }
     return NetworkStatus.online;

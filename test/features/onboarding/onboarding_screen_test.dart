@@ -11,8 +11,9 @@ import 'package:nirvana/features/onboarding/presentation/onboarding_screen.dart'
 import 'package:nirvana/l10n/app_localizations.dart';
 
 void main() {
-  testWidgets('OnboardingScreen navigates across steps',
-      (WidgetTester tester) async {
+  testWidgets('OnboardingScreen navigates across steps', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(

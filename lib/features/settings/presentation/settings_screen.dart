@@ -56,7 +56,9 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               // 1. Accessibility & Visual Comfort Section
               SectionHeader(
-                title: l10n?.accessibilitySectionTitle ?? 'Visual & Motion Comfort',
+                title:
+                    l10n?.accessibilitySectionTitle ??
+                    'Visual & Motion Comfort',
                 icon: Icons.accessibility_new_rounded,
               ),
 
@@ -85,7 +87,9 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   onChanged: (val) {
-                    ref.read(reducedMotionProvider.notifier).setReducedMotion(val);
+                    ref
+                        .read(reducedMotionProvider.notifier)
+                        .setReducedMotion(val);
                   },
                 ),
               ),
@@ -115,7 +119,9 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   onChanged: (val) {
-                    ref.read(highContrastProvider.notifier).setHighContrast(val);
+                    ref
+                        .read(highContrastProvider.notifier)
+                        .setHighContrast(val);
                   },
                 ),
               ),
@@ -135,7 +141,8 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6.0),
                     Text(
-                      l10n?.textSizeSubtitle ?? 'Make words and numbers larger and clearer.',
+                      l10n?.textSizeSubtitle ??
+                          'Make words and numbers larger and clearer.',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: ElderColors.textSecondary,
                       ),
@@ -144,19 +151,25 @@ class SettingsScreen extends ConsumerWidget {
                     _buildScaleOption(
                       title: l10n?.textSizeStandard ?? 'Large (Standard)',
                       isSelected: textScale == TextScaleOption.standard,
-                      onTap: () => ref.read(textScaleProvider.notifier).setScale(TextScaleOption.standard),
+                      onTap: () => ref
+                          .read(textScaleProvider.notifier)
+                          .setScale(TextScaleOption.standard),
                     ),
                     const SizedBox(height: 8.0),
                     _buildScaleOption(
                       title: l10n?.textSizeExtraLarge ?? 'Extra Large',
                       isSelected: textScale == TextScaleOption.extraLarge,
-                      onTap: () => ref.read(textScaleProvider.notifier).setScale(TextScaleOption.extraLarge),
+                      onTap: () => ref
+                          .read(textScaleProvider.notifier)
+                          .setScale(TextScaleOption.extraLarge),
                     ),
                     const SizedBox(height: 8.0),
                     _buildScaleOption(
                       title: l10n?.textSizeMaximum ?? 'Maximum Clarity',
                       isSelected: textScale == TextScaleOption.maximum,
-                      onTap: () => ref.read(textScaleProvider.notifier).setScale(TextScaleOption.maximum),
+                      onTap: () => ref
+                          .read(textScaleProvider.notifier)
+                          .setScale(TextScaleOption.maximum),
                     ),
                   ],
                 ),
@@ -275,7 +288,9 @@ class SettingsScreen extends ConsumerWidget {
         child: Row(
           children: [
             Icon(
-              isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+              isSelected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
               color: isSelected ? ElderColors.primary : ElderColors.textMuted,
               size: 28.0,
             ),
@@ -286,7 +301,9 @@ class SettingsScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                  color: isSelected ? ElderColors.onPrimaryContainer : ElderColors.textPrimary,
+                  color: isSelected
+                      ? ElderColors.onPrimaryContainer
+                      : ElderColors.textPrimary,
                 ),
               ),
             ),

@@ -24,9 +24,9 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
   GameDifficulty _selectedDifficulty = GameDifficulty.easy;
 
   void _launchGame(Widget screen) async {
-    final session = await Navigator.of(context).push<GameSession>(
-      MaterialPageRoute(builder: (_) => screen),
-    );
+    final session = await Navigator.of(
+      context,
+    ).push<GameSession>(MaterialPageRoute(builder: (_) => screen));
 
     if (session != null && widget.onSessionCompleted != null) {
       widget.onSessionCompleted!(session);
@@ -40,7 +40,11 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
       appBar: AppBar(
         title: const Text(
           'Daily Activities',
-          style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+          style: TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF0F172A),
+          ),
         ),
         backgroundColor: Colors.white,
         elevation: 1,
@@ -69,12 +73,20 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                       children: [
                         Text(
                           'Welcome to Today\'s Fun!',
-                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800, color: Color(0xFF14532D)),
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF14532D),
+                          ),
                         ),
                         SizedBox(height: 4.0),
                         Text(
                           'Choose an enjoyable activity below. Take all the time you like.',
-                          style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500, color: Color(0xFF15803D)),
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF15803D),
+                          ),
                         ),
                       ],
                     ),
@@ -87,7 +99,11 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
             // Difficulty Selector (Pill bar)
             const Text(
               'Activity Pace:',
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF334155),
+              ),
             ),
             const SizedBox(height: 10.0),
             Row(
@@ -106,10 +122,14 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF0F766E) : Colors.white,
+                          color: isSelected
+                              ? const Color(0xFF0F766E)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(14.0),
                           border: Border.all(
-                            color: isSelected ? const Color(0xFF0F766E) : const Color(0xFFCBD5E1),
+                            color: isSelected
+                                ? const Color(0xFF0F766E)
+                                : const Color(0xFFCBD5E1),
                             width: 2.0,
                           ),
                         ),
@@ -119,7 +139,9 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w700,
-                            color: isSelected ? Colors.white : const Color(0xFF334155),
+                            color: isSelected
+                                ? Colors.white
+                                : const Color(0xFF334155),
                           ),
                         ),
                       ),
@@ -197,7 +219,11 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
         borderRadius: BorderRadius.circular(22.0),
         border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6.0, offset: Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6.0,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       padding: const EdgeInsets.all(20.0),

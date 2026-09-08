@@ -57,14 +57,21 @@ class GameHistoryList extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: records.length,
-            separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.withValues(alpha: 0.15)),
+            separatorBuilder: (_, __) =>
+                Divider(height: 1, color: Colors.grey.withValues(alpha: 0.15)),
             itemBuilder: (context, index) {
               final game = records[index];
               return ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
                 leading: CircleAvatar(
                   backgroundColor: ElderColors.primary.withValues(alpha: 0.12),
-                  child: const Icon(Icons.videogame_asset_outlined, color: ElderColors.primary),
+                  child: const Icon(
+                    Icons.videogame_asset_outlined,
+                    color: ElderColors.primary,
+                  ),
                 ),
                 title: Text(
                   game.gameTitle,

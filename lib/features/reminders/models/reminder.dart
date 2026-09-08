@@ -72,19 +72,19 @@ class Reminder {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'patient_id': patientId,
-        'title': title,
-        'body': body,
-        'scheduled_at': scheduledAt.toUtc().toIso8601String(),
-        'is_active': isActive,
-        'is_completed': isCompleted,
-        'created_at': createdAt.toUtc().toIso8601String(),
-        'completed_at': completedAt?.toUtc().toIso8601String(),
-        'snoozed_until': snoozedUntil?.toUtc().toIso8601String(),
-        'notification_id': notificationId,
-        'recurrence_rule': recurrenceRule,
-      };
+    'id': id,
+    'patient_id': patientId,
+    'title': title,
+    'body': body,
+    'scheduled_at': scheduledAt.toUtc().toIso8601String(),
+    'is_active': isActive,
+    'is_completed': isCompleted,
+    'created_at': createdAt.toUtc().toIso8601String(),
+    'completed_at': completedAt?.toUtc().toIso8601String(),
+    'snoozed_until': snoozedUntil?.toUtc().toIso8601String(),
+    'notification_id': notificationId,
+    'recurrence_rule': recurrenceRule,
+  };
 
   Reminder copyWith({
     String? id,

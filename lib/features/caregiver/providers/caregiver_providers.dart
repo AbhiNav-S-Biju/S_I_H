@@ -17,7 +17,8 @@ final caregiverRepositoryProvider = Provider<ICaregiverRepository>((ref) {
 });
 
 /// Caregiver Authentication StateNotifier
-class CaregiverAuthNotifier extends StateNotifier<AsyncValue<CaregiverProfile?>> {
+class CaregiverAuthNotifier
+    extends StateNotifier<AsyncValue<CaregiverProfile?>> {
   final ICaregiverRepository _repository;
 
   CaregiverAuthNotifier(this._repository) : super(const AsyncValue.data(null)) {
@@ -34,10 +35,7 @@ class CaregiverAuthNotifier extends StateNotifier<AsyncValue<CaregiverProfile?>>
   Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
     try {
-      final profile = await _repository.login(
-        email: email,
-        password: password,
-      );
+      final profile = await _repository.login(email: email, password: password);
       state = AsyncValue.data(profile);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -52,21 +50,23 @@ class CaregiverAuthNotifier extends StateNotifier<AsyncValue<CaregiverProfile?>>
 }
 
 final caregiverAuthProvider =
-    StateNotifierProvider<CaregiverAuthNotifier, AsyncValue<CaregiverProfile?>>((ref) {
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return CaregiverAuthNotifier(repo);
-});
+    StateNotifierProvider<CaregiverAuthNotifier, AsyncValue<CaregiverProfile?>>(
+      (ref) {
+        final repo = ref.watch(caregiverRepositoryProvider);
+        return CaregiverAuthNotifier(repo);
+      },
+    );
 
 /// List of accessible patients assigned to the current caregiver
 final assignedPatientsProvider =
     FutureProvider.autoDispose<List<PatientSummary>>((ref) async {
-  final authState = ref.watch(caregiverAuthProvider);
-  final caregiver = authState.value;
-  if (caregiver == null) return [];
+      final authState = ref.watch(caregiverAuthProvider);
+      final caregiver = authState.value;
+      if (caregiver == null) return [];
 
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return repo.getAssignedPatients(caregiver.id);
-});
+      final repo = ref.watch(caregiverRepositoryProvider);
+      return repo.getAssignedPatients(caregiver.id);
+    });
 
 /// Currently selected patient provider
 final selectedPatientProvider = StateProvider<PatientSummary?>((ref) {
@@ -81,37 +81,37 @@ final selectedPatientProvider = StateProvider<PatientSummary?>((ref) {
 /// Game History for selected patient
 final selectedPatientGameHistoryProvider =
     FutureProvider.autoDispose<List<CaregiverGameRecord>>((ref) async {
-  final selected = ref.watch(selectedPatientProvider);
-  if (selected == null) return [];
+      final selected = ref.watch(selectedPatientProvider);
+      if (selected == null) return [];
 
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return repo.getGameHistory(selected.id);
-});
+      final repo = ref.watch(caregiverRepositoryProvider);
+      return repo.getGameHistory(selected.id);
+    });
 
 /// Reminder Status for selected patient
 final selectedPatientRemindersProvider =
     FutureProvider.autoDispose<List<CaregiverReminderRecord>>((ref) async {
-  final selected = ref.watch(selectedPatientProvider);
-  if (selected == null) return [];
+      final selected = ref.watch(selectedPatientProvider);
+      if (selected == null) return [];
 
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return repo.getReminderStatus(selected.id);
-});
+      final repo = ref.watch(caregiverRepositoryProvider);
+      return repo.getReminderStatus(selected.id);
+    });
 
 /// 7-Day Activity Summary for selected patient
 final selectedPatientSevenDayActivityProvider =
     FutureProvider.autoDispose<List<DailyActivitySummary>>((ref) async {
-  final selected = ref.watch(selectedPatientProvider);
-  if (selected == null) return [];
+      final selected = ref.watch(selectedPatientProvider);
+      if (selected == null) return [];
 
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return repo.getSevenDayActivity(selected.id);
-});
+      final repo = ref.watch(caregiverRepositoryProvider);
+      return repo.getSevenDayActivity(selected.id);
+    });
 
 /// Real-time Sync Status provider
 final caregiverSyncStatusProvider =
     FutureProvider.autoDispose<CaregiverSyncInfo>((ref) async {
-  final selected = ref.watch(selectedPatientProvider);
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return repo.getSyncStatus(selected?.id ?? '');
-});
+      final selected = ref.watch(selectedPatientProvider);
+      final repo = ref.watch(caregiverRepositoryProvider);
+      return repo.getSyncStatus(selected?.id ?? '');
+    });

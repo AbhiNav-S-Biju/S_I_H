@@ -18,13 +18,15 @@ class NotificationService {
 
   static const String channelId = 'nirvana_reminders_channel';
   static const String channelName = 'NIRVANA Care Reminders';
-  static const String channelDesc = 'Timely alerts for medication, hydration, and elder activities';
+  static const String channelDesc =
+      'Timely alerts for medication, hydration, and elder activities';
 
   NotificationService({
     FlutterLocalNotificationsPlugin? notificationsPlugin,
     IReminderRepository? reminderRepository,
-  })  : _notificationsPlugin = notificationsPlugin ?? FlutterLocalNotificationsPlugin(),
-        _reminderRepository = reminderRepository;
+  }) : _notificationsPlugin =
+           notificationsPlugin ?? FlutterLocalNotificationsPlugin(),
+       _reminderRepository = reminderRepository;
 
   /// Initializes the local notification plugin and sets up action categories.
   Future<bool?> initialize({
@@ -32,7 +34,19 @@ class NotificationService {
   }) async {
     _ensureTimeZoneInitialized();
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.android &&
+            defaultTargetPlatform != TargetPlatform.iOS &&
+            defaultTargetPlatform != TargetPlatform.macOS)) {
+      debugPrint(
+        '🔔 NotificationService: Local notifications skipped on ${defaultTargetPlatform.name} (desktop/web). Operating in standard UI mode.',
+      );
+      return false;
+    }
+
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const darwinSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -47,7 +61,8 @@ class NotificationService {
 
     final initialized = await _notificationsPlugin.initialize(
       initSettings,
-      onDidReceiveNotificationResponse: onResponse ?? handleNotificationResponse,
+      onDidReceiveNotificationResponse:
+          onResponse ?? handleNotificationResponse,
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
@@ -60,7 +75,9 @@ class NotificationService {
 
   Future<void> _requestPermissions() async {
     final androidImpl = _notificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidImpl != null) {
       await androidImpl.requestNotificationsPermission();
       await androidImpl.requestExactAlarmsPermission();
@@ -73,6 +90,7 @@ class NotificationService {
     if (_timeZoneInitialized) return;
     try {
       tz.initializeTimeZones();
+      tz.setLocalLocation(tz.getLocation('UTC'));
       _timeZoneInitialized = true;
     } catch (_) {}
   }
@@ -148,7 +166,9 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
         payload: reminder.id,
       );
-      debugPrint('⏰ Scheduled reminder "${reminder.title}" for $targetTime (id: ${reminder.notificationId})');
+      debugPrint(
+        '⏰ Scheduled reminder "${reminder.title}" for $targetTime (id: ${reminder.notificationId})',
+      );
     } catch (e) {
       debugPrint('❌ Failed to schedule zoned notification: $e');
       // Fallback to immediate display if exact alarm scheduling is not supported in current environment
@@ -182,7 +202,9 @@ class NotificationService {
 
     if (reminderId == null || reminderId.isEmpty) return;
 
-    debugPrint('📬 Notification action received: $actionId for reminder: $reminderId');
+    debugPrint(
+      '📬 Notification action received: $actionId for reminder: $reminderId',
+    );
 
     if (_reminderRepository == null) return;
 
@@ -211,5 +233,7 @@ class NotificationService {
 /// Top-level background notification tap handler (required by flutter_local_notifications)
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
-  debugPrint('📬 Background notification action received: ${notificationResponse.actionId}');
+  debugPrint(
+    '📬 Background notification action received: ${notificationResponse.actionId}',
+  );
 }

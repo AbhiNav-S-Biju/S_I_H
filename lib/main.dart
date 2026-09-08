@@ -15,7 +15,7 @@ Future<void> main() async {
 
   // 1. Initialize Hive offline database
   try {
-    await HiveDatabase.init();
+    await HiveDatabase.init().timeout(const Duration(seconds: 4));
   } catch (e) {
     debugPrint('⚠️ HiveDatabase initialization error: $e');
   }
@@ -23,7 +23,7 @@ Future<void> main() async {
   // 2. Initialize local notification service
   try {
     final notificationService = NotificationService();
-    await notificationService.initialize();
+    await notificationService.initialize().timeout(const Duration(seconds: 4));
   } catch (e) {
     debugPrint('⚠️ NotificationService initialization error: $e');
   }
@@ -35,20 +35,18 @@ Future<void> main() async {
         url: SupabaseConfig.supabaseUrl,
         // ignore: deprecated_member_use
         anonKey: SupabaseConfig.supabaseAnonKey,
-      );
+      ).timeout(const Duration(seconds: 5));
       debugPrint('✅ Supabase initialized successfully.');
     } catch (e) {
       debugPrint('⚠️ Supabase init warning (running in offline mode): $e');
     }
   } else {
-    debugPrint('ℹ️ Supabase not configured yet. App is operating in 100% Offline Mode.');
+    debugPrint(
+      'ℹ️ Supabase not configured yet. App is operating in 100% Offline Mode.',
+    );
   }
 
-  runApp(
-    const ProviderScope(
-      child: NirvanaApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: NirvanaApp()));
 }
 
 class NirvanaApp extends ConsumerWidget {

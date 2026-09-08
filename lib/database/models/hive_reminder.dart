@@ -35,17 +35,17 @@ class HiveReminder extends HiveObject {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'patient_id': patientId,
-        'title': title,
-        'body': body,
-        'scheduled_at': scheduledAt.toIso8601String(),
-        'is_active': isActive,
-        'is_completed': isCompleted,
-        'created_at': createdAt.toIso8601String(),
-        'completed_at': completedAt?.toIso8601String(),
-        'snoozed_until': snoozedUntil?.toIso8601String(),
-        'notification_id': notificationId,
-        'recurrence_rule': recurrenceRule,
-      };
+    'id': id,
+    'patient_id': patientId,
+    'title': title,
+    'body': body,
+    'scheduled_at': scheduledAt.toIso8601String(),
+    'is_active': isActive,
+    'is_completed': isCompleted,
+    'created_at': createdAt.toIso8601String(),
+    'completed_at': completedAt?.toIso8601String(),
+    'snoozed_until': snoozedUntil?.toIso8601String(),
+    'notification_id': notificationId,
+    'recurrence_rule': recurrenceRule,
+  };
 }

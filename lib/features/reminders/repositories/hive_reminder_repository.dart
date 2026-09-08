@@ -26,10 +26,10 @@ class HiveReminderRepository implements IReminderRepository {
     required Box<HiveReminderLog> reminderLogsBox,
     required SyncEngine syncEngine,
     Uuid? uuid,
-  })  : _remindersBox = remindersBox,
-        _reminderLogsBox = reminderLogsBox,
-        _syncEngine = syncEngine,
-        _uuid = uuid ?? const Uuid();
+  }) : _remindersBox = remindersBox,
+       _reminderLogsBox = reminderLogsBox,
+       _syncEngine = syncEngine,
+       _uuid = uuid ?? const Uuid();
 
   @override
   Future<List<Reminder>> getActiveReminders(String patientId) async {

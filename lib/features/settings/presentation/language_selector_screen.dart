@@ -62,7 +62,10 @@ class LanguageSelectorScreen extends ConsumerWidget {
                     final isSelected = activeLocale.languageCode == code;
 
                     return ElderCard(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 18.0,
+                      ),
                       backgroundColor: isSelected
                           ? ElderColors.primaryContainer
                           : Colors.white,

@@ -5,20 +5,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
-import 'caregiver_dashboard_screen.dart';
 
 class CaregiverLoginScreen extends ConsumerStatefulWidget {
   const CaregiverLoginScreen({super.key});
 
   @override
-  ConsumerState<CaregiverLoginScreen> createState() => _CaregiverLoginScreenState();
+  ConsumerState<CaregiverLoginScreen> createState() =>
+      _CaregiverLoginScreenState();
 }
 
 class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'caregiver@nirvana.care');
+  final _emailController = TextEditingController(
+    text: 'caregiver@nirvana.care',
+  );
   final _passwordController = TextEditingController(text: 'CaregiverPass123!');
   bool _obscurePassword = true;
 
@@ -32,16 +35,13 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    await ref.read(caregiverAuthProvider.notifier).login(
-          _emailController.text,
-          _passwordController.text,
-        );
+    await ref
+        .read(caregiverAuthProvider.notifier)
+        .login(_emailController.text, _passwordController.text);
 
     final authState = ref.read(caregiverAuthProvider);
     if (authState.value != null && mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const CaregiverDashboardScreen()),
-      );
+      context.go('/caregiver/dashboard');
     }
   }
 
@@ -57,11 +57,25 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: ElderColors.textPrimary,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back to Home',
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        ),
       ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 450),
               child: Form(
@@ -109,12 +123,15 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                       decoration: InputDecoration(
                         labelText: 'Email Address',
                         prefixIcon: const Icon(Icons.email_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      validator: (val) =>
-                          (val == null || val.trim().isEmpty) ? 'Please enter your email' : null,
+                      validator: (val) => (val == null || val.trim().isEmpty)
+                          ? 'Please enter your email'
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -127,17 +144,23 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
-                          onPressed: () =>
-                              setState(() => _obscurePassword = !_obscurePassword),
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
                         ),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      validator: (val) =>
-                          (val == null || val.isEmpty) ? 'Please enter your password' : null,
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Please enter your password'
+                          : null,
                     ),
                     const SizedBox(height: 24),
 
@@ -149,14 +172,21 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ElderColors.primary,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           elevation: 0,
                         ),
                         child: isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
                             : const Text(
                                 'Sign In to Dashboard',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                       ),
                     ),

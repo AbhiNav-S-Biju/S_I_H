@@ -9,13 +9,19 @@ import 'package:nirvana/features/games/games.dart';
 void main() {
   group('Who Is This? Game Tests', () {
     test('Difficulty settings accurately generate 2, 3, and 4 questions', () {
-      final controllerEasy = WhoIsThisController(initialDifficulty: GameDifficulty.easy);
+      final controllerEasy = WhoIsThisController(
+        initialDifficulty: GameDifficulty.easy,
+      );
       expect(controllerEasy.state.questions.length, equals(2));
 
-      final controllerMedium = WhoIsThisController(initialDifficulty: GameDifficulty.medium);
+      final controllerMedium = WhoIsThisController(
+        initialDifficulty: GameDifficulty.medium,
+      );
       expect(controllerMedium.state.questions.length, equals(3));
 
-      final controllerHard = WhoIsThisController(initialDifficulty: GameDifficulty.hard);
+      final controllerHard = WhoIsThisController(
+        initialDifficulty: GameDifficulty.hard,
+      );
       expect(controllerHard.state.questions.length, equals(4));
     });
 
@@ -37,27 +43,35 @@ void main() {
       expect(controller.state.answers, isEmpty);
     });
 
-    test('Hints feature: eliminates a wrong answer and increments hint counter', () {
-      final controller = WhoIsThisController();
-      final currentQ = controller.state.currentQuestion!;
+    test(
+      'Hints feature: eliminates a wrong answer and increments hint counter',
+      () {
+        final controller = WhoIsThisController();
+        final currentQ = controller.state.currentQuestion!;
 
-      expect(controller.state.hintsUsed, equals(0));
-      expect(controller.state.eliminatedDistractors, isEmpty);
+        expect(controller.state.hintsUsed, equals(0));
+        expect(controller.state.eliminatedDistractors, isEmpty);
 
-      final hintUsed = controller.useHint();
-      expect(hintUsed, isTrue);
-      expect(controller.state.hintsUsed, equals(1));
-      expect(controller.state.eliminatedDistractors.length, equals(1));
-      expect(controller.state.activeHintText, equals(currentQ.hintDescription));
+        final hintUsed = controller.useHint();
+        expect(hintUsed, isTrue);
+        expect(controller.state.hintsUsed, equals(1));
+        expect(controller.state.eliminatedDistractors.length, equals(1));
+        expect(
+          controller.state.activeHintText,
+          equals(currentQ.hintDescription),
+        );
 
-      // Attempting to select the eliminated option is blocked
-      final eliminatedOption = controller.state.eliminatedDistractors.first;
-      controller.selectRelationship(eliminatedOption);
-      expect(controller.state.selectedRelationship, isNull);
-    });
+        // Attempting to select the eliminated option is blocked
+        final eliminatedOption = controller.state.eliminatedDistractors.first;
+        controller.selectRelationship(eliminatedOption);
+        expect(controller.state.selectedRelationship, isNull);
+      },
+    );
 
     test('Multi-card progression through to completion', () {
-      final controller = WhoIsThisController(initialDifficulty: GameDifficulty.easy);
+      final controller = WhoIsThisController(
+        initialDifficulty: GameDifficulty.easy,
+      );
       expect(controller.state.questions.length, equals(2));
 
       // Answer Question 1 correctly
@@ -90,17 +104,27 @@ void main() {
       expect(controller.state.isCompleted, isTrue);
 
       // Safety check
-      expect(session.supportiveFeedbackMessage.toLowerCase(), isNot(contains('dementia')));
-      expect(session.supportiveFeedbackMessage.toLowerCase(), isNot(contains('brain score')));
+      expect(
+        session.supportiveFeedbackMessage.toLowerCase(),
+        isNot(contains('dementia')),
+      );
+      expect(
+        session.supportiveFeedbackMessage.toLowerCase(),
+        isNot(contains('brain score')),
+      );
     });
 
     test('Post-completion interaction is blocked', () {
       final controller = WhoIsThisController();
-      controller.selectRelationship(controller.state.currentQuestion!.relationship);
+      controller.selectRelationship(
+        controller.state.currentQuestion!.relationship,
+      );
       controller.completeGame();
 
       // Attempts after completion
-      controller.selectRelationship(controller.state.currentQuestion!.relationship);
+      controller.selectRelationship(
+        controller.state.currentQuestion!.relationship,
+      );
       final hintRes = controller.useHint();
       expect(hintRes, isFalse);
     });

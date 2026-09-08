@@ -6,9 +6,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
-import 'caregiver_login_screen.dart';
 import 'widgets/activity_summary_cards.dart';
 import 'widgets/game_history_list.dart';
 import 'widgets/patient_selector_widget.dart';
@@ -27,6 +27,17 @@ class CaregiverDashboardScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAF9),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back to Home',
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -35,8 +46,14 @@ class CaregiverDashboardScreen extends ConsumerWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
-              caregiver != null ? 'Welcome, ${caregiver.fullName}' : 'NIRVANA Care',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Colors.grey),
+              caregiver != null
+                  ? 'Welcome, ${caregiver.fullName}'
+                  : 'NIRVANA Care',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                color: Colors.grey,
+              ),
             ),
           ],
         ),
@@ -61,9 +78,7 @@ class CaregiverDashboardScreen extends ConsumerWidget {
             onPressed: () async {
               await ref.read(caregiverAuthProvider.notifier).logout();
               if (context.mounted) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const CaregiverLoginScreen()),
-                );
+                context.go('/caregiver/login');
               }
             },
           ),
@@ -79,7 +94,10 @@ class CaregiverDashboardScreen extends ConsumerWidget {
             ref.invalidate(caregiverSyncStatusProvider);
           },
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 16.0,
+            ),
             children: const [
               // 1. Patient Selector (Only assigned patients)
               PatientSelectorWidget(),

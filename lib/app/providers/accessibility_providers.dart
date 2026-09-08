@@ -17,8 +17,8 @@ class ReducedMotionNotifier extends StateNotifier<bool> {
 
 final reducedMotionProvider =
     StateNotifierProvider<ReducedMotionNotifier, bool>((ref) {
-  return ReducedMotionNotifier();
-});
+      return ReducedMotionNotifier();
+    });
 
 /// Notifier for High Contrast visual theme
 class HighContrastNotifier extends StateNotifier<bool> {
@@ -28,8 +28,9 @@ class HighContrastNotifier extends StateNotifier<bool> {
   void setHighContrast(bool value) => state = value;
 }
 
-final highContrastProvider =
-    StateNotifierProvider<HighContrastNotifier, bool>((ref) {
+final highContrastProvider = StateNotifierProvider<HighContrastNotifier, bool>((
+  ref,
+) {
   return HighContrastNotifier();
 });
 
@@ -51,8 +52,8 @@ class TextScaleNotifier extends StateNotifier<TextScaleOption> {
 
 final textScaleProvider =
     StateNotifierProvider<TextScaleNotifier, TextScaleOption>((ref) {
-  return TextScaleNotifier();
-});
+      return TextScaleNotifier();
+    });
 
 /// Notifier for Active Language / Locale
 class LocaleNotifier extends StateNotifier<Locale> {

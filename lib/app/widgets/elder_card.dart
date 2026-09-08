@@ -30,15 +30,20 @@ class ElderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isHighContrast = theme.brightness == Brightness.light &&
+    final isHighContrast =
+        theme.brightness == Brightness.light &&
         theme.primaryColor == ElderColors.highContrastPrimary;
 
-    final effectiveBorderColor = borderColor ??
+    final effectiveBorderColor =
+        borderColor ??
         (isHighContrast ? ElderColors.borderHighContrast : ElderColors.border);
-    final effectiveBgColor = backgroundColor ?? theme.cardTheme.color ?? Colors.white;
+    final effectiveBgColor =
+        backgroundColor ?? theme.cardTheme.color ?? Colors.white;
 
     final cardContent = Container(
-      constraints: const BoxConstraints(minHeight: ElderTheme.minTouchTargetSize),
+      constraints: const BoxConstraints(
+        minHeight: ElderTheme.minTouchTargetSize,
+      ),
       padding: padding,
       decoration: BoxDecoration(
         color: effectiveBgColor,

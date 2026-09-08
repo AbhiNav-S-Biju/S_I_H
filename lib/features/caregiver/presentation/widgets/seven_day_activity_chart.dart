@@ -23,7 +23,9 @@ class SevenDayActivityChart extends ConsumerWidget {
           return const Center(child: Text('No activity data recorded yet.'));
         }
 
-        final maxTotal = days.map((d) => d.totalActivities).fold<int>(1, math.max);
+        final maxTotal = days
+            .map((d) => d.totalActivities)
+            .fold<int>(1, math.max);
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -55,9 +57,15 @@ class SevenDayActivityChart extends ConsumerWidget {
                   ),
                   Row(
                     children: [
-                      const _LegendIndicator(color: ElderColors.primary, label: 'Games'),
+                      const _LegendIndicator(
+                        color: ElderColors.primary,
+                        label: 'Games',
+                      ),
                       const SizedBox(width: 12),
-                      _LegendIndicator(color: Colors.amber[700]!, label: 'Reminders'),
+                      _LegendIndicator(
+                        color: Colors.amber[700]!,
+                        label: 'Reminders',
+                      ),
                     ],
                   ),
                 ],
@@ -68,8 +76,10 @@ class SevenDayActivityChart extends ConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: days.map((day) {
-                    final gamesHeightFraction = (day.gamesCompleted / maxTotal).clamp(0.0, 1.0);
-                    final remindersHeightFraction = (day.remindersCompleted / maxTotal).clamp(0.0, 1.0);
+                    final gamesHeightFraction = (day.gamesCompleted / maxTotal)
+                        .clamp(0.0, 1.0);
+                    final remindersHeightFraction =
+                        (day.remindersCompleted / maxTotal).clamp(0.0, 1.0);
 
                     return Expanded(
                       child: Padding(
@@ -90,19 +100,25 @@ class SevenDayActivityChart extends ConsumerWidget {
                             Column(
                               children: [
                                 Container(
-                                  height: (80.0 * remindersHeightFraction).toDouble(),
+                                  height: (80.0 * remindersHeightFraction)
+                                      .toDouble(),
                                   width: 18,
                                   decoration: BoxDecoration(
                                     color: Colors.amber[700],
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(4),
+                                    ),
                                   ),
                                 ),
                                 Container(
-                                  height: (80.0 * gamesHeightFraction).toDouble(),
+                                  height: (80.0 * gamesHeightFraction)
+                                      .toDouble(),
                                   width: 18,
                                   decoration: const BoxDecoration(
                                     color: ElderColors.primary,
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+                                    borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(4),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -127,7 +143,10 @@ class SevenDayActivityChart extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const SizedBox(height: 160, child: Center(child: CircularProgressIndicator())),
+      loading: () => const SizedBox(
+        height: 160,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       error: (e, _) => Text('Error loading 7-day activity: $e'),
     );
   }
@@ -152,7 +171,11 @@ class _LegendIndicator extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );

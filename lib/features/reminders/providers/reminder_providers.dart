@@ -30,15 +30,19 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 });
 
 /// Stream / Future provider of active reminders for a given patient ID
-final activeRemindersProvider =
-    FutureProvider.family<List<Reminder>, String>((ref, patientId) async {
+final activeRemindersProvider = FutureProvider.family<List<Reminder>, String>((
+  ref,
+  patientId,
+) async {
   final repo = ref.watch(reminderRepositoryProvider);
   return repo.getActiveReminders(patientId);
 });
 
 /// Future provider of reminder logs for a given patient ID
-final reminderLogsProvider =
-    FutureProvider.family<List<ReminderLog>, String>((ref, patientId) async {
+final reminderLogsProvider = FutureProvider.family<List<ReminderLog>, String>((
+  ref,
+  patientId,
+) async {
   final repo = ref.watch(reminderRepositoryProvider);
   return repo.getReminderLogs(patientId);
 });

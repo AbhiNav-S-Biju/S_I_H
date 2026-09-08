@@ -25,10 +25,8 @@ class GameCompletionDialog extends StatelessWidget {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => GameCompletionDialog(
-        session: session,
-        onFinish: onFinish,
-      ),
+      builder: (ctx) =>
+          GameCompletionDialog(session: session, onFinish: onFinish),
     );
   }
 
@@ -99,11 +97,16 @@ class GameCompletionDialog extends StatelessWidget {
                 children: [
                   _buildMetric(
                     label: 'Items Found',
-                    value: '${session.correctAnswers} / ${session.totalQuestions}',
+                    value:
+                        '${session.correctAnswers} / ${session.totalQuestions}',
                     icon: Icons.star_rounded,
                     color: const Color(0xFFD97706),
                   ),
-                  Container(height: 36.0, width: 1.5, color: const Color(0xFFCBD5E1)),
+                  Container(
+                    height: 36.0,
+                    width: 1.5,
+                    color: const Color(0xFFCBD5E1),
+                  ),
                   _buildMetric(
                     label: 'Minutes Active',
                     value: '${(session.durationSeconds / 60).ceil()} min',

@@ -111,7 +111,9 @@ class ElderTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(buttonBorderRadius),
           ),
-          textStyle: textTheme.labelLarge?.copyWith(color: ElderColors.onPrimary),
+          textStyle: textTheme.labelLarge?.copyWith(
+            color: ElderColors.onPrimary,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -182,7 +184,10 @@ class ElderTheme {
         elevation: 0.0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(cardBorderRadius),
-          side: const BorderSide(color: ElderColors.borderHighContrast, width: 3.0),
+          side: const BorderSide(
+            color: ElderColors.borderHighContrast,
+            width: 3.0,
+          ),
         ),
         margin: const EdgeInsets.symmetric(vertical: 8.0),
       ),
@@ -212,15 +217,15 @@ class ElderTheme {
           textStyle: textTheme.labelLarge?.copyWith(color: Colors.black),
         ),
       ),
-      iconTheme: const IconThemeData(
-        size: 34.0,
-        color: Colors.black,
-      ),
+      iconTheme: const IconThemeData(size: 34.0, color: Colors.black),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0.0,
-        titleTextStyle: textTheme.headlineMedium?.copyWith(color: Colors.black, fontWeight: FontWeight.w900),
+        titleTextStyle: textTheme.headlineMedium?.copyWith(
+          color: Colors.black,
+          fontWeight: FontWeight.w900,
+        ),
         shape: const Border(
           bottom: BorderSide(color: Colors.black, width: 3.0),
         ),

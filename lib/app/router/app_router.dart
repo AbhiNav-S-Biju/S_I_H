@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/caregiver/caregiver.dart';
 import '../../features/games/games.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
@@ -16,17 +17,20 @@ import '../../features/settings/presentation/language_selector_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../shell/elder_app_shell.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _homeNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'home');
-final GlobalKey<NavigatorState> _gamesNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'games');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
+final GlobalKey<NavigatorState> _homeNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'home',
+);
+final GlobalKey<NavigatorState> _gamesNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'games',
+);
 final GlobalKey<NavigatorState> _settingsNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'settings');
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final isOnboardingCompleted = ref.watch(onboardingCompletedProvider);
+  final isOnboardingCompleted = ref.read(onboardingCompletedProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -38,7 +42,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const OnboardingScreen(),
       ),
 
-      // 2. Main Stateful Shell with Accessible Bottom Navigation
+      // 2. Caregiver Portal Routes (Full screen, outside elder shell)
+      GoRoute(
+        path: '/caregiver/login',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CaregiverLoginScreen(),
+      ),
+      GoRoute(
+        path: '/caregiver/dashboard',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CaregiverDashboardScreen(),
+      ),
+
+      // 3. Main Stateful Shell with Accessible Bottom Navigation
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ElderAppShell(navigationShell: navigationShell);

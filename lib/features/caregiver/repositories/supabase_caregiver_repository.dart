@@ -21,8 +21,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   SupabaseCaregiverRepository({
     SupabaseClient? client,
     IConnectivityMonitor? connectivityMonitor,
-  })  : _client = client,
-        _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
+  }) : _client = client,
+       _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
 
   SupabaseClient? get client {
     if (_client != null) return _client;
@@ -66,7 +66,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
           return _cachedProfile!;
         }
       } catch (e) {
-        debugPrint('⚠️ Supabase login exception: $e. Falling back to offline session mode.');
+        debugPrint(
+          '⚠️ Supabase login exception: $e. Falling back to offline session mode.',
+        );
       }
     }
 
@@ -174,7 +176,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             durationSeconds: map['duration_seconds'] as int? ?? 0,
             correctCount: map['correct_count'] as int? ?? 0,
             totalCount: map['total_count'] as int? ?? 0,
-            playedAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now(),
+            playedAt:
+                DateTime.tryParse(map['created_at'] as String? ?? '') ??
+                DateTime.now(),
           );
         }).toList();
       } catch (e) {
@@ -222,7 +226,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   }
 
   @override
-  Future<List<CaregiverReminderRecord>> getReminderStatus(String patientId) async {
+  Future<List<CaregiverReminderRecord>> getReminderStatus(
+    String patientId,
+  ) async {
     // Check local Hive database first for instant offline readiness
     try {
       final localReminders = HiveDatabase.remindersBox.values.where((r) {
@@ -238,7 +244,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             isCompleted: r.isCompleted,
             completedAt: r.completedAt,
             snoozedUntil: r.snoozedUntil,
-            lastAction: r.isCompleted ? 'done' : (r.snoozedUntil != null ? 'snoozed' : null),
+            lastAction: r.isCompleted
+                ? 'done'
+                : (r.snoozedUntil != null ? 'snoozed' : null),
           );
         }).toList();
       }
@@ -274,7 +282,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   }
 
   @override
-  Future<List<DailyActivitySummary>> getSevenDayActivity(String patientId) async {
+  Future<List<DailyActivitySummary>> getSevenDayActivity(
+    String patientId,
+  ) async {
     final now = DateTime.now();
     final List<DailyActivitySummary> summaries = [];
 
@@ -317,9 +327,13 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     return CaregiverSyncInfo(
       pendingEventsCount: pendingCount,
       isOnline: isOnline,
-      lastSyncedAt: isOnline ? DateTime.now().subtract(const Duration(minutes: 4)) : null,
+      lastSyncedAt: isOnline
+          ? DateTime.now().subtract(const Duration(minutes: 4))
+          : null,
       statusLabel: isOnline
-          ? (pendingCount == 0 ? 'All activities synchronized' : '$pendingCount pending updates syncing...')
+          ? (pendingCount == 0
+                ? 'All activities synchronized'
+                : '$pendingCount pending updates syncing...')
           : 'Operating Offline — records queued locally',
     );
   }

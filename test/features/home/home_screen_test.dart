@@ -23,23 +23,28 @@ void main() {
     );
   }
 
-  testWidgets('HomeScreen renders greeting, activities card, and settings card',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(createHomeScreen());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'HomeScreen renders greeting, activities card, and settings card',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(createHomeScreen());
+      await tester.pumpAndSettle();
 
-    // Check App bar title
-    expect(find.text('NIRVANA'), findsOneWidget);
+      // Check App bar title
+      expect(find.text('NIRVANA'), findsOneWidget);
 
-    // Check Start Activities action button exists
-    expect(find.text("Today's Activities"), findsOneWidget);
-    expect(find.text('Start Activities'), findsOneWidget);
+      // Check Start Activities action button exists
+      expect(find.text("Today's Activities"), findsOneWidget);
+      expect(find.text('Start Activities'), findsOneWidget);
 
-    // Check Settings action card exists
-    expect(find.text('App Settings & Comfort'), findsOneWidget);
-    expect(find.text('Settings'), findsWidgets);
+      // Check Settings action card exists
+      expect(find.text('App Settings & Comfort'), findsOneWidget);
+      expect(find.text('Settings'), findsWidgets);
 
-    // Check supportive message exists
-    expect(find.byIcon(Icons.spa_rounded), findsWidgets);
-  });
+      // Check supportive message exists
+      expect(find.byIcon(Icons.spa_rounded), findsWidgets);
+
+      // Check Caregiver Portal secondary button exists
+      expect(find.text('Caregiver Portal'), findsOneWidget);
+    },
+  );
 }

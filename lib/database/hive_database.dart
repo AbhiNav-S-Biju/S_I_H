@@ -25,8 +25,10 @@ class HiveDatabase {
     await openBoxes();
 
     _isInitialized = true;
-    debugPrint('✅ HiveDatabase initialized successfully with boxes: '
-        '${HiveBoxes.reminders}, ${HiveBoxes.reminderLogs}, ${HiveBoxes.syncQueue}');
+    debugPrint(
+      '✅ HiveDatabase initialized successfully with boxes: '
+      '${HiveBoxes.reminders}, ${HiveBoxes.reminderLogs}, ${HiveBoxes.syncQueue}',
+    );
   }
 
   /// Registers TypeAdapters if not already registered.

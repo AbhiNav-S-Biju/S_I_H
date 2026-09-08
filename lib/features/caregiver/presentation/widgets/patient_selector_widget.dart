@@ -37,7 +37,10 @@ class PatientSelectorWidget extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: ElderColors.primary.withValues(alpha: 0.3), width: 1.5),
+            border: Border.all(
+              color: ElderColors.primary.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -75,7 +78,10 @@ class PatientSelectorWidget extends ConsumerWidget {
                       child: DropdownButton<PatientSummary>(
                         value: selectedPatient ?? patients.first,
                         isDense: true,
-                        icon: const Icon(Icons.arrow_drop_down, color: ElderColors.primary),
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: ElderColors.primary,
+                        ),
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -84,12 +90,15 @@ class PatientSelectorWidget extends ConsumerWidget {
                         items: patients.map((patient) {
                           return DropdownMenuItem<PatientSummary>(
                             value: patient,
-                            child: Text('${patient.fullName} (${patient.relationship})'),
+                            child: Text(
+                              '${patient.fullName} (${patient.relationship})',
+                            ),
                           );
                         }).toList(),
                         onChanged: (newPatient) {
                           if (newPatient != null) {
-                            ref.read(selectedPatientProvider.notifier).state = newPatient;
+                            ref.read(selectedPatientProvider.notifier).state =
+                                newPatient;
                           }
                         },
                       ),

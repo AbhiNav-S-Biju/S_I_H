@@ -26,73 +26,97 @@ void main() {
   });
 
   group('CaregiverRepository Authentication Tests', () {
-    test('login returns valid CaregiverProfile in offline fallback mode', () async {
-      final profile = await repository.login(
-        email: 'sarah.caregiver@example.com',
-        password: 'SecurePassword123',
-      );
+    test(
+      'login returns valid CaregiverProfile in offline fallback mode',
+      () async {
+        final profile = await repository.login(
+          email: 'sarah.caregiver@example.com',
+          password: 'SecurePassword123',
+        );
 
-      expect(profile.id, isNotEmpty);
-      expect(profile.email, equals('sarah.caregiver@example.com'));
-      expect(profile.role, equals('primary_caregiver'));
-    });
+        expect(profile.id, isNotEmpty);
+        expect(profile.email, equals('sarah.caregiver@example.com'));
+        expect(profile.role, equals('primary_caregiver'));
+      },
+    );
 
-    test('getCurrentCaregiver returns cached profile after login and null after logout', () async {
-      await repository.login(
-        email: 'test@example.com',
-        password: 'pass',
-      );
+    test(
+      'getCurrentCaregiver returns cached profile after login and null after logout',
+      () async {
+        await repository.login(email: 'test@example.com', password: 'pass');
 
-      final current = await repository.getCurrentCaregiver();
-      expect(current, isNotNull);
-      expect(current!.email, equals('test@example.com'));
+        final current = await repository.getCurrentCaregiver();
+        expect(current, isNotNull);
+        expect(current!.email, equals('test@example.com'));
 
-      await repository.logout();
-      final afterLogout = await repository.getCurrentCaregiver();
-      expect(afterLogout, isNull);
-    });
+        await repository.logout();
+        final afterLogout = await repository.getCurrentCaregiver();
+        expect(afterLogout, isNull);
+      },
+    );
   });
 
   group('CaregiverRepository Patient-Scoped Access & Metrics Tests', () {
-    test('getAssignedPatients returns only patients assigned to caregiver', () async {
-      final patients = await repository.getAssignedPatients('caregiver-local-001');
+    test(
+      'getAssignedPatients returns only patients assigned to caregiver',
+      () async {
+        final patients = await repository.getAssignedPatients(
+          'caregiver-local-001',
+        );
 
-      expect(patients, isNotEmpty);
-      for (final patient in patients) {
-        expect(patient.primaryCaregiverId, equals('caregiver-local-001'));
-        expect(patient.fullName, isNotEmpty);
-        expect(patient.relationship, isNotEmpty);
-      }
-    });
+        expect(patients, isNotEmpty);
+        for (final patient in patients) {
+          expect(patient.primaryCaregiverId, equals('caregiver-local-001'));
+          expect(patient.fullName, isNotEmpty);
+          expect(patient.relationship, isNotEmpty);
+        }
+      },
+    );
 
-    test('getGameHistory returns recent game activity without clinical progression labels', () async {
-      final history = await repository.getGameHistory('patient-elena-01');
+    test(
+      'getGameHistory returns recent game activity without clinical progression labels',
+      () async {
+        final history = await repository.getGameHistory('patient-elena-01');
 
-      expect(history, isNotEmpty);
-      for (final game in history) {
-        expect(game.gameTitle, isNotEmpty);
-        expect(game.score, isNonNegative);
-        expect(game.correctCount, isNonNegative);
-        expect(game.totalCount, isPositive);
-      }
-    });
+        expect(history, isNotEmpty);
+        for (final game in history) {
+          expect(game.gameTitle, isNotEmpty);
+          expect(game.score, isNonNegative);
+          expect(game.correctCount, isNonNegative);
+          expect(game.totalCount, isPositive);
+        }
+      },
+    );
 
-    test('getReminderStatus returns reminder records with completion status', () async {
-      final reminders = await repository.getReminderStatus('patient-elena-01');
+    test(
+      'getReminderStatus returns reminder records with completion status',
+      () async {
+        final reminders = await repository.getReminderStatus(
+          'patient-elena-01',
+        );
 
-      expect(reminders, isNotEmpty);
-      expect(reminders.any((r) => r.isCompleted), isTrue);
-    });
+        expect(reminders, isNotEmpty);
+        expect(reminders.any((r) => r.isCompleted), isTrue);
+      },
+    );
 
-    test('getSevenDayActivity calculates 7 daily summaries for the past week', () async {
-      final summaries = await repository.getSevenDayActivity('patient-elena-01');
+    test(
+      'getSevenDayActivity calculates 7 daily summaries for the past week',
+      () async {
+        final summaries = await repository.getSevenDayActivity(
+          'patient-elena-01',
+        );
 
-      expect(summaries.length, equals(7));
-      for (final day in summaries) {
-        expect(day.dayLabel, isNotEmpty);
-        expect(day.totalActivities, equals(day.gamesCompleted + day.remindersCompleted));
-      }
-    });
+        expect(summaries.length, equals(7));
+        for (final day in summaries) {
+          expect(day.dayLabel, isNotEmpty);
+          expect(
+            day.totalActivities,
+            equals(day.gamesCompleted + day.remindersCompleted),
+          );
+        }
+      },
+    );
 
     test('getSyncStatus returns proper offline status information', () async {
       final syncInfo = await repository.getSyncStatus('patient-elena-01');

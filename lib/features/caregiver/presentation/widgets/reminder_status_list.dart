@@ -57,7 +57,8 @@ class ReminderStatusList extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: reminders.length,
-            separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.withValues(alpha: 0.15)),
+            separatorBuilder: (_, __) =>
+                Divider(height: 1, color: Colors.grey.withValues(alpha: 0.15)),
             itemBuilder: (context, index) {
               final reminder = reminders[index];
 
@@ -73,7 +74,10 @@ class ReminderStatusList extends ConsumerWidget {
                   : (isSnoozed ? 'Snoozed' : 'Scheduled');
 
               return ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
                 leading: CircleAvatar(
                   backgroundColor: statusColor.withValues(alpha: 0.12),
                   child: Icon(
@@ -96,7 +100,10 @@ class ReminderStatusList extends ConsumerWidget {
                   style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                 ),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
@@ -127,10 +134,12 @@ class ReminderStatusList extends ConsumerWidget {
 
   static String _formatReminderSubtitle(dynamic reminder) {
     final sched = reminder.scheduledAt;
-    final timeStr = '${sched.hour.toString().padLeft(2, '0')}:${sched.minute.toString().padLeft(2, '0')}';
+    final timeStr =
+        '${sched.hour.toString().padLeft(2, '0')}:${sched.minute.toString().padLeft(2, '0')}';
     if (reminder.isCompleted && reminder.completedAt != null) {
       final comp = reminder.completedAt!;
-      final compTime = '${comp.hour.toString().padLeft(2, '0')}:${comp.minute.toString().padLeft(2, '0')}';
+      final compTime =
+          '${comp.hour.toString().padLeft(2, '0')}:${comp.minute.toString().padLeft(2, '0')}';
       return 'Scheduled: $timeStr • Completed at $compTime';
     }
     return 'Scheduled for $timeStr';

@@ -10,31 +10,37 @@ import 'package:nirvana/database/models/hive_sync_event.dart';
 
 void main() {
   group('HiveSyncEvent Model Tests', () {
-    test('creates HiveSyncEvent with default values and generates valid RPC payload', () {
-      final now = DateTime.utc(2026, 9, 8, 12, 0, 0);
-      final event = HiveSyncEvent(
-        eventId: 'test-event-uuid-1234',
-        entityType: 'reminder',
-        entityId: 'reminder-uuid-5678',
-        operation: 'create',
-        payload: {'title': 'Morning Medicine', 'is_active': true},
-        createdAt: now,
-        patientId: 'patient-uuid-9999',
-      );
+    test(
+      'creates HiveSyncEvent with default values and generates valid RPC payload',
+      () {
+        final now = DateTime.utc(2026, 9, 8, 12, 0, 0);
+        final event = HiveSyncEvent(
+          eventId: 'test-event-uuid-1234',
+          entityType: 'reminder',
+          entityId: 'reminder-uuid-5678',
+          operation: 'create',
+          payload: {'title': 'Morning Medicine', 'is_active': true},
+          createdAt: now,
+          patientId: 'patient-uuid-9999',
+        );
 
-      expect(event.eventId, equals('test-event-uuid-1234'));
-      expect(event.retryCount, equals(0));
-      expect(event.syncStatus, equals(SyncStatus.pending));
+        expect(event.eventId, equals('test-event-uuid-1234'));
+        expect(event.retryCount, equals(0));
+        expect(event.syncStatus, equals(SyncStatus.pending));
 
-      final rpcPayload = event.toRpcPayload();
-      expect(rpcPayload['event_id'], equals('test-event-uuid-1234'));
-      expect(rpcPayload['patient_id'], equals('patient-uuid-9999'));
-      expect(rpcPayload['entity_type'], equals('reminder'));
-      expect(rpcPayload['entity_id'], equals('reminder-uuid-5678'));
-      expect(rpcPayload['operation'], equals('create'));
-      expect(rpcPayload['payload'], equals({'title': 'Morning Medicine', 'is_active': true}));
-      expect(rpcPayload['created_at'], equals('2026-09-08T12:00:00.000Z'));
-    });
+        final rpcPayload = event.toRpcPayload();
+        expect(rpcPayload['event_id'], equals('test-event-uuid-1234'));
+        expect(rpcPayload['patient_id'], equals('patient-uuid-9999'));
+        expect(rpcPayload['entity_type'], equals('reminder'));
+        expect(rpcPayload['entity_id'], equals('reminder-uuid-5678'));
+        expect(rpcPayload['operation'], equals('create'));
+        expect(
+          rpcPayload['payload'],
+          equals({'title': 'Morning Medicine', 'is_active': true}),
+        );
+        expect(rpcPayload['created_at'], equals('2026-09-08T12:00:00.000Z'));
+      },
+    );
 
     test('sync status transitions properly', () {
       final event = HiveSyncEvent(

@@ -46,7 +46,10 @@ class HomeScreen extends ConsumerWidget {
           IconButton(
             iconSize: 32.0,
             tooltip: l10n?.settingsNavLabel ?? 'Settings',
-            icon: const Icon(Icons.settings_outlined, color: ElderColors.textPrimary),
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: ElderColors.textPrimary,
+            ),
             onPressed: () => context.push('/settings'),
           ),
           const SizedBox(width: 8.0),
@@ -77,7 +80,8 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16.0),
               SupportiveMessage(
-                message: l10n?.dailySupportiveMessage ??
+                message:
+                    l10n?.dailySupportiveMessage ??
                     'Take your time. There is no rush, and you are doing wonderful.',
                 icon: Icons.spa_rounded,
               ),
@@ -86,7 +90,9 @@ class HomeScreen extends ConsumerWidget {
               // 2. Primary Action 1: Daily Activities (Games)
               ElderCard(
                 padding: const EdgeInsets.all(22.0),
-                backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.35),
+                backgroundColor: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.35,
+                ),
                 borderColor: theme.colorScheme.primary,
                 borderWidth: 2.5,
                 child: Column(
@@ -109,7 +115,8 @@ class HomeScreen extends ConsumerWidget {
                         const SizedBox(width: 14.0),
                         Expanded(
                           child: Text(
-                            l10n?.dailyActivitiesCardTitle ?? "Today's Activities",
+                            l10n?.dailyActivitiesCardTitle ??
+                                "Today's Activities",
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w900,
                               color: ElderColors.textPrimary,
@@ -150,7 +157,10 @@ class HomeScreen extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color: ElderColors.surfaceElevated,
                             shape: BoxShape.circle,
-                            border: Border.all(color: ElderColors.border, width: 1.5),
+                            border: Border.all(
+                              color: ElderColors.border,
+                              width: 1.5,
+                            ),
                           ),
                           child: const Icon(
                             Icons.tune_rounded,
@@ -186,6 +196,29 @@ class HomeScreen extends ConsumerWidget {
                       onPressed: () => context.push('/settings'),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 20.0),
+
+              // 4. Secondary Portal Entry: Caregiver Portal
+              Center(
+                child: TextButton.icon(
+                  style: TextButton.styleFrom(
+                    foregroundColor: ElderColors.textSecondary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 10.0,
+                    ),
+                  ),
+                  icon: const Icon(Icons.family_restroom_rounded, size: 20.0),
+                  label: const Text(
+                    'Caregiver Portal',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onPressed: () => context.push('/caregiver/login'),
                 ),
               ),
               const SizedBox(height: 24.0),

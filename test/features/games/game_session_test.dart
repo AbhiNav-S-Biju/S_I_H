@@ -114,7 +114,11 @@ void main() {
       ];
 
       for (final term in forbiddenTerms) {
-        expect(msg, isNot(contains(term)), reason: 'Forbidden term "$term" found in message');
+        expect(
+          msg,
+          isNot(contains(term)),
+          reason: 'Forbidden term "$term" found in message',
+        );
       }
     });
   });

@@ -78,7 +78,9 @@ void main() {
   setUp(() async {
     final timestamp = DateTime.now().microsecondsSinceEpoch;
     remindersBox = await Hive.openBox<HiveReminder>('reminders_$timestamp');
-    reminderLogsBox = await Hive.openBox<HiveReminderLog>('reminder_logs_$timestamp');
+    reminderLogsBox = await Hive.openBox<HiveReminderLog>(
+      'reminder_logs_$timestamp',
+    );
     syncQueueBox = await Hive.openBox<HiveSyncEvent>('sync_queue_$timestamp');
 
     syncEngine = SyncEngine(
@@ -117,7 +119,10 @@ void main() {
 
       expect(created.id, equals('rem-uuid-1'));
       expect(remindersBox.length, equals(1));
-      expect(remindersBox.get('rem-uuid-1')?.title, equals('Morning Blood Pressure Check'));
+      expect(
+        remindersBox.get('rem-uuid-1')?.title,
+        equals('Morning Blood Pressure Check'),
+      );
 
       // Check sync queue
       expect(syncQueueBox.length, equals(1));
@@ -128,140 +133,170 @@ void main() {
       expect(queued.syncStatus, equals(SyncStatus.pending));
     });
 
-    test('getActiveReminders returns only active non-completed items', () async {
-      final active = Reminder(
-        id: 'rem-active',
-        patientId: 'pat-1',
-        title: 'Drink Water',
-        body: '',
-        scheduledAt: DateTime.now().add(const Duration(hours: 1)),
-        createdAt: DateTime.now(),
-        notificationId: 102,
-        isActive: true,
-        isCompleted: false,
-      );
+    test(
+      'getActiveReminders returns only active non-completed items',
+      () async {
+        final active = Reminder(
+          id: 'rem-active',
+          patientId: 'pat-1',
+          title: 'Drink Water',
+          body: '',
+          scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+          createdAt: DateTime.now(),
+          notificationId: 102,
+          isActive: true,
+          isCompleted: false,
+        );
 
-      final completed = Reminder(
-        id: 'rem-done',
-        patientId: 'pat-1',
-        title: 'Breakfast pills',
-        body: '',
-        scheduledAt: DateTime.now().subtract(const Duration(hours: 2)),
-        createdAt: DateTime.now(),
-        notificationId: 103,
-        isActive: true,
-        isCompleted: true,
-      );
+        final completed = Reminder(
+          id: 'rem-done',
+          patientId: 'pat-1',
+          title: 'Breakfast pills',
+          body: '',
+          scheduledAt: DateTime.now().subtract(const Duration(hours: 2)),
+          createdAt: DateTime.now(),
+          notificationId: 103,
+          isActive: true,
+          isCompleted: true,
+        );
 
-      final deleted = Reminder(
-        id: 'rem-del',
-        patientId: 'pat-1',
-        title: 'Old alert',
-        body: '',
-        scheduledAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        notificationId: 104,
-        isActive: false,
-        isCompleted: false,
-      );
+        final deleted = Reminder(
+          id: 'rem-del',
+          patientId: 'pat-1',
+          title: 'Old alert',
+          body: '',
+          scheduledAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          notificationId: 104,
+          isActive: false,
+          isCompleted: false,
+        );
 
-      await repository.createReminder(active);
-      await repository.createReminder(completed);
-      await repository.createReminder(deleted);
+        await repository.createReminder(active);
+        await repository.createReminder(completed);
+        await repository.createReminder(deleted);
 
-      final list = await repository.getActiveReminders('pat-1');
-      expect(list.length, equals(1));
-      expect(list.first.id, equals('rem-active'));
-    });
+        final list = await repository.getActiveReminders('pat-1');
+        expect(list.length, equals(1));
+        expect(list.first.id, equals('rem-active'));
+      },
+    );
   });
 
   group('HiveReminderRepository Action Tests (Done / Snooze / Later)', () {
-    test('completeReminder marks complete, writes adherence log with "done", and queues sync events', () async {
-      final reminder = Reminder(
-        id: 'rem-action-1',
-        patientId: 'pat-1',
-        title: 'Afternoon Vitamin D',
-        body: '',
-        scheduledAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        notificationId: 201,
-      );
+    test(
+      'completeReminder marks complete, writes adherence log with "done", and queues sync events',
+      () async {
+        final reminder = Reminder(
+          id: 'rem-action-1',
+          patientId: 'pat-1',
+          title: 'Afternoon Vitamin D',
+          body: '',
+          scheduledAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          notificationId: 201,
+        );
 
-      await repository.createReminder(reminder);
-      await syncQueueBox.clear(); // Clear initial create event
+        await repository.createReminder(reminder);
+        await syncQueueBox.clear(); // Clear initial create event
 
-      await repository.completeReminder('rem-action-1');
+        await repository.completeReminder('rem-action-1');
 
-      // Verify reminder state
-      final updated = remindersBox.get('rem-action-1')!;
-      expect(updated.isCompleted, isTrue);
-      expect(updated.completedAt, isNotNull);
+        // Verify reminder state
+        final updated = remindersBox.get('rem-action-1')!;
+        expect(updated.isCompleted, isTrue);
+        expect(updated.completedAt, isNotNull);
 
-      // Verify log entry
-      expect(reminderLogsBox.length, equals(1));
-      final log = reminderLogsBox.values.first;
-      expect(log.reminderId, equals('rem-action-1'));
-      expect(log.action, equals(ReminderActionType.done.value));
+        // Verify log entry
+        expect(reminderLogsBox.length, equals(1));
+        final log = reminderLogsBox.values.first;
+        expect(log.reminderId, equals('rem-action-1'));
+        expect(log.action, equals(ReminderActionType.done.value));
 
-      // Verify sync events: 1 reminder update + 1 reminder_log create
-      expect(syncQueueBox.length, equals(2));
-      final events = syncQueueBox.values.toList();
-      expect(events.any((e) => e.entityType == 'reminder' && e.operation == 'update'), isTrue);
-      expect(events.any((e) => e.entityType == 'reminder_log' && e.operation == 'create'), isTrue);
-    });
+        // Verify sync events: 1 reminder update + 1 reminder_log create
+        expect(syncQueueBox.length, equals(2));
+        final events = syncQueueBox.values.toList();
+        expect(
+          events.any(
+            (e) => e.entityType == 'reminder' && e.operation == 'update',
+          ),
+          isTrue,
+        );
+        expect(
+          events.any(
+            (e) => e.entityType == 'reminder_log' && e.operation == 'create',
+          ),
+          isTrue,
+        );
+      },
+    );
 
-    test('snoozeReminder sets snoozedUntil (+15m), writes log, and queues sync events', () async {
-      final reminder = Reminder(
-        id: 'rem-snooze-1',
-        patientId: 'pat-1',
-        title: 'Eye drops',
-        body: '',
-        scheduledAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        notificationId: 202,
-      );
+    test(
+      'snoozeReminder sets snoozedUntil (+15m), writes log, and queues sync events',
+      () async {
+        final reminder = Reminder(
+          id: 'rem-snooze-1',
+          patientId: 'pat-1',
+          title: 'Eye drops',
+          body: '',
+          scheduledAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          notificationId: 202,
+        );
 
-      await repository.createReminder(reminder);
-      await syncQueueBox.clear();
+        await repository.createReminder(reminder);
+        await syncQueueBox.clear();
 
-      await repository.snoozeReminder('rem-snooze-1', delay: const Duration(minutes: 15));
+        await repository.snoozeReminder(
+          'rem-snooze-1',
+          delay: const Duration(minutes: 15),
+        );
 
-      final updated = remindersBox.get('rem-snooze-1')!;
-      expect(updated.isCompleted, isFalse);
-      expect(updated.snoozedUntil, isNotNull);
-      expect(updated.snoozedUntil!.isAfter(DateTime.now()), isTrue);
+        final updated = remindersBox.get('rem-snooze-1')!;
+        expect(updated.isCompleted, isFalse);
+        expect(updated.snoozedUntil, isNotNull);
+        expect(updated.snoozedUntil!.isAfter(DateTime.now()), isTrue);
 
-      final log = reminderLogsBox.values.first;
-      expect(log.action, equals(ReminderActionType.snoozed.value));
-      expect(log.metadata['snooze_duration_seconds'], equals(900));
+        final log = reminderLogsBox.values.first;
+        expect(log.action, equals(ReminderActionType.snoozed.value));
+        expect(log.metadata['snooze_duration_seconds'], equals(900));
 
-      expect(syncQueueBox.length, equals(2));
-    });
+        expect(syncQueueBox.length, equals(2));
+      },
+    );
 
-    test('dismissReminderLaterToday sets snoozedUntil (+4h), writes log, and queues sync events', () async {
-      final reminder = Reminder(
-        id: 'rem-later-1',
-        patientId: 'pat-1',
-        title: 'Walk in garden',
-        body: '',
-        scheduledAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        notificationId: 203,
-      );
+    test(
+      'dismissReminderLaterToday sets snoozedUntil (+4h), writes log, and queues sync events',
+      () async {
+        final reminder = Reminder(
+          id: 'rem-later-1',
+          patientId: 'pat-1',
+          title: 'Walk in garden',
+          body: '',
+          scheduledAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          notificationId: 203,
+        );
 
-      await repository.createReminder(reminder);
-      await syncQueueBox.clear();
+        await repository.createReminder(reminder);
+        await syncQueueBox.clear();
 
-      await repository.dismissReminderLaterToday('rem-later-1');
+        await repository.dismissReminderLaterToday('rem-later-1');
 
-      final updated = remindersBox.get('rem-later-1')!;
-      expect(updated.snoozedUntil, isNotNull);
-      expect(updated.snoozedUntil!.isAfter(DateTime.now().add(const Duration(hours: 3))), isTrue);
+        final updated = remindersBox.get('rem-later-1')!;
+        expect(updated.snoozedUntil, isNotNull);
+        expect(
+          updated.snoozedUntil!.isAfter(
+            DateTime.now().add(const Duration(hours: 3)),
+          ),
+          isTrue,
+        );
 
-      final log = reminderLogsBox.values.first;
-      expect(log.action, equals(ReminderActionType.laterToday.value));
-      expect(syncQueueBox.length, equals(2));
-    });
+        final log = reminderLogsBox.values.first;
+        expect(log.action, equals(ReminderActionType.laterToday.value));
+        expect(syncQueueBox.length, equals(2));
+      },
+    );
 
     test('deleteReminder sets isActive false and queues sync event', () async {
       final reminder = Reminder(

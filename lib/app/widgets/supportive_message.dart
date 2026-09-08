@@ -34,19 +34,12 @@ class SupportiveMessage extends StatelessWidget {
         decoration: BoxDecoration(
           color: ElderColors.supportiveBg,
           borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-          border: Border.all(
-            color: ElderColors.supportiveBorder,
-            width: 2.0,
-          ),
+          border: Border.all(color: ElderColors.supportiveBorder, width: 2.0),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              icon,
-              size: 32.0,
-              color: ElderColors.supportiveIcon,
-            ),
+            Icon(icon, size: 32.0, color: ElderColors.supportiveIcon),
             const SizedBox(width: 14.0),
             Expanded(
               child: Column(

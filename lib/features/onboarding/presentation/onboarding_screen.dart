@@ -109,7 +109,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             padding: const EdgeInsets.only(right: 16.0),
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14.0,
+                  vertical: 6.0,
+                ),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(20.0),
@@ -133,7 +136,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(), // Controlled via buttons
+                physics:
+                    const NeverScrollableScrollPhysics(), // Controlled via buttons
                 onPageChanged: (index) {
                   setState(() {
                     _currentStep = index;
@@ -189,16 +193,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             padding: const EdgeInsets.all(16.0),
                             child: Consumer(
                               builder: (context, ref, _) {
-                                final isHighContrast = ref.watch(highContrastProvider);
+                                final isHighContrast = ref.watch(
+                                  highContrastProvider,
+                                );
                                 return SwitchListTile(
                                   contentPadding: EdgeInsets.zero,
                                   title: Text(
-                                    l10n?.highContrastTitle ?? 'High Contrast Mode',
-                                    style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.w700),
+                                    l10n?.highContrastTitle ??
+                                        'High Contrast Mode',
+                                    style: const TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                   value: isHighContrast,
                                   onChanged: (val) {
-                                    ref.read(highContrastProvider.notifier).setHighContrast(val);
+                                    ref
+                                        .read(highContrastProvider.notifier)
+                                        .setHighContrast(val);
                                   },
                                 );
                               },
@@ -206,7 +218,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           ),
                         ] else if (index == 2) ...[
                           SupportiveMessage(
-                            message: l10n?.dailySupportiveMessage ??
+                            message:
+                                l10n?.dailySupportiveMessage ??
                                 'Take your time. There is no rush, and you are doing wonderful.',
                             icon: Icons.favorite_rounded,
                           ),
@@ -219,7 +232,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
             // Bottom Action Area (Maximum 2 buttons: Back & Next/Finish)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -234,7 +250,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         ? (l10n?.onboardingFinishButton ?? 'Enter Nirvana')
                         : (l10n?.continueButton ?? 'Continue'),
                     onPressed: _nextPage,
-                    icon: _currentStep == 2 ? Icons.check_circle_rounded : Icons.arrow_forward_rounded,
+                    icon: _currentStep == 2
+                        ? Icons.check_circle_rounded
+                        : Icons.arrow_forward_rounded,
                   ),
                   if (_currentStep > 0) ...[
                     const SizedBox(height: 12.0),

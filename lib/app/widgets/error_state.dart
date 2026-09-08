@@ -20,7 +20,8 @@ class ErrorState extends StatelessWidget {
   const ErrorState({
     super.key,
     this.title = "Let's Take a Gentle Pause",
-    this.message = 'We ran into a small hiccup. Everything is safe and your progress is saved.',
+    this.message =
+        'We ran into a small hiccup. Everything is safe and your progress is saved.',
     this.retryLabel = 'Try Again',
     this.onRetry,
     this.secondaryActionLabel,
@@ -85,7 +86,8 @@ class ErrorState extends StatelessWidget {
                   onPressed: onRetry,
                   icon: Icons.refresh_rounded,
                 ),
-              if (onSecondaryAction != null && secondaryActionLabel != null) ...[
+              if (onSecondaryAction != null &&
+                  secondaryActionLabel != null) ...[
                 const SizedBox(height: 14.0),
                 LargeActionButton(
                   label: secondaryActionLabel!,

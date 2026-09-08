@@ -30,9 +30,7 @@ class ElderGameButton extends StatelessWidget {
     final defaultBg = isSecondary
         ? const Color(0xFFF1F5F9)
         : const Color(0xFF0F766E); // Deep calming teal
-    final defaultFg = isSecondary
-        ? const Color(0xFF0F172A)
-        : Colors.white;
+    final defaultFg = isSecondary ? const Color(0xFF0F172A) : Colors.white;
 
     final bg = backgroundColor ?? defaultBg;
     final fg = foregroundColor ?? defaultFg;
@@ -42,10 +40,7 @@ class ElderGameButton extends StatelessWidget {
       label: label,
       enabled: onPressed != null,
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: minHeight,
-          minWidth: 140.0,
-        ),
+        constraints: BoxConstraints(minHeight: minHeight, minWidth: 140.0),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: bg,
@@ -57,11 +52,16 @@ class ElderGameButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.0),
               side: BorderSide(
-                color: isSecondary ? const Color(0xFFCBD5E1) : Colors.transparent,
+                color: isSecondary
+                    ? const Color(0xFFCBD5E1)
+                    : Colors.transparent,
                 width: 2.0,
               ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
           ),
           onPressed: onPressed,
           child: Row(

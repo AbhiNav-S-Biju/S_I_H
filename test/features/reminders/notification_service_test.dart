@@ -56,7 +56,8 @@ class MockReminderRepository implements IReminderRepository {
     laterTodayCalls.add(reminderId);
     if (store.containsKey(reminderId)) {
       store[reminderId] = store[reminderId]!.copyWith(
-        snoozedUntil: scheduledLater ?? DateTime.now().add(const Duration(hours: 4)),
+        snoozedUntil:
+            scheduledLater ?? DateTime.now().add(const Duration(hours: 4)),
       );
     }
   }
@@ -67,10 +68,12 @@ class MockReminderRepository implements IReminderRepository {
   }
 
   @override
-  Future<List<Reminder>> getActiveReminders(String patientId) async => store.values.toList();
+  Future<List<Reminder>> getActiveReminders(String patientId) async =>
+      store.values.toList();
 
   @override
-  Future<Reminder?> getReminderById(String reminderId) async => store[reminderId];
+  Future<Reminder?> getReminderById(String reminderId) async =>
+      store[reminderId];
 
   @override
   Future<List<ReminderLog>> getReminderLogs(String patientId) async => [];
@@ -96,78 +99,91 @@ void main() {
   });
 
   group('NotificationService Action Dispatching Tests', () {
-    test('handles action_done and calls completeReminder on repository', () async {
-      final reminder = Reminder(
-        id: 'rem-done-test',
-        patientId: 'pat-1',
-        title: 'Heart Medication',
-        body: '1 tablet with water',
-        scheduledAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        notificationId: 501,
-      );
-      await mockRepository.createReminder(reminder);
+    test(
+      'handles action_done and calls completeReminder on repository',
+      () async {
+        final reminder = Reminder(
+          id: 'rem-done-test',
+          patientId: 'pat-1',
+          title: 'Heart Medication',
+          body: '1 tablet with water',
+          scheduledAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          notificationId: 501,
+        );
+        await mockRepository.createReminder(reminder);
 
-      final response = NotificationResponse(
-        notificationResponseType: NotificationResponseType.selectedNotificationAction,
-        actionId: NotificationActionIds.done,
-        payload: 'rem-done-test',
-      );
+        final response = NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotificationAction,
+          actionId: NotificationActionIds.done,
+          payload: 'rem-done-test',
+        );
 
-      await notificationService.handleNotificationResponse(response);
+        await notificationService.handleNotificationResponse(response);
 
-      expect(mockRepository.completedCalls, contains('rem-done-test'));
-    });
+        expect(mockRepository.completedCalls, contains('rem-done-test'));
+      },
+    );
 
-    test('handles action_snooze_15 and calls snoozeReminder on repository', () async {
-      final reminder = Reminder(
-        id: 'rem-snooze-test',
-        patientId: 'pat-1',
-        title: 'Eye Drops',
-        body: '2 drops in left eye',
-        scheduledAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        notificationId: 502,
-      );
-      await mockRepository.createReminder(reminder);
+    test(
+      'handles action_snooze_15 and calls snoozeReminder on repository',
+      () async {
+        final reminder = Reminder(
+          id: 'rem-snooze-test',
+          patientId: 'pat-1',
+          title: 'Eye Drops',
+          body: '2 drops in left eye',
+          scheduledAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          notificationId: 502,
+        );
+        await mockRepository.createReminder(reminder);
 
-      final response = NotificationResponse(
-        notificationResponseType: NotificationResponseType.selectedNotificationAction,
-        actionId: NotificationActionIds.snooze15,
-        payload: 'rem-snooze-test',
-      );
+        final response = NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotificationAction,
+          actionId: NotificationActionIds.snooze15,
+          payload: 'rem-snooze-test',
+        );
 
-      await notificationService.handleNotificationResponse(response);
+        await notificationService.handleNotificationResponse(response);
 
-      expect(mockRepository.snoozedCalls, contains('rem-snooze-test'));
-    });
+        expect(mockRepository.snoozedCalls, contains('rem-snooze-test'));
+      },
+    );
 
-    test('handles action_later_today and calls dismissReminderLaterToday on repository', () async {
-      final reminder = Reminder(
-        id: 'rem-later-test',
-        patientId: 'pat-1',
-        title: 'Gentle Stretches',
-        body: '10 min chair yoga',
-        scheduledAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        notificationId: 503,
-      );
-      await mockRepository.createReminder(reminder);
+    test(
+      'handles action_later_today and calls dismissReminderLaterToday on repository',
+      () async {
+        final reminder = Reminder(
+          id: 'rem-later-test',
+          patientId: 'pat-1',
+          title: 'Gentle Stretches',
+          body: '10 min chair yoga',
+          scheduledAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          notificationId: 503,
+        );
+        await mockRepository.createReminder(reminder);
 
-      final response = NotificationResponse(
-        notificationResponseType: NotificationResponseType.selectedNotificationAction,
-        actionId: NotificationActionIds.laterToday,
-        payload: 'rem-later-test',
-      );
+        final response = NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotificationAction,
+          actionId: NotificationActionIds.laterToday,
+          payload: 'rem-later-test',
+        );
 
-      await notificationService.handleNotificationResponse(response);
+        await notificationService.handleNotificationResponse(response);
 
-      expect(mockRepository.laterTodayCalls, contains('rem-later-test'));
-    });
+        expect(mockRepository.laterTodayCalls, contains('rem-later-test'));
+      },
+    );
 
     test('gracefully ignores null or empty payload', () async {
       const response = NotificationResponse(
-        notificationResponseType: NotificationResponseType.selectedNotificationAction,
+        notificationResponseType:
+            NotificationResponseType.selectedNotificationAction,
         actionId: NotificationActionIds.done,
         payload: null,
       );

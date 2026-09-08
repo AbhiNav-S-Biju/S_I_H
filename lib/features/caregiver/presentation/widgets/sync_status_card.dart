@@ -33,7 +33,10 @@ class SyncStatusCard extends ConsumerWidget {
           decoration: BoxDecoration(
             color: badgeColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: badgeColor.withValues(alpha: 0.3), width: 1.2),
+            border: Border.all(
+              color: badgeColor.withValues(alpha: 0.3),
+              width: 1.2,
+            ),
           ),
           child: Row(
             children: [
@@ -65,7 +68,9 @@ class SyncStatusCard extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isOnline ? Colors.green[800] : Colors.blueGrey[800],
+                            color: isOnline
+                                ? Colors.green[800]
+                                : Colors.blueGrey[800],
                           ),
                         ),
                       ],
@@ -83,7 +88,10 @@ class SyncStatusCard extends ConsumerWidget {
               ),
               if (info.pendingEventsCount > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.orange[100],
                     borderRadius: BorderRadius.circular(12),
@@ -101,7 +109,10 @@ class SyncStatusCard extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const SizedBox(height: 48, child: Center(child: CircularProgressIndicator())),
+      loading: () => const SizedBox(
+        height: 48,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }

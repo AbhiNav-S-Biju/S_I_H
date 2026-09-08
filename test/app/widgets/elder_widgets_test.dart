@@ -18,7 +18,9 @@ void main() {
   }
 
   group('LargeActionButton Tests', () {
-    testWidgets('Renders with min 64dp height and triggers onPressed', (tester) async {
+    testWidgets('Renders with min 64dp height and triggers onPressed', (
+      tester,
+    ) async {
       bool tapped = false;
       await tester.pumpWidget(
         testWrapper(
@@ -44,14 +46,12 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('Shows CircularProgressIndicator when isLoading is true', (tester) async {
+    testWidgets('Shows CircularProgressIndicator when isLoading is true', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         testWrapper(
-          LargeActionButton(
-            label: 'Saving',
-            isLoading: true,
-            onPressed: () {},
-          ),
+          LargeActionButton(label: 'Saving', isLoading: true, onPressed: () {}),
         ),
       );
 
@@ -61,7 +61,9 @@ void main() {
   });
 
   group('ElderCard Tests', () {
-    testWidgets('Renders content with accessible border and tap area', (tester) async {
+    testWidgets('Renders content with accessible border and tap area', (
+      tester,
+    ) async {
       bool cardTapped = false;
       await tester.pumpWidget(
         testWrapper(
@@ -85,7 +87,9 @@ void main() {
   });
 
   group('SectionHeader Tests', () {
-    testWidgets('Displays title, icon, and subtitle with header semantics', (tester) async {
+    testWidgets('Displays title, icon, and subtitle with header semantics', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         testWrapper(
           const SectionHeader(
@@ -103,7 +107,9 @@ void main() {
   });
 
   group('SupportiveMessage Tests', () {
-    testWidgets('Displays comforting feedback with warm styling', (tester) async {
+    testWidgets('Displays comforting feedback with warm styling', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         testWrapper(
           const SupportiveMessage(
@@ -119,7 +125,9 @@ void main() {
   });
 
   group('LargeIconButton Tests', () {
-    testWidgets('Has touch target >= 64dp and triggers callback', (tester) async {
+    testWidgets('Has touch target >= 64dp and triggers callback', (
+      tester,
+    ) async {
       bool tapped = false;
       await tester.pumpWidget(
         testWrapper(
@@ -143,11 +151,11 @@ void main() {
   });
 
   group('LoadingState Tests', () {
-    testWidgets('Renders friendly soothing loading indicator and message', (tester) async {
+    testWidgets('Renders friendly soothing loading indicator and message', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        testWrapper(
-          const LoadingState(message: 'Preparing your game...'),
-        ),
+        testWrapper(const LoadingState(message: 'Preparing your game...')),
       );
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -156,7 +164,9 @@ void main() {
   });
 
   group('EmptyState Tests', () {
-    testWidgets('Renders uncluttered empty view with action button', (tester) async {
+    testWidgets('Renders uncluttered empty view with action button', (
+      tester,
+    ) async {
       bool actionTriggered = false;
       await tester.pumpWidget(
         testWrapper(
@@ -180,7 +190,9 @@ void main() {
   });
 
   group('ErrorState Tests', () {
-    testWidgets('Renders gentle supportive error state with Retry action', (tester) async {
+    testWidgets('Renders gentle supportive error state with Retry action', (
+      tester,
+    ) async {
       bool retried = false;
       await tester.pumpWidget(
         testWrapper(

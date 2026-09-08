@@ -77,9 +77,7 @@ class SupabaseSyncRepository implements ISupabaseSyncRepository {
     try {
       final response = await activeClient.rpc(
         'process_sync_events_batch',
-        params: {
-          'p_events': events,
-        },
+        params: {'p_events': events},
       );
 
       if (response is Map) {

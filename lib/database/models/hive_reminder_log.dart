@@ -26,12 +26,12 @@ class HiveReminderLog extends HiveObject {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'reminder_id': reminderId,
-        'patient_id': patientId,
-        'action': action,
-        'action_timestamp': actionTimestamp.toIso8601String(),
-        'created_at': createdAt.toIso8601String(),
-        'metadata': metadata,
-      };
+    'id': id,
+    'reminder_id': reminderId,
+    'patient_id': patientId,
+    'action': action,
+    'action_timestamp': actionTimestamp.toIso8601String(),
+    'created_at': createdAt.toIso8601String(),
+    'metadata': metadata,
+  };
 }

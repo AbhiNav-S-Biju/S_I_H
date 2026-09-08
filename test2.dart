@@ -20,9 +20,13 @@ Future<void> main() async {
     print('📦 Profiles response: $response');
 
     // 2. Test RLS protection / Auth state
-    print('🔒 Row Level Security: Active (Anonymous caller query returned: $response)');
+    print(
+      '🔒 Row Level Security: Active (Anonymous caller query returned: $response)',
+    );
     print('----------------------------------------------------');
-    print('🎉 CONGRATULATIONS: Your Supabase backend is LIVE and fully connected!');
+    print(
+      '🎉 CONGRATULATIONS: Your Supabase backend is LIVE and fully connected!',
+    );
     print('----------------------------------------------------');
   } catch (e) {
     print('❌ Connection Test Output: $e');

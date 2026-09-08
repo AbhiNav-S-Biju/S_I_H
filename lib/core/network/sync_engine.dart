@@ -48,16 +48,18 @@ class SyncEngine {
     required ISupabaseSyncRepository syncRepository,
     required IConnectivityMonitor connectivityMonitor,
     this.maxRetries = 8,
-  })  : _syncQueueBox = syncQueueBox,
-        _syncRepository = syncRepository,
-        _connectivityMonitor = connectivityMonitor {
+  }) : _syncQueueBox = syncQueueBox,
+       _syncRepository = syncRepository,
+       _connectivityMonitor = connectivityMonitor {
     _startConnectivityListener();
   }
 
   void _startConnectivityListener() {
     _connectivitySub = _connectivityMonitor.statusStream.listen((status) {
       if (status == NetworkStatus.online) {
-        debugPrint('🌐 Network online detected. Triggering sync queue processing...');
+        debugPrint(
+          '🌐 Network online detected. Triggering sync queue processing...',
+        );
         processQueue();
       }
     });
@@ -73,7 +75,9 @@ class SyncEngine {
   /// Enqueues a new sync event locally and attempts immediate sync if online.
   Future<void> enqueueEvent(HiveSyncEvent event) async {
     await _syncQueueBox.put(event.eventId, event);
-    debugPrint('📥 Enqueued sync event: ${event.eventId} (${event.entityType}:${event.operation})');
+    debugPrint(
+      '📥 Enqueued sync event: ${event.eventId} (${event.entityType}:${event.operation})',
+    );
 
     // Attempt sync in background if online
     final status = await _connectivityMonitor.checkStatus();
@@ -94,8 +98,15 @@ class SyncEngine {
   /// Processes all pending events in the sync queue.
   Future<SyncResult> processQueue() async {
     if (_isProcessing) {
-      debugPrint('⏳ SyncEngine is already processing. Skipping duplicate trigger.');
-      return const SyncResult(totalProcessed: 0, succeeded: 0, failed: 0, deadLettered: 0);
+      debugPrint(
+        '⏳ SyncEngine is already processing. Skipping duplicate trigger.',
+      );
+      return const SyncResult(
+        totalProcessed: 0,
+        succeeded: 0,
+        failed: 0,
+        deadLettered: 0,
+      );
     }
 
     _isProcessing = true;
@@ -106,10 +117,17 @@ class SyncEngine {
     try {
       final pendingEvents = getPendingEvents();
       if (pendingEvents.isEmpty) {
-        return const SyncResult(totalProcessed: 0, succeeded: 0, failed: 0, deadLettered: 0);
+        return const SyncResult(
+          totalProcessed: 0,
+          succeeded: 0,
+          failed: 0,
+          deadLettered: 0,
+        );
       }
 
-      debugPrint('🚀 Processing ${pendingEvents.length} pending sync events...');
+      debugPrint(
+        '🚀 Processing ${pendingEvents.length} pending sync events...',
+      );
 
       for (final event in pendingEvents) {
         // Dead letter check
@@ -132,7 +150,8 @@ class SyncEngine {
           );
 
           // If the server returns success (or duplicate already processed)
-          final isSuccess = response['status'] == 'success' ||
+          final isSuccess =
+              response['status'] == 'success' ||
               response['status'] == 'duplicate' ||
               response['result'] != null ||
               !response.containsKey('error');
@@ -143,7 +162,9 @@ class SyncEngine {
             succeeded++;
             debugPrint('✅ Synced event: ${event.eventId}');
           } else {
-            throw Exception(response['error'] ?? 'Sync RPC returned error status');
+            throw Exception(
+              response['error'] ?? 'Sync RPC returned error status',
+            );
           }
         } catch (e) {
           failed++;
@@ -151,9 +172,13 @@ class SyncEngine {
           if (event.retryCount >= maxRetries) {
             event.syncStatus = SyncStatus.deadLetter;
             deadLettered++;
-            debugPrint('⚠️ Event ${event.eventId} marked DEAD LETTER after $maxRetries retries.');
+            debugPrint(
+              '⚠️ Event ${event.eventId} marked DEAD LETTER after $maxRetries retries.',
+            );
           } else {
-            debugPrint('❌ Failed syncing event ${event.eventId} (retry: ${event.retryCount}): $e');
+            debugPrint(
+              '❌ Failed syncing event ${event.eventId} (retry: ${event.retryCount}): $e',
+            );
           }
           await event.save();
         }
