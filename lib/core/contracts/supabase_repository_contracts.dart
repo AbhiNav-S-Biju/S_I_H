@@ -100,3 +100,34 @@ abstract class ISupabaseSyncRepository {
     required List<Map<String, dynamic>> events,
   });
 }
+
+/// 8. Patient Device Repository Contract
+abstract class ISupabasePatientDeviceRepository {
+  /// Lists devices paired with patient
+  Future<List<Map<String, dynamic>>> getDevices(String patientId);
+
+  /// Revokes device access
+  Future<void> revokeDevice(String deviceId);
+}
+
+/// 9. Patient Pairing Repository Contract
+abstract class ISupabasePairingRepository {
+  /// Generates a 6-digit one-time pairing code (valid for 15 mins)
+  Future<String> generatePairingCode(String patientId, {int validityMinutes = 15});
+
+  /// Validates a 6-digit pairing code and registers device server-side
+  Future<Map<String, dynamic>> validateAndPairDevice({
+    required String code,
+    required String deviceId,
+    String? deviceName,
+  });
+}
+
+/// 10. Caregiver Notification Repository Contract
+abstract class ISupabaseCaregiverNotificationRepository {
+  /// Queries notifications for caregiver
+  Future<List<Map<String, dynamic>>> getNotifications(String caregiverId, {bool unreadOnly = false});
+
+  /// Marks notification as read
+  Future<void> markAsRead(String notificationId);
+}
