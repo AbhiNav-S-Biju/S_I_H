@@ -34,6 +34,68 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   }
 
   @override
+  Future<CaregiverProfile> register({
+    required String email,
+    required String password,
+    required String fullName,
+    String? phone,
+  }) async {
+    final activeClient = client;
+
+    if (activeClient != null) {
+      try {
+        // 1. Create the auth.users entry via Supabase Auth
+        final response = await activeClient.auth.signUp(
+          email: email.trim(),
+          password: password,
+          data: {'full_name': fullName},
+        );
+
+        final user = response.user;
+        if (user != null) {
+          // 2. Upsert into public.profiles (trigger may have already created it)
+          await activeClient.from('profiles').upsert({
+            'id': user.id,
+            'email': email.trim(),
+            'full_name': fullName,
+            'phone': phone,
+            'role': 'caregiver',
+            'created_at': DateTime.now().toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          });
+
+          _cachedProfile = CaregiverProfile(
+            id: user.id,
+            email: user.email ?? email,
+            fullName: fullName,
+            phone: phone,
+            role: 'caregiver',
+          );
+          return _cachedProfile!;
+        }
+        throw Exception('Registration succeeded but user object was null.');
+      } catch (e) {
+        // Rethrow to allow the provider/UI to display the error
+        debugPrint('⚠️ Registration error: $e');
+        rethrow;
+      }
+    }
+
+    // Offline fallback: create a local-only caregiver profile
+    debugPrint(
+      '⚠️ Supabase unavailable. Registering in offline demo mode.',
+    );
+    _cachedProfile = CaregiverProfile(
+      id: 'caregiver-local-${DateTime.now().millisecondsSinceEpoch}',
+      email: email,
+      fullName: fullName,
+      phone: phone,
+      role: 'caregiver',
+    );
+    return _cachedProfile!;
+  }
+
+  @override
   Future<CaregiverProfile> login({
     required String email,
     required String password,
