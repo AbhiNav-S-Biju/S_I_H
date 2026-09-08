@@ -6,6 +6,7 @@ import 'app/providers/accessibility_providers.dart';
 import 'app/router/app_router.dart';
 import 'app/theme/elder_theme.dart';
 import 'core/config/supabase_config.dart';
+import 'core/network/audio_service.dart';
 import 'database/hive_database.dart';
 import 'features/reminders/services/notification_service.dart';
 import 'l10n/app_localizations.dart';
@@ -26,6 +27,14 @@ Future<void> main() async {
     await notificationService.initialize().timeout(const Duration(seconds: 4));
   } catch (e) {
     debugPrint('⚠️ NotificationService initialization error: $e');
+  }
+
+  // 3. Initialize audio service for voice-assisted interaction
+  try {
+    final audioService = AudioService();
+    await audioService.initialize();
+  } catch (e) {
+    debugPrint('⚠️ AudioService initialization error: $e');
   }
 
   // Initialize Supabase if credentials are provided in SupabaseConfig

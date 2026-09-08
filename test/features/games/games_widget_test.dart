@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nirvana/features/games/games.dart';
 
@@ -16,7 +17,11 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(const MaterialApp(home: GamesHubScreen()));
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: GamesHubScreen()),
+        ),
+      );
 
       expect(find.text('Daily Activities'), findsOneWidget);
       expect(find.text('Remember Objects'), findsOneWidget);
@@ -35,12 +40,14 @@ void main() {
         GameSession? completedSession;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: RememberObjectsScreen(
-              difficulty: GameDifficulty.easy,
-              onGameCompleted: (session) {
-                completedSession = session;
-              },
+          ProviderScope(
+            child: MaterialApp(
+              home: RememberObjectsScreen(
+                difficulty: GameDifficulty.easy,
+                onGameCompleted: (session) {
+                  completedSession = session;
+                },
+              ),
             ),
           ),
         );
@@ -90,12 +97,14 @@ void main() {
         GameSession? completedSession;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: WhoIsThisScreen(
-              difficulty: GameDifficulty.easy,
-              onGameCompleted: (session) {
-                completedSession = session;
-              },
+          ProviderScope(
+            child: MaterialApp(
+              home: WhoIsThisScreen(
+                difficulty: GameDifficulty.easy,
+                onGameCompleted: (session) {
+                  completedSession = session;
+                },
+              ),
             ),
           ),
         );
@@ -172,12 +181,14 @@ void main() {
         GameSession? completedSession;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: GroceryMemoryScreen(
-              difficulty: GameDifficulty.easy,
-              onGameCompleted: (session) {
-                completedSession = session;
-              },
+          ProviderScope(
+            child: MaterialApp(
+              home: GroceryMemoryScreen(
+                difficulty: GameDifficulty.easy,
+                onGameCompleted: (session) {
+                  completedSession = session;
+                },
+              ),
             ),
           ),
         );

@@ -5,9 +5,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_as.dart';
+import 'app_localizations_bn.dart';
 import 'app_localizations_en.dart';
-import 'app_localizations_es.dart';
 import 'app_localizations_hi.dart';
+import 'app_localizations_kha.dart';
+import 'app_localizations_lus.dart';
+import 'app_localizations_mni.dart';
+import 'app_localizations_ne.dart';
 
 // ignore_for_file: type=lint
 
@@ -95,9 +100,14 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('as'),
+    Locale('bn'),
     Locale('en'),
-    Locale('es'),
     Locale('hi'),
+    Locale('kha'),
+    Locale('lus'),
+    Locale('mni'),
+    Locale('ne'),
   ];
 
   /// The name of the application
@@ -289,7 +299,7 @@ abstract class AppLocalizations {
   /// Setting title for language selection
   ///
   /// In en, this message translates to:
-  /// **'Language / भाषा / Idioma'**
+  /// **'Language / ভাষা / भाषा'**
   String get languageTitle;
 
   /// Explanation of language selection
@@ -316,17 +326,47 @@ abstract class AppLocalizations {
   /// **'English'**
   String get english;
 
-  /// Spanish language name
-  ///
-  /// In en, this message translates to:
-  /// **'Español'**
-  String get spanish;
-
   /// Hindi language name
   ///
   /// In en, this message translates to:
   /// **'हिन्दी (Hindi)'**
   String get hindi;
+
+  /// Assamese language name
+  ///
+  /// In en, this message translates to:
+  /// **'অসমীয়া (Assamese)'**
+  String get assamese;
+
+  /// Bengali language name
+  ///
+  /// In en, this message translates to:
+  /// **'বাংলা (Bengali)'**
+  String get bengali;
+
+  /// Manipuri / Meitei language name
+  ///
+  /// In en, this message translates to:
+  /// **'মৈতৈলোন্ (Manipuri / Meitei)'**
+  String get manipuri;
+
+  /// Khasi language name
+  ///
+  /// In en, this message translates to:
+  /// **'Ka Ktien Khasi'**
+  String get khasi;
+
+  /// Mizo language name
+  ///
+  /// In en, this message translates to:
+  /// **'Mizo ṭawng'**
+  String get mizo;
+
+  /// Nepali language name
+  ///
+  /// In en, this message translates to:
+  /// **'नेपाली (Nepali)'**
+  String get nepali;
 
   /// Button to confirm settings or language
   ///
@@ -441,8 +481,16 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'es', 'hi'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'as',
+    'bn',
+    'en',
+    'hi',
+    'kha',
+    'lus',
+    'mni',
+    'ne',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -451,12 +499,22 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'as':
+      return AppLocalizationsAs();
+    case 'bn':
+      return AppLocalizationsBn();
     case 'en':
       return AppLocalizationsEn();
-    case 'es':
-      return AppLocalizationsEs();
     case 'hi':
       return AppLocalizationsHi();
+    case 'kha':
+      return AppLocalizationsKha();
+    case 'lus':
+      return AppLocalizationsLus();
+    case 'mni':
+      return AppLocalizationsMni();
+    case 'ne':
+      return AppLocalizationsNe();
   }
 
   throw FlutterError(

@@ -17,30 +17,31 @@ import '../../features/settings/presentation/language_selector_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../shell/elder_app_shell.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'root',
-);
-final GlobalKey<NavigatorState> _homeNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'home',
-);
-final GlobalKey<NavigatorState> _gamesNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'games',
-);
-final GlobalKey<NavigatorState> _settingsNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'settings');
-
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final rootNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'root',
+  );
+  final homeNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'home',
+  );
+  final gamesNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'games',
+  );
+  final settingsNavigatorKey =
+      GlobalKey<NavigatorState>(debugLabel: 'settings');
+
   final isOnboardingCompleted = ref.read(onboardingCompletedProvider);
 
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: isOnboardingCompleted ? '/home' : '/onboarding',
     redirect: (context, state) {
-      final authState = ref.read(caregiverAuthProvider);
       final isCaregiverRoute = state.matchedLocation.startsWith('/caregiver');
       final isProtectedCaregiver = state.matchedLocation == '/caregiver/dashboard' ||
           state.matchedLocation == '/caregiver/onboarding' ||
           state.matchedLocation == '/caregiver/add-patient';
+      // Read auth state at redirect time so it reflects the latest login/logout
+      final authState = ref.read(caregiverAuthProvider);
       final isAuthenticated = authState.value != null;
 
       // Guard dashboard and onboarding — redirect to login if not authenticated
@@ -68,27 +69,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 2. Caregiver Portal Routes (Full screen, outside elder shell)
       GoRoute(
         path: '/caregiver/login',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverLoginScreen(),
       ),
       GoRoute(
         path: '/caregiver/register',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverRegisterScreen(),
       ),
       GoRoute(
         path: '/caregiver/onboarding',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverPatientOnboardingScreen(),
       ),
       GoRoute(
         path: '/caregiver/add-patient',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverPatientOnboardingScreen(),
       ),
       GoRoute(
         path: '/caregiver/dashboard',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverDashboardScreen(),
       ),
 
@@ -100,7 +101,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         branches: [
           // Branch 0: Home
           StatefulShellBranch(
-            navigatorKey: _homeNavigatorKey,
+            navigatorKey: homeNavigatorKey,
             routes: [
               GoRoute(
                 path: '/home',
@@ -111,7 +112,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
           // Branch 1: Games Hub
           StatefulShellBranch(
-            navigatorKey: _gamesNavigatorKey,
+            navigatorKey: gamesNavigatorKey,
             routes: [
               GoRoute(
                 path: '/games',
@@ -126,7 +127,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
           // Branch 2: Settings & Visual Comfort
           StatefulShellBranch(
-            navigatorKey: _settingsNavigatorKey,
+            navigatorKey: settingsNavigatorKey,
             routes: [
               GoRoute(
                 path: '/settings',
@@ -134,7 +135,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'language',
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     builder: (context, state) => const LanguageSelectorScreen(),
                   ),
                 ],

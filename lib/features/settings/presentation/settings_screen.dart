@@ -23,15 +23,26 @@ class SettingsScreen extends ConsumerWidget {
 
     final reducedMotion = ref.watch(reducedMotionProvider);
     final highContrast = ref.watch(highContrastProvider);
+    final voiceEnabled = ref.watch(voiceEnabledProvider);
     final textScale = ref.watch(textScaleProvider);
     final currentLocale = ref.watch(localeProvider);
 
     String getLanguageName(String code) {
       switch (code) {
-        case 'es':
-          return l10n?.spanish ?? 'Español';
         case 'hi':
           return l10n?.hindi ?? 'हिन्दी (Hindi)';
+        case 'as':
+          return l10n?.assamese ?? 'অসমীয়া (Assamese)';
+        case 'bn':
+          return l10n?.bengali ?? 'বাংলা (Bengali)';
+        case 'mni':
+          return l10n?.manipuri ?? 'মৈতৈলোন্ (Manipuri / Meitei)';
+        case 'kha':
+          return l10n?.khasi ?? 'Ka Ktien Khasi (Khasi)';
+        case 'lus':
+          return l10n?.mizo ?? 'Mizo ṭawng (Mizo)';
+        case 'ne':
+          return l10n?.nepali ?? 'नेपाली (Nepali)';
         case 'en':
         default:
           return l10n?.english ?? 'English';
@@ -68,12 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: reducedMotion,
-                  thumbColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return theme.colorScheme.primary;
-                    }
-                    return null;
-                  }),
+                  activeThumbColor: theme.colorScheme.primary,
                   title: Text(
                     l10n?.reducedMotionTitle ?? 'Reduced Motion',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -105,12 +111,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: highContrast,
-                  thumbColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return theme.colorScheme.primary;
-                    }
-                    return null;
-                  }),
+                  activeThumbColor: theme.colorScheme.primary,
                   title: Text(
                     l10n?.highContrastTitle ?? 'High Contrast Mode',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -132,6 +133,37 @@ class SettingsScreen extends ConsumerWidget {
                     ref
                         .read(highContrastProvider.notifier)
                         .setHighContrast(val);
+                  },
+                ),
+              ),
+
+              // Voice Guidance & Feedback Card
+              ElderCard(
+                padding: const EdgeInsets.all(18.0),
+                child: SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: voiceEnabled,
+                  activeThumbColor: theme.colorScheme.primary,
+                  title: Text(
+                    'Voice Assistance & Prompts',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: ElderColors.textPrimary,
+                    ),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 6.0),
+                    child: Text(
+                      'Speaks instructions aloud and enables voice input for games and reminders.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: ElderColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  onChanged: (val) {
+                    ref
+                        .read(voiceEnabledProvider.notifier)
+                        .setVoiceEnabled(val);
                   },
                 ),
               ),

@@ -1,17 +1,20 @@
-// ==============================================================================
-// NIRVANA - GameCompletionDialog Widget
-// Description: Supportive, non-clinical activity completion modal
-// ==============================================================================
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/providers/accessibility_providers.dart';
+import '../../../../core/network/audio_service.dart';
+import '../../../../core/widgets/voice_helper.dart';
 import '../../models/game_session.dart';
 import 'elder_game_button.dart';
 
-class GameCompletionDialog extends StatelessWidget {
+class GameCompletionDialog extends ConsumerStatefulWidget {
   final GameSession session;
   final VoidCallback? onFinish;
 
-  const GameCompletionDialog({super.key, required this.session, this.onFinish});
+  const GameCompletionDialog({
+    super.key,
+    required this.session,
+    required this.onFinish,
+  });
 
   static Future<bool?> show(
     BuildContext context, {
@@ -21,11 +24,32 @@ class GameCompletionDialog extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => GameCompletionDialog(
-        session: session,
-        onFinish: onFinish ?? () => Navigator.of(ctx).pop(true),
-      ),
+      builder: (dialogCtx) =>
+          GameCompletionDialog(session: session, onFinish: onFinish),
     );
+  }
+
+  @override
+  ConsumerState<GameCompletionDialog> createState() =>
+      _GameCompletionDialogState();
+}
+
+class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final voiceEnabled = ref.read(voiceEnabledProvider);
+      if (voiceEnabled) {
+        final locale = ref.read(localeProvider);
+        ref
+            .read(audioServiceProvider)
+            .speak(
+              widget.session.supportiveFeedbackMessage,
+              languageCode: locale.languageCode,
+            );
+      }
+    });
   }
 
   @override
@@ -69,15 +93,35 @@ class GameCompletionDialog extends StatelessWidget {
             ),
             const SizedBox(height: 12.0),
 
-            // Supportive Message
-            Text(
-              session.supportiveFeedbackMessage,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w500,
-                height: 1.4,
-                color: Color(0xFF334155),
+            // Supportive Message with SpeakButton
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14.0,
+                vertical: 8.0,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.session.supportiveFeedbackMessage,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                        color: Color(0xFF334155),
+                      ),
+                    ),
+                  ),
+                  SpeakButton(
+                    text: widget.session.supportiveFeedbackMessage,
+                    size: 38.0,
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24.0),
@@ -96,7 +140,7 @@ class GameCompletionDialog extends StatelessWidget {
                   _buildMetric(
                     label: 'Items Found',
                     value:
-                        '${session.correctAnswers} / ${session.totalQuestions}',
+                        '${widget.session.correctAnswers} / ${widget.session.totalQuestions}',
                     icon: Icons.star_rounded,
                     color: const Color(0xFFD97706),
                   ),
@@ -107,7 +151,8 @@ class GameCompletionDialog extends StatelessWidget {
                   ),
                   _buildMetric(
                     label: 'Minutes Active',
-                    value: '${(session.durationSeconds / 60).ceil()} min',
+                    value:
+                        '${(widget.session.durationSeconds / 60).ceil()} min',
                     icon: Icons.timer_outlined,
                     color: const Color(0xFF0F766E),
                   ),
@@ -120,7 +165,7 @@ class GameCompletionDialog extends StatelessWidget {
             ElderGameButton(
               label: 'All Done',
               icon: Icons.arrow_forward_rounded,
-              onPressed: onFinish ?? () => Navigator.of(context).pop(true),
+              onPressed: widget.onFinish ?? () => Navigator.of(context).pop(),
             ),
           ],
         ),
