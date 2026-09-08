@@ -68,7 +68,12 @@ class SettingsScreen extends ConsumerWidget {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: reducedMotion,
-                  activeThumbColor: theme.colorScheme.primary,
+                  thumbColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return theme.colorScheme.primary;
+                    }
+                    return null;
+                  }),
                   title: Text(
                     l10n?.reducedMotionTitle ?? 'Reduced Motion',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -100,7 +105,12 @@ class SettingsScreen extends ConsumerWidget {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: highContrast,
-                  activeThumbColor: theme.colorScheme.primary,
+                  thumbColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return theme.colorScheme.primary;
+                    }
+                    return null;
+                  }),
                   title: Text(
                     l10n?.highContrastTitle ?? 'High Contrast Mode',
                     style: theme.textTheme.titleMedium?.copyWith(
