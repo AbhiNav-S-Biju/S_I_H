@@ -1,6 +1,6 @@
 // ==============================================================================
 // NIRVANA - Caregiver Repository Unit Tests
-// Description: Tests caregiver authentication, patient-scoped access,
+// Description: Tests caregiver authentication, patient onboarding, patient-scoped access,
 // activity metrics, and offline resilience.
 // ==============================================================================
 
@@ -56,7 +56,46 @@ void main() {
     );
   });
 
-  group('CaregiverRepository Patient-Scoped Access & Metrics Tests', () {
+  group('CaregiverRepository Patient Onboarding & Management Tests', () {
+    test('createPatient creates valid patient summary in offline mode', () async {
+      final input = CreatePatientInput(
+        fullName: 'Robert Davis',
+        preferredName: 'Bob',
+        relationship: 'Father',
+        dateOfBirth: DateTime(1948, 5, 12),
+        emergencyContactPhone: '+1-555-0123',
+        timezone: 'America/New_York',
+        fontScale: 1.4,
+        highContrast: true,
+        largeText: true,
+        initialReminders: [
+          const InitialReminderInput(
+            title: 'Morning Heart Medication',
+            description: 'Take with glass of water',
+            reminderType: 'medication',
+            scheduleTime: '08:00:00',
+            isEnabled: true,
+          ),
+        ],
+      );
+
+      final created = await repository.createPatient(
+        input: input,
+        caregiverId: 'caregiver-local-001',
+      );
+
+      expect(created.id, isNotEmpty);
+      expect(created.fullName, equals('Robert Davis'));
+      expect(created.preferredName, equals('Bob'));
+      expect(created.relationship, equals('Father'));
+      expect(created.primaryCaregiverId, equals('caregiver-local-001'));
+      expect(created.emergencyContactPhone, equals('+1-555-0123'));
+
+      // Verify newly created patient is in assigned patients list
+      final assigned = await repository.getAssignedPatients('caregiver-local-001');
+      expect(assigned.any((p) => p.id == created.id), isTrue);
+    });
+
     test(
       'getAssignedPatients returns only patients assigned to caregiver',
       () async {

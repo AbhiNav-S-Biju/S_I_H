@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/features/caregiver/models/caregiver_models.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
@@ -21,16 +22,74 @@ class PatientSelectorWidget extends ConsumerWidget {
     return patientsAsync.when(
       data: (patients) {
         if (patients.isEmpty) {
-          return const Card(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'No assigned loved ones found for this account.',
-                style: TextStyle(fontSize: 16),
+          return Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: ElderColors.primary.withValues(alpha: 0.3),
+                width: 1.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.person_add_alt_1,
+                  size: 40,
+                  color: ElderColors.primary,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'No loved ones linked yet',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: ElderColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Add a care recipient to start monitoring activity.',
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ElderColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                  ),
+                  onPressed: () => context.push('/caregiver/onboarding'),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text(
+                    'Add Loved One',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
           );
         }
+
+        final effectiveSelected = (selectedPatient != null &&
+                patients.any((p) => p.id == selectedPatient.id))
+            ? selectedPatient
+            : patients.first;
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -76,7 +135,8 @@ class PatientSelectorWidget extends ConsumerWidget {
                     ),
                     DropdownButtonHideUnderline(
                       child: DropdownButton<PatientSummary>(
-                        value: selectedPatient ?? patients.first,
+                        key: const Key('patient_selector_dropdown'),
+                        value: effectiveSelected,
                         isDense: true,
                         icon: const Icon(
                           Icons.arrow_drop_down,
@@ -105,6 +165,12 @@ class PatientSelectorWidget extends ConsumerWidget {
                     ),
                   ],
                 ),
+              ),
+              IconButton(
+                key: const Key('patient_selector_add_button'),
+                icon: const Icon(Icons.person_add_alt, color: ElderColors.primary),
+                tooltip: 'Add Loved One',
+                onPressed: () => context.push('/caregiver/onboarding'),
               ),
             ],
           ),

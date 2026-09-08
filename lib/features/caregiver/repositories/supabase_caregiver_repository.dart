@@ -1,7 +1,7 @@
 // ==============================================================================
 // NIRVANA - Supabase & Offline Caregiver Repository Implementation
 // Description: Implements ICaregiverRepository with full offline fallback,
-// patient-scoped security, and adherence tracking.
+// patient-scoped security, patient onboarding, and adherence tracking.
 // ==============================================================================
 
 import 'package:flutter/foundation.dart';
@@ -17,6 +17,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   final IConnectivityMonitor _connectivityMonitor;
 
   CaregiverProfile? _cachedProfile;
+  final List<PatientSummary> _offlinePatients = [];
 
   SupabaseCaregiverRepository({
     SupabaseClient? client,
@@ -171,26 +172,150 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   }
 
   @override
+  Future<PatientSummary> createPatient({
+    required CreatePatientInput input,
+    String? caregiverId,
+  }) async {
+    final activeClient = client;
+    final effectiveCaregiverId = caregiverId ??
+        activeClient?.auth.currentUser?.id ??
+        _cachedProfile?.id ??
+        'caregiver-local-001';
+
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (activeClient != null && status == NetworkStatus.online) {
+      try {
+        // 1. Create patients record in Supabase
+        final patientInsertData = {
+          'primary_caregiver_id': effectiveCaregiverId,
+          'display_name': input.fullName.trim(),
+          'preferred_name': input.preferredName.trim().isNotEmpty
+              ? input.preferredName.trim()
+              : input.fullName.trim(),
+          if (input.dateOfBirth != null)
+            'date_of_birth': input.dateOfBirth!.toIso8601String().split('T').first,
+          if (input.emergencyContactPhone != null &&
+              input.emergencyContactPhone!.trim().isNotEmpty)
+            'emergency_contact_phone': input.emergencyContactPhone!.trim(),
+          'accessibility_settings': input.toAccessibilitySettings(),
+          'created_at': DateTime.now().toUtc().toIso8601String(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        };
+
+        final patientResponse = await activeClient
+            .from('patients')
+            .insert(patientInsertData)
+            .select()
+            .single();
+
+        final patientId = patientResponse['id'] as String;
+
+        // 2. Create caregiver_patient_links record
+        await activeClient.from('caregiver_patient_links').insert({
+          'caregiver_id': effectiveCaregiverId,
+          'patient_id': patientId,
+          'relationship_label': input.relationship.trim(),
+          'access_role': 'primary',
+          'created_at': DateTime.now().toUtc().toIso8601String(),
+        });
+
+        // 3. Create initial reminders if configured
+        if (input.initialReminders.isNotEmpty) {
+          final reminderInserts = input.initialReminders
+              .where((r) => r.isEnabled)
+              .map((r) => r.toMap(patientId))
+              .toList();
+
+          if (reminderInserts.isNotEmpty) {
+            try {
+              await activeClient.from('reminders').insert(reminderInserts);
+            } catch (reminderErr) {
+              debugPrint('⚠️ Non-fatal: Reminder insert issue: $reminderErr');
+            }
+          }
+        }
+
+        final createdSummary = PatientSummary(
+          id: patientId,
+          fullName: input.fullName.trim(),
+          preferredName: input.preferredName.trim().isNotEmpty
+              ? input.preferredName.trim()
+              : input.fullName.trim(),
+          relationship: input.relationship.trim(),
+          primaryCaregiverId: effectiveCaregiverId,
+          emergencyContactPhone: input.emergencyContactPhone?.trim(),
+          lastActiveAt: DateTime.now(),
+        );
+
+        _offlinePatients.insert(0, createdSummary);
+        return createdSummary;
+      } catch (e) {
+        debugPrint('⚠️ Remote patient creation error: $e');
+        if (e is AuthException || e is PostgrestException) {
+          rethrow;
+        }
+      }
+    }
+
+    // Offline fallback patient creation
+    final newId = 'patient-local-${DateTime.now().millisecondsSinceEpoch}';
+    final fallbackSummary = PatientSummary(
+      id: newId,
+      fullName: input.fullName.trim(),
+      preferredName: input.preferredName.trim().isNotEmpty
+          ? input.preferredName.trim()
+          : input.fullName.trim(),
+      relationship: input.relationship.trim(),
+      primaryCaregiverId: effectiveCaregiverId,
+      emergencyContactPhone: input.emergencyContactPhone?.trim(),
+      lastActiveAt: DateTime.now(),
+    );
+
+    _offlinePatients.insert(0, fallbackSummary);
+    return fallbackSummary;
+  }
+
+  @override
   Future<List<PatientSummary>> getAssignedPatients(String caregiverId) async {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
 
     if (activeClient != null && status == NetworkStatus.online) {
       try {
-        // Query assigned patients via primary_caregiver_id or links
+        // Query assigned patients via links
         final response = await activeClient
             .from('patients')
-            .select()
-            .eq('primary_caregiver_id', caregiverId);
+            .select('*, caregiver_patient_links(relationship_label, access_role, caregiver_id)');
 
         final list = (response as List)
             .map((item) => PatientSummary.fromMap(item as Map<String, dynamic>))
             .toList();
 
         if (list.isNotEmpty) return list;
+
+        // Fallback to direct query by primary_caregiver_id
+        final directResponse = await activeClient
+            .from('patients')
+            .select()
+            .eq('primary_caregiver_id', caregiverId);
+
+        final directList = (directResponse as List)
+            .map((item) => PatientSummary.fromMap(item as Map<String, dynamic>))
+            .toList();
+
+        if (directList.isNotEmpty) return directList;
       } catch (e) {
         debugPrint('⚠️ Failed to fetch remote patients: $e');
       }
+    }
+
+    if (_offlinePatients.isNotEmpty) {
+      return [
+        ..._offlinePatients.where(
+          (p) => p.primaryCaregiverId == caregiverId || caregiverId.isEmpty,
+        ),
+      ];
     }
 
     // Offline / Default Assigned Patients
@@ -198,6 +323,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
       PatientSummary(
         id: 'patient-elena-01',
         fullName: 'Elena Rostova',
+        preferredName: 'Elena',
         relationship: 'Mother',
         primaryCaregiverId: caregiverId,
         lastActiveAt: DateTime.now().subtract(const Duration(minutes: 25)),
@@ -205,6 +331,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
       PatientSummary(
         id: 'patient-arthur-02',
         fullName: 'Arthur Pendelton',
+        preferredName: 'Arthur',
         relationship: 'Father',
         primaryCaregiverId: caregiverId,
         lastActiveAt: DateTime.now().subtract(const Duration(hours: 3)),

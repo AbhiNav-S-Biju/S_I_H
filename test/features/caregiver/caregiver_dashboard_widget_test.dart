@@ -53,6 +53,21 @@ class StubCaregiverRepository implements ICaregiverRepository {
   Future<CaregiverProfile?> getCurrentCaregiver() async => profile;
 
   @override
+  Future<PatientSummary> createPatient({
+    required CreatePatientInput input,
+    String? caregiverId,
+  }) async {
+    return PatientSummary(
+      id: 'p-new-01',
+      fullName: input.fullName,
+      preferredName: input.preferredName,
+      relationship: input.relationship,
+      primaryCaregiverId: caregiverId ?? profile.id,
+      emergencyContactPhone: input.emergencyContactPhone,
+    );
+  }
+
+  @override
   Future<List<PatientSummary>> getAssignedPatients(String caregiverId) async =>
       patients;
 

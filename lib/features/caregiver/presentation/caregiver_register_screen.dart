@@ -100,7 +100,7 @@ class _CaregiverRegisterScreenState
 
       final authState = ref.read(caregiverAuthProvider);
       if (authState.value != null && mounted) {
-        context.go('/caregiver/dashboard');
+        context.go('/caregiver/onboarding');
       }
 
       // Capture error from state if it occurred

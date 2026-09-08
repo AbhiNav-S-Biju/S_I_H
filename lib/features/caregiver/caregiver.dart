@@ -8,6 +8,7 @@ export 'repositories/caregiver_repository.dart';
 export 'repositories/supabase_caregiver_repository.dart';
 export 'presentation/caregiver_login_screen.dart';
 export 'presentation/caregiver_register_screen.dart';
+export 'presentation/caregiver_patient_onboarding_screen.dart';
 export 'presentation/caregiver_dashboard_screen.dart';
 export 'presentation/widgets/activity_summary_cards.dart';
 export 'presentation/widgets/game_history_list.dart';

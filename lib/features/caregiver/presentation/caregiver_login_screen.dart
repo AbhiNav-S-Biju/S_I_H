@@ -193,8 +193,9 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                     const SizedBox(height: 16),
 
                     // Create Account link
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           'New caregiver? ',
@@ -202,7 +203,7 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () => context.go('/caregiver/register'),
-                          child: Text(
+                          child: const Text(
                             'Create Account',
                             style: TextStyle(
                               color: ElderColors.primary,
@@ -218,6 +219,7 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                     Center(
                       child: Text(
                         '🔒 Offline-first verified • Patient-scoped data protection',
+                        textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ),

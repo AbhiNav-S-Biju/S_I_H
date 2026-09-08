@@ -26,6 +26,12 @@ abstract class ICaregiverRepository {
   /// Gets current authenticated caregiver profile (or cached offline)
   Future<CaregiverProfile?> getCurrentCaregiver();
 
+  /// Creates a new patient record and links it to the active caregiver
+  Future<PatientSummary> createPatient({
+    required CreatePatientInput input,
+    String? caregiverId,
+  });
+
   /// Fetches only patients assigned to the authenticated caregiver
   Future<List<PatientSummary>> getAssignedPatients(String caregiverId);
 

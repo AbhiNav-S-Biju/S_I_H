@@ -62,6 +62,11 @@ class CaregiverDashboardScreen extends ConsumerWidget {
         foregroundColor: ElderColors.textPrimary,
         actions: [
           IconButton(
+            icon: const Icon(Icons.person_add_outlined),
+            tooltip: 'Add Loved One',
+            onPressed: () => context.push('/caregiver/onboarding'),
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh Data',
             onPressed: () {

@@ -32,19 +32,19 @@ final GlobalKey<NavigatorState> _settingsNavigatorKey =
 final appRouterProvider = Provider<GoRouter>((ref) {
   final isOnboardingCompleted = ref.read(onboardingCompletedProvider);
 
-  // Read the auth state to apply the redirect guard
-  final authNotifier = ref.watch(caregiverAuthProvider);
-
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: isOnboardingCompleted ? '/home' : '/onboarding',
     redirect: (context, state) {
+      final authState = ref.read(caregiverAuthProvider);
       final isCaregiverRoute = state.matchedLocation.startsWith('/caregiver');
-      final isDashboard = state.matchedLocation == '/caregiver/dashboard';
-      final isAuthenticated = authNotifier.value != null;
+      final isProtectedCaregiver = state.matchedLocation == '/caregiver/dashboard' ||
+          state.matchedLocation == '/caregiver/onboarding' ||
+          state.matchedLocation == '/caregiver/add-patient';
+      final isAuthenticated = authState.value != null;
 
-      // Guard the dashboard — redirect to login if not authenticated
-      if (isDashboard && !isAuthenticated) {
+      // Guard dashboard and onboarding — redirect to login if not authenticated
+      if (isProtectedCaregiver && !isAuthenticated) {
         return '/caregiver/login';
       }
 
@@ -75,6 +75,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/caregiver/register',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const CaregiverRegisterScreen(),
+      ),
+      GoRoute(
+        path: '/caregiver/onboarding',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CaregiverPatientOnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/caregiver/add-patient',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const CaregiverPatientOnboardingScreen(),
       ),
       GoRoute(
         path: '/caregiver/dashboard',

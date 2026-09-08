@@ -40,19 +40,16 @@ class ElderCard extends StatelessWidget {
     final effectiveBgColor =
         backgroundColor ?? theme.cardTheme.color ?? Colors.white;
 
-    final cardContent = Container(
-      constraints: const BoxConstraints(
-        minHeight: ElderTheme.minTouchTargetSize,
+    final cardShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+      side: BorderSide(
+        color: effectiveBorderColor,
+        width: isHighContrast ? 3.0 : borderWidth,
       ),
+    );
+
+    final cardContent = Padding(
       padding: padding,
-      decoration: BoxDecoration(
-        color: effectiveBgColor,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-        border: Border.all(
-          color: effectiveBorderColor,
-          width: isHighContrast ? 3.0 : borderWidth,
-        ),
-      ),
       child: child,
     );
 
@@ -60,7 +57,17 @@ class ElderCard extends StatelessWidget {
       return Semantics(
         container: true,
         label: semanticLabel,
-        child: cardContent,
+        child: Material(
+          color: effectiveBgColor,
+          shape: cardShape,
+          clipBehavior: Clip.antiAlias,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: ElderTheme.minTouchTargetSize,
+            ),
+            child: cardContent,
+          ),
+        ),
       );
     }
 
@@ -68,12 +75,18 @@ class ElderCard extends StatelessWidget {
       button: true,
       label: semanticLabel,
       child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+        color: effectiveBgColor,
+        shape: cardShape,
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-          child: cardContent,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: ElderTheme.minTouchTargetSize,
+            ),
+            child: cardContent,
+          ),
         ),
       ),
     );
