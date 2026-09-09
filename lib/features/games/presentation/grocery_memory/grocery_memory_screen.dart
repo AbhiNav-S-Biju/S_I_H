@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/providers/accessibility_providers.dart';
 import '../../../../core/network/audio_service.dart';
 import '../../../../core/widgets/voice_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../controllers/grocery_memory_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
@@ -43,10 +44,15 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
       if (!mounted) return;
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
-        final items = _controller.state.shoppingList.map((e) => e.name).join(', ');
         final locale = ref.read(localeProvider);
+        final l10n = AppLocalizations.of(context);
+        final items = _controller.state.shoppingList
+            .map((e) => e.localizedName(locale.languageCode))
+            .join(', ');
+        final prompt = l10n?.shoppingListSubtitle ??
+            'Review these items, then tap Start Shopping when ready.';
         ref.read(audioServiceProvider).speak(
-              'Here is your shopping list: $items. Review what to get.',
+              '$prompt $items',
               languageCode: locale.languageCode,
             );
       }
@@ -59,8 +65,11 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
         final locale = ref.read(localeProvider);
+        final l10n = AppLocalizations.of(context);
+        final prompt = l10n?.findItemsOnShelf ??
+            'Tap items from your list to put them in your cart.';
         ref.read(audioServiceProvider).speak(
-              'Tap items from your list to put them in your cart.',
+              prompt,
               languageCode: locale.languageCode,
             );
       }
@@ -89,7 +98,10 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final activeLocale = ref.watch(localeProvider);
+    final l10n = AppLocalizations.of(context);
     final state = _controller.state;
+    final langCode = activeLocale.languageCode;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -97,7 +109,7 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
         children: [
           // Header Bar
           GameHeader(
-            title: GameType.groceryMemory.displayName,
+            title: GameType.groceryMemory.localizedTitle(l10n),
             difficulty: state.difficulty,
             onExit: _handleExit,
             onHint: !state.isListPhase
@@ -105,11 +117,56 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                     setState(() {
                       _controller.useHint();
                     });
-                    final hint = _controller.state.lastFeedback;
-                    if (hint != null && ref.read(voiceEnabledProvider)) {
+                    if (ref.read(voiceEnabledProvider)) {
                       final locale = ref.read(localeProvider);
+                      final hintTargetId =
+                          _controller.state.hintHighlightedItemId;
+                      final hintItem = hintTargetId != null
+                          ? _controller.state.shoppingList
+                              .where((e) => e.id == hintTargetId)
+                              .firstOrNull
+                          : null;
+                      final String hintText;
+                      if (hintItem != null) {
+                        final name =
+                            hintItem.localizedName(locale.languageCode);
+                        switch (locale.languageCode) {
+                          case 'hi':
+                            hintText = 'संकेत: शेल्फ़ पर $name खोजें!';
+                            break;
+                          case 'bn':
+                            hintText = 'ইঙ্গিত: তাক থেকে $name খুঁজুন!';
+                            break;
+                          case 'as':
+                            hintText = 'ইংগিত: শ্বেলফত $name বিচাৰক!';
+                            break;
+                          case 'ne':
+                            hintText = 'संकेत: दराजमा $name खोज्नुहोस्!';
+                            break;
+                          default:
+                            hintText = 'Hint: Look for the $name on the shelf!';
+                        }
+                      } else {
+                        switch (locale.languageCode) {
+                          case 'hi':
+                            hintText = 'आपकी टोकरी में सभी वस्तुएं हैं!';
+                            break;
+                          case 'bn':
+                            hintText = 'আপনার ঝুড়িতে সমস্ত বস্তু রয়েছে!';
+                            break;
+                          case 'as':
+                            hintText = 'আপোনাৰ ডলাত সকলো বস্তু আছে!';
+                            break;
+                          case 'ne':
+                            hintText = 'तपाईंको टोकरीमा सबै वस्तुहरू छन्!';
+                            break;
+                          default:
+                            hintText =
+                                'Your basket contains all items from the list!';
+                        }
+                      }
                       ref.read(audioServiceProvider).speak(
-                            hint,
+                            hintText,
                             languageCode: locale.languageCode,
                           );
                     }
@@ -121,8 +178,8 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
           // Main Interactive Area
           Expanded(
             child: state.isListPhase
-                ? _buildShoppingListView(state)
-                : _buildShelfView(state),
+                ? _buildShoppingListView(state, l10n, langCode)
+                : _buildShelfView(state, l10n, langCode),
           ),
         ],
       ),
@@ -132,8 +189,14 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
   // ---------------------------------------------------------------------------
   // Phase 1: Shopping List View
   // ---------------------------------------------------------------------------
-  Widget _buildShoppingListView(GroceryMemoryState state) {
-    final itemsText = state.shoppingList.map((e) => e.name).join(', ');
+  Widget _buildShoppingListView(
+    GroceryMemoryState state,
+    AppLocalizations? l10n,
+    String langCode,
+  ) {
+    final itemsText = state.shoppingList
+        .map((e) => e.localizedName(langCode))
+        .join(', ');
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
       child: Column(
@@ -157,7 +220,8 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                 const SizedBox(width: 14.0),
                 Expanded(
                   child: Text(
-                    'Here is your shopping list with ${state.shoppingList.length} items.\nReview what to get:',
+                    l10n?.shoppingListSubtitle ??
+                        'Here is your shopping list with ${state.shoppingList.length} items.\nReview what to get:',
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w700,
@@ -166,7 +230,8 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                   ),
                 ),
                 SpeakButton(
-                  text: 'Here is your shopping list: $itemsText.',
+                  text:
+                      '${l10n?.shoppingListSubtitle ?? 'Here is your shopping list: '} $itemsText',
                   size: 36.0,
                 ),
               ],
@@ -218,7 +283,7 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                     const SizedBox(width: 16.0),
                     Expanded(
                       child: Text(
-                        item.name,
+                        item.localizedName(langCode),
                         style: const TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.w700,
@@ -240,7 +305,7 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
 
           // Let's Go to the Market Button
           ElderGameButton(
-            label: 'Go to Market ➔',
+            label: l10n?.startShoppingButton ?? 'Go to Market ➔',
             icon: Icons.storefront_rounded,
             onPressed: () {
               setState(() {
@@ -258,11 +323,45 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
   // ---------------------------------------------------------------------------
   // Phase 2: Market Shelf View
   // ---------------------------------------------------------------------------
-  Widget _buildShelfView(GroceryMemoryState state) {
+  Widget _buildShelfView(
+    GroceryMemoryState state,
+    AppLocalizations? l10n,
+    String langCode,
+  ) {
     final collectedCount = state.basketItemIds.length;
     final totalListCount = state.shoppingList.length;
-    final feedbackText = state.lastFeedback ??
-        'Tap items from your list to put them in your cart:';
+
+    final String feedbackText;
+    if (state.hintHighlightedItemId != null) {
+      final hintItem = state.shoppingList
+          .where((e) => e.id == state.hintHighlightedItemId)
+          .firstOrNull;
+      if (hintItem != null) {
+        final name = hintItem.localizedName(langCode);
+        switch (langCode) {
+          case 'hi':
+            feedbackText = 'संकेत: शेल्फ़ पर $name खोजें!';
+            break;
+          case 'bn':
+            feedbackText = 'ইঙ্গিত: তাক থেকে $name খুঁজুন!';
+            break;
+          case 'as':
+            feedbackText = 'ইংগিত: শ্বেলফত $name বিচাৰক!';
+            break;
+          case 'ne':
+            feedbackText = 'संकेत: दराजमा $name खोज्नुहोस्!';
+            break;
+          default:
+            feedbackText = 'Hint: Look for the $name on the shelf!';
+        }
+      } else {
+        feedbackText = l10n?.findItemsOnShelf ??
+            'Tap items from your list to put them in your cart:';
+      }
+    } else {
+      feedbackText = l10n?.findItemsOnShelf ??
+          'Tap items from your list to put them in your cart:';
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -295,10 +394,10 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
         // Supermarket Shelf Grid
         Expanded(
           child: state.shelfItems.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'Getting ready…',
-                    style: TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+                    l10n?.loadingMessage ?? 'Getting ready…',
+                    style: const TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
                   ),
                 )
               : GridView.builder(
@@ -319,7 +418,7 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                     final isHint = state.hintHighlightedItemId == item.id;
 
                     return ElderGameCard(
-                      title: item.name,
+                      title: item.localizedName(langCode),
                       imagePath: item.imagePath,
                       emoji: item.emoji,
                       fallbackIcon: item.fallbackIcon,
@@ -352,7 +451,15 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                 // Basket Counter
                 Expanded(
                   child: Text(
-                    'In Cart: $collectedCount of $totalListCount',
+                    langCode == 'hi'
+                        ? 'टोकरी में: $collectedCount / $totalListCount'
+                        : langCode == 'bn'
+                            ? 'ঝুড়িতে: $collectedCount / $totalListCount'
+                            : langCode == 'as'
+                                ? 'ডলাত: $collectedCount / $totalListCount'
+                                : langCode == 'ne'
+                                    ? 'टोकरीमा: $collectedCount / $totalListCount'
+                                    : 'In Cart: $collectedCount of $totalListCount',
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w700,
@@ -363,7 +470,7 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                 const SizedBox(width: 12.0),
                 // Finish / Checkout Button
                 ElderGameButton(
-                  label: 'Complete Shopping ➔',
+                  label: l10n?.completeActivityButton ?? 'Complete Shopping ➔',
                   icon: Icons.check_circle_rounded,
                   onPressed: collectedCount > 0
                       ? () {

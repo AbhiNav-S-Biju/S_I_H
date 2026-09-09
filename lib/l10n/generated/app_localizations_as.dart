@@ -197,4 +197,103 @@ class AppLocalizationsAs extends AppLocalizations {
 
   @override
   String get aboutAppVersion => 'সংস্কৰণ ১.০.০ • স্নেহশীল আৰু সহজ যত্ন';
+
+  @override
+  String get activitiesTitle => 'দৈনন্দিন কাৰ্যকলাপ';
+
+  @override
+  String get activitiesBannerTitle => 'আজিৰ আনন্দলৈ স্বাগতম!';
+
+  @override
+  String get activitiesBannerSubtitle =>
+      'তলৰ যিকোনো এটা কাৰ্যকলাপ বাছক। নিজৰ সময় লওক।';
+
+  @override
+  String get activityPace => 'কাৰ্যকলাপৰ গতি:';
+
+  @override
+  String get paceGentle => 'সহজ';
+
+  @override
+  String get paceStandard => 'সাধাৰণ';
+
+  @override
+  String get paceChallenge => 'উত্তেজক';
+
+  @override
+  String get gameRememberObjectsTitle => 'বস্তু মনত ৰাখক';
+
+  @override
+  String get gameRememberObjectsSubtitle =>
+      'বস্তুবোৰ ভালদৰে চাওক, তাৰ পিছত কি দেখিলে বাছক';
+
+  @override
+  String get gameWhoIsThisTitle => 'এইজন কোন?';
+
+  @override
+  String get gameWhoIsThisSubtitle => 'চিনাকি মুখ আৰু আপোনজনক চিনাক্ত কৰক';
+
+  @override
+  String get gameGroceryMemoryTitle => 'বজাৰৰ তালিকা';
+
+  @override
+  String get gameGroceryMemorySubtitle =>
+      'আপোনাৰ বজাৰৰ তালিকাৰ পৰা সামগ্ৰী বাছক';
+
+  @override
+  String get playActivityButton => 'কাৰ্যকলাপ আৰম্ভ কৰক ➔';
+
+  @override
+  String get exitActivityTooltip => 'কাৰ্যকলাপৰ পৰা ওলাই যাওক';
+
+  @override
+  String get leaveActivityTitle => 'কাৰ্যকলাপ ত্যাগ কৰিবনে?';
+
+  @override
+  String get leaveActivityMessage =>
+      'আপুনি মূল স্ক্ৰীনলৈ উভতি যাব বিচাৰেনে? আপোনাৰ অগ্ৰগতি সুৰক্ষিত আছে।';
+
+  @override
+  String get stayAndContinue => 'চলাই যাওক';
+
+  @override
+  String get yesExit => 'হয়, ওলাই যাওক';
+
+  @override
+  String get hintButton => 'সংকেত';
+
+  @override
+  String get activityCompletedTitle => 'কাৰ্যকলাপ সম্পূৰ্ণ হ\'ল!';
+
+  @override
+  String get finishButton => 'সমাপ্ত কৰক';
+
+  @override
+  String get rememberObjectsLookCarefully =>
+      'এই বস্তুবোৰ মনোযোগেৰে চাওক। নিজৰ সময় লওক।';
+
+  @override
+  String get iAmReadyButton => 'মই সাজু ➔';
+
+  @override
+  String get whichItemsDidYouSee => 'আপুনি কি কি বস্তু দেখিলে? তলত বাছক:';
+
+  @override
+  String get completeActivityButton => 'কাৰ্যকলাপ সমাপ্ত কৰক ➔';
+
+  @override
+  String get familyAndFriends => 'পৰিয়াল আৰু বন্ধু';
+
+  @override
+  String get shoppingListTitle => 'আপোনাৰ বজাৰৰ তালিকা';
+
+  @override
+  String get shoppingListSubtitle =>
+      'বস্তুবোৰ চাওক, সাজু হ\'লে \'বজাৰ আৰম্ভ কৰক\' টিপক।';
+
+  @override
+  String get startShoppingButton => 'বজাৰ আৰম্ভ কৰক ➔';
+
+  @override
+  String get findItemsOnShelf => 'তালিকাত থকা বস্তুবোৰ বাকচত থ\'বলৈ বাছক:';
 }

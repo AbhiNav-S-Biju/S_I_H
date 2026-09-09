@@ -3,6 +3,8 @@
 // Description: Non-clinical game types and difficulty tiers
 // ==============================================================================
 
+import '../../../l10n/app_localizations.dart';
+
 /// The 3 cognitive engagement activity types in NIRVANA
 enum GameType {
   rememberObjects,
@@ -41,6 +43,30 @@ enum GameType {
         return 'Collect everyday items from your shopping list';
     }
   }
+
+  String localizedTitle(AppLocalizations? l10n) {
+    if (l10n == null) return displayName;
+    switch (this) {
+      case GameType.rememberObjects:
+        return l10n.gameRememberObjectsTitle;
+      case GameType.whoIsThis:
+        return l10n.gameWhoIsThisTitle;
+      case GameType.groceryMemory:
+        return l10n.gameGroceryMemoryTitle;
+    }
+  }
+
+  String localizedSubtitle(AppLocalizations? l10n) {
+    if (l10n == null) return subtitle;
+    switch (this) {
+      case GameType.rememberObjects:
+        return l10n.gameRememberObjectsSubtitle;
+      case GameType.whoIsThis:
+        return l10n.gameWhoIsThisSubtitle;
+      case GameType.groceryMemory:
+        return l10n.gameGroceryMemorySubtitle;
+    }
+  }
 }
 
 /// Difficulty settings designed for accessibility
@@ -59,6 +85,18 @@ enum GameDifficulty {
         return 'Standard';
       case GameDifficulty.hard:
         return 'Challenge';
+    }
+  }
+
+  String localizedLabel(AppLocalizations? l10n) {
+    if (l10n == null) return label;
+    switch (this) {
+      case GameDifficulty.easy:
+        return l10n.paceGentle;
+      case GameDifficulty.medium:
+        return l10n.paceStandard;
+      case GameDifficulty.hard:
+        return l10n.paceChallenge;
     }
   }
 

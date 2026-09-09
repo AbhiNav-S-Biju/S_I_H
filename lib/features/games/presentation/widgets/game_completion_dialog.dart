@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/providers/accessibility_providers.dart';
 import '../../../../core/network/audio_service.dart';
 import '../../../../core/widgets/voice_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../models/game_session.dart';
 import 'elder_game_button.dart';
 
@@ -45,7 +46,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
         ref
             .read(audioServiceProvider)
             .speak(
-              widget.session.supportiveFeedbackMessage,
+              widget.session.localizedSupportiveFeedback(locale.languageCode),
               languageCode: locale.languageCode,
             );
       }
@@ -54,6 +55,35 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final activeLocale = ref.watch(localeProvider);
+    final feedbackMsg =
+        widget.session.localizedSupportiveFeedback(activeLocale.languageCode);
+
+    final String itemsFoundLabel;
+    final String minutesActiveLabel;
+    switch (activeLocale.languageCode) {
+      case 'hi':
+        itemsFoundLabel = 'वस्तुएं मिलीं';
+        minutesActiveLabel = 'सक्रिय मिनट';
+        break;
+      case 'bn':
+        itemsFoundLabel = 'পাওয়া বস্তু';
+        minutesActiveLabel = 'সক্রিয় মিনিট';
+        break;
+      case 'as':
+        itemsFoundLabel = 'বিচাৰি পোৱা বস্তু';
+        minutesActiveLabel = 'সক্ৰিয় মিনিট';
+        break;
+      case 'ne':
+        itemsFoundLabel = 'फेला परेका वस्तु';
+        minutesActiveLabel = 'सक्रिय मिनेट';
+        break;
+      default:
+        itemsFoundLabel = 'Items Found';
+        minutesActiveLabel = 'Minutes Active';
+    }
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.0)),
       elevation: 8,
@@ -81,19 +111,19 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
             ),
             const SizedBox(height: 20.0),
 
-            // Header Title
-            const Text(
-              'Activity Completed!',
+            // Friendly congratulatory title
+            Text(
+              l10n?.activityCompletedTitle ?? 'Activity Completed!',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 26.0,
+              style: const TextStyle(
+                fontSize: 24.0,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 12.0),
 
-            // Supportive Message with SpeakButton
+            // Warm supportive message card with speak button
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 14.0,
@@ -107,7 +137,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 children: [
                   Expanded(
                     child: Text(
-                      widget.session.supportiveFeedbackMessage,
+                      feedbackMsg,
                       textAlign: TextAlign.left,
                       style: const TextStyle(
                         fontSize: 17.0,
@@ -118,7 +148,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                     ),
                   ),
                   SpeakButton(
-                    text: widget.session.supportiveFeedbackMessage,
+                    text: feedbackMsg,
                     size: 38.0,
                   ),
                 ],
@@ -138,7 +168,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildMetric(
-                    label: 'Items Found',
+                    label: itemsFoundLabel,
                     value:
                         '${widget.session.correctAnswers} / ${widget.session.totalQuestions}',
                     icon: Icons.star_rounded,
@@ -150,7 +180,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                     color: const Color(0xFFCBD5E1),
                   ),
                   _buildMetric(
-                    label: 'Minutes Active',
+                    label: minutesActiveLabel,
                     value:
                         '${(widget.session.durationSeconds / 60).ceil()} min',
                     icon: Icons.timer_outlined,
@@ -163,7 +193,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
 
             // Finish Button
             ElderGameButton(
-              label: 'All Done',
+              label: l10n?.finishButton ?? 'All Done',
               icon: Icons.arrow_forward_rounded,
               onPressed: () {
                 Navigator.of(context).pop();

@@ -200,4 +200,104 @@ class AppLocalizationsLus extends AppLocalizations {
 
   @override
   String get aboutAppVersion => 'Version 1.0.0 • Hmangaihna nena Enkawlna';
+
+  @override
+  String get activitiesTitle => 'Daily Activities';
+
+  @override
+  String get activitiesBannerTitle => 'Welcome to Today\'s Fun!';
+
+  @override
+  String get activitiesBannerSubtitle =>
+      'Choose an enjoyable activity below. Take all the time you like.';
+
+  @override
+  String get activityPace => 'Activity Pace:';
+
+  @override
+  String get paceGentle => 'Gentle';
+
+  @override
+  String get paceStandard => 'Standard';
+
+  @override
+  String get paceChallenge => 'Challenge';
+
+  @override
+  String get gameRememberObjectsTitle => 'Remember Objects';
+
+  @override
+  String get gameRememberObjectsSubtitle =>
+      'Look at the friendly items, then tap what you saw';
+
+  @override
+  String get gameWhoIsThisTitle => 'Who Is This?';
+
+  @override
+  String get gameWhoIsThisSubtitle => 'Recognize familiar faces and loved ones';
+
+  @override
+  String get gameGroceryMemoryTitle => 'Grocery Memory';
+
+  @override
+  String get gameGroceryMemorySubtitle =>
+      'Collect everyday items from your shopping list';
+
+  @override
+  String get playActivityButton => 'Play Activity ➔';
+
+  @override
+  String get exitActivityTooltip => 'Exit Activity';
+
+  @override
+  String get leaveActivityTitle => 'Leave Activity?';
+
+  @override
+  String get leaveActivityMessage =>
+      'Are you sure you want to pause and return to the main screen? Your gentle progress is always saved.';
+
+  @override
+  String get stayAndContinue => 'Stay & Continue';
+
+  @override
+  String get yesExit => 'Yes, Exit';
+
+  @override
+  String get hintButton => 'Hint';
+
+  @override
+  String get activityCompletedTitle => 'Activity Completed!';
+
+  @override
+  String get finishButton => 'Finish';
+
+  @override
+  String get rememberObjectsLookCarefully =>
+      'Look at these items carefully. Take all the time you need.';
+
+  @override
+  String get iAmReadyButton => 'I am Ready ➔';
+
+  @override
+  String get whichItemsDidYouSee => 'Which items did you see? Tap them below:';
+
+  @override
+  String get completeActivityButton => 'Complete Activity ➔';
+
+  @override
+  String get familyAndFriends => 'Family & Friends';
+
+  @override
+  String get shoppingListTitle => 'Your Shopping List';
+
+  @override
+  String get shoppingListSubtitle =>
+      'Review these items, then tap \'Start Shopping\' when ready.';
+
+  @override
+  String get startShoppingButton => 'Start Shopping ➔';
+
+  @override
+  String get findItemsOnShelf =>
+      'Tap items from your list to put them in your cart:';
 }

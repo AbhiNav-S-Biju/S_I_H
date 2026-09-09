@@ -199,4 +199,105 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get aboutAppVersion => 'संस्करण 1.0.0 • सरल एवं करुणामयी देखभाल';
+
+  @override
+  String get activitiesTitle => 'दैनिक गतिविधियां';
+
+  @override
+  String get activitiesBannerTitle => 'आज के आनंद में आपका स्वागत है!';
+
+  @override
+  String get activitiesBannerSubtitle =>
+      'नीचे दी गई किसी भी गतिविधि को चुनें। आराम से खेलें।';
+
+  @override
+  String get activityPace => 'गतिविधि की गति:';
+
+  @override
+  String get paceGentle => 'सरल';
+
+  @override
+  String get paceStandard => 'सामान्य';
+
+  @override
+  String get paceChallenge => 'चुनौतीपूर्ण';
+
+  @override
+  String get gameRememberObjectsTitle => 'वस्तुएं याद रखें';
+
+  @override
+  String get gameRememberObjectsSubtitle =>
+      'वस्तुओं को ध्यान से देखें, फिर जो देखा उसे चुनें';
+
+  @override
+  String get gameWhoIsThisTitle => 'यह कौन हैं?';
+
+  @override
+  String get gameWhoIsThisSubtitle =>
+      'अपने प्रियजनों और परिचित चेहरों को पहचानें';
+
+  @override
+  String get gameGroceryMemoryTitle => 'खरीदारी सूची खेल';
+
+  @override
+  String get gameGroceryMemorySubtitle =>
+      'अपनी खरीदारी सूची में से सामान चुनें';
+
+  @override
+  String get playActivityButton => 'गतिविधि शुरू करें ➔';
+
+  @override
+  String get exitActivityTooltip => 'गतिविधि से बाहर जाएं';
+
+  @override
+  String get leaveActivityTitle => 'गतिविधि छोड़ें?';
+
+  @override
+  String get leaveActivityMessage =>
+      'क्या आप मुख्य स्क्रीन पर लौटना चाहते हैं? आपकी प्रगति सुरक्षित रहेगी।';
+
+  @override
+  String get stayAndContinue => 'जारी रखें';
+
+  @override
+  String get yesExit => 'हाँ, बाहर जाएं';
+
+  @override
+  String get hintButton => 'संकेत';
+
+  @override
+  String get activityCompletedTitle => 'गतिविधि पूरी हुई!';
+
+  @override
+  String get finishButton => 'समाप्त करें';
+
+  @override
+  String get rememberObjectsLookCarefully =>
+      'इन वस्तुओं को ध्यान से देखें। अपना पूरा समय लें।';
+
+  @override
+  String get iAmReadyButton => 'मैं तैयार हूँ ➔';
+
+  @override
+  String get whichItemsDidYouSee => 'आपने कौन-सी वस्तुएं देखीं? नीचे चुनें:';
+
+  @override
+  String get completeActivityButton => 'गतिविधि समाप्त करें ➔';
+
+  @override
+  String get familyAndFriends => 'परिवार और मित्र';
+
+  @override
+  String get shoppingListTitle => 'आपकी खरीदारी सूची';
+
+  @override
+  String get shoppingListSubtitle =>
+      'सामानों को देखें, तैयार होने पर \'खरीदारी शुरू करें\' दबाएं।';
+
+  @override
+  String get startShoppingButton => 'खरीदारी शुरू करें ➔';
+
+  @override
+  String get findItemsOnShelf =>
+      'सूची की वस्तुओं को अपनी टोकरी में रखने के लिए चुनें:';
 }

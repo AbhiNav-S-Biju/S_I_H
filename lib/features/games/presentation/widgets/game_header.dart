@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../models/game_enums.dart';
 
 class GameHeader extends StatelessWidget {
@@ -24,6 +25,8 @@ class GameHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: const BoxDecoration(
@@ -38,7 +41,7 @@ class GameHeader extends StatelessWidget {
           children: [
             // Close / Exit button
             IconButton(
-              tooltip: 'Exit Activity',
+              tooltip: l10n?.exitActivityTooltip ?? 'Exit Activity',
               iconSize: 32.0,
               padding: const EdgeInsets.all(8.0),
               constraints: const BoxConstraints(
@@ -50,7 +53,7 @@ class GameHeader extends StatelessWidget {
                 color: Color(0xFF1E293B),
               ),
               onPressed: () {
-                _showExitConfirmDialog(context);
+                _showExitConfirmDialog(context, l10n);
               },
             ),
             const SizedBox(width: 8.0),
@@ -86,7 +89,7 @@ class GameHeader extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                         child: Text(
-                          difficulty.label,
+                          difficulty.localizedLabel(l10n),
                           style: const TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.w700,
@@ -94,9 +97,9 @@ class GameHeader extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const Text(
-                        '• Activity',
-                        style: TextStyle(
+                      Text(
+                        '• ${l10n?.activitiesNavLabel ?? 'Activity'}',
+                        style: const TextStyle(
                           fontSize: 13.0,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF64748B),
@@ -131,9 +134,9 @@ class GameHeader extends StatelessWidget {
                   ),
                   onPressed: isHintAvailable ? onHint : null,
                   icon: const Icon(Icons.lightbulb_rounded, size: 22.0),
-                  label: const Text(
-                    'Hint',
-                    style: TextStyle(
+                  label: Text(
+                    l10n?.hintButton ?? 'Hint',
+                    style: const TextStyle(
                       fontSize: 17.0,
                       fontWeight: FontWeight.w700,
                     ),
@@ -146,20 +149,21 @@ class GameHeader extends StatelessWidget {
     );
   }
 
-  void _showExitConfirmDialog(BuildContext context) {
+  void _showExitConfirmDialog(BuildContext context, AppLocalizations? l10n) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
-        title: const Text(
-          'Leave Activity?',
-          style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w800),
+        title: Text(
+          l10n?.leaveActivityTitle ?? 'Leave Activity?',
+          style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.w800),
         ),
-        content: const Text(
-          'You can return anytime. Would you like to stop for now?',
-          style: TextStyle(fontSize: 18.0, color: Color(0xFF334155)),
+        content: Text(
+          l10n?.leaveActivityMessage ??
+              'You can return anytime. Would you like to stop for now?',
+          style: const TextStyle(fontSize: 18.0, color: Color(0xFF334155)),
         ),
         actionsPadding: const EdgeInsets.all(16.0),
         actions: [
@@ -171,17 +175,18 @@ class GameHeader extends StatelessWidget {
               ),
             ),
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              'Keep Playing',
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+            child: Text(
+              l10n?.stayAndContinue ?? 'Stay & Continue',
+              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
             ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF64748B),
-              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFFE2E8F0),
+              foregroundColor: const Color(0xFF0F172A),
+              elevation: 0,
               padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
+                horizontal: 18.0,
                 vertical: 12.0,
               ),
               shape: RoundedRectangleBorder(
@@ -192,9 +197,9 @@ class GameHeader extends StatelessWidget {
               Navigator.of(ctx).pop();
               onExit();
             },
-            child: const Text(
-              'Exit',
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
+            child: Text(
+              l10n?.yesExit ?? 'Yes, Exit',
+              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
             ),
           ),
         ],

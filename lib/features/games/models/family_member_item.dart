@@ -28,6 +28,266 @@ class FamilyMemberItem {
     required this.alternativeRelationshipOptions,
   });
 
+  String localizedRelationship(String languageCode) {
+    return localizeRelationship(relationship, languageCode);
+  }
+
+  String localizedName(String languageCode) {
+    final trans = _localizedNames[id];
+    if (trans != null && trans.containsKey(languageCode)) {
+      return trans[languageCode]!;
+    }
+    return name;
+  }
+
+  String localizedQuestionPrompt(String langCode) {
+    final memberName = localizedName(langCode);
+    switch (langCode) {
+      case 'hi':
+        return '$memberName से आपका क्या संबंध है?';
+      case 'bn':
+        return '$memberName-র সাথে আপনার কী সম্পর্ক?';
+      case 'as':
+        return '$memberNameৰ সৈতে আপোনাৰ কি সম্পৰ্ক?';
+      case 'ne':
+        return '$memberNameसँग तपाईंको के नाता छ?';
+      default:
+        return 'What is $memberName\'s relationship to you?';
+    }
+  }
+
+  String localizedHintDescription(String languageCode) {
+    final trans = _localizedHints[id];
+    if (trans != null && trans.containsKey(languageCode)) {
+      return trans[languageCode]!;
+    }
+    return hintDescription;
+  }
+
+  String localizedVoiceNoteTranscription(String languageCode) {
+    final trans = _localizedTranscriptions[id];
+    if (trans != null && trans.containsKey(languageCode)) {
+      return trans[languageCode]!;
+    }
+    return voiceNoteTranscription;
+  }
+
+  static String localizeRelationship(String rel, String languageCode) {
+    final trans = _localizedRelationships[rel];
+    if (trans != null && trans.containsKey(languageCode)) {
+      return trans[languageCode]!;
+    }
+    return rel;
+  }
+
+  static const Map<String, Map<String, String>> _localizedNames = {
+    'fam_emily': {
+      'en': 'Emily',
+      'hi': 'एमिली',
+      'bn': 'এমিলি',
+      'as': 'এমিলি',
+      'ne': 'एमिली',
+    },
+    'fam_sarah': {
+      'en': 'Sarah',
+      'hi': 'सारा',
+      'bn': 'সারা',
+      'as': 'চাৰা',
+      'ne': 'सारा',
+    },
+    'fam_david': {
+      'en': 'David',
+      'hi': 'डेविड',
+      'bn': 'ডেভিড',
+      'as': 'ডেভিড',
+      'ne': 'डेभिड',
+    },
+    'fam_bailey': {
+      'en': 'Bailey',
+      'hi': 'बेली',
+      'bn': 'বেইলি',
+      'as': 'বেইলী',
+      'ne': 'बेली',
+    },
+  };
+
+  static const Map<String, Map<String, String>> _localizedHints = {
+    'fam_emily': {
+      'en': 'She is your daughter Sarah\'s child and loves painting!',
+      'hi': 'वह आपकी बेटी सारा की बच्ची है और उसे पेंटिंग करना पसंद है!',
+      'bn': 'সে আপনার মেয়ে সারার সন্তান এবং ছবি আঁকতে ভালোবাসে!',
+      'as': 'তেওঁ আপোনাৰ জীয়াৰী চাৰাৰ সন্তান আৰু ছবি আঁকি ভাল পায়!',
+      'ne': 'उनी आपकी छोरी साराकी छोरी हुन् र चित्र बनाउन मन पराउँछिन्!',
+    },
+    'fam_sarah': {
+      'en': 'She calls you every morning and brings your favorite tea.',
+      'hi': 'वह आपको हर सुबह फोन करती है और आपकी पसंदीदा चाय लाती है।',
+      'bn': 'সে প্রতিদিন সকালে আপনাকে फोन করে এবং আপনার পছন্দের চা নিয়ে আসে।',
+      'as': 'তেওঁ প্ৰতি পুৱা আপোনাক ফোন কৰে আৰু আপোনাৰ প্ৰিয় চাহ আনে।',
+      'ne': 'उनी हरेक बिहान तपाईंलाई फोन गर्छिन् र तपाईंको मनपर्ने चिया ल्याउँछिन्।',
+    },
+    'fam_david': {
+      'en': 'He loves gardening with you and fixing things around the house.',
+      'hi': 'उसे आपके साथ बागवानी करना और घर के काम ठीक करना पसंद है।',
+      'bn': 'সে আপনার সাথে বাগানের কাজ করতে এবং বাড়ির জিনিস মেরামত করতে পছন্দ করে।',
+      'as': 'তেওঁ আপোনাৰ সৈতে বাগিচা কাম কৰিবলৈ আৰু ঘৰৰ কাম ঠিক কৰিবলৈ ভাল পায়।',
+      'ne': 'उनलाई तपाईंसँग बगैंचाको काम गर्न र घरका कुराहरू मर्मत गर्न मन पर्छ।',
+    },
+    'fam_bailey': {
+      'en': 'The cheerful dog who wags his tail and sits by your feet!',
+      'hi': 'खुशमिजाज कुत्ता जो अपनी पूंछ हिलाता है और आपके पैरों के पास बैठता है!',
+      'bn': 'আনন্দময় কুকুরটি যে লেজ নাড়ায় এবং আপনার পায়ের কাছে বসে!',
+      'as': 'আনন্দময় কুকুৰটো যিয়ে নেজ জোকাৰি আপোনাৰ ভৰিৰ কাষত বহে!',
+      'ne': 'हँसिलो कुकुर जसले पुच्छर हल्लाउँछ र तपाईंको खुट्टा नजिक बस्छ!',
+    },
+  };
+
+  static const Map<String, Map<String, String>> _localizedTranscriptions = {
+    'fam_emily': {
+      'en': 'Hi Grandpa! Hope you are having a wonderful day!',
+      'hi': 'नमस्ते दादाजी! आशा है आपका दिन बहुत अच्छा बीत रहा होगा!',
+      'bn': 'হ্যালো দাদু! আশা করি আপনার দিনটি খুব সুন্দর কাটছে!',
+      'as': 'নমস্কাৰ ককা! আশা কৰোঁ আপোনাৰ দিনটো অতি সুন্দৰকৈ পাৰ হৈছে!',
+      'ne': 'नमस्ते बाजे! आशा छ तपाईंको दिन धेरै राम्रो बितिरहेको छ!',
+    },
+    'fam_sarah': {
+      'en': 'Hello Dad, thinking of you today!',
+      'hi': 'नमस्ते पिताजी, आज आपकी याद आ रही थी!',
+      'bn': 'হ্যালো বাবা, আজ তোমার কথা ভাবছিলাম!',
+      'as': 'নমস্কাৰ দেউতা, আজি আপোনাৰ কথা ভাবি আছিলোঁ!',
+      'ne': 'नमस्ते बुबा, आज तपाईंको सम्झना आइरहेको छ!',
+    },
+    'fam_david': {
+      'en': 'Hey Dad, looking forward to our weekend walk!',
+      'hi': 'अरे पिताजी, हमारे सप्ताहांत की सैर का बेसब्री से इंतज़ार है!',
+      'bn': 'আরে বাবা, আমাদের উইকএন্ডে হাঁটার অপেক্ষায় রইলাম!',
+      'as': 'নমস্কাৰ দেউতা, সপ্তাহান্তৰ খোজ কঢ়াৰ বাবে আগ্ৰহেৰে বাট চাই আছোঁ!',
+      'ne': 'नमस्ते बुबा, सप्ताहन्तको पैदल यात्राको उत्सुकताका साथ पर्खाइमा छु!',
+    },
+    'fam_bailey': {
+      'en': 'Woof woof! Friendly tail wags!',
+      'hi': 'भौंक-भौंक! प्यार से पूंछ हिलाना!',
+      'bn': 'ঘেউ ঘেউ! ভালোবাসায় লেজ নাড়ানো!',
+      'as': 'ভৌ ভৌ! মৰমেৰে নেজ জোকাৰিছে!',
+      'ne': 'भुक्-भुक्! मायालु पुच्छर हल्लाइ!',
+    },
+  };
+
+  static const Map<String, Map<String, String>> _localizedRelationships = {
+    'Granddaughter': {
+      'en': 'Granddaughter',
+      'hi': 'पोती / नातिन',
+      'bn': 'নাতনি',
+      'as': 'নাতিনী',
+      'ne': 'नातिनी',
+    },
+    'Doctor': {
+      'en': 'Doctor',
+      'hi': 'डॉक्टर',
+      'bn': 'ডাক্তার',
+      'as': 'চিকিৎসক',
+      'ne': 'डाक्टर',
+    },
+    'Neighbor': {
+      'en': 'Neighbor',
+      'hi': 'पड़ोसी',
+      'bn': 'প্রতিবেশী',
+      'as': 'চুবুৰীয়া',
+      'ne': 'छिमेकी',
+    },
+    'Sister': {
+      'en': 'Sister',
+      'hi': 'बहन',
+      'bn': 'বোন',
+      'as': 'ভনী / বায়েক',
+      'ne': 'बहिनी / दिदी',
+    },
+    'Daughter': {
+      'en': 'Daughter',
+      'hi': 'बेटी',
+      'bn': 'মেয়ে',
+      'as': 'জীয়াৰী',
+      'ne': 'छोरी',
+    },
+    'Teacher': {
+      'en': 'Teacher',
+      'hi': 'शिक्षक',
+      'bn': 'শিক্ষক',
+      'as': 'শিক্ষক',
+      'ne': 'शिक्षक',
+    },
+    'Cousin': {
+      'en': 'Cousin',
+      'hi': 'चचेरा भाई / बहन',
+      'bn': 'মামাতো/কাকাতো ভাই-বোন',
+      'as': 'সম্পৰ্কীয় ভাই-ভনী',
+      'ne': 'काका/मामाको सन्तान',
+    },
+    'Nurse': {
+      'en': 'Nurse',
+      'hi': 'नर्स',
+      'bn': 'নার্স',
+      'as': 'নাৰ্ছ',
+      'ne': 'नर्स',
+    },
+    'Son': {
+      'en': 'Son',
+      'hi': 'बेटा',
+      'bn': 'ছেলে',
+      'as': 'পুত্ৰ',
+      'ne': 'छोरा',
+    },
+    'Grandson': {
+      'en': 'Grandson',
+      'hi': 'पोता / नाती',
+      'bn': 'নাতি',
+      'as': 'নাতি',
+      'ne': 'नाति',
+    },
+    'Dentist': {
+      'en': 'Dentist',
+      'hi': 'दांतों के डॉक्टर',
+      'bn': 'দাঁতের ডাক্তার',
+      'as': 'দাঁতৰ ডাক্তৰ',
+      'ne': 'दन्त चिकित्सक',
+    },
+    'Mail Carrier': {
+      'en': 'Mail Carrier',
+      'hi': 'डाकिया',
+      'bn': 'ডাকপিয়ন',
+      'as': 'ডাকোৱাল',
+      'ne': 'हुलाकी',
+    },
+    'Family Pet': {
+      'en': 'Family Pet',
+      'hi': 'पालतू कुत्ता / बिल्ली',
+      'bn': 'পোষা প্রাণী',
+      'as': 'পোহনীয়া জীৱ',
+      'ne': 'घरपालुवा जनावर',
+    },
+    "Neighbor's Cat": {
+      'en': "Neighbor's Cat",
+      'hi': 'पड़ोसी की बिल्ली',
+      'bn': 'প্রতিবেশীর বিড়াল',
+      'as': 'চুবুৰীয়াৰ মেকুৰী',
+      'ne': 'छिमेकीको बिरालो',
+    },
+    'Bird': {
+      'en': 'Bird',
+      'hi': 'चिड़िया',
+      'bn': 'পাখি',
+      'as': 'চৰাই',
+      'ne': 'चरा',
+    },
+    'Teddy Bear': {
+      'en': 'Teddy Bear',
+      'hi': 'टेडी बियर',
+      'bn': 'টেডি বিয়ার',
+      'as': 'টেডি বিয়েৰ',
+      'ne': 'टेडी बियर',
+    },
+  };
+
   /// Curated demo family list (fully offline)
   static const List<FamilyMemberItem> defaultFamilyMembers = [
     FamilyMemberItem(

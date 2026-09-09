@@ -469,6 +469,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version 1.0.0 • Compassionate Cognitive Care'**
   String get aboutAppVersion;
+
+  /// Title for daily activities
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Activities'**
+  String get activitiesTitle;
+
+  /// Banner title in activities screen
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Today\'s Fun!'**
+  String get activitiesBannerTitle;
+
+  /// Banner subtitle in activities screen
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an enjoyable activity below. Take all the time you like.'**
+  String get activitiesBannerSubtitle;
+
+  /// Activity pace label
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Pace:'**
+  String get activityPace;
+
+  /// Gentle pace option
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle'**
+  String get paceGentle;
+
+  /// Standard pace option
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get paceStandard;
+
+  /// Challenge pace option
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge'**
+  String get paceChallenge;
+
+  /// Title of Remember Objects game
+  ///
+  /// In en, this message translates to:
+  /// **'Remember Objects'**
+  String get gameRememberObjectsTitle;
+
+  /// Subtitle of Remember Objects game
+  ///
+  /// In en, this message translates to:
+  /// **'Look at the friendly items, then tap what you saw'**
+  String get gameRememberObjectsSubtitle;
+
+  /// Title of Who Is This game
+  ///
+  /// In en, this message translates to:
+  /// **'Who Is This?'**
+  String get gameWhoIsThisTitle;
+
+  /// Subtitle of Who Is This game
+  ///
+  /// In en, this message translates to:
+  /// **'Recognize familiar faces and loved ones'**
+  String get gameWhoIsThisSubtitle;
+
+  /// Title of Grocery Memory game
+  ///
+  /// In en, this message translates to:
+  /// **'Grocery Memory'**
+  String get gameGroceryMemoryTitle;
+
+  /// Subtitle of Grocery Memory game
+  ///
+  /// In en, this message translates to:
+  /// **'Collect everyday items from your shopping list'**
+  String get gameGroceryMemorySubtitle;
+
+  /// Button to start an activity
+  ///
+  /// In en, this message translates to:
+  /// **'Play Activity ➔'**
+  String get playActivityButton;
+
+  /// Tooltip for exiting activity
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Activity'**
+  String get exitActivityTooltip;
+
+  /// Title of exit confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Activity?'**
+  String get leaveActivityTitle;
+
+  /// Body message of exit confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to pause and return to the main screen? Your gentle progress is always saved.'**
+  String get leaveActivityMessage;
+
+  /// Button to stay in activity
+  ///
+  /// In en, this message translates to:
+  /// **'Stay & Continue'**
+  String get stayAndContinue;
+
+  /// Button to exit activity
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Exit'**
+  String get yesExit;
+
+  /// Hint button label
+  ///
+  /// In en, this message translates to:
+  /// **'Hint'**
+  String get hintButton;
+
+  /// Title for activity completion
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Completed!'**
+  String get activityCompletedTitle;
+
+  /// Finish button label
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get finishButton;
+
+  /// Instructions for memorization phase
+  ///
+  /// In en, this message translates to:
+  /// **'Look at these items carefully. Take all the time you need.'**
+  String get rememberObjectsLookCarefully;
+
+  /// Button to proceed to recall phase
+  ///
+  /// In en, this message translates to:
+  /// **'I am Ready ➔'**
+  String get iAmReadyButton;
+
+  /// Instructions for recall phase
+  ///
+  /// In en, this message translates to:
+  /// **'Which items did you see? Tap them below:'**
+  String get whichItemsDidYouSee;
+
+  /// Button to complete activity
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Activity ➔'**
+  String get completeActivityButton;
+
+  /// Family and friends tag
+  ///
+  /// In en, this message translates to:
+  /// **'Family & Friends'**
+  String get familyAndFriends;
+
+  /// Shopping list title
+  ///
+  /// In en, this message translates to:
+  /// **'Your Shopping List'**
+  String get shoppingListTitle;
+
+  /// Shopping list subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Review these items, then tap \'Start Shopping\' when ready.'**
+  String get shoppingListSubtitle;
+
+  /// Button to start shopping phase
+  ///
+  /// In en, this message translates to:
+  /// **'Start Shopping ➔'**
+  String get startShoppingButton;
+
+  /// Instructions for finding items on shelf
+  ///
+  /// In en, this message translates to:
+  /// **'Tap items from your list to put them in your cart:'**
+  String get findItemsOnShelf;
 }
 
 class _AppLocalizationsDelegate
