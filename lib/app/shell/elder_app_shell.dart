@@ -62,14 +62,15 @@ class ElderAppShell extends StatelessWidget {
                 label: activitiesLabel,
                 onTap: () => _onTap(1),
               ),
-              _buildNavItem(
-                context: context,
-                index: 2,
-                isSelected: currentIndex == 2,
-                icon: Icons.settings_rounded,
-                label: settingsLabel,
-                onTap: () => _onTap(2),
-              ),
+              if (navigationShell.route.branches.length > 2)
+                _buildNavItem(
+                  context: context,
+                  index: 2,
+                  isSelected: currentIndex == 2,
+                  icon: Icons.settings_rounded,
+                  label: settingsLabel,
+                  onTap: () => _onTap(2),
+                ),
             ],
           ),
         ),

@@ -92,5 +92,15 @@
   "shoppingListTitle": "আপনার কেনাকাটার তালিকা",
   "shoppingListSubtitle": "জিনিসগুলো দেখে নিন, প্রস্তুত হলে 'কেনাকাটা শুরু করুন' চাপুন।",
   "startShoppingButton": "কেনাকাটা শুরু করুন ➔",
-  "findItemsOnShelf": "তালিকার জিনিসগুলো ঝুড়িতে রাখতে ট্যাপ করুন:"
+  "findItemsOnShelf": "তালিকার জিনিসগুলো ঝুড়িতে রাখতে ট্যাপ করুন:",
+  "landingWelcomeTitle": "নির্বাণে স্বাগতম",
+  "landingSubtitle": "আপনি কীভাবে এগিয়ে যেতে চান তা বেছে নিন।",
+  "patientPortalTitle": "রোগী পোর্টাল",
+  "patientPortalSubtitle": "রোগী ও প্রিয়জনদের জন্য",
+  "patientPortalDescription": "আপনার দৈনিক কার্যক্রম, রিমাইন্ডার ও পরিবারের সাথে সংযোগ।",
+  "patientPortalButton": "রোগী পোর্টালে প্রবেশ করুন",
+  "caregiverPortalTitle": "পরিচর্যাকারী পোর্টাল",
+  "caregiverPortalSubtitle": "পরিচর্যাকারীদের জন্য",
+  "caregiverPortalDescription": "রোগী, দিনচর্যা, রিমাইন্ডার ও কার্যক্রম পরিচালনা করুন।",
+  "caregiverPortalButton": "পরিচর্যাকারী পোর্টালে প্রবেশ করুন"
 }

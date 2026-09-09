@@ -15,17 +15,13 @@ import '../../features/caregiver/caregiver.dart';
 import '../../features/games/games.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
-import '../../features/onboarding/providers/onboarding_provider.dart';
+import '../../features/landing/landing.dart';
 import '../../features/patient/patient.dart';
 import '../../features/settings/presentation/language_selector_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../shell/elder_app_shell.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  // Check local pairing state synchronously — HiveDatabase is already open
-  // before runApp() is called in main.dart.
-  final isPatientDevicePaired = HiveDatabase.isDevicePaired;
-
   final rootNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'root',
   );
@@ -35,20 +31,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final gamesNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'games',
   );
-  final settingsNavigatorKey =
-      GlobalKey<NavigatorState>(debugLabel: 'settings');
 
-  final isOnboardingCompleted = ref.read(onboardingCompletedProvider);
-
-  // Priority: paired patient device > elder onboarding > onboarding
-  final String initialLocation;
-  if (isPatientDevicePaired) {
-    initialLocation = '/patient/home';
-  } else if (isOnboardingCompleted) {
-    initialLocation = '/home';
-  } else {
-    initialLocation = '/onboarding';
-  }
+  // Landing page is always the initial route — portal selection
+  const initialLocation = '/';
 
   final router = GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -85,6 +70,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null; // no redirect
     },
     routes: [
+      // 0. Landing / Portal Selection
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const LandingScreen(),
+      ),
+
       // 1. Onboarding Flow (Full screen)
       GoRoute(
         path: '/onboarding',
@@ -140,12 +131,68 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const PatientHomeScreen(),
       ),
       GoRoute(
+        path: '/patient/games',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => GamesHubScreen(
+          onSessionCompleted: (session) async {
+            debugPrint('Patient Games — Session Completed: $session');
+
+            final pairedId = HiveDatabase.pairedPatientId ??
+                HiveDatabase.currentPatientSession?.patientId;
+
+            if (pairedId != null && pairedId.isNotEmpty) {
+              await ref
+                  .read(gameSessionRepositoryProvider)
+                  .recordGameSession(
+                    session: session,
+                    patientId: pairedId,
+                  );
+
+              await ref
+                  .read(caregiverEventNotificationServiceProvider)
+                  .notifyGameCompleted(
+                    patientId: pairedId,
+                    gameTitle: session.gameType.displayName,
+                    score: session.score,
+                    correctAnswers: session.correctAnswers,
+                    totalQuestions: session.totalQuestions,
+                    gameSessionId: session.id,
+                  );
+            }
+          },
+        ),
+      ),
+      GoRoute(
         path: '/patient/reminders',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientRemindersScreen(),
       ),
+      GoRoute(
+        path: '/patient/settings',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: 'language',
+            parentNavigatorKey: rootNavigatorKey,
+            builder: (context, state) => const LanguageSelectorScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/settings',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: 'language',
+            parentNavigatorKey: rootNavigatorKey,
+            builder: (context, state) => const LanguageSelectorScreen(),
+          ),
+        ],
+      ),
 
-      // 4. Main Stateful Shell with Accessible Bottom Navigation
+      // 4. Main Stateful Shell with Accessible Bottom Navigation (Home & Games)
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ElderAppShell(navigationShell: navigationShell);
@@ -215,24 +262,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     }
                   },
                 ),
-              ),
-            ],
-          ),
-
-          // Branch 2: Settings & Visual Comfort
-          StatefulShellBranch(
-            navigatorKey: settingsNavigatorKey,
-            routes: [
-              GoRoute(
-                path: '/settings',
-                builder: (context, state) => const SettingsScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'language',
-                    parentNavigatorKey: rootNavigatorKey,
-                    builder: (context, state) => const LanguageSelectorScreen(),
-                  ),
-                ],
               ),
             ],
           ),

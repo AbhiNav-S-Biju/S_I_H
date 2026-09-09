@@ -667,6 +667,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap items from your list to put them in your cart:'**
   String get findItemsOnShelf;
+
+  /// Welcome header on landing page
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to NIRVANA'**
+  String get landingWelcomeTitle;
+
+  /// Subtitle on landing page prompting portal selection
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you would like to continue.'**
+  String get landingSubtitle;
+
+  /// Title for Patient Portal
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Portal'**
+  String get patientPortalTitle;
+
+  /// Subtitle for Patient Portal
+  ///
+  /// In en, this message translates to:
+  /// **'For patients and loved ones'**
+  String get patientPortalSubtitle;
+
+  /// Description for Patient Portal
+  ///
+  /// In en, this message translates to:
+  /// **'Access your daily activities, reminders and family connections.'**
+  String get patientPortalDescription;
+
+  /// Action button to enter Patient Portal
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Patient Portal'**
+  String get patientPortalButton;
+
+  /// Title for Caregiver Portal
+  ///
+  /// In en, this message translates to:
+  /// **'Caregiver Portal'**
+  String get caregiverPortalTitle;
+
+  /// Subtitle for Caregiver Portal
+  ///
+  /// In en, this message translates to:
+  /// **'For caregivers'**
+  String get caregiverPortalSubtitle;
+
+  /// Description for Caregiver Portal
+  ///
+  /// In en, this message translates to:
+  /// **'Manage patients, reminders, activities and caregiver information.'**
+  String get caregiverPortalDescription;
+
+  /// Action button to enter Caregiver Portal
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Caregiver Portal'**
+  String get caregiverPortalButton;
 }
 
 class _AppLocalizationsDelegate

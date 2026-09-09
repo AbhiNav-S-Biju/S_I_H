@@ -307,4 +307,36 @@ class AppLocalizationsLus extends AppLocalizations {
   @override
   String get findItemsOnShelf =>
       'Tap items from your list to put them in your cart:';
+
+  @override
+  String get landingWelcomeTitle => 'Nirvana-ah kan lo lawm che';
+
+  @override
+  String get landingSubtitle => 'Engtin nge i kal zui duh tih thlang rawh.';
+
+  @override
+  String get patientPortalTitle => 'Damlo Portal';
+
+  @override
+  String get patientPortalSubtitle => 'Damlo leh hmangaih takte tan';
+
+  @override
+  String get patientPortalDescription =>
+      'Ni tin kan thil tih tur, soidawntute leh chhungkaw inzawmna.';
+
+  @override
+  String get patientPortalButton => 'Damlo Portal-ah lut rawh';
+
+  @override
+  String get caregiverPortalTitle => 'Enkawltu Portal';
+
+  @override
+  String get caregiverPortalSubtitle => 'Enkawltute tan';
+
+  @override
+  String get caregiverPortalDescription =>
+      'Damlo, nikhua, soidawntu leh thil tih tur enkawl rawh.';
+
+  @override
+  String get caregiverPortalButton => 'Enkawltu Portal-ah lut rawh';
 }

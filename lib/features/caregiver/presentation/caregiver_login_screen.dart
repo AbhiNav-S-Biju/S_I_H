@@ -157,12 +157,12 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
         foregroundColor: ElderColors.textPrimary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back to Home',
+          tooltip: 'Back to Landing',
           onPressed: () {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/home');
+              context.go('/');
             }
           },
         ),

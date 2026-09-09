@@ -371,5 +371,45 @@
   "findItemsOnShelf": "Tap items from your list to put them in your cart:",
   "@findItemsOnShelf": {
     "description": "Instructions for finding items on shelf"
+  },
+  "landingWelcomeTitle": "Welcome to NIRVANA",
+  "@landingWelcomeTitle": {
+    "description": "Welcome header on landing page"
+  },
+  "landingSubtitle": "Choose how you would like to continue.",
+  "@landingSubtitle": {
+    "description": "Subtitle on landing page prompting portal selection"
+  },
+  "patientPortalTitle": "Patient Portal",
+  "@patientPortalTitle": {
+    "description": "Title for Patient Portal"
+  },
+  "patientPortalSubtitle": "For patients and loved ones",
+  "@patientPortalSubtitle": {
+    "description": "Subtitle for Patient Portal"
+  },
+  "patientPortalDescription": "Access your daily activities, reminders and family connections.",
+  "@patientPortalDescription": {
+    "description": "Description for Patient Portal"
+  },
+  "patientPortalButton": "Enter Patient Portal",
+  "@patientPortalButton": {
+    "description": "Action button to enter Patient Portal"
+  },
+  "caregiverPortalTitle": "Caregiver Portal",
+  "@caregiverPortalTitle": {
+    "description": "Title for Caregiver Portal"
+  },
+  "caregiverPortalSubtitle": "For caregivers",
+  "@caregiverPortalSubtitle": {
+    "description": "Subtitle for Caregiver Portal"
+  },
+  "caregiverPortalDescription": "Manage patients, reminders, activities and caregiver information.",
+  "@caregiverPortalDescription": {
+    "description": "Description for Caregiver Portal"
+  },
+  "caregiverPortalButton": "Enter Caregiver Portal",
+  "@caregiverPortalButton": {
+    "description": "Action button to enter Caregiver Portal"
   }
 }

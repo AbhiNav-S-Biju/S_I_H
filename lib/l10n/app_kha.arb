@@ -59,5 +59,15 @@
   "tryAgainButton": "Pyrshang biang",
   "goHomeButton": "Phai sha Home",
   "aboutAppTitle": "Shaphang Nirvana",
-  "aboutAppVersion": "Version 1.0.0 • Ka Jingri-sumar ba Maya"
+  "aboutAppVersion": "Version 1.0.0 • Ka Jingri-sumar ba Maya",
+  "landingWelcomeTitle": "Jingialang sha Nirvana",
+  "landingSubtitle": "Jied kumno phi kwah ban phai sha.",
+  "patientPortalTitle": "Portal jong u Nongwai",
+  "patientPortalSubtitle": "Na ka bynta jong ki nongwai bad ki bynriew ba ieit",
+  "patientPortalDescription": "Pyndonkam ia ki kam ba hin-hin-sngi, ki jingsoidne bad jingialang ha pamiliar.",
+  "patientPortalButton": "Leit sha Portal jong u Nongwai",
+  "caregiverPortalTitle": "Portal jong u Nongiarap",
+  "caregiverPortalSubtitle": "Na ka bynta jong ki nongiarap",
+  "caregiverPortalDescription": "Pynshai ia ki nongwai, ki jingsoidne bad ki kam ba hin-hin-sngi.",
+  "caregiverPortalButton": "Leit sha Portal jong u Nongiarap"
 }
