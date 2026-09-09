@@ -11,6 +11,7 @@ import '../../../../core/widgets/voice_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../controllers/remember_objects_controller.dart';
 import '../../models/game_enums.dart';
+import '../../models/game_level.dart';
 import '../../models/game_session.dart';
 import '../widgets/elder_game_button.dart';
 import '../widgets/elder_game_card.dart';
@@ -21,12 +22,14 @@ class RememberObjectsScreen extends ConsumerStatefulWidget {
   final GameDifficulty difficulty;
   final ValueChanged<GameSession>? onGameCompleted;
   final VoidCallback? onExit;
+  final GameLevel? level;
 
   const RememberObjectsScreen({
     super.key,
     this.difficulty = GameDifficulty.easy,
     this.onGameCompleted,
     this.onExit,
+    this.level,
   });
 
   @override
@@ -40,7 +43,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
   void initState() {
     super.initState();
     _controller = RememberObjectsController(
-      initialDifficulty: widget.difficulty,
+      initialDifficulty: widget.level?.difficulty ?? widget.difficulty,
     );
     _speakMemorizationItems();
   }
@@ -97,6 +100,23 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
     Navigator.of(context).maybePop(session);
   }
 
+  void _loadNextLevel(int nextLevelNumber) {
+    final allLevels = GameLevel.getLevelsForGame(GameType.rememberObjects);
+    final next = allLevels.firstWhere(
+      (l) => l.levelNumber == nextLevelNumber,
+      orElse: () => allLevels.last,
+    );
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => RememberObjectsScreen(
+          level: next,
+          onGameCompleted: widget.onGameCompleted,
+          onExit: widget.onExit,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeLocale = ref.watch(localeProvider);
@@ -110,7 +130,9 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
         children: [
           // Header Bar
           GameHeader(
-            title: GameType.rememberObjects.localizedTitle(l10n),
+            title: widget.level != null
+                ? 'Level ${widget.level!.levelNumber}: ${widget.level!.localizedTitle(langCode)}'
+                : GameType.rememberObjects.localizedTitle(l10n),
             difficulty: state.difficulty,
             onExit: _handleExit,
             onHint: !state.isMemorizationPhase
@@ -438,10 +460,16 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                           await GameCompletionDialog.show(
                             context,
                             session: session,
+                            level: widget.level,
+                            onNextLevel: widget.level != null && widget.level!.levelNumber < 8
+                                ? () => _loadNextLevel(widget.level!.levelNumber + 1)
+                                : null,
+                            onFinish: () {
+                              if (mounted) {
+                                _handleCompletion(session);
+                              }
+                            },
                           );
-                          if (mounted) {
-                            _handleCompletion(session);
-                          }
                         }
                       : null,
                 ),

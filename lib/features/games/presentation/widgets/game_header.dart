@@ -73,39 +73,13 @@ class GameHeader extends StatelessWidget {
                       color: Color(0xFF0F172A),
                     ),
                   ),
-                  const SizedBox(height: 2.0),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 6.0,
-                    runSpacing: 2.0,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 2.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE0F2FE),
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
-                        child: Text(
-                          difficulty.localizedLabel(l10n),
-                          style: const TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF0369A1),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '• ${l10n?.activitiesNavLabel ?? 'Activity'}',
-                        style: const TextStyle(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    l10n?.activitiesNavLabel ?? 'Activity',
+                    style: const TextStyle(
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF64748B),
+                    ),
                   ),
                 ],
               ),

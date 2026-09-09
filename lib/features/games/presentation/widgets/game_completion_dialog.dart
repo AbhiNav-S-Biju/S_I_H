@@ -4,29 +4,41 @@ import '../../../../app/providers/accessibility_providers.dart';
 import '../../../../core/network/audio_service.dart';
 import '../../../../core/widgets/voice_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../models/game_level.dart';
 import '../../models/game_session.dart';
+import '../../services/game_progress_service.dart';
 import 'elder_game_button.dart';
 
 class GameCompletionDialog extends ConsumerStatefulWidget {
   final GameSession session;
   final VoidCallback? onFinish;
+  final GameLevel? level;
+  final VoidCallback? onNextLevel;
 
   const GameCompletionDialog({
     super.key,
     required this.session,
     required this.onFinish,
+    this.level,
+    this.onNextLevel,
   });
 
   static Future<bool?> show(
     BuildContext context, {
     required GameSession session,
     VoidCallback? onFinish,
+    GameLevel? level,
+    VoidCallback? onNextLevel,
   }) {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogCtx) =>
-          GameCompletionDialog(session: session, onFinish: onFinish),
+      builder: (dialogCtx) => GameCompletionDialog(
+        session: session,
+        onFinish: onFinish,
+        level: level,
+        onNextLevel: onNextLevel,
+      ),
     );
   }
 
@@ -36,21 +48,84 @@ class GameCompletionDialog extends ConsumerStatefulWidget {
 }
 
 class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
+  int _starsEarned = 1;
+
   @override
   void initState() {
     super.initState();
+    _calculateAndSaveProgress();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
         final locale = ref.read(localeProvider);
-        ref
-            .read(audioServiceProvider)
-            .speak(
-              widget.session.localizedSupportiveFeedback(locale.languageCode),
+        final feedbackMsg =
+            widget.session.localizedSupportiveFeedback(locale.languageCode);
+        final starMsg = _getStarEncouragement(locale.languageCode);
+        ref.read(audioServiceProvider).speak(
+              '$starMsg. $feedbackMsg',
               languageCode: locale.languageCode,
             );
       }
     });
+  }
+
+  void _calculateAndSaveProgress() {
+    final acc = widget.session.completionRate;
+    final hints = widget.session.hintsUsed;
+    if (acc >= 0.85 && hints <= 1) {
+      _starsEarned = 3;
+    } else if (acc >= 0.5) {
+      _starsEarned = 2;
+    } else {
+      _starsEarned = 1;
+    }
+
+    if (widget.level != null) {
+      GameProgressService.instance.completeLevel(
+        gameType: widget.level!.gameType,
+        levelNumber: widget.level!.levelNumber,
+        stars: _starsEarned,
+        timeSeconds: widget.session.durationSeconds,
+      );
+    }
+  }
+
+  String _getStarEncouragement(String langCode) {
+    if (_starsEarned == 3) {
+      switch (langCode) {
+        case 'as':
+          return 'অসাধাৰণ! আপুনি ৩ টা তৰা লাভ কৰিলে!';
+        case 'hi':
+          return 'शानदार! आपको ३ सितारे मिले!';
+        case 'bn':
+          return 'অসাধারণ! আপনি ৩টি তারা পেলেন!';
+        default:
+          return 'Superb! You earned 3 stars!';
+      }
+    } else if (_starsEarned == 2) {
+      switch (langCode) {
+        case 'as':
+          return 'বৰ ধুনীয়া! আপুনি ২ টা তৰা লাভ কৰিলে!';
+        case 'hi':
+          return 'बहुत बढ़िया! आपको २ सितारे मिले!';
+        case 'bn':
+          return 'দারুণ হয়েছে! আপনি ২টি তারা পেলেন!';
+        default:
+          return 'Wonderful work! You earned 2 stars!';
+      }
+    } else {
+      switch (langCode) {
+        case 'as':
+          return 'ভাল কাম! আপুনি ১ টা তৰা লাভ কৰিলে!';
+        case 'hi':
+          return 'शाबाश! आपने १ सितारा अर्जित किया!';
+        case 'bn':
+          return 'খুব ভালো! আপনি ১টি তারা পেলেন!';
+        default:
+          return 'Great progress! You earned 1 star!';
+      }
+    }
   }
 
   @override
@@ -59,6 +134,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     final activeLocale = ref.watch(localeProvider);
     final feedbackMsg =
         widget.session.localizedSupportiveFeedback(activeLocale.languageCode);
+    final starEncouragement = _getStarEncouragement(activeLocale.languageCode);
 
     final String itemsFoundLabel;
     final String minutesActiveLabel;
@@ -84,32 +160,83 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
         minutesActiveLabel = 'Minutes Active';
     }
 
+    final level = widget.level;
+    final hasNextLevel = level != null &&
+        level.levelNumber < 8 &&
+        widget.onNextLevel != null;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.0)),
       elevation: 8,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Cheerful celebratory badge
+            // Level Badge if in journey mode
+            if (level != null) ...[
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14.0,
+                    vertical: 6.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: level.themeColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(level.icon, size: 18.0, color: level.themeColor),
+                      const SizedBox(width: 6.0),
+                      Text(
+                        'Level ${level.levelNumber}: ${level.localizedTitle(activeLocale.languageCode)}',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w800,
+                          color: level.themeColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14.0),
+            ],
+
+            // Golden Star Row
             Center(
               child: Container(
-                width: 84.0,
-                height: 84.0,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDCFCE7), // Soft mint green
-                  shape: BoxShape.circle,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 10.0,
                 ),
-                child: const Icon(
-                  Icons.check_circle_rounded,
-                  size: 56.0,
-                  color: Color(0xFF16A34A),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(24.0),
+                  border: Border.all(color: const Color(0xFFFDE68A), width: 1.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(3, (index) {
+                    final isFilled = index < _starsEarned;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Icon(
+                        isFilled ? Icons.star_rounded : Icons.star_border_rounded,
+                        size: 40.0,
+                        color: isFilled
+                            ? const Color(0xFFF59E0B)
+                            : const Color(0xFFCBD5E1),
+                      ),
+                    );
+                  }),
                 ),
               ),
             ),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 14.0),
 
             // Friendly congratulatory title
             Text(
@@ -119,6 +246,16 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 fontSize: 24.0,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFF0F172A),
+              ),
+            ),
+            const SizedBox(height: 6.0),
+            Text(
+              starEncouragement,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFD97706),
               ),
             ),
             const SizedBox(height: 12.0),
@@ -140,7 +277,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                       feedbackMsg,
                       textAlign: TextAlign.left,
                       style: const TextStyle(
-                        fontSize: 17.0,
+                        fontSize: 16.0,
                         fontWeight: FontWeight.w600,
                         height: 1.4,
                         color: Color(0xFF334155),
@@ -148,17 +285,17 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                     ),
                   ),
                   SpeakButton(
-                    text: feedbackMsg,
+                    text: '$starEncouragement. $feedbackMsg',
                     size: 38.0,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24.0),
+            const SizedBox(height: 18.0),
 
             // Clean Non-Clinical Metric Summary Card
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(14.0),
               decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(16.0),
@@ -171,11 +308,11 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                     label: itemsFoundLabel,
                     value:
                         '${widget.session.correctAnswers} / ${widget.session.totalQuestions}',
-                    icon: Icons.star_rounded,
-                    color: const Color(0xFFD97706),
+                    icon: Icons.check_circle_outline_rounded,
+                    color: const Color(0xFF16A34A),
                   ),
                   Container(
-                    height: 36.0,
+                    height: 32.0,
                     width: 1.5,
                     color: const Color(0xFFCBD5E1),
                   ),
@@ -189,17 +326,60 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 28.0),
+            const SizedBox(height: 22.0),
 
-            // Finish Button
-            ElderGameButton(
-              label: l10n?.finishButton ?? 'All Done',
-              icon: Icons.arrow_forward_rounded,
-              onPressed: () {
-                Navigator.of(context).pop();
-                widget.onFinish?.call();
-              },
-            ),
+            // Action Buttons (Next Level + Back to Map)
+            if (hasNextLevel) ...[
+              ElderGameButton(
+                label: activeLocale.languageCode == 'as'
+                    ? 'পৰবৰ্তী স্তৰ ➔'
+                    : activeLocale.languageCode == 'hi'
+                        ? 'अगला स्तर ➔'
+                        : activeLocale.languageCode == 'bn'
+                            ? 'পরবর্তী ধাপ ➔'
+                            : 'Next Level ➔',
+                icon: Icons.arrow_forward_rounded,
+                backgroundColor: level.themeColor,
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  widget.onNextLevel?.call();
+                },
+              ),
+              const SizedBox(height: 10.0),
+              ElderGameButton(
+                label: activeLocale.languageCode == 'as'
+                    ? 'মানচিত্ৰলৈ উভতি যাওক'
+                    : activeLocale.languageCode == 'hi'
+                        ? 'मानचित्र पर वापस'
+                        : activeLocale.languageCode == 'bn'
+                            ? 'মানচিত্রে ফিরে যান'
+                            : 'Back to Map',
+                icon: Icons.map_outlined,
+                isSecondary: true,
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                  widget.onFinish?.call();
+                },
+              ),
+            ] else ...[
+              ElderGameButton(
+                label: level != null
+                    ? (activeLocale.languageCode == 'as'
+                        ? 'মানচিত্ৰলৈ উভতি যাওক'
+                        : activeLocale.languageCode == 'hi'
+                            ? 'मानचित्र पर वापस'
+                            : activeLocale.languageCode == 'bn'
+                                ? 'মানচিত্রে ফিরে যান'
+                                : 'Back to Map')
+                    : (l10n?.finishButton ?? 'All Done'),
+                icon: Icons.check_rounded,
+                backgroundColor: level?.themeColor ?? const Color(0xFF0F766E),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  widget.onFinish?.call();
+                },
+              ),
+            ],
           ],
         ),
       ),
@@ -223,7 +403,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
             Text(
               value,
               style: const TextStyle(
-                fontSize: 20.0,
+                fontSize: 18.0,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFF0F172A),
               ),
@@ -234,7 +414,7 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 14.0,
+            fontSize: 13.0,
             fontWeight: FontWeight.w600,
             color: Color(0xFF64748B),
           ),

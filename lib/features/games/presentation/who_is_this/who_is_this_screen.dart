@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../controllers/who_is_this_controller.dart';
 import '../../models/family_member_item.dart';
 import '../../models/game_enums.dart';
+import '../../models/game_level.dart';
 import '../../models/game_session.dart';
 import '../widgets/elder_game_button.dart';
 import '../widgets/game_completion_dialog.dart';
@@ -16,12 +17,14 @@ class WhoIsThisScreen extends ConsumerStatefulWidget {
   final GameDifficulty difficulty;
   final ValueChanged<GameSession>? onGameCompleted;
   final VoidCallback? onExit;
+  final GameLevel? level;
 
   const WhoIsThisScreen({
     super.key,
     this.difficulty = GameDifficulty.easy,
     this.onGameCompleted,
     this.onExit,
+    this.level,
   });
 
   @override
@@ -34,7 +37,9 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = WhoIsThisController(initialDifficulty: widget.difficulty);
+    _controller = WhoIsThisController(
+      initialDifficulty: widget.level?.difficulty ?? widget.difficulty,
+    );
     _speakCurrentQuestion();
   }
 
@@ -76,6 +81,23 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
     Navigator.of(context).maybePop(session);
   }
 
+  void _loadNextLevel(int nextLevelNumber) {
+    final allLevels = GameLevel.getLevelsForGame(GameType.whoIsThis);
+    final next = allLevels.firstWhere(
+      (l) => l.levelNumber == nextLevelNumber,
+      orElse: () => allLevels.last,
+    );
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => WhoIsThisScreen(
+          level: next,
+          onGameCompleted: widget.onGameCompleted,
+          onExit: widget.onExit,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeLocale = ref.watch(localeProvider);
@@ -96,7 +118,9 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
         children: [
           // Header Bar
           GameHeader(
-            title: GameType.whoIsThis.localizedTitle(l10n),
+            title: widget.level != null
+                ? 'Level ${widget.level!.levelNumber}: ${widget.level!.localizedTitle(langCode)}'
+                : GameType.whoIsThis.localizedTitle(l10n),
             difficulty: state.difficulty,
             onExit: _handleExit,
             onHint: () {
@@ -407,10 +431,16 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                               await GameCompletionDialog.show(
                                 context,
                                 session: session,
+                                level: widget.level,
+                                onNextLevel: widget.level != null && widget.level!.levelNumber < 8
+                                    ? () => _loadNextLevel(widget.level!.levelNumber + 1)
+                                    : null,
+                                onFinish: () {
+                                  if (mounted) {
+                                    _handleCompletion(session);
+                                  }
+                                },
                               );
-                              if (mounted) {
-                                _handleCompletion(session);
-                              }
                             } else {
                               setState(() {
                                 _controller.nextQuestion();

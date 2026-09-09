@@ -1,18 +1,18 @@
 // ==============================================================================
 // NIRVANA - Games Hub Screen
-// Description: Accessible activity launcher for Elder Mode
+// Description: Accessible activity launcher with 8-level game journey maps,
+// star progression, and dementia-friendly reassurance.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
-import '../../../l10n/app_localizations.dart';
-import '../models/game_enums.dart';
-import '../models/game_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers/accessibility_providers.dart';
-import 'grocery_memory/grocery_memory_screen.dart';
-import 'jigsaw_puzzle/jigsaw_puzzle_screen.dart';
-import 'remember_objects/remember_objects_screen.dart';
-import 'who_is_this/who_is_this_screen.dart';
+import '../../../l10n/app_localizations.dart';
+import '../models/game_enums.dart';
+import '../models/game_level.dart';
+import '../models/game_session.dart';
+import '../services/game_progress_service.dart';
+import 'game_level_map_screen.dart';
 import 'widgets/elder_game_button.dart';
 
 class GamesHubScreen extends ConsumerStatefulWidget {
@@ -25,22 +25,22 @@ class GamesHubScreen extends ConsumerStatefulWidget {
 }
 
 class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
-  GameDifficulty _selectedDifficulty = GameDifficulty.easy;
-
-  void _launchGame(Widget screen) async {
-    final session = await Navigator.of(
-      context,
-    ).push<GameSession>(MaterialPageRoute(builder: (_) => screen));
-
-    if (session != null && widget.onSessionCompleted != null) {
-      widget.onSessionCompleted!(session);
+  void _openGameMap(GameType type) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => GameLevelMapScreen(gameType: type),
+      ),
+    );
+    if (mounted) {
+      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(localeProvider);
+    final activeLocale = ref.watch(localeProvider);
     final l10n = AppLocalizations.of(context);
+    final langCode = activeLocale.languageCode;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -88,8 +88,13 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                         ),
                         const SizedBox(height: 4.0),
                         Text(
-                          l10n?.activitiesBannerSubtitle ??
-                              'Choose an enjoyable activity below. Take all the time you like.',
+                          langCode == 'as'
+                              ? 'প্ৰতিটো খেলৰ ৮ টা স্তৰৰ সুন্দৰ যাত্ৰা আৰম্ভ কৰক। আপোনাৰ নিজৰ গতিত তৰা সংগ্ৰহ কৰক।'
+                              : langCode == 'hi'
+                                  ? 'प्रत्येक खेल के 8 स्तरों की सुंदर यात्रा शुरू करें। अपनी गति से सितारे अर्जित करें।'
+                                  : langCode == 'bn'
+                                      ? 'প্রতিটি খেলার ৮টি স্তরের সুন্দর ভ্রমণ উপভোগ করুন। নিজের ছন্দে তারা সংগ্রহ করুন।'
+                                      : 'Embark on an 8-level journey for each activity. Earn stars at your own calm pace.',
                           style: const TextStyle(
                             fontSize: 15.0,
                             fontWeight: FontWeight.w500,
@@ -104,129 +109,80 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             ),
             const SizedBox(height: 24.0),
 
-            // Difficulty Selector (Pill bar)
-            Text(
-              l10n?.activityPace ?? 'Activity Pace:',
-              style: const TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF334155),
-              ),
-            ),
-            const SizedBox(height: 10.0),
+            // Section Header
             Row(
-              children: GameDifficulty.values.map((diff) {
-                final isSelected = _selectedDifficulty == diff;
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectedDifficulty = diff;
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(14.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? const Color(0xFF0F766E)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(14.0),
-                          border: Border.all(
-                            color: isSelected
-                                ? const Color(0xFF0F766E)
-                                : const Color(0xFFCBD5E1),
-                            width: 2.0,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          diff.localizedLabel(l10n),
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w700,
-                            color: isSelected
-                                ? Colors.white
-                                : const Color(0xFF334155),
-                          ),
-                        ),
-                      ),
-                    ),
+              children: [
+                const Icon(Icons.map_rounded, color: Color(0xFF0F766E), size: 24.0),
+                const SizedBox(width: 8.0),
+                Text(
+                  langCode == 'as'
+                      ? 'খেলৰ স্তৰ আৰু যাত্ৰা মানচিত্ৰ'
+                      : langCode == 'hi'
+                          ? 'खेल के स्तर और यात्रा मानचित्र'
+                          : langCode == 'bn'
+                              ? 'খেলার স্তর ও পরিক্রমা মানচিত্র'
+                              : 'Activity Level Journeys',
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF334155),
                   ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 28.0),
-
-            // 1. Remember Objects Card
-            _buildGameCard(
-              title: GameType.rememberObjects.localizedTitle(l10n),
-              subtitle: GameType.rememberObjects.localizedSubtitle(l10n),
-              emoji: '🍎',
-              badgeColor: const Color(0xFFDCFCE7),
-              textColor: const Color(0xFF166534),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
-              onPlay: () => _launchGame(
-                RememberObjectsScreen(
-                  difficulty: _selectedDifficulty,
-                  onGameCompleted: widget.onSessionCompleted,
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 18.0),
+            const SizedBox(height: 14.0),
 
-            // 2. Who Is This? Card
+            // 1. Familiar Jigsaw Card
             _buildGameCard(
-              title: GameType.whoIsThis.localizedTitle(l10n),
-              subtitle: GameType.whoIsThis.localizedSubtitle(l10n),
-              emoji: '👵',
-              badgeColor: const Color(0xFFE0F2FE),
-              textColor: const Color(0xFF075985),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
-              onPlay: () => _launchGame(
-                WhoIsThisScreen(
-                  difficulty: _selectedDifficulty,
-                  onGameCompleted: widget.onSessionCompleted,
-                ),
-              ),
-            ),
-            const SizedBox(height: 18.0),
-
-            // 3. Grocery Memory Card
-            _buildGameCard(
-              title: GameType.groceryMemory.localizedTitle(l10n),
-              subtitle: GameType.groceryMemory.localizedSubtitle(l10n),
-              emoji: '🛒',
-              badgeColor: const Color(0xFFFEF3C7),
-              textColor: const Color(0xFF92400E),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
-              onPlay: () => _launchGame(
-                GroceryMemoryScreen(
-                  difficulty: _selectedDifficulty,
-                  onGameCompleted: widget.onSessionCompleted,
-                ),
-              ),
-            ),
-            const SizedBox(height: 18.0),
-
-            // 4. Familiar Jigsaw Card
-            _buildGameCard(
+              gameType: GameType.jigsawPuzzle,
               title: GameType.jigsawPuzzle.localizedTitle(l10n),
               subtitle: GameType.jigsawPuzzle.localizedSubtitle(l10n),
               emoji: '🧩',
               badgeColor: const Color(0xFFF3E8FF),
               textColor: const Color(0xFF6B21A8),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
-              onPlay: () => _launchGame(
-                JigsawPuzzleScreen(
-                  difficulty: _selectedDifficulty,
-                  onGameCompleted: widget.onSessionCompleted,
-                ),
-              ),
+              langCode: langCode,
+              onOpenMap: () => _openGameMap(GameType.jigsawPuzzle),
             ),
-            const SizedBox(height: 24.0),
+            const SizedBox(height: 18.0),
+
+            // 2. Remember Objects Card
+            _buildGameCard(
+              gameType: GameType.rememberObjects,
+              title: GameType.rememberObjects.localizedTitle(l10n),
+              subtitle: GameType.rememberObjects.localizedSubtitle(l10n),
+              emoji: '🍎',
+              badgeColor: const Color(0xFFDCFCE7),
+              textColor: const Color(0xFF166534),
+              langCode: langCode,
+              onOpenMap: () => _openGameMap(GameType.rememberObjects),
+            ),
+            const SizedBox(height: 18.0),
+
+            // 3. Who Is This? Card
+            _buildGameCard(
+              gameType: GameType.whoIsThis,
+              title: GameType.whoIsThis.localizedTitle(l10n),
+              subtitle: GameType.whoIsThis.localizedSubtitle(l10n),
+              emoji: '👵',
+              badgeColor: const Color(0xFFE0F2FE),
+              textColor: const Color(0xFF075985),
+              langCode: langCode,
+              onOpenMap: () => _openGameMap(GameType.whoIsThis),
+            ),
+            const SizedBox(height: 18.0),
+
+            // 4. Grocery Memory Card
+            _buildGameCard(
+              gameType: GameType.groceryMemory,
+              title: GameType.groceryMemory.localizedTitle(l10n),
+              subtitle: GameType.groceryMemory.localizedSubtitle(l10n),
+              emoji: '🛒',
+              badgeColor: const Color(0xFFFEF3C7),
+              textColor: const Color(0xFF92400E),
+              langCode: langCode,
+              onOpenMap: () => _openGameMap(GameType.groceryMemory),
+            ),
+            const SizedBox(height: 28.0),
           ],
         ),
       ),
@@ -234,14 +190,48 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
   }
 
   Widget _buildGameCard({
+    required GameType gameType,
     required String title,
     required String subtitle,
     required String emoji,
     required Color badgeColor,
     required Color textColor,
-    required String buttonLabel,
-    required VoidCallback onPlay,
+    required String langCode,
+    required VoidCallback onOpenMap,
   }) {
+    final progress = GameProgressService.instance.getProgressForGame(gameType);
+    final totalStars = GameProgressService.instance.getTotalStarsEarned(gameType);
+    final highestLevel = GameProgressService.instance.getHighestUnlockedLevel(gameType);
+    final completedCount = progress.values.where((p) => p.isCompleted).length;
+    final journeyTitle = GameLevel.getJourneyTitle(gameType, langCode);
+
+    final String buttonLabel;
+    if (completedCount == 0) {
+      buttonLabel = langCode == 'as'
+          ? 'যাত্ৰা আৰম্ভ কৰক ➔'
+          : langCode == 'hi'
+              ? 'यात्रा शुरू करें ➔'
+              : langCode == 'bn'
+                  ? 'যাত্রা শুরু করুন ➔'
+                  : 'Start Level Journey ➔';
+    } else if (completedCount >= 8) {
+      buttonLabel = langCode == 'as'
+          ? 'মানচিত্ৰ চাওক (সম্পূৰ্ণ) 🏆'
+          : langCode == 'hi'
+              ? 'मानचित्र देखें (पूर्ण) 🏆'
+              : langCode == 'bn'
+                  ? 'মানচিত্র দেখুন (সম্পূর্ণ) 🏆'
+                  : 'View Map (Completed) 🏆';
+    } else {
+      buttonLabel = langCode == 'as'
+          ? 'স্তৰ $highestLevel লৈ আগবাঢ়ক ➔'
+          : langCode == 'hi'
+              ? 'स्तर $highestLevel जारी रखें ➔'
+              : langCode == 'bn'
+                  ? 'ধাপ $highestLevel এ চলুন ➔'
+                  : 'Continue Level $highestLevel ➔';
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -249,9 +239,9 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
         border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
         boxShadow: const [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6.0,
-            offset: Offset(0, 2),
+            color: Color(0x0C000000),
+            blurRadius: 8.0,
+            offset: Offset(0, 3),
           ),
         ],
       ),
@@ -260,6 +250,7 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 60.0,
@@ -284,11 +275,20 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                         color: Color(0xFF0F172A),
                       ),
                     ),
+                    const SizedBox(height: 3.0),
+                    Text(
+                      journeyTitle,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
+                    ),
                     const SizedBox(height: 4.0),
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        fontSize: 15.0,
+                        fontSize: 14.0,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF64748B),
                       ),
@@ -298,11 +298,81 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18.0),
+          const SizedBox(height: 16.0),
+
+          // Level progress bar & stars status
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(14.0),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Row(
+              children: [
+                // Completed indicator
+                Icon(
+                  completedCount >= 8
+                      ? Icons.emoji_events_rounded
+                      : Icons.alt_route_rounded,
+                  size: 20.0,
+                  color: completedCount >= 8
+                      ? const Color(0xFFD97706)
+                      : const Color(0xFF0F766E),
+                ),
+                const SizedBox(width: 8.0),
+                Text(
+                  langCode == 'as'
+                      ? 'স্তৰ $completedCount / ৮ সম্পূৰ্ণ'
+                      : langCode == 'hi'
+                          ? 'स्तर $completedCount / 8 पूरे'
+                          : langCode == 'bn'
+                              ? 'ধাপ $completedCount / ৮ সম্পূর্ণ'
+                              : 'Level $completedCount of 8 Done',
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF334155),
+                  ),
+                ),
+                const Spacer(),
+                // Stars pill
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF3C7),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFFD97706),
+                        size: 16.0,
+                      ),
+                      const SizedBox(width: 4.0),
+                      Text(
+                        '$totalStars / 24',
+                        style: const TextStyle(
+                          fontSize: 13.0,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF92400E),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16.0),
+
+          // Open Level Map Button
           ElderGameButton(
             label: buttonLabel,
-            icon: Icons.play_arrow_rounded,
-            onPressed: onPlay,
+            icon: Icons.map_outlined,
+            onPressed: onOpenMap,
           ),
         ],
       ),
