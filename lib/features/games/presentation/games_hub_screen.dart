@@ -94,15 +94,11 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
               ),
               child: Row(
                 children: [
-<<<<<<< HEAD
-                  const Icon(Icons.spa_rounded, color: ElderColors.forestDeep, size: 36.0),
-=======
                   const Icon(
                     Icons.spa_rounded,
-                    color: Color(0xFF16A34A),
+                    color: ElderColors.forestDeep,
                     size: 36.0,
                   ),
->>>>>>> 0ad1531 (Fix post-rebase formatting and game navigation)
                   const SizedBox(width: 14.0),
                   Expanded(
                     child: Column(
@@ -122,22 +118,16 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                           langCode == 'as'
                               ? 'প্ৰতিটো খেলৰ ৮ টা স্তৰৰ সুন্দৰ যাত্ৰা আৰম্ভ কৰক। আপোনাৰ নিজৰ গতিত তৰা সংগ্ৰহ কৰক।'
                               : langCode == 'hi'
-<<<<<<< HEAD
-                                  ? 'प्रत्येक खेल के 8 स्तरों की सुंदर यात्रा शुरू करें। अपनी गति से सितारे अर्जित करें।'
-                                  : langCode == 'bn'
-                                      ? 'প্রতিটি খেলার ৮টি স্তরের সুন্দর ভ্রমণ উপভোগ করুন। নিজের ছন্দে তারা সংগ্রহ করুন।'
-                                      : 'Embark on an 8-level journey for each activity. Earn stars at your own calm pace.',
-                          style: TextStyle(
-=======
                               ? 'प्रत्येक खेल के 8 स्तरों की सुंदर यात्रा शुरू करें। अपनी गति से सितारे अर्जित करें।'
                               : langCode == 'bn'
                               ? 'প্রতিটি খেলার ৮টি স্তরের সুন্দর ভ্রমণ উপভোগ করুন। নিজের ছন্দে তারা সংগ্রহ করুন।'
                               : 'Embark on an 8-level journey for each activity. Earn stars at your own calm pace.',
-                          style: const TextStyle(
->>>>>>> 0ad1531 (Fix post-rebase formatting and game navigation)
+                          style: TextStyle(
                             fontSize: 15.0,
                             fontWeight: FontWeight.w500,
-                            color: ElderColors.forestDeep.withValues(alpha: 0.85),
+                            color: ElderColors.forestDeep.withValues(
+                              alpha: 0.85,
+                            ),
                           ),
                         ),
                       ],
@@ -149,109 +139,11 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             const SizedBox(height: 20.0),
 
             // Section Header
-<<<<<<< HEAD
-            Row(children: [
-  const Icon(
-    Icons.map_rounded,
-    color: ElderColors.forestDeep,
-    size: 24.0,
-  ),
-  const SizedBox(width: 8.0),
-  Text(
-    langCode == 'as'
-        ? 'খেলৰ স্তৰ আৰু যাত্ৰা মানচিত্ৰ'
-        : langCode == 'hi'
-            ? 'खेल के स्तर और यात्रा मानचित्र'
-            : langCode == 'bn'
-                ? 'খেলার স্তর ও পরিক্রমা মানচিত্র'
-                : 'Activity Level Journeys',
-    style: const TextStyle(
-      fontSize: 18.0,
-      fontWeight: FontWeight.w800,
-      color: ElderColors.textPrimary,
-    ),
-  ),
-],
-),
-
-const SizedBox(height: 10.0),
-
-Row(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: GameDifficulty.values.map((diff) {
-    final isSelected = _selectedDifficulty == diff;
-    final isSuggested = diff == recommendedDifficulty;
-
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Column(
-          children: [
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedDifficulty = diff;
-                });
-              },
-              borderRadius: BorderRadius.circular(14.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? ElderColors.forestDeep
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(14.0),
-                  border: Border.all(
-                    color: isSelected
-                        ? ElderColors.forestDeep
-                        : const Color(0xFFCBD5E1),
-                    width: 2.0,
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  diff.localizedLabel(l10n),
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w700,
-                    color: isSelected
-                        ? Colors.white
-                        : ElderColors.textPrimary,
-                  ),
-                ),
-              ),
-            ),
-            if (isSuggested) ...[
-              const SizedBox(height: 6.0),
-              const _SuggestedBadge(),
-            ] else
-              const SizedBox(height: 6.0 + _SuggestedBadge.height),
-          ],
-        ),
-      ),
-    );
-  }).toList(),
-),
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  diff.localizedLabel(l10n),
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w700,
-                    color: isSelected
-                        ? Colors.white
-                        : const Color(0xFF334155),
-                  ),
-                ),
-              ),
-=======
             Row(
               children: [
                 const Icon(
                   Icons.map_rounded,
-                  color: Color(0xFF0F766E),
+                  color: ElderColors.forestDeep,
                   size: 24.0,
                 ),
                 const SizedBox(width: 8.0),
@@ -266,7 +158,7 @@ Row(
                   style: const TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF334155),
+                    color: ElderColors.textPrimary,
                   ),
                 ),
               ],
@@ -274,6 +166,7 @@ Row(
 
             const SizedBox(height: 10.0),
 
+            // Smart Difficulty Selector
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: GameDifficulty.values.map((diff) {
@@ -296,12 +189,12 @@ Row(
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? const Color(0xFF0F766E)
+                                  ? ElderColors.forestDeep
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(14.0),
                               border: Border.all(
                                 color: isSelected
-                                    ? const Color(0xFF0F766E)
+                                    ? ElderColors.forestDeep
                                     : const Color(0xFFCBD5E1),
                                 width: 2.0,
                               ),
@@ -314,7 +207,7 @@ Row(
                                 fontWeight: FontWeight.w700,
                                 color: isSelected
                                     ? Colors.white
-                                    : const Color(0xFF334155),
+                                    : ElderColors.textPrimary,
                               ),
                             ),
                           ),
@@ -329,8 +222,8 @@ Row(
                   ),
                 );
               }).toList(),
->>>>>>> 0ad1531 (Fix post-rebase formatting and game navigation)
             ),
+
             const SizedBox(height: 14.0),
 
             // 1. Familiar Jigsaw Card (Pastel Peach)
@@ -539,16 +432,17 @@ Row(
                   ),
                 ),
                 const Spacer(),
+
                 // Stars pill
                 Container(
-  padding: const EdgeInsets.symmetric(
-    horizontal: 8.0,
-    vertical: 3.0,
-  ),
-  decoration: BoxDecoration(
-    color: ElderColors.pastelButtercupBg,
-    borderRadius: BorderRadius.circular(NirvanaRadii.pill),
-  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 3.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ElderColors.pastelButtercupBg,
+                    borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
