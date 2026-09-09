@@ -63,4 +63,24 @@ class HivePatientDeviceSession {
     'is_active': isActive,
     'accessibility_settings': accessibilitySettings,
   };
+
+  factory HivePatientDeviceSession.fromMap(Map<String, dynamic> map) {
+    return HivePatientDeviceSession(
+      isPaired: map['is_paired'] as bool? ?? false,
+      patientId: map['patient_id'] as String? ?? '',
+      deviceId: map['device_id'] as String? ?? '',
+      displayName: map['display_name'] as String? ?? 'Loved One',
+      preferredName: map['preferred_name'] as String? ?? 'Loved One',
+      pairedAt: map['paired_at'] != null
+          ? DateTime.tryParse(map['paired_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      lastSyncAt: map['last_sync_at'] != null
+          ? DateTime.tryParse(map['last_sync_at'].toString())
+          : null,
+      isActive: map['is_active'] as bool? ?? true,
+      accessibilitySettings: map['accessibility_settings'] is Map
+          ? (map['accessibility_settings'] as Map).cast<String, dynamic>()
+          : const {},
+    );
+  }
 }
