@@ -16,6 +16,7 @@ class HiveBoxes {
 
   // Settings keys
   static const String settingsKeyLocale = 'locale_language_code';
+  static const String difficultyStats = 'nirvana_difficulty_stats';
 }
 
 class HiveTypeIds {
@@ -25,4 +26,5 @@ class HiveTypeIds {
   static const int hiveReminder = 2;
   static const int hiveReminderLog = 3;
   static const int hivePatientDeviceSession = 4;
+  static const int hiveDifficultyStats = 5;
 }

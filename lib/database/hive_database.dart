@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'adapters/hive_adapters.dart';
 import 'hive_boxes.dart';
 import 'models/hive_patient_session.dart';
+import 'models/hive_difficulty_stats.dart';
 import 'models/hive_reminder.dart';
 import 'models/hive_reminder_log.dart';
 import 'models/hive_sync_event.dart';
@@ -32,7 +33,8 @@ class HiveDatabase {
     debugPrint(
       '✅ HiveDatabase initialized successfully with boxes: '
       '${HiveBoxes.reminders}, ${HiveBoxes.reminderLogs}, '
-      '${HiveBoxes.syncQueue}, ${HiveBoxes.patientSession}',
+      '${HiveBoxes.syncQueue}, ${HiveBoxes.patientSession}, '
+      '${HiveBoxes.difficultyStats}',
     );
   }
 
@@ -50,6 +52,9 @@ class HiveDatabase {
     if (!Hive.isAdapterRegistered(HiveTypeIds.hivePatientDeviceSession)) {
       Hive.registerAdapter(HivePatientDeviceSessionAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTypeIds.hiveDifficultyStats)) {
+      Hive.registerAdapter(HiveDifficultyStatsAdapter());
+    }
   }
 
   /// Opens the core Hive boxes required for offline-first operation.
@@ -60,8 +65,12 @@ class HiveDatabase {
       Hive.openBox<HiveSyncEvent>(HiveBoxes.syncQueue),
       Hive.openBox<HivePatientDeviceSession>(HiveBoxes.patientSession),
       Hive.openBox<dynamic>(HiveBoxes.settings),
+      Hive.openBox<HiveDifficultyStats>(HiveBoxes.difficultyStats),
     ]);
   }
+
+  static Box<HiveDifficultyStats> get difficultyStatsBox =>
+      Hive.box<HiveDifficultyStats>(HiveBoxes.difficultyStats);
 
   /// Helper getters for typed boxes
   static Box<HiveReminder> get remindersBox =>

@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../app/providers/accessibility_providers.dart';
 import '../../../app/widgets/clay_3d/clay_3d.dart';
+import '../../../core/intelligence/difficulty_recommender.dart';
 import '../../../l10n/app_localizations.dart';
 import '../models/game_enums.dart';
 import '../models/game_level.dart';
@@ -28,6 +29,8 @@ class GamesHubScreen extends ConsumerStatefulWidget {
 }
 
 class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
+  GameDifficulty _selectedDifficulty = GameDifficulty.easy;
+
   void _openGameMap(GameType type) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -44,6 +47,9 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
     final activeLocale = ref.watch(localeProvider);
     final l10n = AppLocalizations.of(context);
     final langCode = activeLocale.languageCode;
+    final recommendedDifficulty = ref.watch(
+      recommendedDifficultyProvider(GameType.rememberObjects),
+    );
 
     return ClayScaffold3D(
       body: Column(
@@ -150,6 +156,86 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             ),
           ),
           const SizedBox(height: 22.0),
+
+          ClayCard3D(
+            padding: const EdgeInsets.all(16.0),
+            borderRadius: 22.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Choose your pace',
+                  style: GoogleFonts.nunito(
+                    fontSize: 17.0,
+                    fontWeight: FontWeight.w900,
+                    color: Clay3DTheme.textDark,
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: GameDifficulty.values.map((difficulty) {
+                    final isSelected = _selectedDifficulty == difficulty;
+                    final isSuggested = difficulty == recommendedDifficulty;
+
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Column(
+                          children: [
+                            InkWell(
+                              onTap: () => setState(
+                                () => _selectedDifficulty = difficulty,
+                              ),
+                              borderRadius: BorderRadius.circular(16.0),
+                              child: ClayPill3D(
+                                color: isSelected
+                                    ? Clay3DTheme.teal
+                                    : Clay3DTheme.cardSurface,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                  vertical: 11.0,
+                                ),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: Text(
+                                    difficulty.localizedLabel(l10n),
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 13.0,
+                                      fontWeight: FontWeight.w800,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Clay3DTheme.textDark,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6.0),
+                            SizedBox(
+                              height: 20.0,
+                              child: isSuggested
+                                  ? Text(
+                                      'Suggested',
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 10.0,
+                                        fontWeight: FontWeight.w800,
+                                        color: Clay3DTheme.olive,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16.0),
 
           // Section Title Slab
           ClaySlab3D(

@@ -7,6 +7,7 @@
 import 'package:hive/hive.dart';
 import '../hive_boxes.dart';
 import '../models/hive_patient_session.dart';
+import '../models/hive_difficulty_stats.dart';
 import '../models/hive_reminder.dart';
 import '../models/hive_reminder_log.dart';
 import '../models/hive_sync_event.dart';
@@ -163,7 +164,6 @@ class HiveReminderLogAdapter extends TypeAdapter<HiveReminderLog> {
       ..write(obj.metadata);
   }
 }
-
 class HivePatientDeviceSessionAdapter
     extends TypeAdapter<HivePatientDeviceSession> {
   @override
@@ -175,6 +175,7 @@ class HivePatientDeviceSessionAdapter
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
+
     return HivePatientDeviceSession(
       isPaired: fields[0] as bool? ?? false,
       patientId: fields[1] as String? ?? '',
@@ -216,5 +217,47 @@ class HivePatientDeviceSessionAdapter
       ..write(obj.isActive)
       ..writeByte(8)
       ..write(obj.accessibilitySettings);
+  }
+}
+
+class HiveDifficultyStatsAdapter extends TypeAdapter<HiveDifficultyStats> {
+  @override
+  final int typeId = HiveTypeIds.hiveDifficultyStats;
+
+  @override
+  HiveDifficultyStats read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+
+    return HiveDifficultyStats(
+      patientId: fields[0] as String? ?? 'default_patient',
+      gameTypeId: fields[1] as String? ?? 'remember_objects',
+      difficultyId: fields[2] as String? ?? 'easy',
+      rewardScores: (fields[3] as List?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
+      lastPlayedAt: fields[4] != null
+          ? DateTime.tryParse(fields[4] as String) ?? DateTime.now()
+          : DateTime.now(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, HiveDifficultyStats obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.patientId)
+      ..writeByte(1)
+      ..write(obj.gameTypeId)
+      ..writeByte(2)
+      ..write(obj.difficultyId)
+      ..writeByte(3)
+      ..write(obj.rewardScores)
+      ..writeByte(4)
+      ..write(obj.lastPlayedAt.toIso8601String());
   }
 }
