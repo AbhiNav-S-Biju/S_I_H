@@ -1,9 +1,12 @@
 // ==============================================================================
 // NIRVANA - GameHeader Widget
-// Description: Accessible top bar with difficulty badge, hint action, and gentle close
+// Description: Accessible claymorphic top bar with difficulty badge, hint action,
+// and gentle close
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import '../../../../app/theme/elder_theme.dart';
+import '../../../../app/widgets/widgets.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../models/game_enums.dart';
 
@@ -29,10 +32,12 @@ class GameHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24.0)),
+        boxShadow: ElderColors.clayShadow(),
+        border: const Border(
+          bottom: BorderSide(color: ElderColors.borderLight, width: 1.5),
         ),
       ),
       child: SafeArea(
@@ -40,23 +45,15 @@ class GameHeader extends StatelessWidget {
         child: Row(
           children: [
             // Close / Exit button
-            IconButton(
-              tooltip: l10n?.exitActivityTooltip ?? 'Exit Activity',
-              iconSize: 32.0,
-              padding: const EdgeInsets.all(8.0),
-              constraints: const BoxConstraints(
-                minWidth: 54.0,
-                minHeight: 54.0,
-              ),
-              icon: const Icon(
-                Icons.arrow_back_rounded,
-                color: Color(0xFF1E293B),
-              ),
+            LargeIconButton(
+              icon: Icons.arrow_back_rounded,
+              semanticLabel: l10n?.exitActivityTooltip ?? 'Exit Activity',
+              size: 48,
               onPressed: () {
                 _showExitConfirmDialog(context, l10n);
               },
             ),
-            const SizedBox(width: 8.0),
+            const SizedBox(width: 12.0),
             // Title & Difficulty Tag
             Expanded(
               child: Column(
@@ -68,12 +65,12 @@ class GameHeader extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w900,
+                      color: ElderColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 2.0),
+                  const SizedBox(height: 4.0),
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: 6.0,
@@ -81,19 +78,19 @@ class GameHeader extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 2.0,
+                          horizontal: 10.0,
+                          vertical: 3.0,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE0F2FE),
-                          borderRadius: BorderRadius.circular(6.0),
+                          color: ElderColors.pastelSky,
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: Text(
                           difficulty.localizedLabel(l10n),
                           style: const TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF0369A1),
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.w800,
+                            color: ElderColors.skyDeep,
                           ),
                         ),
                       ),
@@ -102,7 +99,7 @@ class GameHeader extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13.0,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF64748B),
+                          color: ElderColors.textSecondary,
                         ),
                       ),
                     ],
@@ -111,38 +108,57 @@ class GameHeader extends StatelessWidget {
               ),
             ),
             // Hint Button
-            if (onHint != null)
+            if (onHint != null) ...[
+              const SizedBox(width: 8.0),
               Semantics(
                 button: true,
                 label: 'Get a helpful hint',
-                child: TextButton.icon(
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFFBEB),
-                    foregroundColor: const Color(0xFFB45309),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14.0,
-                      vertical: 12.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isHintAvailable ? ElderColors.pastelButtercup : ElderColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(16.0),
+                    border: Border.all(
+                      color: isHintAvailable ? ElderColors.amberDeep.withValues(alpha: 0.3) : ElderColors.borderLight,
+                      width: 1.5,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                      side: const BorderSide(
-                        color: Color(0xFFFDE68A),
-                        width: 1.5,
-                      ),
-                    ),
-                    minimumSize: const Size(90.0, 50.0),
+                    boxShadow: isHintAvailable ? ElderColors.clayShadow(color: ElderColors.pastelButtercup) : null,
                   ),
-                  onPressed: isHintAvailable ? onHint : null,
-                  icon: const Icon(Icons.lightbulb_rounded, size: 22.0),
-                  label: Text(
-                    l10n?.hintButton ?? 'Hint',
-                    style: const TextStyle(
-                      fontSize: 17.0,
-                      fontWeight: FontWeight.w700,
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16.0),
+                      onTap: isHintAvailable ? onHint : null,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14.0,
+                          vertical: 10.0,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.lightbulb_rounded,
+                              size: 22.0,
+                              color: isHintAvailable ? ElderColors.amberDeep : ElderColors.textMuted,
+                            ),
+                            const SizedBox(width: 6.0),
+                            Text(
+                              l10n?.hintButton ?? 'Hint',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w800,
+                                color: isHintAvailable ? ElderColors.amberDeep : ElderColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
+            ],
           ],
         ),
       ),
@@ -154,18 +170,18 @@ class GameHeader extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
         ),
         title: Text(
           l10n?.leaveActivityTitle ?? 'Leave Activity?',
-          style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.w800),
+          style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.w900, color: ElderColors.textPrimary),
         ),
         content: Text(
           l10n?.leaveActivityMessage ??
               'You can return anytime. Would you like to stop for now?',
-          style: const TextStyle(fontSize: 18.0, color: Color(0xFF334155)),
+          style: const TextStyle(fontSize: 17.0, color: ElderColors.textSecondary, height: 1.4),
         ),
-        actionsPadding: const EdgeInsets.all(16.0),
+        actionsPadding: const EdgeInsets.all(20.0),
         actions: [
           TextButton(
             style: TextButton.styleFrom(
@@ -177,20 +193,20 @@ class GameHeader extends StatelessWidget {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               l10n?.stayAndContinue ?? 'Stay & Continue',
-              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 17.0, fontWeight: FontWeight.w700, color: ElderColors.primary),
             ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE2E8F0),
-              foregroundColor: const Color(0xFF0F172A),
+              backgroundColor: ElderColors.pastelPeach,
+              foregroundColor: ElderColors.coralDeep,
               elevation: 0,
               padding: const EdgeInsets.symmetric(
                 horizontal: 18.0,
                 vertical: 12.0,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(14.0),
               ),
             ),
             onPressed: () {
@@ -199,7 +215,7 @@ class GameHeader extends StatelessWidget {
             },
             child: Text(
               l10n?.yesExit ?? 'Yes, Exit',
-              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
+              style: const TextStyle(fontSize: 17.0, fontWeight: FontWeight.w800),
             ),
           ),
         ],
@@ -207,3 +223,4 @@ class GameHeader extends StatelessWidget {
     );
   }
 }
+

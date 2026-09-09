@@ -1,14 +1,13 @@
 // ==============================================================================
 // NIRVANA - Caregiver Notifications Panel Widget
-// Description: Live real-time notification alert feed for caregivers. Displays
-// telemetry events (reminders completed/snoozed/missed, games completed,
-// device pairing/revocation, sync restoration/errors) with unread status,
-// relative time, and interactive mark-as-read actions.
+// Description: Live real-time notification alert feed for caregivers with
+// claymorphic design and high-contrast readability.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/features/caregiver/models/caregiver_models.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 
@@ -32,16 +31,16 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
             Row(
               children: [
                 const Icon(
-                  Icons.notifications_active_outlined,
-                  size: 20,
-                  color: ElderColors.primary,
+                  Icons.notifications_active_rounded,
+                  size: 22,
+                  color: ElderColors.clayLavender,
                 ),
                 const SizedBox(width: 8),
                 const Text(
                   'Recent Alerts & Activity',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
                     color: ElderColors.textPrimary,
                   ),
                 ),
@@ -53,14 +52,14 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: ElderColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                      color: ElderColors.clayPeach,
+                      borderRadius: BorderRadius.circular(NirvanaRadii.pill),
                     ),
                     child: Text(
                       '$unreadCount NEW',
                       style: const TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                         color: Colors.white,
                       ),
                     ),
@@ -75,13 +74,13 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
                       .read(caregiverNotificationsNotifierProvider.notifier)
                       .markAllAsRead(caregiver.id);
                 },
-                icon: const Icon(Icons.done_all, size: 16),
+                icon: const Icon(Icons.done_all_rounded, size: 16),
                 label: const Text(
                   'Mark all read',
-                  style: TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
                 ),
                 style: TextButton.styleFrom(
-                  foregroundColor: ElderColors.primary,
+                  foregroundColor: ElderColors.clayLavender,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
                     vertical: 4,
@@ -96,78 +95,55 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
         notificationsAsync.when(
           data: (notifications) {
             if (notifications.isEmpty) {
-              return Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 24,
-                  horizontal: 20,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.grey.withValues(alpha: 0.2),
+              return ElderCard(
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: ElderColors.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          size: 32,
+                          color: ElderColors.clayLavender,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'No new alerts',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: ElderColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Activity notifications and adherence updates will appear here in real time.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 13, color: ElderColors.textSecondary),
+                      ),
+                    ],
                   ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: ElderColors.primary.withValues(alpha: 0.08),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.notifications_none,
-                        size: 32,
-                        color: ElderColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'No new alerts',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: ElderColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Activity notifications and adherence updates will appear here in real time.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                    ),
-                  ],
                 ),
               );
             }
 
-            // Show latest up to 10 notifications
             final displayList = notifications.take(10).toList();
 
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.grey.withValues(alpha: 0.2),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+            return ElderCard(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: displayList.length,
-                separatorBuilder: (_, __) => Divider(
+                separatorBuilder: (_, __) => const Divider(
                   height: 1,
-                  color: Colors.grey.withValues(alpha: 0.12),
+                  color: Color(0xFFF1EDE6),
                 ),
                 itemBuilder: (context, index) {
                   final notification = displayList[index];
@@ -176,34 +152,27 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
               ),
             );
           },
-          loading: () => Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey.withValues(alpha: 0.2),
-              ),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
+          loading: () => const ElderCard(
+            padding: EdgeInsets.all(24),
+            child: Center(
+              child: CircularProgressIndicator(color: ElderColors.clayLavender),
             ),
           ),
           error: (e, _) => Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.red.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.red.shade200),
+              color: ElderColors.clayPeach.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ElderColors.clayPeach),
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline, color: Colors.red),
+                const Icon(Icons.error_outline_rounded, color: Color(0xFFC2410C)),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Failed to load notifications: $e',
-                    style: const TextStyle(fontSize: 13, color: Colors.red),
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF9A3412)),
                   ),
                 ),
               ],
@@ -237,18 +206,21 @@ class _NotificationTile extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Viewing reminder related to "${notification.title}"'),
-              backgroundColor: ElderColors.primary,
+              backgroundColor: ElderColors.clayLavender,
               duration: const Duration(seconds: 2),
             ),
           );
         }
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        color: isUnread
-            ? style.bgColor.withValues(alpha: 0.06)
-            : Colors.transparent,
+        decoration: BoxDecoration(
+          color: isUnread
+              ? style.bgColor.withValues(alpha: 0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -256,8 +228,8 @@ class _NotificationTile extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: style.bgColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(10),
+                color: style.bgColor.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(style.icon, size: 20, color: style.iconColor),
             ),
@@ -279,8 +251,8 @@ class _NotificationTile extends ConsumerWidget {
                                 notification.title,
                                 style: TextStyle(
                                   fontWeight: isUnread
-                                      ? FontWeight.bold
-                                      : FontWeight.w600,
+                                      ? FontWeight.w900
+                                      : FontWeight.w700,
                                   fontSize: 14,
                                   color: ElderColors.textPrimary,
                                 ),
@@ -293,7 +265,7 @@ class _NotificationTile extends ConsumerWidget {
                                 width: 8,
                                 height: 8,
                                 decoration: const BoxDecoration(
-                                  color: ElderColors.primary,
+                                  color: ElderColors.clayLavender,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -305,9 +277,9 @@ class _NotificationTile extends ConsumerWidget {
                         _formatRelativeTime(notification.createdAt),
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey[600],
+                          color: ElderColors.textMuted,
                           fontWeight:
-                              isUnread ? FontWeight.w600 : FontWeight.normal,
+                              isUnread ? FontWeight.w700 : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -321,7 +293,7 @@ class _NotificationTile extends ConsumerWidget {
                       fontSize: 13,
                       color: isUnread
                           ? ElderColors.textPrimary
-                          : Colors.grey[700],
+                          : ElderColors.textSecondary,
                     ),
                   ),
 
@@ -331,19 +303,19 @@ class _NotificationTile extends ConsumerWidget {
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+                        horizontal: 8,
+                        vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(4),
+                        color: const Color(0xFFF1EDE6),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         notification.patientName!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 11,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
+                          color: ElderColors.textSecondary,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -361,57 +333,57 @@ class _NotificationTile extends ConsumerWidget {
     switch (type) {
       case 'reminder_completed':
         return const _NotificationVisual(
-          icon: Icons.check_circle_outline,
-          iconColor: Color(0xFF2E7D32),
-          bgColor: Color(0xFF2E7D32),
+          icon: Icons.check_circle_outline_rounded,
+          iconColor: ElderColors.claySage,
+          bgColor: ElderColors.claySage,
         );
       case 'reminder_snoozed':
         return const _NotificationVisual(
-          icon: Icons.snooze,
-          iconColor: Color(0xFFE65100),
-          bgColor: Color(0xFFE65100),
+          icon: Icons.snooze_rounded,
+          iconColor: ElderColors.clayButtercup,
+          bgColor: ElderColors.clayButtercup,
         );
       case 'reminder_missed':
         return const _NotificationVisual(
-          icon: Icons.alarm_off,
-          iconColor: Color(0xFFC2410C),
-          bgColor: Color(0xFFC2410C),
+          icon: Icons.alarm_off_rounded,
+          iconColor: ElderColors.clayPeach,
+          bgColor: ElderColors.clayPeach,
         );
       case 'game_completed':
         return const _NotificationVisual(
           icon: Icons.emoji_events_outlined,
-          iconColor: Color(0xFF7C3AED),
-          bgColor: Color(0xFF7C3AED),
+          iconColor: ElderColors.clayLavender,
+          bgColor: ElderColors.clayLavender,
         );
       case 'device_paired':
         return const _NotificationVisual(
-          icon: Icons.phonelink_setup,
-          iconColor: ElderColors.primary,
-          bgColor: ElderColors.primary,
+          icon: Icons.phonelink_setup_rounded,
+          iconColor: ElderColors.clayLavender,
+          bgColor: ElderColors.clayLavender,
         );
       case 'device_revoked':
         return const _NotificationVisual(
-          icon: Icons.phonelink_erase,
-          iconColor: Color(0xFF9A3412),
-          bgColor: Color(0xFF9A3412),
+          icon: Icons.phonelink_erase_rounded,
+          iconColor: ElderColors.clayPeach,
+          bgColor: ElderColors.clayPeach,
         );
       case 'sync_restored':
         return const _NotificationVisual(
-          icon: Icons.cloud_done_outlined,
-          iconColor: Color(0xFF0F766E),
-          bgColor: Color(0xFF0F766E),
+          icon: Icons.cloud_done_rounded,
+          iconColor: ElderColors.claySage,
+          bgColor: ElderColors.claySage,
         );
       case 'sync_error':
         return const _NotificationVisual(
-          icon: Icons.cloud_off_outlined,
-          iconColor: Color(0xFFB45309),
-          bgColor: Color(0xFFB45309),
+          icon: Icons.cloud_off_rounded,
+          iconColor: ElderColors.clayButtercup,
+          bgColor: ElderColors.clayButtercup,
         );
       default:
         return const _NotificationVisual(
           icon: Icons.notifications_outlined,
-          iconColor: ElderColors.primary,
-          bgColor: ElderColors.primary,
+          iconColor: ElderColors.clayLavender,
+          bgColor: ElderColors.clayLavender,
         );
     }
   }

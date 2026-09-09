@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/providers/accessibility_providers.dart';
+import '../../../../app/theme/elder_theme.dart';
 import '../../../../core/network/audio_service.dart';
 import '../../../../core/widgets/voice_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -86,26 +87,35 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.0)),
-      elevation: 8,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28.0),
+          boxShadow: ElderColors.clayShadow(),
+          border: Border.all(color: ElderColors.borderLight, width: 1.5),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Cheerful celebratory badge
+            // Cheerful celebratory clay bubble
             Center(
               child: Container(
-                width: 84.0,
-                height: 84.0,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDCFCE7), // Soft mint green
+                width: 92.0,
+                height: 92.0,
+                decoration: BoxDecoration(
+                  color: ElderColors.pastelSage,
                   shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3.0),
+                  boxShadow: ElderColors.clayShadow(color: ElderColors.pastelSage),
                 ),
                 child: const Icon(
-                  Icons.check_circle_rounded,
+                  Icons.check_rounded,
                   size: 56.0,
-                  color: Color(0xFF16A34A),
+                  color: ElderColors.forestDeep,
                 ),
               ),
             ),
@@ -117,21 +127,19 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 24.0,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w900,
+                color: ElderColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 12.0),
+            const SizedBox(height: 14.0),
 
             // Warm supportive message card with speak button
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14.0,
-                vertical: 8.0,
-              ),
+              padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(16.0),
+                color: ElderColors.pastelSage.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+                border: Border.all(color: ElderColors.forestDeep.withValues(alpha: 0.2), width: 1.5),
               ),
               child: Row(
                 children: [
@@ -140,13 +148,14 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                       feedbackMsg,
                       textAlign: TextAlign.left,
                       style: const TextStyle(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w700,
                         height: 1.4,
-                        color: Color(0xFF334155),
+                        color: ElderColors.forestDeep,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8.0),
                   SpeakButton(
                     text: feedbackMsg,
                     size: 38.0,
@@ -154,15 +163,15 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 24.0),
+            const SizedBox(height: 20.0),
 
-            // Clean Non-Clinical Metric Summary Card
+            // Clean Non-Clinical Metric Summary Clay Card
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(16.0),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                color: ElderColors.background,
+                borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+                border: Border.all(color: ElderColors.borderLight, width: 1.5),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -172,29 +181,29 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                     value:
                         '${widget.session.correctAnswers} / ${widget.session.totalQuestions}',
                     icon: Icons.star_rounded,
-                    color: const Color(0xFFD97706),
+                    color: ElderColors.amberDeep,
                   ),
                   Container(
                     height: 36.0,
                     width: 1.5,
-                    color: const Color(0xFFCBD5E1),
+                    color: ElderColors.borderLight,
                   ),
                   _buildMetric(
                     label: minutesActiveLabel,
                     value:
                         '${(widget.session.durationSeconds / 60).ceil()} min',
                     icon: Icons.timer_outlined,
-                    color: const Color(0xFF0F766E),
+                    color: ElderColors.primary,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 28.0),
+            const SizedBox(height: 24.0),
 
             // Finish Button
             ElderGameButton(
               label: l10n?.finishButton ?? 'All Done',
-              icon: Icons.arrow_forward_rounded,
+              icon: Icons.check_circle_rounded,
               onPressed: () {
                 Navigator.of(context).pop();
                 widget.onFinish?.call();
@@ -218,14 +227,14 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20.0, color: color),
+            Icon(icon, size: 22.0, color: color),
             const SizedBox(width: 6.0),
             Text(
               value,
               style: const TextStyle(
                 fontSize: 20.0,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w900,
+                color: ElderColors.textPrimary,
               ),
             ),
           ],
@@ -234,12 +243,13 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
+            fontSize: 13.0,
+            fontWeight: FontWeight.w700,
+            color: ElderColors.textSecondary,
           ),
         ),
       ],
     );
   }
 }
+

@@ -1,13 +1,14 @@
 // ==============================================================================
 // NIRVANA - LargeActionButton
-// Description: Accessible, high-contrast, tactile action button with a minimum
-// touch target of 64dp and min 22sp text for seniors and motor-impaired users.
+// Description: Accessible, high-contrast, tactile claymorphic action button with
+// minimum touch target of 64dp and min 22sp text for seniors.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import '../theme/elder_theme.dart';
 
-enum LargeActionButtonVariant { primary, secondary, gentleWarning }
+enum LargeActionButtonVariant { primary, secondary, gentleWarning, sage, peach, buttercup }
+typedef ElderButtonScheme = LargeActionButtonVariant;
 
 class LargeActionButton extends StatelessWidget {
   final String label;
@@ -17,6 +18,7 @@ class LargeActionButton extends StatelessWidget {
   final LargeActionButtonVariant variant;
   final String? semanticLabel;
   final double minHeight;
+  final double? borderRadius;
 
   const LargeActionButton({
     super.key,
@@ -24,10 +26,12 @@ class LargeActionButton extends StatelessWidget {
     required this.onPressed,
     this.icon,
     this.isLoading = false,
-    this.variant = LargeActionButtonVariant.primary,
+    LargeActionButtonVariant? variant,
+    LargeActionButtonVariant? colorScheme,
     this.semanticLabel,
     this.minHeight = ElderTheme.buttonHeight,
-  });
+    this.borderRadius,
+  }) : variant = colorScheme ?? variant ?? LargeActionButtonVariant.primary;
 
   @override
   Widget build(BuildContext context) {
@@ -39,86 +43,107 @@ class LargeActionButton extends StatelessWidget {
     Color bg;
     Color fg;
     BorderSide border;
+    List<BoxShadow>? shadow;
 
     switch (variant) {
       case LargeActionButtonVariant.primary:
-        bg = theme.colorScheme.primary;
-        fg = theme.colorScheme.onPrimary;
+        bg = ElderColors.primary;
+        fg = Colors.white;
         border = BorderSide.none;
+        shadow = ElderColors.buttonShadow(color: ElderColors.primary);
         break;
       case LargeActionButtonVariant.secondary:
-        bg = theme.colorScheme.surface;
-        fg = theme.colorScheme.onSurface;
-        border = const BorderSide(color: ElderColors.border, width: 2.5);
+        bg = ElderColors.surface;
+        fg = ElderColors.textPrimary;
+        border = const BorderSide(color: ElderColors.borderLight, width: 2.0);
+        shadow = ElderColors.clayShadow();
         break;
       case LargeActionButtonVariant.gentleWarning:
-        bg = ElderColors.supportiveBg;
-        fg = ElderColors.supportiveText;
-        border = const BorderSide(
-          color: ElderColors.supportiveBorder,
-          width: 2.0,
-        );
+      case LargeActionButtonVariant.peach:
+        bg = ElderColors.pastelPeach;
+        fg = Colors.white;
+        border = BorderSide.none;
+        shadow = ElderColors.buttonShadow(color: ElderColors.pastelPeach);
+        break;
+      case LargeActionButtonVariant.sage:
+        bg = ElderColors.pastelSage;
+        fg = Colors.white;
+        border = BorderSide.none;
+        shadow = ElderColors.buttonShadow(color: ElderColors.pastelSage);
+        break;
+      case LargeActionButtonVariant.buttercup:
+        bg = ElderColors.pastelButtercup;
+        fg = Colors.white;
+        border = BorderSide.none;
+        shadow = ElderColors.buttonShadow(color: ElderColors.pastelButtercup);
         break;
     }
 
     final isEnabled = onPressed != null && !isLoading;
+    final effectiveRadius = borderRadius ?? ElderTheme.buttonBorderRadius;
 
     return Semantics(
       button: true,
       enabled: isEnabled,
       label: semanticLabel ?? label,
-      child: Material(
-        color: isEnabled ? bg : ElderColors.surfaceElevated,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ElderTheme.buttonBorderRadius),
-          side: border,
+      child: Container(
+        constraints: BoxConstraints(minHeight: minHeight),
+        decoration: BoxDecoration(
+          color: isEnabled ? bg : ElderColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(effectiveRadius),
+          border: isEnabled
+              ? (border == BorderSide.none ? null : Border.fromBorderSide(border))
+              : Border.all(color: ElderColors.border, width: 1.5),
+          boxShadow: isEnabled ? shadow : null,
         ),
-        elevation: 0.0,
-        child: InkWell(
-          onTap: isEnabled ? onPressed : null,
-          borderRadius: BorderRadius.circular(ElderTheme.buttonBorderRadius),
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: minHeight,
-              minWidth: ElderTheme.minTouchTargetSize,
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 16.0,
-            ),
-            alignment: Alignment.center,
-            child: isLoading
-                ? SizedBox(
-                    width: 28.0,
-                    height: 28.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(fg),
-                    ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(
-                          icon,
-                          size: 28.0,
-                          color: isEnabled ? fg : ElderColors.textMuted,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(effectiveRadius),
+          child: InkWell(
+            onTap: isEnabled ? onPressed : null,
+            borderRadius: BorderRadius.circular(effectiveRadius),
+            splashColor: fg.withValues(alpha: 0.15),
+            highlightColor: fg.withValues(alpha: 0.08),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
+              child: Center(
+                child: isLoading
+                    ? SizedBox(
+                        width: 28.0,
+                        height: 28.0,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3.0,
+                          valueColor: AlwaysStoppedAnimation<Color>(fg),
                         ),
-                        const SizedBox(width: 12.0),
-                      ],
-                      Flexible(
-                        child: Text(
-                          label,
-                          textAlign: TextAlign.center,
-                          style: textStyle.copyWith(
-                            color: isEnabled ? fg : ElderColors.textMuted,
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (icon != null) ...[
+                            Icon(icon, size: 28.0, color: fg),
+                            const SizedBox(width: 14.0),
+                          ],
+                          Flexible(
+                            child: Text(
+                              label,
+                              style: textStyle.copyWith(
+                                color: fg,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 20.0,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+              ),
+            ),
           ),
         ),
       ),

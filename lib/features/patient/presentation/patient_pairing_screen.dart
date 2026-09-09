@@ -1,8 +1,8 @@
 // ==============================================================================
 // NIRVANA - Patient Pairing Screen
 // Description: 6-digit PIN entry screen for elderly patients.
-// Large touch targets, auto-advance focus, clear error messages in plain language.
-// Calls patientPairingProvider to validate the code server-side.
+// Claymorphic design with large touch targets, auto-advance focus,
+// clear feedback in plain language, and soft dual shadows.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
 
 class PatientPairingScreen extends ConsumerStatefulWidget {
@@ -45,7 +46,6 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
 
   void _onDigitChanged(int index, String value) {
     if (value.length > 1) {
-      // Paste handling: distribute across boxes
       final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
       for (int i = 0; i < _codeLength && i < digits.length; i++) {
         _controllers[index + i < _codeLength ? index + i : _codeLength - 1]
@@ -58,7 +58,6 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
     }
 
     if (value.isNotEmpty) {
-      // Advance to next box
       if (index < _codeLength - 1) {
         _focusNodes[index + 1].requestFocus();
       } else {
@@ -99,7 +98,6 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
   Widget build(BuildContext context) {
     final pairingState = ref.watch(patientPairingProvider);
 
-    // Navigate to success on pairing success
     ref.listen(patientPairingProvider, (_, next) {
       if (next.isSuccess && !_hasNavigated) {
         _hasNavigated = true;
@@ -114,68 +112,72 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          iconSize: 32,
-          color: ElderColors.textSecondary,
-          onPressed: () => context.go('/patient/welcome'),
-          tooltip: 'Go back',
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: LargeIconButton(
+            icon: Icons.arrow_back_rounded,
+            semanticLabel: 'Go back',
+            onPressed: () => context.go('/patient/welcome'),
+            size: 48,
+          ),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // Icon
+              // Dialpad Icon Clay Bubble
               Container(
                 width: 88,
                 height: 88,
                 decoration: BoxDecoration(
                   color: ElderColors.primaryContainer,
                   shape: BoxShape.circle,
+                  boxShadow: NirvanaShadows.float(tint: ElderColors.primary),
                 ),
                 child: const Icon(
                   Icons.dialpad_rounded,
-                  size: 48,
+                  size: 44,
                   color: ElderColors.primary,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Heading
-              Text(
+              const Text(
                 'Enter Your Code',
                 style: TextStyle(
                   fontSize: 30,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w900,
                   color: ElderColors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
-              Text(
+              const Text(
                 'Your caregiver showed you a 6-digit number.\nType it below.',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 17,
                   color: ElderColors.textSecondary,
-                  height: 1.5,
+                  height: 1.4,
+                  fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 44),
+              const SizedBox(height: 36),
 
               // 6-digit PIN boxes
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(_codeLength, (i) {
                   return Padding(
-                    padding: EdgeInsets.only(right: i < _codeLength - 1 ? 10 : 0),
-                    child: _PinBox(
+                    padding: EdgeInsets.only(right: i < _codeLength - 1 ? 8 : 0),
+                    child: _ClayPinBox(
                       controller: _controllers[i],
                       focusNode: _focusNodes[i],
                       hasError: pairingState.isError,
@@ -201,17 +203,14 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: ElderColors.gentleErrorBg,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: ElderColors.gentleErrorBorder,
-                            width: 1.5,
-                          ),
+                          borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+                          boxShadow: NirvanaShadows.card(tint: ElderColors.gentleErrorPrimary),
                         ),
                         child: Row(
                           children: [
                             const Icon(
                               Icons.info_outline_rounded,
-                              color: ElderColors.gentleErrorPrimary,
+                              color: ElderColors.coralDeep,
                               size: 28,
                             ),
                             const SizedBox(width: 12),
@@ -221,7 +220,8 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
                                     'Incorrect code. Please try again.',
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  color: ElderColors.gentleErrorText,
+                                  color: ElderColors.coralDeep,
+                                  fontWeight: FontWeight.w700,
                                   height: 1.4,
                                 ),
                               ),
@@ -232,55 +232,32 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
                     : const SizedBox.shrink(key: ValueKey('no-error')),
               ),
 
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
 
               // Verify button
               SizedBox(
                 width: double.infinity,
-                height: 68,
-                child: ElevatedButton(
-                  onPressed:
-                      isComplete && !pairingState.isLoading ? _verify : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ElderColors.primary,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: ElderColors.border,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: isComplete ? 4 : 0,
-                  ),
-                  child: pairingState.isLoading
-                      ? const SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text(
-                          'Verify Code',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                child: LargeActionButton(
+                  label: 'Verify Code',
+                  isLoading: pairingState.isLoading,
+                  icon: Icons.check_circle_rounded,
+                  variant: LargeActionButtonVariant.primary,
+                  onPressed: isComplete && !pairingState.isLoading ? _verify : null,
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               // Clear button
               TextButton.icon(
                 onPressed: _clearAll,
-                icon: const Icon(Icons.clear_rounded, size: 22),
+                icon: const Icon(Icons.refresh_rounded, size: 22),
                 label: const Text(
-                  'Clear',
-                  style: TextStyle(fontSize: 18),
+                  'Clear All Digits',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
                 ),
                 style: TextButton.styleFrom(
-                  foregroundColor: ElderColors.textMuted,
+                  foregroundColor: ElderColors.textSecondary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 12,
@@ -288,36 +265,14 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
               // Help hint
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: ElderColors.supportiveBg,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: ElderColors.supportiveBorder),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.lightbulb_outline_rounded,
-                      color: ElderColors.supportiveIcon,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'If you don\'t have a code, ask your caregiver to tap "Generate Pairing Code" on their phone.',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: ElderColors.supportiveText,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              SupportiveMessage(
+                message: 'If you do not have a code, ask your caregiver to tap "Generate Pairing Code" on their phone.',
+                icon: Icons.lightbulb_outline_rounded,
+                backgroundColor: ElderColors.pastelSage,
+                accentColor: ElderColors.forestDeep,
               ),
 
               const SizedBox(height: 24),
@@ -330,10 +285,10 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
 }
 
 // ==============================================================================
-// PIN Box Widget
+// Claymorphic PIN Box Widget
 // ==============================================================================
 
-class _PinBox extends StatelessWidget {
+class _ClayPinBox extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool hasError;
@@ -341,7 +296,7 @@ class _PinBox extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final ValueChanged<KeyEvent> onKeyEvent;
 
-  const _PinBox({
+  const _ClayPinBox({
     required this.controller,
     required this.focusNode,
     required this.hasError,
@@ -352,9 +307,22 @@ class _PinBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 50,
-      height: 68,
+    final hasValue = controller.text.isNotEmpty;
+
+    return Container(
+      width: 48,
+      height: 64,
+      decoration: BoxDecoration(
+        color: hasValue ? ElderColors.primaryContainer : ElderColors.surface,
+        borderRadius: BorderRadius.circular(NirvanaRadii.icon),
+        border: Border.all(
+          color: hasError
+              ? ElderColors.gentleErrorPrimary
+              : (hasValue ? ElderColors.primary : ElderColors.border),
+          width: hasValue ? 1.5 : 1.0,
+        ),
+        boxShadow: NirvanaShadows.input,
+      ),
       child: KeyboardListener(
         focusNode: FocusNode(skipTraversal: true),
         onKeyEvent: onKeyEvent,
@@ -364,50 +332,21 @@ class _PinBox extends StatelessWidget {
           autofocus: autofocus,
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
-          maxLength: 2, // Allow 2 temporarily for paste detection
+          maxLength: 2,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w800,
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
             color: hasError
-                ? ElderColors.gentleErrorPrimary
-                : ElderColors.textPrimary,
+                ? ElderColors.coralDeep
+                : (hasValue ? ElderColors.primary : ElderColors.textPrimary),
           ),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             counterText: '',
-            filled: true,
-            fillColor: controller.text.isNotEmpty
-                ? ElderColors.primaryContainer
-                : ElderColors.surface,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                color: hasError
-                    ? ElderColors.gentleErrorBorder
-                    : ElderColors.border,
-                width: 2,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                color: hasError
-                    ? ElderColors.gentleErrorPrimary
-                    : ElderColors.primary,
-                width: 2.5,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                color: hasError
-                    ? ElderColors.gentleErrorBorder
-                    : (controller.text.isNotEmpty
-                        ? ElderColors.primary
-                        : ElderColors.border),
-                width: 2,
-              ),
-            ),
+            filled: false,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           onChanged: onChanged,
@@ -416,3 +355,4 @@ class _PinBox extends StatelessWidget {
     );
   }
 }
+

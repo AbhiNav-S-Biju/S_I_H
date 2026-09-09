@@ -1,7 +1,8 @@
 // ==============================================================================
 // NIRVANA - ElderCard
-// Description: Prominent tactile card with generous padding, bold borders,
-// and accessible touch surfaces for elderly users.
+// Description: Shadow-first claymorphic card. The card edge is defined by a
+// soft warm shadow, not a border stroke. A border is only added when the
+// caller explicitly passes borderColor, or in high-contrast mode.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ class ElderCard extends StatelessWidget {
   final Color? backgroundColor;
   final Color? borderColor;
   final double borderWidth;
+  final double? borderRadius;
+  final List<BoxShadow>? customShadow;
   final String? semanticLabel;
 
   const ElderCard({
@@ -23,7 +26,9 @@ class ElderCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(22.0),
     this.backgroundColor,
     this.borderColor,
-    this.borderWidth = 2.0,
+    this.borderWidth = 1.5,
+    this.borderRadius,
+    this.customShadow,
     this.semanticLabel,
   });
 
@@ -34,18 +39,27 @@ class ElderCard extends StatelessWidget {
         theme.brightness == Brightness.light &&
         theme.primaryColor == ElderColors.highContrastPrimary;
 
-    final effectiveBorderColor =
-        borderColor ??
-        (isHighContrast ? ElderColors.borderHighContrast : ElderColors.border);
     final effectiveBgColor =
-        backgroundColor ?? theme.cardTheme.color ?? Colors.white;
+        backgroundColor ?? theme.cardTheme.color ?? ElderColors.surface;
+    final effectiveRadius = borderRadius ?? ElderTheme.cardBorderRadius;
 
-    final cardShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-      side: BorderSide(
-        color: effectiveBorderColor,
-        width: isHighContrast ? 3.0 : borderWidth,
-      ),
+    // Shadow-first: border is only drawn when explicitly requested or HC mode.
+    final hasBorder = borderColor != null || isHighContrast;
+    final effectiveBorderColor = borderColor ??
+        (isHighContrast ? ElderColors.borderHighContrast : ElderColors.borderLight);
+
+    final decoration = BoxDecoration(
+      color: effectiveBgColor,
+      borderRadius: BorderRadius.circular(effectiveRadius),
+      border: hasBorder
+          ? Border.all(
+              color: effectiveBorderColor,
+              width: isHighContrast ? 2.0 : borderWidth,
+            )
+          : null,
+      boxShadow: isHighContrast
+          ? null
+          : (customShadow ?? NirvanaShadows.card()),
     );
 
     final cardContent = Padding(
@@ -57,15 +71,17 @@ class ElderCard extends StatelessWidget {
       return Semantics(
         container: true,
         label: semanticLabel,
-        child: Material(
-          color: effectiveBgColor,
-          shape: cardShape,
-          clipBehavior: Clip.antiAlias,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minHeight: ElderTheme.minTouchTargetSize,
+        child: Container(
+          decoration: decoration,
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(effectiveRadius),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: ElderTheme.minTouchTargetSize,
+              ),
+              child: cardContent,
             ),
-            child: cardContent,
           ),
         ),
       );
@@ -74,18 +90,22 @@ class ElderCard extends StatelessWidget {
     return Semantics(
       button: true,
       label: semanticLabel,
-      child: Material(
-        color: effectiveBgColor,
-        shape: cardShape,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minHeight: ElderTheme.minTouchTargetSize,
+      child: Container(
+        decoration: decoration,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(effectiveRadius),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(effectiveRadius),
+            splashColor: ElderColors.primary.withValues(alpha: 0.1),
+            highlightColor: ElderColors.primary.withValues(alpha: 0.05),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: ElderTheme.minTouchTargetSize,
+              ),
+              child: cardContent,
             ),
-            child: cardContent,
           ),
         ),
       ),

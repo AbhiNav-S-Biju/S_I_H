@@ -1,7 +1,7 @@
 // ==============================================================================
 // NIRVANA - SupportiveMessage
-// Description: Calming, comforting message card designed to reassure elderly
-// users, reduce anxiety, and foster a peaceful interaction.
+// Description: Calming, comforting claymorphic message card designed to reassure
+// elderly users, reduce anxiety, and foster a peaceful interaction.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -12,18 +12,24 @@ class SupportiveMessage extends StatelessWidget {
   final IconData icon;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final Color? backgroundColor;
+  final Color? accentColor;
 
   const SupportiveMessage({
     super.key,
     required this.message,
-    this.icon = Icons.favorite_rounded,
+    this.icon = Icons.spa_rounded,
     this.actionLabel,
     this.onAction,
+    this.backgroundColor,
+    this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bg = backgroundColor ?? ElderColors.pastelSage;
+    final fg = accentColor ?? ElderColors.forestDeep;
 
     return Semantics(
       container: true,
@@ -32,14 +38,21 @@ class SupportiveMessage extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 10.0),
         padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
-          color: ElderColors.supportiveBg,
+          color: bg,
           borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-          border: Border.all(color: ElderColors.supportiveBorder, width: 2.0),
+          boxShadow: NirvanaShadows.card(tint: fg),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 32.0, color: ElderColors.supportiveIcon),
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.6),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 28.0, color: fg),
+            ),
             const SizedBox(width: 14.0),
             Expanded(
               child: Column(
@@ -49,7 +62,7 @@ class SupportiveMessage extends StatelessWidget {
                   Text(
                     message,
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: ElderColors.supportiveText,
+                      color: fg,
                       fontWeight: FontWeight.w700,
                       height: 1.4,
                     ),
@@ -58,7 +71,7 @@ class SupportiveMessage extends StatelessWidget {
                     const SizedBox(height: 10.0),
                     TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: ElderColors.supportiveText,
+                        foregroundColor: fg,
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         textStyle: const TextStyle(
                           fontSize: 18.0,
@@ -79,3 +92,4 @@ class SupportiveMessage extends StatelessWidget {
     );
   }
 }
+

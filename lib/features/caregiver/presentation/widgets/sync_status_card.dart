@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 
 class SyncStatusCard extends ConsumerWidget {
@@ -21,30 +22,24 @@ class SyncStatusCard extends ConsumerWidget {
         final hasPending = info.pendingEventsCount > 0;
 
         Color badgeColor = isOnline
-            ? (hasPending ? Colors.orange : Colors.green)
-            : Colors.blueGrey;
+            ? (hasPending ? ElderColors.clayButtercup : ElderColors.claySage)
+            : ElderColors.clayPeach;
 
         IconData statusIcon = isOnline
-            ? (hasPending ? Icons.sync : Icons.cloud_done)
-            : Icons.cloud_off;
+            ? (hasPending ? Icons.sync_rounded : Icons.cloud_done_rounded)
+            : Icons.cloud_off_rounded;
 
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: badgeColor.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: badgeColor.withValues(alpha: 0.3),
-              width: 1.2,
-            ),
-          ),
+        return ElderCard(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          backgroundColor: ElderColors.surface,
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.15),
+                  color: badgeColor.withValues(alpha: 0.18),
                   shape: BoxShape.circle,
+                  boxShadow: NirvanaShadows.float(tint: badgeColor),
                 ),
                 child: Icon(statusIcon, color: badgeColor, size: 22),
               ),
@@ -59,18 +54,16 @@ class SyncStatusCard extends ConsumerWidget {
                           'Sync status: ',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w800,
                             color: badgeColor,
                           ),
                         ),
                         Text(
                           isOnline ? 'Online' : 'Offline Mode',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: isOnline
-                                ? Colors.green[800]
-                                : Colors.blueGrey[800],
+                            fontWeight: FontWeight.w800,
+                            color: ElderColors.textPrimary,
                           ),
                         ),
                       ],
@@ -80,7 +73,8 @@ class SyncStatusCard extends ConsumerWidget {
                       info.statusLabel,
                       style: const TextStyle(
                         fontSize: 13,
-                        color: ElderColors.textPrimary,
+                        color: ElderColors.textSecondary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -89,19 +83,19 @@ class SyncStatusCard extends ConsumerWidget {
               if (info.pendingEventsCount > 0)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: 10,
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.orange[100],
-                    borderRadius: BorderRadius.circular(12),
+                    color: ElderColors.amberBg,
+                    borderRadius: BorderRadius.circular(NirvanaRadii.pill),
                   ),
                   child: Text(
                     '${info.pendingEventsCount} queued',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange[900],
+                      fontWeight: FontWeight.w800,
+                      color: ElderColors.amberDeep,
                     ),
                   ),
                 ),
@@ -111,7 +105,7 @@ class SyncStatusCard extends ConsumerWidget {
       },
       loading: () => const SizedBox(
         height: 48,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: CircularProgressIndicator(color: ElderColors.clayLavender)),
       ),
       error: (_, __) => const SizedBox.shrink(),
     );

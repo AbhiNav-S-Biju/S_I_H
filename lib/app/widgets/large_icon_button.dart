@@ -1,7 +1,7 @@
 // ==============================================================================
 // NIRVANA - LargeIconButton
 // Description: Tactile square/rounded icon button with guaranteed >=64dp touch
-// target and explicit semantic labeling for screen readers.
+// target, claymorphic dual shadows, and explicit semantic labeling.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -9,20 +9,24 @@ import '../theme/elder_theme.dart';
 
 class LargeIconButton extends StatelessWidget {
   final IconData icon;
-  final String semanticLabel;
+  final String? semanticLabel;
+  final String? tooltip;
   final VoidCallback? onPressed;
   final Color? backgroundColor;
   final Color? iconColor;
   final double size;
+  final double? borderRadius;
 
   const LargeIconButton({
     super.key,
     required this.icon,
-    required this.semanticLabel,
+    this.semanticLabel,
+    this.tooltip,
     required this.onPressed,
     this.backgroundColor,
     this.iconColor,
     this.size = ElderTheme.minTouchTargetSize,
+    this.borderRadius,
   });
 
   @override
@@ -32,32 +36,50 @@ class LargeIconButton extends StatelessWidget {
 
     final effectiveBg = backgroundColor ?? ElderColors.surface;
     final effectiveFg = iconColor ?? theme.colorScheme.primary;
+    final effectiveRadius = borderRadius ?? ElderTheme.buttonBorderRadius;
+    final effectiveLabel = semanticLabel ?? tooltip ?? 'Action button';
 
-    return Semantics(
+    Widget button = Semantics(
       button: true,
       enabled: isEnabled,
-      label: semanticLabel,
-      child: Material(
-        color: isEnabled ? effectiveBg : ElderColors.surfaceElevated,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ElderTheme.buttonBorderRadius),
-          side: const BorderSide(color: ElderColors.border, width: 2.0),
+      label: effectiveLabel,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: isEnabled ? effectiveBg : ElderColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(effectiveRadius),
+          border: Border.all(color: ElderColors.borderLight, width: 1.5),
+          boxShadow: isEnabled ? ElderColors.clayShadow(color: effectiveBg) : null,
         ),
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(ElderTheme.buttonBorderRadius),
-          child: Container(
-            width: size,
-            height: size,
-            alignment: Alignment.center,
-            child: Icon(
-              icon,
-              size: 32.0,
-              color: isEnabled ? effectiveFg : ElderColors.textMuted,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(effectiveRadius),
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(effectiveRadius),
+            splashColor: effectiveFg.withValues(alpha: 0.15),
+            highlightColor: effectiveFg.withValues(alpha: 0.08),
+            child: Container(
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
+                size: size * 0.45,
+                color: isEnabled ? effectiveFg : ElderColors.textMuted,
+              ),
             ),
           ),
         ),
       ),
     );
+
+    if (tooltip != null) {
+      button = Tooltip(
+        message: tooltip!,
+        child: button,
+      );
+    }
+
+    return button;
   }
 }

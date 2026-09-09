@@ -1,11 +1,13 @@
 // ==============================================================================
 // NIRVANA - Game History List Widget
-// Description: Displays recent memory and engagement activities played by the patient.
+// Description: Displays recent memory and engagement activities played by the patient
+// with claymorphic card styling.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 
 class GameHistoryList extends ConsumerWidget {
@@ -18,21 +20,20 @@ class GameHistoryList extends ConsumerWidget {
     return historyAsync.when(
       data: (records) {
         if (records.isEmpty) {
-          return Container(
+          return ElderCard(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-            ),
-            child: const Center(
+            child: Center(
               child: Column(
-                children: [
-                  Icon(Icons.extension_outlined, size: 40, color: Colors.grey),
+                children: const [
+                  Icon(Icons.extension_rounded, size: 38, color: ElderColors.textMuted),
                   SizedBox(height: 8),
                   Text(
                     'No game activity recorded yet.',
-                    style: TextStyle(fontSize: 15, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: ElderColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -40,25 +41,14 @@ class GameHistoryList extends ConsumerWidget {
           );
         }
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+        return ElderCard(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: records.length,
             separatorBuilder: (_, __) =>
-                Divider(height: 1, color: Colors.grey.withValues(alpha: 0.15)),
+                const Divider(height: 1, color: ElderColors.borderLight),
             itemBuilder: (context, index) {
               final game = records[index];
               return ListTile(
@@ -66,28 +56,45 @@ class GameHistoryList extends ConsumerWidget {
                   horizontal: 16,
                   vertical: 6,
                 ),
-                leading: CircleAvatar(
-                  backgroundColor: ElderColors.primary.withValues(alpha: 0.12),
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: ElderColors.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
                   child: const Icon(
-                    Icons.videogame_asset_outlined,
-                    color: ElderColors.primary,
+                    Icons.videogame_asset_rounded,
+                    color: ElderColors.clayLavender,
+                    size: 24,
                   ),
                 ),
                 title: Text(
                   game.gameTitle,
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
                     color: ElderColors.textPrimary,
                   ),
                 ),
-                subtitle: Text(
-                  '${game.difficulty.toUpperCase()} • ${game.correctCount}/${game.totalCount} correct • ${game.durationSeconds}s',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    '${game.difficulty.toUpperCase()} • ${game.correctCount}/${game.totalCount} correct • ${game.durationSeconds}s',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: ElderColors.textSecondary,
+                    ),
+                  ),
                 ),
                 trailing: Text(
                   _formatTimeAgo(game.playedAt),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: ElderColors.textMuted,
+                  ),
                 ),
               );
             },
@@ -97,7 +104,7 @@ class GameHistoryList extends ConsumerWidget {
       loading: () => const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(color: ElderColors.clayLavender),
         ),
       ),
       error: (e, _) => Text('Error loading game history: $e'),

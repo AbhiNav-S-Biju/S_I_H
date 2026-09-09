@@ -1,15 +1,16 @@
 // ==============================================================================
 // NIRVANA - Patient Reminders Screen
 // Description: Senior-accessible daily routine and reminder checklist.
+// Claymorphic wellness design with soft dual shadows, progress tracking,
+// large touch targets (>64dp), and clear Done / Snooze / Later actions.
 // Operates 100% offline via Hive with automated SyncEngine background sync.
-// Features large touch targets (>56dp), high-contrast text, and simple Done /
-// Snooze / Later actions for elderly loved ones.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/database/hive_database.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
@@ -24,45 +25,51 @@ class PatientRemindersScreen extends ConsumerWidget {
     final session = ref.watch(localPatientSessionProvider);
     final patientId = session?.patientId ?? HiveDatabase.pairedPatientId ?? '';
 
-    // Watch reminders for this patient from the offline-first Hive repository
     final remindersAsync = ref.watch(activeRemindersProvider(patientId));
 
     return Scaffold(
       backgroundColor: ElderColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, size: 28, color: ElderColors.textPrimary),
-          tooltip: 'Back to Home',
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/patient/home');
-            }
-          },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: LargeIconButton(
+            icon: Icons.arrow_back_rounded,
+            semanticLabel: 'Back to Home',
+            size: 48,
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/patient/home');
+              }
+            },
+          ),
         ),
         title: const Text(
-          'My Daily Reminders',
+          'Daily Routines',
           style: TextStyle(
             fontSize: 22,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
             color: ElderColors.textPrimary,
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, size: 26, color: ElderColors.textPrimary),
-            tooltip: 'Refresh',
-            onPressed: () => ref.invalidate(activeRemindersProvider(patientId)),
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: LargeIconButton(
+              icon: Icons.refresh_rounded,
+              semanticLabel: 'Refresh',
+              size: 48,
+              onPressed: () => ref.invalidate(activeRemindersProvider(patientId)),
+            ),
           ),
         ],
       ),
       body: SafeArea(
         child: remindersAsync.when(
           data: (reminders) {
-            // Also check all reminders in Hive box (including completed ones for today)
             final allReminders = HiveDatabase.remindersBox.values.where((r) {
               return (patientId.isEmpty || r.patientId == patientId) && r.isActive;
             }).map(Reminder.fromHive).toList();
@@ -73,31 +80,31 @@ class PatientRemindersScreen extends ConsumerWidget {
             final totalCount = allReminders.length;
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Motivational Progress Header
-                  _ProgressBanner(
+                  _ClayProgressBanner(
                     completedCount: completedCount,
                     totalCount: totalCount,
                   ),
                   const SizedBox(height: 24),
 
                   // 2. Reminders Header
-                  Text(
+                  const Text(
                     'Today\'s Schedule',
                     style: TextStyle(
                       fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                       color: ElderColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
                   // 3. Reminders List
                   if (allReminders.isEmpty)
-                    const _EmptyRemindersCard()
+                    const _ClayEmptyRemindersCard()
                   else
                     ListView.separated(
                       shrinkWrap: true,
@@ -106,7 +113,7 @@ class PatientRemindersScreen extends ConsumerWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final reminder = allReminders[index];
-                        return _PatientReminderCard(
+                        return _ClayPatientReminderCard(
                           reminder: reminder,
                           patientId: patientId,
                         );
@@ -118,20 +125,11 @@ class PatientRemindersScreen extends ConsumerWidget {
               ),
             );
           },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(40),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (e, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                'Could not load reminders: $e',
-                style: const TextStyle(fontSize: 16, color: Colors.red),
-              ),
-            ),
+          loading: () => const LoadingState(message: 'Loading your routines...'),
+          error: (e, _) => ErrorState(
+            title: 'Could not load reminders',
+            message: e.toString(),
+            onRetry: () => ref.invalidate(activeRemindersProvider(patientId)),
           ),
         ),
       ),
@@ -140,13 +138,14 @@ class PatientRemindersScreen extends ConsumerWidget {
 }
 
 // ==============================================================================
-// Motivational Progress Banner
+// Motivational Clay Progress Banner
 // ==============================================================================
-class _ProgressBanner extends StatelessWidget {
+
+class _ClayProgressBanner extends StatelessWidget {
   final int completedCount;
   final int totalCount;
 
-  const _ProgressBanner({
+  const _ClayProgressBanner({
     required this.completedCount,
     required this.totalCount,
   });
@@ -160,33 +159,32 @@ class _ProgressBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: allDone ? const Color(0xFFE8F5E9) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: allDone
-              ? const Color(0xFF81C784)
-              : Colors.grey.withValues(alpha: 0.2),
-          width: allDone ? 2 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        color: allDone ? ElderColors.forestBg : ElderColors.surface,
+        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+        boxShadow: NirvanaShadows.card(tint: allDone ? ElderColors.forestDeep : null),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                allDone ? Icons.celebration : Icons.checklist_rounded,
-                size: 28,
-                color: allDone ? const Color(0xFF2E7D32) : ElderColors.primary,
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: allDone ? ElderColors.forestBg : ElderColors.primaryContainer,
+                  shape: BoxShape.circle,
+                  boxShadow: NirvanaShadows.float(
+                    tint: allDone ? ElderColors.forestDeep : ElderColors.primary,
+                  ),
+                ),
+                child: Icon(
+                  allDone ? Icons.celebration_rounded : Icons.checklist_rounded,
+                  size: 26,
+                  color: allDone ? ElderColors.forestDeep : ElderColors.primary,
+                ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   allDone
@@ -194,33 +192,35 @@ class _ProgressBanner extends StatelessWidget {
                       : '$completedCount of $totalCount Completed',
                   style: TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: allDone
-                        ? const Color(0xFF2E7D32)
-                        : ElderColors.textPrimary,
+                    fontWeight: FontWeight.w900,
+                    color: allDone ? ElderColors.forestDeep : ElderColors.textPrimary,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(NirvanaRadii.pill),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
-              minHeight: 10,
-              backgroundColor: Colors.grey.withValues(alpha: 0.15),
+              minHeight: 12,
+              backgroundColor: ElderColors.border,
               valueColor: AlwaysStoppedAnimation<Color>(
-                allDone ? const Color(0xFF2E7D32) : ElderColors.primary,
+                allDone ? ElderColors.forestDeep : ElderColors.primary,
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             allDone
                 ? 'Great job keeping up with your health routines today.'
                 : 'Take your time and complete each activity as scheduled.',
-            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: allDone ? ElderColors.forestDeep : ElderColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -229,13 +229,14 @@ class _ProgressBanner extends StatelessWidget {
 }
 
 // ==============================================================================
-// Patient Reminder Card
+// Claymorphic Patient Reminder Card
 // ==============================================================================
-class _PatientReminderCard extends ConsumerWidget {
+
+class _ClayPatientReminderCard extends ConsumerWidget {
   final Reminder reminder;
   final String patientId;
 
-  const _PatientReminderCard({
+  const _ClayPatientReminderCard({
     required this.reminder,
     required this.patientId,
   });
@@ -252,33 +253,34 @@ class _PatientReminderCard extends ConsumerWidget {
     final minuteStr = minute.toString().padLeft(2, '0');
     final formattedTime = '$displayHour:$minuteStr $period';
 
+    Color cardBg = ElderColors.surface;
+    Color iconBg = ElderColors.skyBg;
+    Color iconColor = ElderColors.skyDeep;
+    IconData icon = Icons.alarm_rounded;
+
+    if (isCompleted) {
+      cardBg = ElderColors.forestBg;
+      iconBg = ElderColors.forestBg;
+      iconColor = ElderColors.forestDeep;
+      icon = Icons.check_circle_rounded;
+    } else if (isSnoozed) {
+      cardBg = ElderColors.amberBg;
+      iconBg = ElderColors.amberBg;
+      iconColor = ElderColors.amberDeep;
+      icon = Icons.snooze_rounded;
+    }
+
     return Container(
       decoration: BoxDecoration(
-        color: isCompleted
-            ? const Color(0xFFF1F8E9)
-            : (isSnoozed ? const Color(0xFFFFF8E1) : Colors.white),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isCompleted
-              ? const Color(0xFFA5D6A7)
-              : (isSnoozed
-                  ? const Color(0xFFFFE082)
-                  : Colors.grey.withValues(alpha: 0.2)),
-          width: isCompleted || isSnoozed ? 1.5 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: cardBg,
+        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+        boxShadow: isCompleted ? NirvanaShadows.card(tint: ElderColors.forestDeep) : NirvanaShadows.card(),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row: Icon, Time, Status Pill
+          // Header row: Icon bubble, Time, Status Pill
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -286,24 +288,11 @@ class _PatientReminderCard extends ConsumerWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: isCompleted
-                      ? const Color(0xFFC8E6C9)
-                      : (isSnoozed
-                          ? const Color(0xFFFFECB3)
-                          : ElderColors.primaryContainer),
-                  borderRadius: BorderRadius.circular(14),
+                  color: iconBg,
+                  shape: BoxShape.circle,
+                  boxShadow: NirvanaShadows.float(tint: iconColor),
                 ),
-                child: Icon(
-                  isCompleted
-                      ? Icons.check_circle_rounded
-                      : (isSnoozed ? Icons.snooze_rounded : Icons.alarm_rounded),
-                  size: 30,
-                  color: isCompleted
-                      ? const Color(0xFF2E7D32)
-                      : (isSnoozed
-                          ? const Color(0xFFE65100)
-                          : ElderColors.primary),
-                ),
+                child: Icon(icon, size: 28, color: iconColor),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -312,28 +301,28 @@ class _PatientReminderCard extends ConsumerWidget {
                   children: [
                     Text(
                       formattedTime,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: ElderColors.textPrimary,
+                        fontWeight: FontWeight.w900,
+                        color: isCompleted ? ElderColors.textMuted : ElderColors.textPrimary,
                       ),
                     ),
                     if (isCompleted && reminder.completedAt != null)
-                      Text(
-                        'Completed today',
+                      const Text(
+                        'Completed today ✓',
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green[800],
+                          fontWeight: FontWeight.w800,
+                          color: ElderColors.forestDeep,
                         ),
                       )
                     else if (isSnoozed && reminder.snoozedUntil != null)
                       Text(
                         'Snoozed until ${_formatTimeOfDay(reminder.snoozedUntil!)}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.amber[900],
+                          fontWeight: FontWeight.w800,
+                          color: ElderColors.amberDeep,
                         ),
                       ),
                   ],
@@ -348,20 +337,20 @@ class _PatientReminderCard extends ConsumerWidget {
             reminder.title,
             style: TextStyle(
               fontSize: 19,
-              fontWeight: FontWeight.w700,
-              color: isCompleted ? Colors.grey[700] : ElderColors.textPrimary,
+              fontWeight: FontWeight.w800,
+              color: isCompleted ? ElderColors.textMuted : ElderColors.textPrimary,
               decoration: isCompleted ? TextDecoration.lineThrough : null,
             ),
           ),
 
-          // Description / instructions
+          // Description
           if (reminder.body.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(
               reminder.body,
               style: TextStyle(
                 fontSize: 15,
-                color: Colors.grey[700],
+                color: isCompleted ? ElderColors.textMuted : ElderColors.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -372,10 +361,14 @@ class _PatientReminderCard extends ConsumerWidget {
           if (!isCompleted) ...[
             Row(
               children: [
-                // DONE BUTTON (Big green accessible button)
+                // DONE BUTTON
                 Expanded(
                   flex: 3,
-                  child: ElevatedButton.icon(
+                  child: LargeActionButton(
+                    label: 'Done',
+                    icon: Icons.check_rounded,
+                    variant: LargeActionButtonVariant.sage,
+                    minHeight: 52,
                     onPressed: () async {
                       final repo = ref.read(reminderRepositoryProvider);
                       final notif = ref.read(notificationServiceProvider);
@@ -394,28 +387,14 @@ class _PatientReminderCard extends ConsumerWidget {
                           SnackBar(
                             content: Text(
                               'Wonderful! "${reminder.title}" marked as complete. 🌟',
-                              style: const TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                             ),
-                            backgroundColor: const Color(0xFF2E7D32),
+                            backgroundColor: ElderColors.forestDeep,
                             duration: const Duration(seconds: 3),
                           ),
                         );
                       }
                     },
-                    icon: const Icon(Icons.check_rounded, size: 28),
-                    label: const Text(
-                      'Done',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -423,7 +402,11 @@ class _PatientReminderCard extends ConsumerWidget {
                 // SNOOZE BUTTON
                 Expanded(
                   flex: 2,
-                  child: OutlinedButton.icon(
+                  child: LargeActionButton(
+                    label: '15 min',
+                    icon: Icons.snooze_rounded,
+                    variant: LargeActionButtonVariant.buttercup,
+                    minHeight: 52,
                     onPressed: () async {
                       final repo = ref.read(reminderRepositoryProvider);
                       await repo.snoozeReminder(
@@ -440,49 +423,36 @@ class _PatientReminderCard extends ConsumerWidget {
                           SnackBar(
                             content: Text(
                               'Snoozed "${reminder.title}" for 15 minutes. ⏰',
-                              style: const TextStyle(fontSize: 15),
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                             ),
-                            backgroundColor: const Color(0xFFE65100),
+                            backgroundColor: ElderColors.amberDeep,
                             duration: const Duration(seconds: 2),
                           ),
                         );
                       }
                     },
-                    icon: const Icon(Icons.snooze_rounded, size: 20),
-                    label: const Text(
-                      '15 min',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFE65100),
-                      side: const BorderSide(color: Color(0xFFE65100), width: 1.5),
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
                   ),
                 ),
               ],
             ),
           ] else ...[
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
+                color: ElderColors.forestBg,
+                borderRadius: BorderRadius.circular(NirvanaRadii.pill),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check, size: 18, color: Color(0xFF2E7D32)),
+                  Icon(Icons.check, size: 18, color: ElderColors.forestDeep),
                   SizedBox(width: 6),
                   Text(
                     'All completed for this schedule',
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2E7D32),
+                      fontWeight: FontWeight.w800,
+                      color: ElderColors.forestDeep,
                     ),
                   ),
                 ],
@@ -507,50 +477,17 @@ class _PatientReminderCard extends ConsumerWidget {
 // ==============================================================================
 // Empty State
 // ==============================================================================
-class _EmptyRemindersCard extends StatelessWidget {
-  const _EmptyRemindersCard();
+
+class _ClayEmptyRemindersCard extends StatelessWidget {
+  const _ClayEmptyRemindersCard();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: ElderColors.primaryContainer,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.bedtime_outlined,
-              size: 40,
-              color: ElderColors.primary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'No reminders for today',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: ElderColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'You are all caught up. Have a peaceful, restful day! 🌸',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-          ),
-        ],
-      ),
+    return const EmptyState(
+      icon: Icons.spa_rounded,
+      title: 'No reminders for today',
+      message: 'You are all caught up. Have a peaceful, restful day! 🌸',
     );
   }
 }
+

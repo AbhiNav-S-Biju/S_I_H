@@ -1,8 +1,7 @@
 // ==============================================================================
 // NIRVANA - ErrorState
 // Description: Supportive, non-alarming error state designed to avoid anxiety
-// or stress for elderly users, using warm terracotta/amber tones instead of
-// aggressive red alerts.
+// or stress for elderly users, using warm clay peach tones.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -38,12 +37,13 @@ class ErrorState extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24.0),
           decoration: BoxDecoration(
-            color: ElderColors.gentleErrorBg,
+            color: ElderColors.pastelPeach,
             borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
             border: Border.all(
-              color: ElderColors.gentleErrorBorder,
-              width: 2.0,
+              color: ElderColors.coralDeep.withValues(alpha: 0.2),
+              width: 1.5,
             ),
+            boxShadow: ElderColors.clayShadow(color: ElderColors.pastelPeach),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -51,14 +51,15 @@ class ErrorState extends StatelessWidget {
               Container(
                 width: 76.0,
                 height: 76.0,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
+                  boxShadow: ElderColors.clayShadow(),
                 ),
                 child: const Icon(
-                  Icons.favorite_outline_rounded,
+                  Icons.spa_rounded,
                   size: 42.0,
-                  color: ElderColors.gentleErrorPrimary,
+                  color: ElderColors.coralDeep,
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -67,7 +68,7 @@ class ErrorState extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: ElderColors.gentleErrorText,
+                  color: ElderColors.coralDeep,
                 ),
               ),
               const SizedBox(height: 12.0),
@@ -75,7 +76,7 @@ class ErrorState extends StatelessWidget {
                 message,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: ElderColors.gentleErrorText,
+                  color: ElderColors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -84,6 +85,7 @@ class ErrorState extends StatelessWidget {
                 LargeActionButton(
                   label: retryLabel!,
                   onPressed: onRetry,
+                  variant: LargeActionButtonVariant.primary,
                   icon: Icons.refresh_rounded,
                 ),
               if (onSecondaryAction != null &&
@@ -103,3 +105,4 @@ class ErrorState extends StatelessWidget {
     );
   }
 }
+

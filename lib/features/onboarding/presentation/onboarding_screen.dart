@@ -1,7 +1,7 @@
 // ==============================================================================
 // NIRVANA - OnboardingScreen
 // Description: Gentle, dignified multi-step introduction for seniors with
-// large typography, high touch areas, and optional motion comfort settings.
+// claymorphic visuals, large typography, high touch areas, and wellness cues.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -94,35 +94,51 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       Icons.sentiment_very_satisfied_rounded,
     ];
 
+    final stepColors = [
+      ElderColors.pastelLavender,
+      ElderColors.pastelButtercup,
+      ElderColors.pastelSage,
+    ];
+
+    final stepIconColors = [
+      ElderColors.primary,
+      ElderColors.amberDeep,
+      ElderColors.forestDeep,
+    ];
+
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: ElderColors.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
           l10n?.appName ?? 'NIRVANA',
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w900,
-            color: theme.colorScheme.primary,
+            letterSpacing: 1.5,
+            color: ElderColors.primary,
           ),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 20.0),
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14.0,
+                  horizontal: 16.0,
                   vertical: 6.0,
                 ),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(20.0),
+                  color: ElderColors.primaryContainer,
+                  borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+                  boxShadow: NirvanaShadows.float(tint: ElderColors.primary),
                 ),
                 child: Text(
                   '${_currentStep + 1} / 3',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.onPrimaryContainer,
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w900,
+                    color: ElderColors.primary,
                   ),
                 ),
               ),
@@ -136,8 +152,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                physics:
-                    const NeverScrollableScrollPhysics(), // Controlled via buttons
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (index) {
                   setState(() {
                     _currentStep = index;
@@ -152,45 +167,46 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       children: [
                         const SizedBox(height: 16.0),
                         Container(
-                          width: 100.0,
-                          height: 100.0,
+                          width: 108.0,
+                          height: 108.0,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer,
+                            color: stepColors[index],
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: theme.colorScheme.primary,
-                              width: 2.5,
+                              color: Colors.white,
+                              width: 3.0,
                             ),
+                            boxShadow: ElderColors.clayShadow(color: stepColors[index]),
                           ),
                           child: Icon(
                             stepIcons[index],
-                            size: 54.0,
-                            color: theme.colorScheme.primary,
+                            size: 56.0,
+                            color: stepIconColors[index],
                           ),
                         ),
                         const SizedBox(height: 28.0),
                         Text(
                           stepTitles[index],
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.displaySmall?.copyWith(
+                          style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: ElderColors.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 18.0),
+                        const SizedBox(height: 14.0),
                         Text(
                           stepBodies[index],
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: ElderColors.textSecondary,
                             height: 1.5,
+                            fontSize: 18.0,
                           ),
                         ),
-                        const SizedBox(height: 24.0),
+                        const SizedBox(height: 28.0),
                         if (index == 1) ...[
-                          // Quick accessibility toggles right on onboarding
                           ElderCard(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.all(20.0),
                             child: Consumer(
                               builder: (context, ref, _) {
                                 final isHighContrast = ref.watch(
@@ -203,10 +219,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                         'High Contrast Mode',
                                     style: const TextStyle(
                                       fontSize: 20.0,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w800,
+                                      color: ElderColors.textPrimary,
                                     ),
                                   ),
                                   value: isHighContrast,
+                                  activeThumbColor: ElderColors.primary,
                                   onChanged: (val) {
                                     ref
                                         .read(highContrastProvider.notifier)
@@ -221,7 +239,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             message:
                                 l10n?.dailySupportiveMessage ??
                                 'Take your time. There is no rush, and you are doing wonderful.',
-                            icon: Icons.favorite_rounded,
+                            icon: Icons.spa_rounded,
                           ),
                         ],
                       ],
@@ -230,17 +248,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 },
               ),
             ),
-            // Bottom Action Area (Maximum 2 buttons: Back & Next/Finish)
+            // Bottom Action Area
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
-                vertical: 16.0,
+                vertical: 20.0,
               ),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  top: BorderSide(color: ElderColors.border, width: 1.5),
-                ),
+              decoration: BoxDecoration(
+                color: ElderColors.surface,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(NirvanaRadii.sheet)),
+                boxShadow: NirvanaShadows.card(),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -272,3 +289,4 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 }
+

@@ -1,13 +1,14 @@
 // ==============================================================================
 // NIRVANA - Patient Welcome Screen
 // Description: First-run screen shown to elderly patients on their device.
-// Presented only once — after pairing, the app launches directly to Patient Home.
-// Designed with maximum accessibility: large text, high contrast, minimal steps.
+// Claymorphic wellness design with soft dual shadows, large typography,
+// and accessible touch surfaces.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/widgets.dart';
 
 class PatientWelcomeScreen extends StatefulWidget {
   const PatientWelcomeScreen({super.key});
@@ -59,7 +60,7 @@ class _PatientWelcomeScreenState extends State<PatientWelcomeScreen>
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 32.0,
+                    horizontal: 28.0,
                     vertical: 24.0,
                   ),
                   child: ConstrainedBox(
@@ -74,48 +75,44 @@ class _PatientWelcomeScreenState extends State<PatientWelcomeScreen>
                       children: [
                         const SizedBox(height: 16),
 
-                        // App Logo / Icon
+                        // App Logo / Icon Clay Bubble
                         Container(
-                          width: 110,
-                          height: 110,
+                          width: 112,
+                          height: 112,
                           decoration: BoxDecoration(
                             color: ElderColors.primaryContainer,
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: ElderColors.primary.withAlpha(40),
-                                blurRadius: 30,
-                                spreadRadius: 4,
-                              ),
-                            ],
+                            boxShadow: NirvanaShadows.float(tint: ElderColors.primary),
                           ),
-                          child: const Icon(
-                            Icons.favorite_rounded,
-                            size: 56,
-                            color: ElderColors.primary,
+                          child: const Center(
+                            child: Icon(
+                              Icons.favorite_rounded,
+                              size: 56,
+                              color: ElderColors.primary,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
 
                         // App Name
-                        Text(
+                        const Text(
                           'NIRVANA',
                           style: TextStyle(
                             fontSize: 36,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w900,
                             color: ElderColors.primary,
-                            letterSpacing: 4,
+                            letterSpacing: 3,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 10),
 
                         // Tagline
-                        Text(
+                        const Text(
                           'Your daily companion\nfor memory and wellness',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w500,
                             color: ElderColors.textSecondary,
                             height: 1.4,
                           ),
@@ -123,40 +120,46 @@ class _PatientWelcomeScreenState extends State<PatientWelcomeScreen>
                         ),
                         const SizedBox(height: 32),
 
-                        // Setup instruction card
+                        // Setup instruction clay card
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: ElderColors.primaryContainer,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: ElderColors.primary.withAlpha(60),
-                              width: 1.5,
-                            ),
+                            color: ElderColors.surface,
+                            borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+                            boxShadow: NirvanaShadows.card(),
                           ),
                           child: Column(
                             children: [
-                              const Icon(
-                                Icons.phone_android_rounded,
-                                size: 40,
-                                color: ElderColors.primary,
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  color: ElderColors.skyBg,
+                                  shape: BoxShape.circle,
+                                  boxShadow: NirvanaShadows.float(tint: ElderColors.skyDeep),
+                                ),
+                                child: const Icon(
+                                  Icons.phone_android_rounded,
+                                  size: 32,
+                                  color: ElderColors.skyDeep,
+                                ),
                               ),
-                              const SizedBox(height: 12),
-                              Text(
+                              const SizedBox(height: 16),
+                              const Text(
                                 'Let\'s connect this device',
                                 style: TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w700,
-                                  color: ElderColors.onPrimaryContainer,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                  color: ElderColors.textPrimary,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Ask your caregiver for a short code.\nYou only need to do this once.',
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Ask your caregiver for a short 6-digit code.\nYou only need to do this once.',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   color: ElderColors.textSecondary,
                                   height: 1.4,
                                 ),
@@ -171,43 +174,23 @@ class _PatientWelcomeScreenState extends State<PatientWelcomeScreen>
                         // Primary CTA button
                         SizedBox(
                           width: double.infinity,
-                          height: 64,
-                          child: ElevatedButton(
+                          child: LargeActionButton(
+                            label: 'Connect This Device',
+                            icon: Icons.link_rounded,
+                            variant: LargeActionButtonVariant.primary,
                             onPressed: () => context.go('/patient/pairing'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ElderColors.primary,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              elevation: 4,
-                              shadowColor: ElderColors.primary.withAlpha(100),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.link_rounded, size: 28),
-                                SizedBox(width: 12),
-                                Text(
-                                  'Connect This Device',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 18),
 
                         // Small reassurance text
-                        Text(
+                        const Text(
                           'Your caregiver set this up for you.',
                           style: TextStyle(
                             fontSize: 14,
                             color: ElderColors.textMuted,
+                            fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -224,3 +207,4 @@ class _PatientWelcomeScreenState extends State<PatientWelcomeScreen>
     );
   }
 }
+

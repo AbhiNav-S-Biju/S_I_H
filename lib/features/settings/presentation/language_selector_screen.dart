@@ -1,6 +1,6 @@
 // ==============================================================================
 // NIRVANA - LanguageSelectorScreen
-// Description: Accessible, high-contrast language picker with native script
+// Description: Accessible, claymorphic language picker with native script
 // names and large touch surfaces for seniors.
 // ==============================================================================
 
@@ -41,19 +41,19 @@ class LanguageSelectorScreen extends ConsumerWidget {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.info_outline_rounded, color: Colors.white, size: 24),
+              const Icon(Icons.schedule_rounded, color: Colors.white, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   '${item['title']} is coming soon! Not available yet.',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                 ),
               ),
             ],
           ),
-          backgroundColor: const Color(0xFFD97706),
+          backgroundColor: const Color(0xFFE08244),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -61,29 +61,31 @@ class LanguageSelectorScreen extends ConsumerWidget {
       showDialog(
         context: context,
         builder: (dialogContext) => AlertDialog(
+          backgroundColor: ElderColors.surfaceElevated,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
           ),
           title: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF3E0),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ElderColors.clayPeach.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.schedule_rounded,
-                  color: Color(0xFFE65100),
+                  color: Color(0xFFC2410C),
                   size: 28,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               const Text(
                 'Coming Soon',
                 style: TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w900,
+                  color: ElderColors.textPrimary,
                 ),
               ),
             ],
@@ -96,8 +98,8 @@ class LanguageSelectorScreen extends ConsumerWidget {
                 '${item['native']} (${item['title']})',
                 style: const TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  fontWeight: FontWeight.w800,
+                  color: ElderColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 10),
@@ -106,29 +108,17 @@ class LanguageSelectorScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.4,
-                  color: Color(0xFF475569),
+                  color: ElderColors.textSecondary,
                 ),
               ),
             ],
           ),
           actions: [
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+            LargeActionButton(
+              label: 'OK',
+              icon: Icons.check_circle_outline_rounded,
+              colorScheme: ElderButtonScheme.primary,
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text(
-                'OK',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
             ),
           ],
         ),
@@ -136,176 +126,171 @@ class LanguageSelectorScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back',
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/settings');
-            }
-          },
-        ),
-        title: Text(
-          l10n?.selectLanguageTitle ?? 'Choose Your Language',
-          style: theme.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
+      backgroundColor: ElderColors.backgroundClay,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n?.selectLanguageSubtitle ??
-                    'Tap the language you feel most comfortable using.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: ElderColors.textSecondary,
-                ),
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: Row(
+                children: [
+                  LargeIconButton(
+                    icon: Icons.arrow_back_rounded,
+                    tooltip: 'Back to Settings',
+                    backgroundColor: Colors.white,
+                    iconColor: ElderColors.textPrimary,
+                    size: 56.0,
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/settings');
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: Text(
+                      l10n?.selectLanguageTitle ?? 'Choose Language',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: ElderColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24.0),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: languages.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 14.0),
-                  itemBuilder: (context, index) {
-                    final item = languages[index];
-                    final code = item['code']!;
-                    final isUnsupported = unsupportedCodes.contains(code);
-                    final isSelected = !isUnsupported && activeLocale.languageCode == code;
+            ),
 
-                    return ElderCard(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 18.0,
-                      ),
-                      backgroundColor: isUnsupported
-                          ? const Color(0xFFF8FAFC)
-                          : isSelected
-                              ? ElderColors.primaryContainer
-                              : Colors.white,
-                      borderColor: isUnsupported
-                          ? const Color(0xFFCBD5E1)
-                          : isSelected
-                              ? theme.colorScheme.primary
-                              : ElderColors.border,
-                      borderWidth: isSelected ? 3.0 : 2.0,
-                      onTap: () {
-                        if (isUnsupported) {
-                          showComingSoonNotice(context, item);
-                          return;
-                        }
-                        ref.read(localeProvider.notifier).setLanguageCode(code);
-                      },
-                      semanticLabel: '${item['native']} - ${item['title']}${isUnsupported ? ' (Coming Soon)' : ''}',
-                      child: Row(
-                        children: [
-                          Icon(
-                            isUnsupported
-                                ? Icons.schedule_rounded
-                                : isSelected
-                                    ? Icons.radio_button_checked_rounded
-                                    : Icons.radio_button_off_rounded,
-                            size: 32.0,
-                            color: isUnsupported
-                                ? const Color(0xFF94A3B8)
-                                : isSelected
-                                    ? theme.colorScheme.primary
-                                    : ElderColors.textMuted,
-                          ),
-                          const SizedBox(width: 16.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item['native']!,
-                                  style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.w800,
-                                    color: isUnsupported
-                                        ? const Color(0xFF64748B)
-                                        : isSelected
-                                            ? ElderColors.onPrimaryContainer
-                                            : ElderColors.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 2.0),
-                                Text(
-                                  item['title']!,
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w500,
-                                    color: isUnsupported
-                                        ? const Color(0xFF94A3B8)
-                                        : isSelected
-                                            ? ElderColors.onPrimaryContainer
-                                            : ElderColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (isUnsupported)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFEF3C7),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: const Color(0xFFF59E0B),
-                                  width: 1.2,
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.schedule_rounded,
-                                    size: 14,
-                                    color: Color(0xFFB45309),
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Coming Soon',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFFB45309),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (isSelected)
-                            Icon(
-                              Icons.check_circle_rounded,
-                              size: 32.0,
-                              color: theme.colorScheme.primary,
-                            ),
-                        ],
-                      ),
-                    );
-                  },
+            // Description
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 6.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n?.selectLanguageSubtitle ??
+                      'Tap the language you feel most comfortable using.',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: ElderColors.textSecondary,
+                  ),
                 ),
               ),
-              const SizedBox(height: 16.0),
-              LargeActionButton(
-                label: l10n?.saveAndApply ?? 'Apply Selection',
-                onPressed: () => context.pop(),
-                icon: Icons.check_rounded,
+            ),
+
+            const SizedBox(height: 12.0),
+
+            // Languages List
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                itemCount: languages.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12.0),
+                itemBuilder: (context, index) {
+                  final item = languages[index];
+                  final code = item['code']!;
+                  final isUnsupported = unsupportedCodes.contains(code);
+                  final isSelected = !isUnsupported && activeLocale.languageCode == code;
+
+                  return ElderCard(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 18.0,
+                    ),
+                    backgroundColor: isUnsupported
+                        ? const Color(0xFFF1EDE6)
+                        : isSelected
+                            ? ElderColors.clayLavender.withValues(alpha: 0.18)
+                            : Colors.white,
+                    borderColor: isUnsupported
+                        ? const Color(0xFFDDD7CE)
+                        : isSelected
+                            ? ElderColors.clayLavender
+                            : ElderColors.border,
+                    borderWidth: isSelected ? 3.0 : 1.5,
+                    onTap: () {
+                      if (isUnsupported) {
+                        showComingSoonNotice(context, item);
+                        return;
+                      }
+                      ref.read(localeProvider.notifier).setLanguageCode(code);
+                    },
+                    semanticLabel:
+                        '${item['native']} - ${item['title']}${isUnsupported ? ' (Coming Soon)' : ''}',
+                    child: Row(
+                      children: [
+                        Icon(
+                          isUnsupported
+                              ? Icons.schedule_rounded
+                              : isSelected
+                                  ? Icons.radio_button_checked_rounded
+                                  : Icons.radio_button_off_rounded,
+                          size: 30.0,
+                          color: isUnsupported
+                              ? const Color(0xFF94A3B8)
+                              : isSelected
+                                  ? ElderColors.clayLavender
+                                  : ElderColors.textMuted,
+                        ),
+                        const SizedBox(width: 16.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['native']!,
+                                style: TextStyle(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.w800,
+                                  color: isUnsupported
+                                      ? const Color(0xFF64748B)
+                                      : isSelected
+                                          ? ElderColors.textPrimary
+                                          : ElderColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 2.0),
+                              Text(
+                                item['title']!,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w500,
+                                  color: isUnsupported
+                                      ? const Color(0xFF94A3B8)
+                                      : isSelected
+                                          ? ElderColors.clayLavender
+                                          : ElderColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isUnsupported)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                              vertical: 4.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE2E8F0),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: const Text(
+                              'Soon',
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF64748B),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

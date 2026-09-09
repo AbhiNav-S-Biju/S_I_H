@@ -1,6 +1,7 @@
 // ==============================================================================
 // NIRVANA - Caregiver Login Screen
-// Description: Secure authentication interface for caregivers and family members.
+// Description: Secure authentication interface for caregivers and family members
+// with claymorphic design tokens and smooth accessibility.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 
 class CaregiverLoginScreen extends ConsumerStatefulWidget {
@@ -112,7 +114,6 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
         return;
       }
 
-      // Safe access: valueOrNull avoids throwing if an error was captured
       final profile = authState.valueOrNull;
       if (profile != null && mounted) {
         context.go('/caregiver/dashboard');
@@ -137,7 +138,6 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
     final authState = ref.watch(caregiverAuthProvider);
     final isLoading = authState.isLoading;
 
-    // Show error from provider state if not already captured
     if (authState.hasError && _errorMessage == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -149,229 +149,280 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FAF9),
-      appBar: AppBar(
-        title: const Text('Caregiver & Family Portal'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: ElderColors.textPrimary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back to Landing',
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
-      ),
+      backgroundColor: ElderColors.backgroundClay,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 16.0,
-            ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 450),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Icon and Header
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: ElderColors.primary.withValues(alpha: 0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_rounded,
-                          size: 48,
-                          color: ElderColors.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Welcome to Nirvana Care',
-                      textAlign: TextAlign.center,
+        child: Column(
+          children: [
+            // Top Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: Row(
+                children: [
+                  LargeIconButton(
+                    icon: Icons.arrow_back_rounded,
+                    tooltip: 'Back to Landing',
+                    backgroundColor: Colors.white,
+                    iconColor: ElderColors.textPrimary,
+                    size: 56.0,
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/');
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 16.0),
+                  const Expanded(
+                    child: Text(
+                      'Caregiver & Family Portal',
                       style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
                         color: ElderColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Stay connected with your loved one\'s daily activities, games, and routine.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                    ),
-                    const SizedBox(height: 32),
+                  ),
+                ],
+              ),
+            ),
 
-                    // Email Field
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'Email Address',
-                        prefixIcon: const Icon(Icons.email_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      validator: _validateEmail,
-                      onChanged: (_) {
-                        if (_errorMessage != null) {
-                          setState(() => _errorMessage = null);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Password Field
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      validator: _validatePassword,
-                      onChanged: (_) {
-                        if (_errorMessage != null) {
-                          setState(() => _errorMessage = null);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Error Banner
-                    if (_errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade50,
-                          border: Border.all(color: Colors.red.shade200),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              color: Colors.red.shade700,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: TextStyle(
-                                  color: Colors.red.shade800,
-                                  fontSize: 13,
-                                  height: 1.3,
-                                ),
+            // Form Body
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 460),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Friendly Clay Avatar Header
+                          Center(
+                            child: Container(
+                              width: 88,
+                              height: 88,
+                              decoration: BoxDecoration(
+                                color: ElderColors.forestBg,
+                                shape: BoxShape.circle,
+                                boxShadow: NirvanaShadows.float(tint: ElderColors.claySage),
+                              ),
+                              child: const Icon(
+                                Icons.favorite_rounded,
+                                size: 44,
+                                color: ElderColors.claySage,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Login Button
-                    SizedBox(
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: isLoading ? null : _handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ElderColors.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
                           ),
-                          elevation: 0,
-                        ),
-                        child: isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                'Sign In to Dashboard',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Create Account link
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          'New caregiver? ',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.go('/caregiver/register'),
-                          child: const Text(
-                            'Create Account',
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Welcome to Nirvana Care',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: ElderColors.primary,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              color: ElderColors.textPrimary,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Stay connected with your loved one\'s daily activities, games, and routine.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: ElderColors.textSecondary,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 28),
 
-                    // Offline Info Note
-                    Center(
-                      child: Text(
-                        '🔒 Offline-first verified • Patient-scoped data protection',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          // Email Field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: ElderColors.surface,
+                              borderRadius: BorderRadius.circular(NirvanaRadii.icon),
+                              boxShadow: NirvanaShadows.input,
+                            ),
+                            child: TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: ElderColors.textPrimary,
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'Email Address',
+                                labelStyle: const TextStyle(color: ElderColors.textSecondary),
+                                prefixIcon: const Icon(Icons.email_outlined, color: ElderColors.claySage),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                              ),
+                              validator: _validateEmail,
+                              onChanged: (_) {
+                                if (_errorMessage != null) {
+                                  setState(() => _errorMessage = null);
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Password Field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: ElderColors.surface,
+                              borderRadius: BorderRadius.circular(NirvanaRadii.icon),
+                              boxShadow: NirvanaShadows.input,
+                            ),
+                            child: TextFormField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: ElderColors.textPrimary,
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: const TextStyle(color: ElderColors.textSecondary),
+                                prefixIcon: const Icon(Icons.lock_outline_rounded, color: ElderColors.claySage),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                    color: ElderColors.textMuted,
+                                  ),
+                                  onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                              ),
+                              validator: _validatePassword,
+                              onChanged: (_) {
+                                if (_errorMessage != null) {
+                                  setState(() => _errorMessage = null);
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Error Banner
+                          if (_errorMessage != null) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: ElderColors.gentleErrorBg,
+                                borderRadius: BorderRadius.circular(NirvanaRadii.button),
+                                boxShadow: NirvanaShadows.card(tint: ElderColors.gentleErrorPrimary),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline,
+                                    color: ElderColors.gentleErrorText,
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      _errorMessage!,
+                                      style: const TextStyle(
+                                        color: ElderColors.gentleErrorText,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.3,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+
+                          // Login Button
+                          LargeActionButton(
+                            label: 'Sign In to Dashboard',
+                            icon: Icons.login_rounded,
+                            colorScheme: ElderButtonScheme.primary,
+                            isLoading: isLoading,
+                            onPressed: isLoading ? null : _handleLogin,
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Create Account link
+                          Center(
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                const Text(
+                                  'New caregiver? ',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: ElderColors.textSecondary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => context.go('/caregiver/register'),
+                                  child: const Text(
+                                    'Create Account',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: ElderColors.clayLavender,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Privacy Note
+                          const Center(
+                            child: Text(
+                              '🔒 Patient-scoped data protection • Offline verified',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: ElderColors.textMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
-

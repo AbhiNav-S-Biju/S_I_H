@@ -1,7 +1,7 @@
 // ==============================================================================
 // NIRVANA - SettingsScreen
-// Description: Senior-accessible settings screen with large switches, high
-// contrast toggles, reduced motion controls, and language preferences.
+// Description: Senior-accessible settings screen with claymorphic cards, large
+// touch toggles, text scale selection, and language preferences.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -50,274 +50,298 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back to Home',
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/patient/home');
-            }
-          },
-        ),
-        title: Text(
-          l10n?.settingsNavLabel ?? 'Settings',
-          style: theme.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
+      backgroundColor: ElderColors.backgroundClay,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Accessibility & Visual Comfort Section
-              SectionHeader(
-                title:
-                    l10n?.accessibilitySectionTitle ??
-                    'Visual & Motion Comfort',
-                icon: Icons.accessibility_new_rounded,
-              ),
-
-              // Reduced Motion Card
-              ElderCard(
-                padding: const EdgeInsets.all(18.0),
-                child: SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: reducedMotion,
-                  activeColor: theme.colorScheme.primary,
-                  title: Text(
-                    l10n?.reducedMotionTitle ?? 'Reduced Motion',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: ElderColors.textPrimary,
-                    ),
+        child: Column(
+          children: [
+            // Top App Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: Row(
+                children: [
+                  LargeIconButton(
+                    icon: Icons.arrow_back_rounded,
+                    tooltip: 'Back to Home',
+                    backgroundColor: ElderColors.surface,
+                    iconColor: ElderColors.textPrimary,
+                    size: 56.0,
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/patient/home');
+                      }
+                    },
                   ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 6.0),
+                  const SizedBox(width: 16.0),
+                  Expanded(
                     child: Text(
-                      l10n?.reducedMotionSubtitle ??
-                          'Turns off moving effects and animations for a steadier screen.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: ElderColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  onChanged: (val) {
-                    ref
-                        .read(reducedMotionProvider.notifier)
-                        .setReducedMotion(val);
-                  },
-                ),
-              ),
-
-              // High Contrast Card
-              ElderCard(
-                padding: const EdgeInsets.all(18.0),
-                child: SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: highContrast,
-                  activeColor: theme.colorScheme.primary,
-                  title: Text(
-                    l10n?.highContrastTitle ?? 'High Contrast Mode',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: ElderColors.textPrimary,
-                    ),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 6.0),
-                    child: Text(
-                      l10n?.highContrastSubtitle ??
-                          'Bolder text and stronger outlines for easier reading.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: ElderColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  onChanged: (val) {
-                    ref
-                        .read(highContrastProvider.notifier)
-                        .setHighContrast(val);
-                  },
-                ),
-              ),
-
-              // Voice Guidance & Feedback Card
-              ElderCard(
-                padding: const EdgeInsets.all(18.0),
-                child: SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: voiceEnabled,
-                  activeColor: theme.colorScheme.primary,
-                  title: Text(
-                    'Voice Assistance & Prompts',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: ElderColors.textPrimary,
-                    ),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 6.0),
-                    child: Text(
-                      'Speaks instructions aloud and enables voice input for games and reminders.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: ElderColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  onChanged: (val) {
-                    ref
-                        .read(voiceEnabledProvider.notifier)
-                        .setVoiceEnabled(val);
-                  },
-                ),
-              ),
-
-              // Text Scale Segmented Options
-              ElderCard(
-                padding: const EdgeInsets.all(18.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n?.textSizeTitle ?? 'Text Size',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
+                      l10n?.settingsNavLabel ?? 'Settings',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
                         color: ElderColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 6.0),
-                    Text(
-                      l10n?.textSizeSubtitle ??
-                          'Make words and numbers larger and clearer.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: ElderColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    _buildScaleOption(
-                      title: l10n?.textSizeStandard ?? 'Large (Standard)',
-                      isSelected: textScale == TextScaleOption.standard,
-                      onTap: () => ref
-                          .read(textScaleProvider.notifier)
-                          .setScale(TextScaleOption.standard),
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildScaleOption(
-                      title: l10n?.textSizeExtraLarge ?? 'Extra Large',
-                      isSelected: textScale == TextScaleOption.extraLarge,
-                      onTap: () => ref
-                          .read(textScaleProvider.notifier)
-                          .setScale(TextScaleOption.extraLarge),
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildScaleOption(
-                      title: l10n?.textSizeMaximum ?? 'Maximum Clarity',
-                      isSelected: textScale == TextScaleOption.maximum,
-                      onTap: () => ref
-                          .read(textScaleProvider.notifier)
-                          .setScale(TextScaleOption.maximum),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
 
-              const SizedBox(height: 16.0),
-
-              // 2. Language Selector Tile
-              SectionHeader(
-                title: l10n?.languageTitle ?? 'Language',
-                icon: Icons.language_rounded,
-              ),
-              ElderCard(
-                padding: const EdgeInsets.all(20.0),
-                onTap: () => context.push('/settings/language'),
-                child: Row(
+            // Scrollable Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12.0),
-                      decoration: const BoxDecoration(
-                        color: ElderColors.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.translate_rounded,
-                        size: 30.0,
-                        color: ElderColors.onPrimaryContainer,
+                    // 1. Accessibility & Visual Comfort Section
+                    SectionHeader(
+                      title: l10n?.accessibilitySectionTitle ?? 'Visual & Motion Comfort',
+                      icon: Icons.accessibility_new_rounded,
+                    ),
+
+                    // Reduced Motion Card
+                    ElderCard(
+                      padding: const EdgeInsets.all(20.0),
+                      child: SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: reducedMotion,
+                        activeThumbColor: ElderColors.claySage,
+                        activeTrackColor: ElderColors.claySage.withValues(alpha: 0.4),
+                        title: Text(
+                          l10n?.reducedMotionTitle ?? 'Reduced Motion',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: ElderColors.textPrimary,
+                            fontSize: 19.0,
+                          ),
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6.0),
+                          child: Text(
+                            l10n?.reducedMotionSubtitle ??
+                                'Turns off moving effects and animations for a steadier screen.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: ElderColors.textSecondary,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                        ),
+                        onChanged: (val) {
+                          ref.read(reducedMotionProvider.notifier).setReducedMotion(val);
+                        },
                       ),
                     ),
-                    const SizedBox(width: 16.0),
-                    Expanded(
+                    const SizedBox(height: 14.0),
+
+                    // High Contrast Card
+                    ElderCard(
+                      padding: const EdgeInsets.all(20.0),
+                      child: SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: highContrast,
+                        activeThumbColor: ElderColors.clayLavender,
+                        activeTrackColor: ElderColors.clayLavender.withValues(alpha: 0.4),
+                        title: Text(
+                          l10n?.highContrastTitle ?? 'High Contrast Mode',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: ElderColors.textPrimary,
+                            fontSize: 19.0,
+                          ),
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6.0),
+                          child: Text(
+                            l10n?.highContrastSubtitle ??
+                                'Bolder text and stronger outlines for easier reading.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: ElderColors.textSecondary,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                        ),
+                        onChanged: (val) {
+                          ref.read(highContrastProvider.notifier).setHighContrast(val);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 14.0),
+
+                    // Voice Guidance Card
+                    ElderCard(
+                      padding: const EdgeInsets.all(20.0),
+                      child: SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: voiceEnabled,
+                        activeThumbColor: ElderColors.clayButtercup,
+                        activeTrackColor: ElderColors.clayButtercup.withValues(alpha: 0.4),
+                        title: Text(
+                          'Voice Assistance & Prompts',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: ElderColors.textPrimary,
+                            fontSize: 19.0,
+                          ),
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6.0),
+                          child: Text(
+                            'Speaks instructions aloud and enables voice input for games and reminders.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: ElderColors.textSecondary,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                        ),
+                        onChanged: (val) {
+                          ref.read(voiceEnabledProvider.notifier).setVoiceEnabled(val);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 14.0),
+
+                    // Text Scale Segmented Options
+                    ElderCard(
+                      padding: const EdgeInsets.all(20.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            l10n?.selectLanguageTitle ?? 'Choose Your Language',
+                            l10n?.textSizeTitle ?? 'Text Size',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: ElderColors.textPrimary,
+                              fontSize: 19.0,
+                            ),
+                          ),
+                          const SizedBox(height: 6.0),
+                          Text(
+                            l10n?.textSizeSubtitle ??
+                                'Make words and numbers larger and clearer.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: ElderColors.textSecondary,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          _buildScaleOption(
+                            title: l10n?.textSizeStandard ?? 'Large (Standard)',
+                            isSelected: textScale == TextScaleOption.standard,
+                            onTap: () => ref
+                                .read(textScaleProvider.notifier)
+                                .setScale(TextScaleOption.standard),
+                          ),
+                          const SizedBox(height: 10.0),
+                          _buildScaleOption(
+                            title: l10n?.textSizeExtraLarge ?? 'Extra Large',
+                            isSelected: textScale == TextScaleOption.extraLarge,
+                            onTap: () => ref
+                                .read(textScaleProvider.notifier)
+                                .setScale(TextScaleOption.extraLarge),
+                          ),
+                          const SizedBox(height: 10.0),
+                          _buildScaleOption(
+                            title: l10n?.textSizeMaximum ?? 'Maximum Clarity',
+                            isSelected: textScale == TextScaleOption.maximum,
+                            onTap: () => ref
+                                .read(textScaleProvider.notifier)
+                                .setScale(TextScaleOption.maximum),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24.0),
+
+                    // 2. Language Selector Section
+                    SectionHeader(
+                      title: l10n?.languageTitle ?? 'Language',
+                      icon: Icons.language_rounded,
+                    ),
+                    ElderCard(
+                      padding: const EdgeInsets.all(20.0),
+                      onTap: () => context.push('/settings/language'),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(14.0),
+                            decoration: BoxDecoration(
+                              color: ElderColors.clayLavender.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                              boxShadow: NirvanaShadows.float(tint: ElderColors.clayLavender),
+                            ),
+                            child: const Icon(
+                              Icons.translate_rounded,
+                              size: 28.0,
+                              color: ElderColors.clayLavender,
+                            ),
+                          ),
+                          const SizedBox(width: 16.0),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n?.selectLanguageTitle ?? 'Choose Your Language',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: ElderColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4.0),
+                                Text(
+                                  getLanguageName(currentLocale.languageCode),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: ElderColors.clayLavender,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 20.0,
+                            color: ElderColors.textMuted,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24.0),
+
+                    // 3. About Section
+                    ElderCard(
+                      padding: const EdgeInsets.all(20.0),
+                      backgroundColor: ElderColors.surfaceElevated,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n?.aboutAppTitle ?? 'About Nirvana',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: ElderColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4.0),
+                          const SizedBox(height: 6.0),
                           Text(
-                            getLanguageName(currentLocale.languageCode),
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w700,
+                            l10n?.aboutAppVersion ??
+                                'Version 1.0.0 • Compassionate Cognitive Care',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: ElderColors.textSecondary,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 24.0,
-                      color: ElderColors.textMuted,
-                    ),
+                    const SizedBox(height: 32.0),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 16.0),
-
-
-              // (Section 3 removed — Device & Caregiver Portals are now
-              // accessible from the Landing / Portal Selection page.)
-
-              // 4. About Section
-              ElderCard(
-                padding: const EdgeInsets.all(20.0),
-                backgroundColor: ElderColors.surfaceElevated,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n?.aboutAppTitle ?? 'About Nirvana',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: ElderColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 6.0),
-                    Text(
-                      l10n?.aboutAppVersion ??
-                          'Version 1.0.0 • Compassionate Cognitive Care',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: ElderColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24.0),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -330,17 +354,21 @@ class SettingsScreen extends ConsumerWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12.0),
-      child: Container(
+      borderRadius: BorderRadius.circular(16.0),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         constraints: const BoxConstraints(minHeight: 56.0),
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
-          color: isSelected ? ElderColors.primaryContainer : Colors.transparent,
-          borderRadius: BorderRadius.circular(12.0),
+          color: isSelected ? ElderColors.clayLavender.withValues(alpha: 0.12) : ElderColors.surface,
+          borderRadius: BorderRadius.circular(NirvanaRadii.button),
           border: Border.all(
-            color: isSelected ? ElderColors.primary : ElderColors.border,
-            width: isSelected ? 2.5 : 1.5,
+            color: isSelected ? ElderColors.clayLavender : ElderColors.borderLight,
+            width: isSelected ? 2.0 : 1.0,
           ),
+          boxShadow: isSelected
+              ? NirvanaShadows.float(tint: ElderColors.clayLavender)
+              : NirvanaShadows.card(),
         ),
         child: Row(
           children: [
@@ -348,19 +376,17 @@ class SettingsScreen extends ConsumerWidget {
               isSelected
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_off_rounded,
-              color: isSelected ? ElderColors.primary : ElderColors.textMuted,
-              size: 28.0,
+              color: isSelected ? ElderColors.clayLavender : ElderColors.textMuted,
+              size: 26.0,
             ),
-            const SizedBox(width: 12.0),
+            const SizedBox(width: 14.0),
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: 18.0,
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                  color: isSelected
-                      ? ElderColors.onPrimaryContainer
-                      : ElderColors.textPrimary,
+                  color: isSelected ? ElderColors.textPrimary : ElderColors.textSecondary,
                 ),
               ),
             ),

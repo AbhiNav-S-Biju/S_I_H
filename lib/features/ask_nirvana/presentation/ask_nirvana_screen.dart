@@ -218,16 +218,13 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
     final primaryColor = isHighContrast
         ? ElderColors.highContrastPrimary
         : theme.colorScheme.primary;
-    final borderColor = isHighContrast
-        ? ElderColors.borderHighContrast
-        : ElderColors.border;
 
     return Scaffold(
       backgroundColor: isHighContrast
           ? Colors.white
           : theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: ElderColors.surface,
         elevation: 0,
         toolbarHeight: 72.0,
         centerTitle: false,
@@ -278,10 +275,10 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
           const SizedBox(width: 8.0),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(2.0),
+          preferredSize: const Size.fromHeight(1.0),
           child: Container(
-            color: borderColor,
-            height: isHighContrast ? 2.5 : 1.5,
+            color: isHighContrast ? ElderColors.borderHighContrast : ElderColors.borderLight,
+            height: isHighContrast ? 2.0 : 1.0,
           ),
         ),
       ),
@@ -515,15 +512,13 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
               padding: const EdgeInsets.all(18.0),
               decoration: BoxDecoration(
                 color: isHighContrast
-                    ? const Color(0xFFE2E8F0)
+                    ? ElderColors.surfaceElevated
                     : ElderColors.primaryContainer.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(18.0),
-                border: Border.all(
-                  color: isHighContrast
-                      ? ElderColors.borderHighContrast
-                      : ElderColors.primary,
-                  width: 2.0,
-                ),
+                borderRadius: BorderRadius.circular(NirvanaRadii.card),
+                border: isHighContrast
+                    ? Border.all(color: ElderColors.borderHighContrast, width: 2.0)
+                    : null,
+                boxShadow: isHighContrast ? null : NirvanaShadows.float(tint: ElderColors.primary),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -585,7 +580,7 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
 
     if (isUser) {
       bubbleColor = isHighContrast
-          ? const Color(0xFFE2E8F0)
+          ? ElderColors.surfaceElevated
           : ElderColors.primaryContainer;
       textColor = ElderColors.textPrimary;
       borderSide = BorderSide(
@@ -634,8 +629,15 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
               padding: const EdgeInsets.all(18.0),
               decoration: BoxDecoration(
                 color: bubbleColor,
-                borderRadius: BorderRadius.circular(18.0),
-                border: Border.fromBorderSide(borderSide),
+                borderRadius: BorderRadius.circular(NirvanaRadii.card),
+                border: isHighContrast
+                    ? Border.fromBorderSide(borderSide)
+                    : Border.all(color: ElderColors.borderLight, width: 1.0),
+                boxShadow: isHighContrast
+                    ? null
+                    : (isUser
+                        ? NirvanaShadows.float(tint: ElderColors.primary)
+                        : NirvanaShadows.card()),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -888,10 +890,6 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
     required TextScaleOption textScale,
     required AppLocalizations? l10n,
   }) {
-    final borderColor = isHighContrast
-        ? ElderColors.borderHighContrast
-        : ElderColors.border;
-
     return Container(
       padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 12.0),
       color: ElderColors.surface,
@@ -906,11 +904,12 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
                 constraints: const BoxConstraints(minHeight: 56.0),
                 decoration: BoxDecoration(
                   color: ElderColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(14.0),
+                  borderRadius: BorderRadius.circular(NirvanaRadii.button),
                   border: Border.all(
-                    color: borderColor,
-                    width: isHighContrast ? 2.5 : 2.0,
+                    color: isHighContrast ? ElderColors.borderHighContrast : ElderColors.borderLight,
+                    width: isHighContrast ? 2.5 : 1.0,
                   ),
+                  boxShadow: NirvanaShadows.input,
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
@@ -946,22 +945,17 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
               color: isHighContrast
                   ? ElderColors.highContrastPrimary
                   : ElderColors.primary,
-              borderRadius: BorderRadius.circular(14.0),
+              borderRadius: BorderRadius.circular(NirvanaRadii.button),
               child: InkWell(
                 onTap: _handleSendText,
-                borderRadius: BorderRadius.circular(14.0),
+                borderRadius: BorderRadius.circular(NirvanaRadii.button),
                 child: Container(
                   width: 56.0,
                   height: 56.0,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14.0),
-                    border: Border.all(
-                      color: isHighContrast
-                          ? ElderColors.borderHighContrast
-                          : ElderColors.primary,
-                      width: 2.0,
-                    ),
+                    borderRadius: BorderRadius.circular(NirvanaRadii.button),
+                    boxShadow: isHighContrast ? null : NirvanaShadows.float(tint: ElderColors.primary),
                   ),
                   child: const Icon(
                     Icons.send_rounded,

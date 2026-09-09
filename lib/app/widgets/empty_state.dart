@@ -36,16 +36,18 @@ class EmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 84.0,
-              height: 84.0,
-              decoration: const BoxDecoration(
-                color: ElderColors.primaryContainer,
+              width: 96.0,
+              height: 96.0,
+              decoration: BoxDecoration(
+                color: ElderColors.pastelLavender,
                 shape: BoxShape.circle,
+                boxShadow: ElderColors.clayShadow(color: ElderColors.pastelLavender),
+                border: Border.all(color: Colors.white, width: 2.5),
               ),
               child: Icon(
                 icon,
                 size: 48.0,
-                color: ElderColors.onPrimaryContainer,
+                color: ElderColors.primary,
               ),
             ),
             const SizedBox(height: 24.0),
@@ -63,6 +65,7 @@ class EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: ElderColors.textSecondary,
+                height: 1.4,
               ),
             ),
             if (actionLabel != null && onAction != null) ...[
@@ -79,3 +82,4 @@ class EmptyState extends StatelessWidget {
     );
   }
 }
+

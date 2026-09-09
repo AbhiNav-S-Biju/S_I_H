@@ -1,19 +1,21 @@
 // ==============================================================================
 // NIRVANA - Games Hub Screen
-// Description: Accessible activity launcher for Elder Mode
+// Description: Accessible, claymorphic activity launcher for Elder Mode
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../app/providers/accessibility_providers.dart';
+import '../../../app/theme/elder_theme.dart';
+import '../../../app/widgets/widgets.dart';
 import '../../../l10n/app_localizations.dart';
 import '../models/game_enums.dart';
 import '../models/game_session.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../app/providers/accessibility_providers.dart';
 import 'grocery_memory/grocery_memory_screen.dart';
 import 'jigsaw_puzzle/jigsaw_puzzle_screen.dart';
 import 'remember_objects/remember_objects_screen.dart';
 import 'who_is_this/who_is_this_screen.dart';
-import 'widgets/elder_game_button.dart';
 
 class GamesHubScreen extends ConsumerStatefulWidget {
   final ValueChanged<GameSession>? onSessionCompleted;
@@ -43,113 +45,94 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: ElderColors.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: LargeIconButton(
+            icon: Icons.arrow_back_rounded,
+            semanticLabel: 'Back to Home',
+            size: 48,
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/patient/home');
+              }
+            },
+          ),
+        ),
         title: Text(
           l10n?.activitiesTitle ?? 'Daily Activities',
           style: const TextStyle(
-            fontSize: 24.0,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF0F172A),
+            fontSize: 22.0,
+            fontWeight: FontWeight.w900,
+            color: ElderColors.textPrimary,
           ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Welcome & Safety Banner
-            Container(
-              padding: const EdgeInsets.all(18.0),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF0FDF4),
-                borderRadius: BorderRadius.circular(20.0),
-                border: Border.all(color: const Color(0xFFBBF7D0)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.spa_rounded, color: Color(0xFF16A34A), size: 36.0),
-                  const SizedBox(width: 14.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n?.activitiesBannerTitle ?? 'Welcome to Today\'s Fun!',
-                          style: const TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF14532D),
-                          ),
-                        ),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          l10n?.activitiesBannerSubtitle ??
-                              'Choose an enjoyable activity below. Take all the time you like.',
-                          style: const TextStyle(
-                            fontSize: 15.0,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF15803D),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            SupportiveMessage(
+              message: l10n?.activitiesBannerSubtitle ??
+                  'Choose an enjoyable activity below. Take all the time you like at your own pace.',
+              icon: Icons.spa_rounded,
+              backgroundColor: ElderColors.pastelSage,
+              accentColor: ElderColors.forestDeep,
             ),
-            const SizedBox(height: 24.0),
+            const SizedBox(height: 20.0),
 
-            // Difficulty Selector (Pill bar)
+            // Difficulty Selector (Clay pill bar)
             Text(
               l10n?.activityPace ?? 'Activity Pace:',
               style: const TextStyle(
                 fontSize: 18.0,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF334155),
+                fontWeight: FontWeight.w900,
+                color: ElderColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 12.0),
             Row(
               children: GameDifficulty.values.map((diff) {
                 final isSelected = _selectedDifficulty == diff;
                 return Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectedDifficulty = diff;
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(14.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? const Color(0xFF0F766E)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(14.0),
-                          border: Border.all(
-                            color: isSelected
-                                ? const Color(0xFF0F766E)
-                                : const Color(0xFFCBD5E1),
-                            width: 2.0,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          diff.localizedLabel(l10n),
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w700,
-                            color: isSelected
-                                ? Colors.white
-                                : const Color(0xFF334155),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isSelected ? ElderColors.primary : ElderColors.surface,
+                        borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+                        boxShadow: isSelected
+                            ? NirvanaShadows.button(color: ElderColors.primary)
+                            : NirvanaShadows.card(),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectedDifficulty = diff;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 14.0),
+                            child: Text(
+                              diff.localizedLabel(l10n),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w800,
+                                color: isSelected ? Colors.white : ElderColors.textPrimary,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -158,16 +141,16 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 28.0),
+            const SizedBox(height: 24.0),
 
-            // 1. Remember Objects Card
+            // 1. Remember Objects Card (Pastel Sage)
             _buildGameCard(
               title: GameType.rememberObjects.localizedTitle(l10n),
               subtitle: GameType.rememberObjects.localizedSubtitle(l10n),
               emoji: '🍎',
-              badgeColor: const Color(0xFFDCFCE7),
-              textColor: const Color(0xFF166534),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
+              badgeColor: ElderColors.pastelSage,
+              buttonVariant: LargeActionButtonVariant.sage,
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity',
               onPlay: () => _launchGame(
                 RememberObjectsScreen(
                   difficulty: _selectedDifficulty,
@@ -177,14 +160,14 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             ),
             const SizedBox(height: 18.0),
 
-            // 2. Who Is This? Card
+            // 2. Who Is This? Card (Pastel Lavender)
             _buildGameCard(
               title: GameType.whoIsThis.localizedTitle(l10n),
               subtitle: GameType.whoIsThis.localizedSubtitle(l10n),
               emoji: '👵',
-              badgeColor: const Color(0xFFE0F2FE),
-              textColor: const Color(0xFF075985),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
+              badgeColor: ElderColors.pastelLavender,
+              buttonVariant: LargeActionButtonVariant.primary,
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity',
               onPlay: () => _launchGame(
                 WhoIsThisScreen(
                   difficulty: _selectedDifficulty,
@@ -194,14 +177,14 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             ),
             const SizedBox(height: 18.0),
 
-            // 3. Grocery Memory Card
+            // 3. Grocery Memory Card (Pastel Buttercup)
             _buildGameCard(
               title: GameType.groceryMemory.localizedTitle(l10n),
               subtitle: GameType.groceryMemory.localizedSubtitle(l10n),
               emoji: '🛒',
-              badgeColor: const Color(0xFFFEF3C7),
-              textColor: const Color(0xFF92400E),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
+              badgeColor: ElderColors.pastelButtercup,
+              buttonVariant: LargeActionButtonVariant.buttercup,
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity',
               onPlay: () => _launchGame(
                 GroceryMemoryScreen(
                   difficulty: _selectedDifficulty,
@@ -211,14 +194,14 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             ),
             const SizedBox(height: 18.0),
 
-            // 4. Familiar Jigsaw Card
+            // 4. Familiar Jigsaw Card (Pastel Peach)
             _buildGameCard(
               title: GameType.jigsawPuzzle.localizedTitle(l10n),
               subtitle: GameType.jigsawPuzzle.localizedSubtitle(l10n),
               emoji: '🧩',
-              badgeColor: const Color(0xFFF3E8FF),
-              textColor: const Color(0xFF6B21A8),
-              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
+              badgeColor: ElderColors.pastelPeach,
+              buttonVariant: LargeActionButtonVariant.peach,
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity',
               onPlay: () => _launchGame(
                 JigsawPuzzleScreen(
                   difficulty: _selectedDifficulty,
@@ -226,7 +209,7 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 24.0),
+            const SizedBox(height: 28.0),
           ],
         ),
       ),
@@ -238,35 +221,29 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
     required String subtitle,
     required String emoji,
     required Color badgeColor,
-    required Color textColor,
+    required LargeActionButtonVariant buttonVariant,
     required String buttonLabel,
     required VoidCallback onPlay,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22.0),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6.0,
-            offset: Offset(0, 2),
-          ),
-        ],
+        color: ElderColors.surface,
+        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+        boxShadow: NirvanaShadows.card(),
       ),
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(22.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
               Container(
-                width: 60.0,
-                height: 60.0,
+                width: 64.0,
+                height: 64.0,
                 decoration: BoxDecoration(
-                  color: badgeColor,
+                  color: badgeColor.withValues(alpha: 0.18),
                   shape: BoxShape.circle,
+                  boxShadow: NirvanaShadows.float(tint: badgeColor),
                 ),
                 alignment: Alignment.center,
                 child: Text(emoji, style: const TextStyle(fontSize: 32.0)),
@@ -279,9 +256,9 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF0F172A),
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w900,
+                        color: ElderColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4.0),
@@ -290,7 +267,8 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                       style: const TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF64748B),
+                        color: ElderColors.textSecondary,
+                        height: 1.3,
                       ),
                     ),
                   ],
@@ -298,9 +276,10 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18.0),
-          ElderGameButton(
+          const SizedBox(height: 20.0),
+          LargeActionButton(
             label: buttonLabel,
+            variant: buttonVariant,
             icon: Icons.play_arrow_rounded,
             onPressed: onPlay,
           ),
@@ -309,3 +288,4 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
     );
   }
 }
+
