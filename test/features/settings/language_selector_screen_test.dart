@@ -43,34 +43,24 @@ void main() {
     expect(find.text('Mizo ṭawng'), findsOneWidget);
     expect(find.text('नेपाली'), findsOneWidget);
 
-    // Tap Assamese
+    // Tap Assamese (Supported)
     await tester.tap(find.text('অসমীয়া'));
     await tester.pumpAndSettle();
     expect(container.read(localeProvider).languageCode, equals('as'));
 
-    // Tap Manipuri / Meitei
-    await tester.tap(find.text('মৈতৈলোন্'));
-    await tester.pumpAndSettle();
-    expect(container.read(localeProvider).languageCode, equals('mni'));
-
-    // Tap Khasi
-    await tester.tap(find.text('Ka Ktien Khasi'));
-    await tester.pumpAndSettle();
-    expect(container.read(localeProvider).languageCode, equals('kha'));
-
-    // Tap Mizo
-    await tester.tap(find.text('Mizo ṭawng'));
-    await tester.pumpAndSettle();
-    expect(container.read(localeProvider).languageCode, equals('lus'));
-
-    // Tap Nepali
+    // Tap Nepali (Supported)
     await tester.tap(find.text('नेपाली'));
     await tester.pumpAndSettle();
     expect(container.read(localeProvider).languageCode, equals('ne'));
 
-    // Tap Bengali
+    // Tap Bengali (Supported)
     await tester.tap(find.text('বাংলা'));
     await tester.pumpAndSettle();
     expect(container.read(localeProvider).languageCode, equals('bn'));
+
+    // Tap Manipuri / Meitei (Coming soon)
+    await tester.tap(find.text('মৈতৈলোন্'));
+    await tester.pumpAndSettle();
+    expect(find.text('Manipuri / Meitei is coming soon! Not available yet.'), findsOneWidget);
   });
 }

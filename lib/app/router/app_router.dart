@@ -50,7 +50,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation = '/onboarding';
   }
 
-  return GoRouter(
+  final router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
     redirect: (context, state) {
@@ -240,4 +240,35 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  // Attach listener for caregiver push notification tap deep linking
+  final pushService = ref.watch(caregiverPushNotificationServiceProvider);
+  final tapSub = pushService.onNotificationTapped.listen((payload) {
+    debugPrint(
+      '👉 Caregiver notification tapped: ${payload.notificationType} for patient: ${payload.patientId}',
+    );
+    final authState = ref.read(caregiverAuthProvider);
+    if (authState.value != null) {
+      if (payload.patientId != null && payload.patientId!.isNotEmpty) {
+        final assigned = ref.read(assignedPatientsProvider).value;
+        if (assigned != null) {
+          final matched = assigned.where((p) => p.id == payload.patientId);
+          if (matched.isNotEmpty) {
+            ref.read(selectedPatientProvider.notifier).state = matched.first;
+          }
+        }
+      }
+      ref.invalidate(caregiverNotificationsProvider);
+      ref.invalidate(caregiverNotificationsStreamProvider);
+      router.go('/caregiver/dashboard');
+    } else {
+      router.go('/caregiver/login');
+    }
+  });
+
+  ref.onDispose(() {
+    tapSub.cancel();
+  });
+
+  return router;
 });

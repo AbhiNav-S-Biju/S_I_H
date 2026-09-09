@@ -4,11 +4,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nirvana/features/games/games.dart';
 import 'package:nirvana/main.dart';
 
+import 'package:nirvana/l10n/app_localizations.dart';
+
 void main() {
   testWidgets('App smoke test launches GamesHubScreen directly', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: GamesHubScreen()));
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: GamesHubScreen(),
+        ),
+      ),
+    );
 
     expect(find.text('Daily Activities'), findsOneWidget);
   });

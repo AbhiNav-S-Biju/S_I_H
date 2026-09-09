@@ -90,7 +90,9 @@ class NotificationService {
     if (_timeZoneInitialized) return;
     try {
       tz.initializeTimeZones();
-      tz.setLocalLocation(tz.getLocation('UTC'));
+      try {
+        tz.setLocalLocation(tz.getLocation('UTC'));
+      } catch (_) {}
       _timeZoneInitialized = true;
     } catch (_) {}
   }
@@ -110,7 +112,18 @@ class NotificationService {
     try {
       tzDateTime = tz.TZDateTime.from(targetTime, tz.local);
     } catch (_) {
-      tzDateTime = tz.TZDateTime.from(targetTime, tz.UTC);
+      try {
+        tzDateTime = tz.TZDateTime.from(targetTime, tz.UTC);
+      } catch (_) {
+        tzDateTime = tz.TZDateTime.utc(
+          targetTime.year,
+          targetTime.month,
+          targetTime.day,
+          targetTime.hour,
+          targetTime.minute,
+          targetTime.second,
+        );
+      }
     }
 
     final androidDetails = AndroidNotificationDetails(
