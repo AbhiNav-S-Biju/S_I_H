@@ -26,46 +26,51 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
       children: [
         // Header
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.notifications_active_rounded,
-                  size: 22,
-                  color: ElderColors.clayLavender,
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Recent Alerts & Activity',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: ElderColors.textPrimary,
+            Expanded(
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.notifications_active_rounded,
+                    size: 22,
+                    color: ElderColors.clayLavender,
                   ),
-                ),
-                if (unreadCount > 0) ...[
                   const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ElderColors.clayPeach,
-                      borderRadius: BorderRadius.circular(NirvanaRadii.pill),
-                    ),
+                  const Flexible(
                     child: Text(
-                      '$unreadCount NEW',
-                      style: const TextStyle(
-                        fontSize: 11,
+                      'Recent Alerts & Activities',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: ElderColors.textPrimary,
                       ),
                     ),
                   ),
+                  if (unreadCount > 0) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: ElderColors.clayPeach,
+                        borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+                      ),
+                      child: Text(
+                        '$unreadCount NEW',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
             if (unreadCount > 0 && caregiver != null)
               TextButton.icon(
@@ -96,7 +101,10 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
           data: (notifications) {
             if (notifications.isEmpty) {
               return ElderCard(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 20,
+                ),
                 child: Center(
                   child: Column(
                     children: [
@@ -114,7 +122,7 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        'No new alerts',
+                        'No recent alerts',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -123,9 +131,12 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       const Text(
-                        'Activity notifications and adherence updates will appear here in real time.',
+                        'Everything looks good.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: ElderColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: ElderColors.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -141,10 +152,8 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: displayList.length,
-                separatorBuilder: (_, __) => const Divider(
-                  height: 1,
-                  color: Color(0xFFF1EDE6),
-                ),
+                separatorBuilder: (_, __) =>
+                    const Divider(height: 1, color: Color(0xFFF1EDE6)),
                 itemBuilder: (context, index) {
                   final notification = displayList[index];
                   return _NotificationTile(notification: notification);
@@ -167,12 +176,18 @@ class CaregiverNotificationsPanel extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline_rounded, color: Color(0xFFC2410C)),
+                const Icon(
+                  Icons.error_outline_rounded,
+                  color: Color(0xFFC2410C),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Failed to load notifications: $e',
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF9A3412)),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF9A3412),
+                    ),
                   ),
                 ),
               ],
@@ -205,7 +220,9 @@ class _NotificationTile extends ConsumerWidget {
         if (notification.relatedReminderId != null && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Viewing reminder related to "${notification.title}"'),
+              content: Text(
+                'Viewing reminder related to "${notification.title}"',
+              ),
               backgroundColor: ElderColors.clayLavender,
               duration: const Duration(seconds: 2),
             ),
@@ -278,8 +295,9 @@ class _NotificationTile extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 11,
                           color: ElderColors.textMuted,
-                          fontWeight:
-                              isUnread ? FontWeight.w700 : FontWeight.normal,
+                          fontWeight: isUnread
+                              ? FontWeight.w700
+                              : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -400,7 +418,9 @@ class _NotificationTile extends ConsumerWidget {
       return '${difference.inHours}h ago';
     } else if (difference.inDays == 1) {
       final local = dateTime.toLocal();
-      final h = local.hour > 12 ? local.hour - 12 : (local.hour == 0 ? 12 : local.hour);
+      final h = local.hour > 12
+          ? local.hour - 12
+          : (local.hour == 0 ? 12 : local.hour);
       final p = local.hour >= 12 ? 'PM' : 'AM';
       final m = local.minute.toString().padLeft(2, '0');
       return 'Yesterday $h:$m $p';

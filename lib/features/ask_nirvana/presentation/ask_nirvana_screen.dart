@@ -242,6 +242,8 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
         ),
         title: Text(
           l10n?.askNirvanaTitle ?? 'Ask NIRVANA',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w900,
             color: primaryColor,
@@ -278,7 +280,9 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
           child: Container(
-            color: isHighContrast ? ElderColors.borderHighContrast : ElderColors.borderLight,
+            color: isHighContrast
+                ? ElderColors.borderHighContrast
+                : ElderColors.borderLight,
             height: isHighContrast ? 2.0 : 1.0,
           ),
         ),
@@ -519,9 +523,14 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
                     : ElderColors.primaryContainer.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(NirvanaRadii.card),
                 border: isHighContrast
-                    ? Border.all(color: ElderColors.borderHighContrast, width: 2.0)
+                    ? Border.all(
+                        color: ElderColors.borderHighContrast,
+                        width: 2.0,
+                      )
                     : null,
-                boxShadow: isHighContrast ? null : NirvanaShadows.float(tint: ElderColors.primary),
+                boxShadow: isHighContrast
+                    ? null
+                    : NirvanaShadows.float(tint: ElderColors.primary),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -639,8 +648,8 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
                 boxShadow: isHighContrast
                     ? null
                     : (isUser
-                        ? NirvanaShadows.float(tint: ElderColors.primary)
-                        : NirvanaShadows.card()),
+                          ? NirvanaShadows.float(tint: ElderColors.primary)
+                          : NirvanaShadows.card()),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -909,7 +918,9 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
                   color: ElderColors.surfaceElevated,
                   borderRadius: BorderRadius.circular(NirvanaRadii.button),
                   border: Border.all(
-                    color: isHighContrast ? ElderColors.borderHighContrast : ElderColors.borderLight,
+                    color: isHighContrast
+                        ? ElderColors.borderHighContrast
+                        : ElderColors.borderLight,
                     width: isHighContrast ? 2.5 : 1.0,
                   ),
                   boxShadow: NirvanaShadows.input,
@@ -958,7 +969,9 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(NirvanaRadii.button),
-                    boxShadow: isHighContrast ? null : NirvanaShadows.float(tint: ElderColors.primary),
+                    boxShadow: isHighContrast
+                        ? null
+                        : NirvanaShadows.float(tint: ElderColors.primary),
                   ),
                   child: const Icon(
                     Icons.send_rounded,

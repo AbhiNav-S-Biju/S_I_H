@@ -12,20 +12,43 @@ import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
-import 'widgets/activity_summary_cards.dart';
-import 'widgets/caregiver_notifications_panel.dart';
-import 'widgets/game_history_list.dart';
-import 'widgets/patient_device_panel.dart';
-import 'widgets/patient_selector_widget.dart';
-import 'widgets/reminder_status_list.dart';
-import 'widgets/seven_day_activity_chart.dart';
-import 'widgets/sync_status_card.dart';
+import 'caregiver_dashboard_pages.dart';
+import 'widgets/caregiver_bottom_navigation.dart';
 
-class CaregiverDashboardScreen extends ConsumerWidget {
+class CaregiverDashboardScreen extends ConsumerStatefulWidget {
   const CaregiverDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CaregiverDashboardScreen> createState() =>
+      _CaregiverDashboardScreenState();
+}
+
+class _CaregiverDashboardScreenState
+    extends ConsumerState<CaregiverDashboardScreen> {
+  int _selectedIndex = 0;
+
+  static const _titles = [
+    'Caregiver Dashboard',
+    'Recent Alerts & Activities',
+    'Reminder Status & Recent Activity',
+  ];
+
+  void _refreshData() {
+    ref.invalidate(assignedPatientsProvider);
+    ref.invalidate(caregiverNotificationsProvider);
+    ref.invalidate(selectedPatientGameHistoryProvider);
+    ref.invalidate(selectedPatientRemindersProvider);
+    ref.invalidate(selectedPatientSevenDayActivityProvider);
+    ref.invalidate(caregiverSyncStatusProvider);
+  }
+
+  Future<void> _logout() async {
+    await ref.read(caregiverAuthProvider.notifier).logout();
+    if (mounted) context.go('/');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(caregiverAuthProvider);
     final caregiver = authState.value;
     final unreadCount = ref.watch(unreadCaregiverNotificationsCountProvider);
@@ -38,7 +61,10 @@ class CaregiverDashboardScreen extends ConsumerWidget {
           children: [
             // Top Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 children: [
                   LargeIconButton(
@@ -60,8 +86,8 @@ class CaregiverDashboardScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Caregiver Dashboard',
+                        Text(
+                          _titles[_selectedIndex],
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w900,
@@ -132,14 +158,7 @@ class CaregiverDashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     tooltip: 'Refresh Data',
-                    onPressed: () {
-                      ref.invalidate(assignedPatientsProvider);
-                      ref.invalidate(caregiverNotificationsProvider);
-                      ref.invalidate(selectedPatientGameHistoryProvider);
-                      ref.invalidate(selectedPatientRemindersProvider);
-                      ref.invalidate(selectedPatientSevenDayActivityProvider);
-                      ref.invalidate(caregiverSyncStatusProvider);
-                    },
+                    onPressed: _refreshData,
                   ),
                   // Sign Out Action
                   IconButton(
@@ -163,91 +182,29 @@ class CaregiverDashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     tooltip: 'Sign Out',
-                    onPressed: () async {
-                      await ref.read(caregiverAuthProvider.notifier).logout();
-                      if (context.mounted) {
-                        context.go('/');
-                      }
-                    },
+                    onPressed: _logout,
                   ),
                 ],
               ),
             ),
 
-            // Content List
             Expanded(
-              child: RefreshIndicator(
-                color: ElderColors.clayLavender,
-                onRefresh: () async {
-                  ref.invalidate(assignedPatientsProvider);
-                  ref.invalidate(caregiverNotificationsProvider);
-                  ref.invalidate(selectedPatientGameHistoryProvider);
-                  ref.invalidate(selectedPatientRemindersProvider);
-                  ref.invalidate(selectedPatientSevenDayActivityProvider);
-                  ref.invalidate(caregiverSyncStatusProvider);
-                },
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 8.0,
-                  ),
-                  children: const [
-                    // 1. Patient Selector
-                    PatientSelectorWidget(),
-                    SizedBox(height: 14),
-
-                    // 2. Sync Status Card
-                    SyncStatusCard(),
-                    SizedBox(height: 14),
-
-                    // 3. Patient Device Status & Pairing
-                    PatientDevicePanel(),
-                    SizedBox(height: 18),
-
-                    // 4. Live Event Alerts Feed
-                    CaregiverNotificationsPanel(),
-                    SizedBox(height: 18),
-
-                    // 5. Activity Summary Metrics
-                    ActivitySummaryCards(),
-                    SizedBox(height: 18),
-
-                    // 6. 7-Day Activity View
-                    SevenDayActivityChart(),
-                    SizedBox(height: 20),
-
-                    // 7. Reminder Status Section
-                    Text(
-                      'Reminder Status',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: ElderColors.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    ReminderStatusList(),
-                    SizedBox(height: 24),
-
-                    // 8. Recent Activity / Game History Section
-                    Text(
-                      'Recent Activity',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: ElderColors.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    GameHistoryList(),
-                    SizedBox(height: 36),
-                  ],
-                ),
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: const [
+                  CaregiverHomePage(),
+                  CaregiverAlertsPage(),
+                  CaregiverRemindersPage(),
+                ],
               ),
             ),
           ],
         ),
       ),
+      ),
+      bottomNavigationBar: CaregiverBottomNavigation(
+        selectedIndex: _selectedIndex,
+        onSelected: (index) => setState(() => _selectedIndex = index),
       ),
     );
   }

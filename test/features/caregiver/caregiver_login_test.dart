@@ -100,9 +100,7 @@ class FailingMockCaregiverRepository implements ICaregiverRepository {
 void main() {
   Widget createTestWidget({required ICaregiverRepository repository}) {
     return ProviderScope(
-      overrides: [
-        caregiverRepositoryProvider.overrideWithValue(repository),
-      ],
+      overrides: [caregiverRepositoryProvider.overrideWithValue(repository)],
       child: MaterialApp(
         theme: ElderTheme.buildStandardTheme(),
         home: const CaregiverLoginScreen(),
@@ -115,7 +113,10 @@ void main() {
       'Displays validation error when submitting with empty email or password',
       (WidgetTester tester) async {
         final repo = FailingMockCaregiverRepository(
-          errorToThrow: const AuthException('Invalid login credentials', statusCode: '400'),
+          errorToThrow: const AuthException(
+            'Invalid login credentials',
+            statusCode: '400',
+          ),
         );
 
         await tester.pumpWidget(createTestWidget(repository: repo));
@@ -140,27 +141,29 @@ void main() {
       },
     );
 
-    testWidgets(
-      'Displays validation error for invalid email format',
-      (WidgetTester tester) async {
-        final repo = FailingMockCaregiverRepository(
-          errorToThrow: const AuthException('Invalid login credentials', statusCode: '400'),
-        );
+    testWidgets('Displays validation error for invalid email format', (
+      WidgetTester tester,
+    ) async {
+      final repo = FailingMockCaregiverRepository(
+        errorToThrow: const AuthException(
+          'Invalid login credentials',
+          statusCode: '400',
+        ),
+      );
 
-        await tester.pumpWidget(createTestWidget(repository: repo));
-        await tester.pump();
+      await tester.pumpWidget(createTestWidget(repository: repo));
+      await tester.pump();
 
-        final emailField = find.widgetWithText(TextFormField, 'Email Address');
-        await tester.enterText(emailField, 'notanemail');
-        await tester.pump();
+      final emailField = find.widgetWithText(TextFormField, 'Email Address');
+      await tester.enterText(emailField, 'notanemail');
+      await tester.pump();
 
-        final signInBtn = find.text('Sign In to Dashboard');
-        await tester.tap(signInBtn);
-        await tester.pump();
+      final signInBtn = find.text('Sign In to Dashboard');
+      await tester.tap(signInBtn);
+      await tester.pump();
 
-        expect(find.text('Please enter a valid email address'), findsOneWidget);
-      },
-    );
+      expect(find.text('Please enter a valid email address'), findsOneWidget);
+    });
 
     testWidgets(
       'Catches AuthException (Invalid login credentials) and displays friendly banner without crashing',
@@ -176,13 +179,24 @@ void main() {
         await tester.pumpWidget(createTestWidget(repository: repo));
         await tester.pump();
 
-        // Tap Sign In with validly formatted text
+        // Submit validly formatted test input so the repository error is reached.
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Email Address'),
+          'caregiver@example.com',
+        );
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Password'),
+          'test-password',
+        );
         final signInBtn = find.text('Sign In to Dashboard');
         await tester.tap(signInBtn);
         await tester.pump();
 
         // Verify the friendly error banner is shown and no unhandled exception occurred
-        expect(find.textContaining('Invalid email or password'), findsOneWidget);
+        expect(
+          find.textContaining('Invalid email or password'),
+          findsOneWidget,
+        );
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
       },
     );

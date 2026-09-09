@@ -224,7 +224,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     ),
                                   ),
                                   value: isHighContrast,
-                                  activeThumbColor: ElderColors.primary,
+                                  activeColor: ElderColors.primary,
                                   onChanged: (val) {
                                     ref
                                         .read(highContrastProvider.notifier)

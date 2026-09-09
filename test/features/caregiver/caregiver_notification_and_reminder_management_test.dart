@@ -77,14 +77,7 @@ class MockCaregiverRepository implements ICaregiverRepository {
   final List<CaregiverReminderRecord> reminders = [];
 
   @override
-  Future<CaregiverProfile?> getCurrentCaregiver() async => const CaregiverProfile(
-        id: 'cg-1',
-        email: 'caregiver@test.com',
-        fullName: 'Jane Caregiver',
-      );
-
-  @override
-  Future<CaregiverProfile> login({required String email, required String password}) async =>
+  Future<CaregiverProfile?> getCurrentCaregiver() async =>
       const CaregiverProfile(
         id: 'cg-1',
         email: 'caregiver@test.com',
@@ -92,13 +85,22 @@ class MockCaregiverRepository implements ICaregiverRepository {
       );
 
   @override
+  Future<CaregiverProfile> login({
+    required String email,
+    required String password,
+  }) async => const CaregiverProfile(
+    id: 'cg-1',
+    email: 'caregiver@test.com',
+    fullName: 'Jane Caregiver',
+  );
+
+  @override
   Future<CaregiverProfile> register({
     required String email,
     required String password,
     required String fullName,
     String? phone,
-  }) async =>
-      CaregiverProfile(id: 'cg-1', email: email, fullName: fullName);
+  }) async => CaregiverProfile(id: 'cg-1', email: email, fullName: fullName);
 
   @override
   Future<void> logout() async {}
@@ -107,16 +109,16 @@ class MockCaregiverRepository implements ICaregiverRepository {
   Future<PatientSummary> createPatient({
     required CreatePatientInput input,
     String? caregiverId,
-  }) async =>
-      PatientSummary(
-        id: 'p-1',
-        fullName: input.fullName,
-        relationship: input.relationship,
-        primaryCaregiverId: caregiverId ?? 'cg-1',
-      );
+  }) async => PatientSummary(
+    id: 'p-1',
+    fullName: input.fullName,
+    relationship: input.relationship,
+    primaryCaregiverId: caregiverId ?? 'cg-1',
+  );
 
   @override
-  Future<List<PatientSummary>> getAssignedPatients(String caregiverId) async => [
+  Future<List<PatientSummary>> getAssignedPatients(String caregiverId) async =>
+      [
         const PatientSummary(
           id: 'p-1',
           fullName: 'Eleanor Vance',
@@ -127,11 +129,13 @@ class MockCaregiverRepository implements ICaregiverRepository {
       ];
 
   @override
-  Future<List<CaregiverGameRecord>> getGameHistory(String patientId) async => [];
+  Future<List<CaregiverGameRecord>> getGameHistory(String patientId) async =>
+      [];
 
   @override
-  Future<List<CaregiverReminderRecord>> getReminderStatus(String patientId) async =>
-      reminders;
+  Future<List<CaregiverReminderRecord>> getReminderStatus(
+    String patientId,
+  ) async => reminders;
 
   @override
   Future<CaregiverReminderRecord> createReminder(
@@ -193,7 +197,9 @@ class MockCaregiverRepository implements ICaregiverRepository {
   }
 
   @override
-  Future<List<DailyActivitySummary>> getSevenDayActivity(String patientId) async => [];
+  Future<List<DailyActivitySummary>> getSevenDayActivity(
+    String patientId,
+  ) async => [];
 
   @override
   Future<CaregiverSyncInfo> getSyncStatus(String patientId) async =>
@@ -353,32 +359,37 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            caregiverAuthProvider.overrideWith((ref) => CaregiverAuthNotifier(MockCaregiverRepository())
-              ..state = const AsyncValue.data(
-                CaregiverProfile(
-                  id: 'cg-1',
-                  email: 'caregiver@test.com',
-                  fullName: 'Jane Caregiver',
-                ),
-              )),
-            caregiverNotificationRepositoryProvider.overrideWithValue(notifRepo),
+            caregiverAuthProvider.overrideWith(
+              (ref) =>
+                  CaregiverAuthNotifier(MockCaregiverRepository())
+                    ..state = const AsyncValue.data(
+                      CaregiverProfile(
+                        id: 'cg-1',
+                        email: 'caregiver@test.com',
+                        fullName: 'Jane Caregiver',
+                      ),
+                    ),
+            ),
+            caregiverNotificationRepositoryProvider.overrideWithValue(
+              notifRepo,
+            ),
           ],
           child: const MaterialApp(
             home: Scaffold(
-              body: SingleChildScrollView(
-                child: CaregiverNotificationsPanel(),
-              ),
+              body: SingleChildScrollView(child: CaregiverNotificationsPanel()),
             ),
           ),
         ),
       );
 
       await tester.pumpAndSettle();
-      expect(find.text('Recent Alerts & Activity'), findsOneWidget);
-      expect(find.text('No new alerts'), findsOneWidget);
+      expect(find.text('Recent Alerts & Activities'), findsOneWidget);
+      expect(find.text('No recent alerts'), findsOneWidget);
     });
 
-    testWidgets('renders notifications and allows mark all read', (tester) async {
+    testWidgets('renders notifications and allows mark all read', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -412,21 +423,24 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            caregiverAuthProvider.overrideWith((ref) => CaregiverAuthNotifier(MockCaregiverRepository())
-              ..state = const AsyncValue.data(
-                CaregiverProfile(
-                  id: 'cg-1',
-                  email: 'caregiver@test.com',
-                  fullName: 'Jane Caregiver',
-                ),
-              )),
-            caregiverNotificationRepositoryProvider.overrideWithValue(notifRepo),
+            caregiverAuthProvider.overrideWith(
+              (ref) =>
+                  CaregiverAuthNotifier(MockCaregiverRepository())
+                    ..state = const AsyncValue.data(
+                      CaregiverProfile(
+                        id: 'cg-1',
+                        email: 'caregiver@test.com',
+                        fullName: 'Jane Caregiver',
+                      ),
+                    ),
+            ),
+            caregiverNotificationRepositoryProvider.overrideWithValue(
+              notifRepo,
+            ),
           ],
           child: const MaterialApp(
             home: Scaffold(
-              body: SingleChildScrollView(
-                child: CaregiverNotificationsPanel(),
-              ),
+              body: SingleChildScrollView(child: CaregiverNotificationsPanel()),
             ),
           ),
         ),
@@ -434,7 +448,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Recent Alerts & Activity'), findsOneWidget);
+      expect(find.text('Recent Alerts & Activities'), findsOneWidget);
       expect(find.text('2 NEW'), findsOneWidget);
       expect(find.text('Reminder Completed'), findsOneWidget);
       expect(find.text('Activity Completed'), findsOneWidget);
@@ -448,7 +462,9 @@ void main() {
   });
 
   group('Caregiver Reminder Status & Edit Flow Tests', () {
-    testWidgets('renders reminder list and opens edit sheet on tap', (tester) async {
+    testWidgets('renders reminder list and opens edit sheet on tap', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -463,7 +479,15 @@ void main() {
           reminderType: 'medication',
           scheduleTime: '08:30',
           scheduledAt: DateTime(2026, 9, 9, 8, 30),
-          recurrenceDays: const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+          recurrenceDays: const [
+            'mon',
+            'tue',
+            'wed',
+            'thu',
+            'fri',
+            'sat',
+            'sun',
+          ],
           isActive: true,
           isCompleted: false,
           status: 'pending',
@@ -486,9 +510,7 @@ void main() {
           ],
           child: const MaterialApp(
             home: Scaffold(
-              body: SingleChildScrollView(
-                child: ReminderStatusList(),
-              ),
+              body: SingleChildScrollView(child: ReminderStatusList()),
             ),
           ),
         ),

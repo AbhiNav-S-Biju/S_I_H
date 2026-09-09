@@ -121,7 +121,6 @@ class MockCaregiverRepository implements ICaregiverRepository {
   @override
   Future<void> deleteReminder(String reminderId) async {}
 
-
   @override
   Future<List<DailyActivitySummary>> getSevenDayActivity(
     String patientId,
@@ -166,9 +165,7 @@ void main() {
         caregiverRepositoryProvider.overrideWithValue(
           MockCaregiverRepository(),
         ),
-        pairingRepositoryProvider.overrideWithValue(
-          MockPairingRepository(),
-        ),
+        pairingRepositoryProvider.overrideWithValue(MockPairingRepository()),
       ],
       child: Consumer(
         builder: (context, ref, _) {
@@ -185,27 +182,28 @@ void main() {
   }
 
   group('Caregiver GoRouter Navigation Tests', () {
-    testWidgets('Test 1: First launch -> Landing -> Patient Portal -> Welcome Screen', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestApp(onboardingCompleted: false));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Test 1: First launch -> Landing -> Patient Portal -> Welcome Screen',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestApp(onboardingCompleted: false));
+        await tester.pumpAndSettle();
 
-      // Starts at Landing Screen
-      expect(find.text('Welcome to NIRVANA'), findsOneWidget);
-      expect(find.text('Enter Patient Portal'), findsOneWidget);
-      expect(find.text('Enter Caregiver Portal'), findsOneWidget);
+        // Starts at Landing Screen
+        expect(find.text('Welcome to NIRVANA'), findsOneWidget);
+        expect(find.text('Enter Patient Portal'), findsOneWidget);
+        expect(find.text('Enter Caregiver Portal'), findsOneWidget);
 
-      // Tap Enter Patient Portal -> Goes to Patient Welcome (device not paired)
-      final patientBtn = find.text('Enter Patient Portal');
-      await tester.ensureVisible(patientBtn);
-      await tester.tap(patientBtn);
-      await tester.pumpAndSettle();
+        // Tap Enter Patient Portal -> Goes to Patient Welcome (device not paired)
+        final patientBtn = find.text('Enter Patient Portal');
+        await tester.ensureVisible(patientBtn);
+        await tester.tap(patientBtn);
+        await tester.pumpAndSettle();
 
-      // Verified Patient Welcome Screen
-      expect(find.text("Let's connect this device"), findsOneWidget);
-      expect(find.text('NIRVANA'), findsOneWidget);
-    });
+        // Verified Patient Welcome Screen
+        expect(find.text("Let's connect this device"), findsOneWidget);
+        expect(find.text('NIRVANA'), findsOneWidget);
+      },
+    );
 
     testWidgets('Test 2: Landing -> Caregiver Portal -> Caregiver Login', (
       WidgetTester tester,
@@ -244,6 +242,14 @@ void main() {
       // Tap Sign In to Dashboard
       final signInButton = find.text('Sign In to Dashboard');
       await tester.ensureVisible(signInButton);
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Email Address'),
+        'caregiver@example.com',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Password'),
+        'test-password',
+      );
       await tester.tap(signInButton);
       await tester.pumpAndSettle();
 
@@ -265,6 +271,14 @@ void main() {
       await tester.tap(caregiverBtn);
       await tester.pumpAndSettle();
 
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Email Address'),
+        'caregiver@example.com',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Password'),
+        'test-password',
+      );
       await tester.tap(find.text('Sign In to Dashboard'));
       await tester.pumpAndSettle();
 

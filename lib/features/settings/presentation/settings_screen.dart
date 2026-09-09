@@ -108,7 +108,7 @@ class SettingsScreen extends ConsumerWidget {
                       child: SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         value: reducedMotion,
-                        activeThumbColor: ElderColors.claySage,
+                        activeColor: ElderColors.claySage,
                         activeTrackColor: ElderColors.claySage.withValues(alpha: 0.4),
                         title: Text(
                           l10n?.reducedMotionTitle ?? 'Reduced Motion',
@@ -142,7 +142,7 @@ class SettingsScreen extends ConsumerWidget {
                       child: SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         value: highContrast,
-                        activeThumbColor: ElderColors.clayLavender,
+                        activeColor: ElderColors.clayLavender,
                         activeTrackColor: ElderColors.clayLavender.withValues(alpha: 0.4),
                         title: Text(
                           l10n?.highContrastTitle ?? 'High Contrast Mode',
@@ -176,7 +176,7 @@ class SettingsScreen extends ConsumerWidget {
                       child: SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         value: voiceEnabled,
-                        activeThumbColor: ElderColors.clayButtercup,
+                        activeColor: ElderColors.clayButtercup,
                         activeTrackColor: ElderColors.clayButtercup.withValues(alpha: 0.4),
                         title: Text(
                           'Voice Assistance & Prompts',

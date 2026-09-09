@@ -48,7 +48,8 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
   void initState() {
     super.initState();
     final effectiveDifficulty = widget.level?.difficulty ?? widget.difficulty;
-    final effectiveImage = (widget.level?.config['image'] as PuzzleImage?) ?? widget.initialImage;
+    final effectiveImage =
+        (widget.level?.config['image'] as PuzzleImage?) ?? widget.initialImage;
 
     _controller = JigsawPuzzleController(
       initialDifficulty: effectiveDifficulty,
@@ -65,10 +66,9 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
         final locale = ref.read(localeProvider);
         final prompt = _controller.state.voicePrompt;
         if (prompt != null && prompt.isNotEmpty) {
-          ref.read(audioServiceProvider).speak(
-                prompt,
-                languageCode: locale.languageCode,
-              );
+          ref
+              .read(audioServiceProvider)
+              .speak(prompt, languageCode: locale.languageCode);
         }
       }
     });
@@ -78,10 +78,9 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
     final voiceEnabled = ref.read(voiceEnabledProvider);
     if (voiceEnabled) {
       final locale = ref.read(localeProvider);
-      ref.read(audioServiceProvider).speak(
-            text,
-            languageCode: locale.languageCode,
-          );
+      ref
+          .read(audioServiceProvider)
+          .speak(text, languageCode: locale.languageCode);
     }
   }
 
@@ -193,7 +192,8 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
     final boardWidth = (screenWidth - 40.0).clamp(280.0, 420.0);
     final boardHeight = boardWidth * 0.75; // 4:3 aspect ratio
 
-    final promptText = state.voicePrompt ??
+    final promptText =
+        state.voicePrompt ??
         (langCode == 'hi'
             ? 'तस्वीर को पूरा करने के लिए टुकड़ों को सही जगह रखें'
             : 'Match the pieces to complete this familiar picture');
@@ -303,26 +303,31 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
 
                   // 4. Dementia-Friendly Tray Area
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        langCode == 'hi'
-                          ? 'टुकड़े (${state.trayPieces.length} बचे हैं):'
-                          : 'Pieces to place (${state.trayPieces.length} remaining):',
-                        style: const TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF334155),
+                      Expanded(
+                        child: Text(
+                          langCode == 'hi'
+                              ? 'टुकड़े (${state.trayPieces.length} बचे हैं):'
+                              : 'Pieces to place (${state.trayPieces.length} remaining):',
+                          style: const TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF334155),
+                          ),
                         ),
                       ),
-                      Text(
-                        langCode == 'hi'
-                          ? 'खींचें या टैप करें'
-                          : 'Drag or Tap to place',
-                        style: const TextStyle(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF64748B),
+                      const SizedBox(width: 8.0),
+                      Flexible(
+                        child: Text(
+                          langCode == 'hi'
+                              ? 'खींचें या टैप करें'
+                              : 'Drag or Tap to place',
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF64748B),
+                          ),
                         ),
                       ),
                     ],
@@ -474,10 +479,7 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
               ),
             ),
           ),
-          childWhenDragging: Opacity(
-            opacity: 0.35,
-            child: pieceWidget,
-          ),
+          childWhenDragging: Opacity(opacity: 0.35, child: pieceWidget),
           child: pieceWidget,
         );
       }).toList(),
@@ -492,17 +494,17 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
     final isCalmer = suggestion == GameDifficulty.easy;
     final bannerTitle = isCalmer
         ? (langCode == 'hi'
-            ? 'क्या आप आसान गति आज़माना चाहते हैं?'
-            : 'Would you like a calmer pace?')
+              ? 'क्या आप आसान गति आज़माना चाहते हैं?'
+              : 'Would you like a calmer pace?')
         : (langCode == 'hi'
-            ? 'शानदार प्रगति! अगली चुनौती आज़माएँ?'
-            : 'Wonderful focus! Try more pieces next?');
+              ? 'शानदार प्रगति! अगली चुनौती आज़माएँ?'
+              : 'Wonderful focus! Try more pieces next?');
 
     final actionLabel = isCalmer
         ? (langCode == 'hi' ? 'शांत गति (2 टुकड़े)' : 'Try 2 Pieces')
         : (suggestion == GameDifficulty.medium
-            ? (langCode == 'hi' ? '4 टुकड़े आज़माएँ' : 'Try 4 Pieces')
-            : (langCode == 'hi' ? '6 टुकड़े आज़माएँ' : 'Try 6 Pieces'));
+              ? (langCode == 'hi' ? '4 टुकड़े आज़माएँ' : 'Try 4 Pieces')
+              : (langCode == 'hi' ? '6 टुकड़े आज़माएँ' : 'Try 6 Pieces'));
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -514,11 +516,7 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.spa_rounded,
-            color: Color(0xFFD97706),
-            size: 28.0,
-          ),
+          const Icon(Icons.spa_rounded, color: Color(0xFFD97706), size: 28.0),
           const SizedBox(width: 10.0),
           Expanded(
             child: Text(

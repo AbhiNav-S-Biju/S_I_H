@@ -54,12 +54,12 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
         final items = _controller.state.shoppingList
             .map((e) => e.localizedName(locale.languageCode))
             .join(', ');
-        final prompt = l10n?.shoppingListSubtitle ??
+        final prompt =
+            l10n?.shoppingListSubtitle ??
             'Review these items, then tap Start Shopping when ready.';
-        ref.read(audioServiceProvider).speak(
-              '$prompt $items',
-              languageCode: locale.languageCode,
-            );
+        ref
+            .read(audioServiceProvider)
+            .speak('$prompt $items', languageCode: locale.languageCode);
       }
     });
   }
@@ -71,12 +71,12 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
       if (voiceEnabled) {
         final locale = ref.read(localeProvider);
         final l10n = AppLocalizations.of(context);
-        final prompt = l10n?.findItemsOnShelf ??
+        final prompt =
+            l10n?.findItemsOnShelf ??
             'Tap items from your list to put them in your cart.';
-        ref.read(audioServiceProvider).speak(
-              prompt,
-              languageCode: locale.languageCode,
-            );
+        ref
+            .read(audioServiceProvider)
+            .speak(prompt, languageCode: locale.languageCode);
       }
     });
   }
@@ -153,13 +153,14 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                           _controller.state.hintHighlightedItemId;
                       final hintItem = hintTargetId != null
                           ? _controller.state.shoppingList
-                              .where((e) => e.id == hintTargetId)
-                              .firstOrNull
+                                .where((e) => e.id == hintTargetId)
+                                .firstOrNull
                           : null;
                       final String hintText;
                       if (hintItem != null) {
-                        final name =
-                            hintItem.localizedName(locale.languageCode);
+                        final name = hintItem.localizedName(
+                          locale.languageCode,
+                        );
                         switch (locale.languageCode) {
                           case 'hi':
                             hintText = 'संकेत: शेल्फ़ पर $name खोजें!';
@@ -195,10 +196,9 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                                 'Your basket contains all items from the list!';
                         }
                       }
-                      ref.read(audioServiceProvider).speak(
-                            hintText,
-                            languageCode: locale.languageCode,
-                          );
+                      ref
+                          .read(audioServiceProvider)
+                          .speak(hintText, languageCode: locale.languageCode);
                     }
                   }
                 : null,
@@ -385,11 +385,13 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
             feedbackText = 'Hint: Look for the $name on the shelf!';
         }
       } else {
-        feedbackText = l10n?.findItemsOnShelf ??
+        feedbackText =
+            l10n?.findItemsOnShelf ??
             'Tap items from your list to put them in your cart:';
       }
     } else {
-      feedbackText = l10n?.findItemsOnShelf ??
+      feedbackText =
+          l10n?.findItemsOnShelf ??
           'Tap items from your list to put them in your cart:';
     }
 
@@ -413,10 +415,7 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                   ),
                 ),
               ),
-              SpeakButton(
-                text: feedbackText,
-                size: 34.0,
-              ),
+              SpeakButton(text: feedbackText, size: 34.0),
             ],
           ),
         ),
@@ -427,7 +426,10 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
               ? Center(
                   child: Text(
                     l10n?.loadingMessage ?? 'Getting ready…',
-                    style: const TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+                    style: const TextStyle(
+                      fontSize: 20.0,
+                      color: Color(0xFF64748B),
+                    ),
                   ),
                 )
               : GridView.builder(
@@ -439,7 +441,7 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 16.0,
                     mainAxisSpacing: 16.0,
-                    childAspectRatio: 0.95,
+                    mainAxisExtent: 200.0,
                   ),
                   itemCount: state.shelfItems.length,
                   itemBuilder: (context, index) {
@@ -484,12 +486,12 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
                     langCode == 'hi'
                         ? 'टोकरी में: $collectedCount / $totalListCount'
                         : langCode == 'bn'
-                            ? 'ঝুড়িতে: $collectedCount / $totalListCount'
-                            : langCode == 'as'
-                                ? 'ডলাত: $collectedCount / $totalListCount'
-                                : langCode == 'ne'
-                                    ? 'टोकरीमा: $collectedCount / $totalListCount'
-                                    : 'In Cart: $collectedCount of $totalListCount',
+                        ? 'ঝুড়িতে: $collectedCount / $totalListCount'
+                        : langCode == 'as'
+                        ? 'ডলাত: $collectedCount / $totalListCount'
+                        : langCode == 'ne'
+                        ? 'टोकरीमा: $collectedCount / $totalListCount'
+                        : 'In Cart: $collectedCount of $totalListCount',
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w700,

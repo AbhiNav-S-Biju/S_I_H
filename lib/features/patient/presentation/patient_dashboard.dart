@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nirvana/database/hive_database.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
 
 // ==============================================================================
@@ -42,35 +43,41 @@ class _DashboardPalette {
   static const Color pebbleCoral = Color(0xFFF19E8E);
 
   // Dual-Layer Clay Shadows
-  static List<BoxShadow> clayCardShadow({double blur = 18, double offset = 8}) => [
-        BoxShadow(
-          color: const Color(0xFF4A3B2C).withValues(alpha: 0.12),
-          offset: Offset(offset, offset),
-          blurRadius: blur,
-          spreadRadius: 0,
-        ),
-        BoxShadow(
-          color: Colors.white.withValues(alpha: 0.95),
-          offset: Offset(-offset, -offset),
-          blurRadius: blur,
-          spreadRadius: 0,
-        ),
-      ];
+  static List<BoxShadow> clayCardShadow({
+    double blur = 18,
+    double offset = 8,
+  }) => [
+    BoxShadow(
+      color: const Color(0xFF4A3B2C).withValues(alpha: 0.12),
+      offset: Offset(offset, offset),
+      blurRadius: blur,
+      spreadRadius: 0,
+    ),
+    BoxShadow(
+      color: Colors.white.withValues(alpha: 0.95),
+      offset: Offset(-offset, -offset),
+      blurRadius: blur,
+      spreadRadius: 0,
+    ),
+  ];
 
-  static List<BoxShadow> clayDeepShadow({double blur = 20, double offset = 10}) => [
-        BoxShadow(
-          color: const Color(0xFF382A1E).withValues(alpha: 0.15),
-          offset: Offset(offset, offset + 2),
-          blurRadius: blur,
-          spreadRadius: 1,
-        ),
-        BoxShadow(
-          color: Colors.white.withValues(alpha: 0.90),
-          offset: Offset(-offset, -offset),
-          blurRadius: blur,
-          spreadRadius: 0,
-        ),
-      ];
+  static List<BoxShadow> clayDeepShadow({
+    double blur = 20,
+    double offset = 10,
+  }) => [
+    BoxShadow(
+      color: const Color(0xFF382A1E).withValues(alpha: 0.15),
+      offset: Offset(offset, offset + 2),
+      blurRadius: blur,
+      spreadRadius: 1,
+    ),
+    BoxShadow(
+      color: Colors.white.withValues(alpha: 0.90),
+      offset: Offset(-offset, -offset),
+      blurRadius: blur,
+      spreadRadius: 0,
+    ),
+  ];
 }
 
 // ==============================================================================
@@ -78,6 +85,31 @@ class _DashboardPalette {
 // ==============================================================================
 class PatientDashboard extends ConsumerWidget {
   const PatientDashboard({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Log out?'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Log out'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout != true) return;
+
+    await HiveDatabase.clearPatientSession();
+    if (context.mounted) context.go('/');
+  }
 
   String _timeGreeting() {
     final hour = DateTime.now().hour;
@@ -121,6 +153,7 @@ class PatientDashboard extends ConsumerWidget {
                   _DashboardHeader(
                     greeting: greeting,
                     patientName: patientName,
+                    onLogout: () => _logout(context),
                   ),
                   const SizedBox(height: 22.0),
 
@@ -129,9 +162,7 @@ class PatientDashboard extends ConsumerWidget {
                   const SizedBox(height: 28.0),
 
                   // 3. Section Title inside raised clay slab
-                  const _SectionTitleSlab(
-                    title: 'What would you like to do?',
-                  ),
+                  const _SectionTitleSlab(title: 'What would you like to do?'),
                   const SizedBox(height: 18.0),
 
                   // 4. Action Grid
@@ -257,10 +288,12 @@ class _ActionCardItem {
 class _DashboardHeader extends StatelessWidget {
   final String greeting;
   final String patientName;
+  final VoidCallback onLogout;
 
   const _DashboardHeader({
     required this.greeting,
     required this.patientName,
+    required this.onLogout,
   });
 
   @override
@@ -312,8 +345,15 @@ class _DashboardHeader extends StatelessWidget {
           width: 58.0,
           height: 58.0,
           child: CustomPaint(
-            painter: _ClayHeart3DPainter(color: _DashboardPalette.bannerLavender),
+            painter: _ClayHeart3DPainter(
+              color: _DashboardPalette.bannerLavender,
+            ),
           ),
+        ),
+        IconButton(
+          onPressed: onLogout,
+          tooltip: 'Log out',
+          icon: const Icon(Icons.logout_rounded),
         ),
       ],
     );
@@ -339,11 +379,7 @@ class _DailyMomentBanner3D extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFB5A6E2),
-                Color(0xFFA291D4),
-                Color(0xFF9683CB),
-              ],
+              colors: [Color(0xFFB5A6E2), Color(0xFFA291D4), Color(0xFF9683CB)],
             ),
             borderRadius: BorderRadius.circular(28.0),
             boxShadow: [
@@ -374,7 +410,9 @@ class _DailyMomentBanner3D extends StatelessWidget {
                         vertical: 5.0,
                       ),
                       decoration: BoxDecoration(
-                        color: _DashboardPalette.bannerInset.withValues(alpha: 0.55),
+                        color: _DashboardPalette.bannerInset.withValues(
+                          alpha: 0.55,
+                        ),
                         borderRadius: BorderRadius.circular(16.0),
                         boxShadow: [
                           BoxShadow(
@@ -419,9 +457,7 @@ class _DailyMomentBanner3D extends StatelessWidget {
                         const SizedBox(
                           width: 26.0,
                           height: 26.0,
-                          child: CustomPaint(
-                            painter: _ClayStar3DPainter(),
-                          ),
+                          child: CustomPaint(painter: _ClayStar3DPainter()),
                         ),
                       ],
                     ),
@@ -433,7 +469,9 @@ class _DailyMomentBanner3D extends StatelessWidget {
                       style: GoogleFonts.nunito(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: _DashboardPalette.textDark.withValues(alpha: 0.85),
+                        color: _DashboardPalette.textDark.withValues(
+                          alpha: 0.85,
+                        ),
                         height: 1.35,
                       ),
                     ),
@@ -447,9 +485,7 @@ class _DailyMomentBanner3D extends StatelessWidget {
                 width: 54.0,
                 height: 54.0,
                 child: CustomPaint(
-                  painter: _ClayButton3DPainter(
-                    color: Color(0xFFB0A0E0),
-                  ),
+                  painter: _ClayButton3DPainter(color: Color(0xFFB0A0E0)),
                 ),
               ),
             ],
@@ -464,9 +500,7 @@ class _DailyMomentBanner3D extends StatelessWidget {
             width: 95.0,
             height: 55.0,
             child: CustomPaint(
-              painter: _ClayCloud3DPainter(
-                color: Color(0xFFCFC4F2),
-              ),
+              painter: _ClayCloud3DPainter(color: Color(0xFFCFC4F2)),
             ),
           ),
         ),
@@ -486,10 +520,7 @@ class _SectionTitleSlab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 10.0,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       decoration: BoxDecoration(
         color: _DashboardPalette.cardSurface,
         borderRadius: BorderRadius.circular(16.0),
@@ -538,10 +569,7 @@ class ClayActionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(26.0),
           boxShadow: _DashboardPalette.clayDeepShadow(blur: 18, offset: 8),
         ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14.0,
-          vertical: 14.0,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -675,9 +703,7 @@ class _FloatingAmbient3DLayer extends StatelessWidget {
               width: 80.0,
               height: 48.0,
               child: CustomPaint(
-                painter: _ClayCloud3DPainter(
-                  color: Color(0xFFC7BAEE),
-                ),
+                painter: _ClayCloud3DPainter(color: Color(0xFFC7BAEE)),
               ),
             ),
           ),
@@ -752,9 +778,7 @@ class _FloatingAmbient3DLayer extends StatelessWidget {
             child: SizedBox(
               width: 220.0,
               height: 220.0,
-              child: CustomPaint(
-                painter: _ClayWaveLandscape3DPainter(),
-              ),
+              child: CustomPaint(painter: _ClayWaveLandscape3DPainter()),
             ),
           ),
         ],
@@ -781,10 +805,38 @@ class _ClayHeart3DPainter extends CustomPainter {
     // Drop Shadow
     final shadowPath = Path();
     shadowPath.moveTo(w * 0.5, h * 0.85);
-    shadowPath.cubicTo(w * 0.15, h * 0.55, w * 0.05, h * 0.25, w * 0.28, h * 0.15);
-    shadowPath.cubicTo(w * 0.40, h * 0.10, w * 0.48, h * 0.25, w * 0.5, h * 0.35);
-    shadowPath.cubicTo(w * 0.52, h * 0.25, w * 0.60, h * 0.10, w * 0.72, h * 0.15);
-    shadowPath.cubicTo(w * 0.95, h * 0.25, w * 0.85, h * 0.55, w * 0.5, h * 0.85);
+    shadowPath.cubicTo(
+      w * 0.15,
+      h * 0.55,
+      w * 0.05,
+      h * 0.25,
+      w * 0.28,
+      h * 0.15,
+    );
+    shadowPath.cubicTo(
+      w * 0.40,
+      h * 0.10,
+      w * 0.48,
+      h * 0.25,
+      w * 0.5,
+      h * 0.35,
+    );
+    shadowPath.cubicTo(
+      w * 0.52,
+      h * 0.25,
+      w * 0.60,
+      h * 0.10,
+      w * 0.72,
+      h * 0.15,
+    );
+    shadowPath.cubicTo(
+      w * 0.95,
+      h * 0.25,
+      w * 0.85,
+      h * 0.55,
+      w * 0.5,
+      h * 0.85,
+    );
 
     canvas.drawPath(
       shadowPath.shift(const Offset(5, 7)),
@@ -936,7 +988,10 @@ class _ClayPebble3DPainter extends CustomPainter {
     canvas.translate(-size.width / 2, -size.height / 2);
 
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(size.height * 0.5));
+    final rrect = RRect.fromRectAndRadius(
+      rect,
+      Radius.circular(size.height * 0.5),
+    );
 
     // Shadow
     canvas.drawRRect(
@@ -1075,8 +1130,18 @@ class _ClayButton3DPainter extends CustomPainter {
     path.lineTo(center.dx + 6, center.dy - 1);
     // Cradle
     path.moveTo(center.dx - 9, center.dy + 3);
-    path.quadraticBezierTo(center.dx - 9, center.dy + 10, center.dx, center.dy + 10);
-    path.quadraticBezierTo(center.dx + 9, center.dy + 10, center.dx + 9, center.dy + 3);
+    path.quadraticBezierTo(
+      center.dx - 9,
+      center.dy + 10,
+      center.dx,
+      center.dy + 10,
+    );
+    path.quadraticBezierTo(
+      center.dx + 9,
+      center.dy + 10,
+      center.dx + 9,
+      center.dy + 3,
+    );
 
     canvas.drawPath(path, iconPaint);
   }
@@ -1128,10 +1193,7 @@ class _ClayToken3DPainter extends CustomPainter {
   final Color color;
   final ClayTokenType tokenType;
 
-  const _ClayToken3DPainter({
-    required this.color,
-    required this.tokenType,
-  });
+  const _ClayToken3DPainter({required this.color, required this.tokenType});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1267,10 +1329,7 @@ class _ClayToken3DPainter extends CustomPainter {
       Paint()..color = const Color(0xFF8B473A).withValues(alpha: 0.35),
     );
     // Frame Body
-    canvas.drawRRect(
-      frameRect,
-      Paint()..color = const Color(0xFFF7B5A8),
-    );
+    canvas.drawRRect(frameRect, Paint()..color = const Color(0xFFF7B5A8));
 
     // Inner Silhouette
     canvas.drawCircle(
@@ -1299,17 +1358,29 @@ class _ClayToken3DPainter extends CustomPainter {
         center.dx + r * 0.75 * math.cos(angle),
         center.dy + r * 0.75 * math.sin(angle),
       );
-      canvas.drawCircle(toothCenter, r * 0.30, Paint()..color = const Color(0xFF8C7738));
+      canvas.drawCircle(
+        toothCenter,
+        r * 0.30,
+        Paint()..color = const Color(0xFF8C7738),
+      );
     }
 
-    canvas.drawCircle(center, r * 0.70, Paint()..color = const Color(0xFFE8D596));
+    canvas.drawCircle(
+      center,
+      r * 0.70,
+      Paint()..color = const Color(0xFFE8D596),
+    );
     canvas.drawCircle(center, r * 0.32, Paint()..color = color);
   }
 
   void _drawChatBubble(Canvas canvas, Offset center, double size) {
     final s = size * 0.55;
     final bubbleRect = RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center - const Offset(0, 2), width: s * 1.8, height: s * 1.4),
+      Rect.fromCenter(
+        center: center - const Offset(0, 2),
+        width: s * 1.8,
+        height: s * 1.4,
+      ),
       const Radius.circular(8),
     );
 
@@ -1320,10 +1391,7 @@ class _ClayToken3DPainter extends CustomPainter {
     );
 
     // Bubble Body
-    canvas.drawRRect(
-      bubbleRect,
-      Paint()..color = const Color(0xFFC9BCEE),
-    );
+    canvas.drawRRect(bubbleRect, Paint()..color = const Color(0xFFC9BCEE));
 
     // Bubble Tail
     final tailPath = Path();
@@ -1351,7 +1419,14 @@ class _ClayWaveLandscape3DPainter extends CustomPainter {
     // 1. Lilac Clay Wave Body
     final wavePath = Path();
     wavePath.moveTo(w * 0.20, h);
-    wavePath.cubicTo(w * 0.20, h * 0.65, w * 0.50, h * 0.60, w * 0.65, h * 0.45);
+    wavePath.cubicTo(
+      w * 0.20,
+      h * 0.65,
+      w * 0.50,
+      h * 0.60,
+      w * 0.65,
+      h * 0.45,
+    );
     wavePath.cubicTo(w * 0.80, h * 0.30, w * 0.90, h * 0.40, w, h * 0.30);
     wavePath.lineTo(w, h);
     wavePath.close();
@@ -1369,11 +1444,7 @@ class _ClayWaveLandscape3DPainter extends CustomPainter {
       ..shader = const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xFFD6C8F5),
-          Color(0xFFBAA7EC),
-          Color(0xFF9E89D7),
-        ],
+        colors: [Color(0xFFD6C8F5), Color(0xFFBAA7EC), Color(0xFF9E89D7)],
       ).createShader(Rect.fromLTWH(0, 0, w, h));
 
     canvas.drawPath(wavePath, wavePaint);
@@ -1384,7 +1455,14 @@ class _ClayWaveLandscape3DPainter extends CustomPainter {
     // 3. 3D Glossy Gold Ribbon Tube
     final ribbonPath = Path();
     ribbonPath.moveTo(w * 0.35, h);
-    ribbonPath.cubicTo(w * 0.40, h * 0.80, w * 0.60, h * 0.85, w * 0.75, h * 0.72);
+    ribbonPath.cubicTo(
+      w * 0.40,
+      h * 0.80,
+      w * 0.60,
+      h * 0.85,
+      w * 0.75,
+      h * 0.72,
+    );
     ribbonPath.cubicTo(w * 0.90, h * 0.60, w * 0.95, h * 0.80, w, h * 0.75);
 
     // Ribbon Shadow
@@ -1418,7 +1496,11 @@ class _ClayWaveLandscape3DPainter extends CustomPainter {
     // 4. Floating Gold Egg & Pebbles near bottom-right
     // Gold Egg
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.55, h * 0.50), width: 22, height: 18),
+      Rect.fromCenter(
+        center: Offset(w * 0.55, h * 0.50),
+        width: 22,
+        height: 18,
+      ),
       Paint()
         ..shader = const RadialGradient(
           center: Alignment(-0.35, -0.40),
@@ -1465,5 +1547,6 @@ class _ClayWaveLandscape3DPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ClayWaveLandscape3DPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _ClayWaveLandscape3DPainter oldDelegate) =>
+      false;
 }

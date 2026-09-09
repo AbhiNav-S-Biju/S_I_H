@@ -35,7 +35,8 @@ class RememberObjectsScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<RememberObjectsScreen> createState() => _RememberObjectsScreenState();
+  ConsumerState<RememberObjectsScreen> createState() =>
+      _RememberObjectsScreenState();
 }
 
 class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
@@ -60,12 +61,12 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
         final items = _controller.state.targetItems
             .map((e) => e.localizedName(locale.languageCode))
             .join(', ');
-        final prompt = l10n?.rememberObjectsLookCarefully ??
+        final prompt =
+            l10n?.rememberObjectsLookCarefully ??
             'Look at these items carefully. Take all the time you need.';
-        ref.read(audioServiceProvider).speak(
-              '$prompt $items',
-              languageCode: locale.languageCode,
-            );
+        ref
+            .read(audioServiceProvider)
+            .speak('$prompt $items', languageCode: locale.languageCode);
       }
     });
   }
@@ -77,12 +78,12 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
       if (voiceEnabled) {
         final locale = ref.read(localeProvider);
         final l10n = AppLocalizations.of(context);
-        final prompt = l10n?.whichItemsDidYouSee ??
+        final prompt =
+            l10n?.whichItemsDidYouSee ??
             'Which items did you see? Tap them below.';
-        ref.read(audioServiceProvider).speak(
-              prompt,
-              languageCode: locale.languageCode,
-            );
+        ref
+            .read(audioServiceProvider)
+            .speak(prompt, languageCode: locale.languageCode);
       }
     });
   }
@@ -148,13 +149,14 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                           _controller.state.hintHighlightedItemId;
                       final hintItem = hintTargetId != null
                           ? _controller.state.targetItems
-                              .where((e) => e.id == hintTargetId)
-                              .firstOrNull
+                                .where((e) => e.id == hintTargetId)
+                                .firstOrNull
                           : null;
                       final String hintText;
                       if (hintItem != null) {
-                        final name =
-                            hintItem.localizedName(locale.languageCode);
+                        final name = hintItem.localizedName(
+                          locale.languageCode,
+                        );
                         switch (locale.languageCode) {
                           case 'hi':
                             hintText = 'संकेत: $name को देखें!';
@@ -183,16 +185,16 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                             hintText = 'আপুনি সকলো বস্তু বিচাৰি পাইছে!';
                             break;
                           case 'ne':
-                            hintText = 'तपाईंले सबै वस्तुहरू फेला पार्नुभएको छ!';
+                            hintText =
+                                'तपाईंले सबै वस्तुहरू फेला पार्नुभएको छ!';
                             break;
                           default:
                             hintText = 'You have found all the items!';
                         }
                       }
-                      ref.read(audioServiceProvider).speak(
-                            hintText,
-                            languageCode: locale.languageCode,
-                          );
+                      ref
+                          .read(audioServiceProvider)
+                          .speak(hintText, languageCode: locale.languageCode);
                     }
                   }
                 : null,
@@ -271,7 +273,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 0.95,
+              mainAxisExtent: 200.0,
             ),
             itemCount: state.targetItems.length,
             itemBuilder: (context, index) {
@@ -340,11 +342,13 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
             feedbackText = 'Hint: Take a look at the $name!';
         }
       } else {
-        feedbackText = l10n?.whichItemsDidYouSee ??
+        feedbackText =
+            l10n?.whichItemsDidYouSee ??
             'Which items did you see? Tap them below:';
       }
     } else {
-      feedbackText = l10n?.whichItemsDidYouSee ??
+      feedbackText =
+          l10n?.whichItemsDidYouSee ??
           'Which items did you see? Tap them below:';
     }
 
@@ -368,10 +372,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                   ),
                 ),
               ),
-              SpeakButton(
-                text: feedbackText,
-                size: 34.0,
-              ),
+              SpeakButton(text: feedbackText, size: 34.0),
             ],
           ),
         ),
@@ -382,7 +383,10 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
               ? Center(
                   child: Text(
                     l10n?.loadingMessage ?? 'Getting ready…',
-                    style: const TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+                    style: const TextStyle(
+                      fontSize: 20.0,
+                      color: Color(0xFF64748B),
+                    ),
                   ),
                 )
               : GridView.builder(
@@ -394,7 +398,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 16.0,
                     mainAxisSpacing: 16.0,
-                    childAspectRatio: 0.95,
+                    mainAxisExtent: 200.0,
                   ),
                   itemCount: state.selectionOptions.length,
                   itemBuilder: (context, index) {
@@ -439,12 +443,12 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                     langCode == 'hi'
                         ? 'चुने गए: $selectedCount / $totalTargetCount'
                         : langCode == 'bn'
-                            ? 'নির্বাচিত: $selectedCount / $totalTargetCount'
-                            : langCode == 'as'
-                                ? 'নিৰ্বাচিত: $selectedCount / $totalTargetCount'
-                                : langCode == 'ne'
-                                    ? 'छानिएका: $selectedCount / $totalTargetCount'
-                                    : 'Chosen: $selectedCount of $totalTargetCount',
+                        ? 'নির্বাচিত: $selectedCount / $totalTargetCount'
+                        : langCode == 'as'
+                        ? 'নিৰ্বাচিত: $selectedCount / $totalTargetCount'
+                        : langCode == 'ne'
+                        ? 'छानिएका: $selectedCount / $totalTargetCount'
+                        : 'Chosen: $selectedCount of $totalTargetCount',
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w700,
@@ -469,8 +473,12 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                             context,
                             session: session,
                             level: widget.level,
-                            onNextLevel: widget.level != null && widget.level!.levelNumber < 8
-                                ? () => _loadNextLevel(widget.level!.levelNumber + 1)
+                            onNextLevel:
+                                widget.level != null &&
+                                    widget.level!.levelNumber < 8
+                                ? () => _loadNextLevel(
+                                    widget.level!.levelNumber + 1,
+                                  )
                                 : null,
                             onFinish: () {
                               if (mounted) {

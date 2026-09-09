@@ -23,10 +23,8 @@ class CaregiverLoginScreen extends ConsumerStatefulWidget {
 
 class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(
-    text: 'caregiver@nirvana.care',
-  );
-  final _passwordController = TextEditingController(text: 'CaregiverPass123!');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   String? _errorMessage;
 
@@ -157,7 +155,10 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
           children: [
             // Top Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 children: [
                   LargeIconButton(
@@ -193,7 +194,10 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
             Expanded(
               child: Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 12.0,
+                  ),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 460),
                     child: Form(
@@ -209,7 +213,9 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                               decoration: BoxDecoration(
                                 color: ElderColors.forestBg,
                                 shape: BoxShape.circle,
-                                boxShadow: NirvanaShadows.float(tint: ElderColors.claySage),
+                                boxShadow: NirvanaShadows.float(
+                                  tint: ElderColors.claySage,
+                                ),
                               ),
                               child: const Icon(
                                 Icons.favorite_rounded,
@@ -244,7 +250,9 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                           Container(
                             decoration: BoxDecoration(
                               color: ElderColors.surface,
-                              borderRadius: BorderRadius.circular(NirvanaRadii.icon),
+                              borderRadius: BorderRadius.circular(
+                                NirvanaRadii.icon,
+                              ),
                               boxShadow: NirvanaShadows.input,
                             ),
                             child: TextFormField(
@@ -257,15 +265,24 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                               ),
                               decoration: InputDecoration(
                                 labelText: 'Email Address',
-                                labelStyle: const TextStyle(color: ElderColors.textSecondary),
-                                prefixIcon: const Icon(Icons.email_outlined, color: ElderColors.claySage),
+                                hintText: 'Enter username or email',
+                                labelStyle: const TextStyle(
+                                  color: ElderColors.textSecondary,
+                                ),
+                                prefixIcon: const Icon(
+                                  Icons.email_outlined,
+                                  color: ElderColors.claySage,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20),
                                   borderSide: BorderSide.none,
                                 ),
                                 filled: true,
                                 fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 18,
+                                ),
                               ),
                               validator: _validateEmail,
                               onChanged: (_) {
@@ -281,7 +298,9 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                           Container(
                             decoration: BoxDecoration(
                               color: ElderColors.surface,
-                              borderRadius: BorderRadius.circular(NirvanaRadii.icon),
+                              borderRadius: BorderRadius.circular(
+                                NirvanaRadii.icon,
+                              ),
                               boxShadow: NirvanaShadows.input,
                             ),
                             child: TextFormField(
@@ -294,8 +313,14 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                               ),
                               decoration: InputDecoration(
                                 labelText: 'Password',
-                                labelStyle: const TextStyle(color: ElderColors.textSecondary),
-                                prefixIcon: const Icon(Icons.lock_outline_rounded, color: ElderColors.claySage),
+                                hintText: 'Enter password',
+                                labelStyle: const TextStyle(
+                                  color: ElderColors.textSecondary,
+                                ),
+                                prefixIcon: const Icon(
+                                  Icons.lock_outline_rounded,
+                                  color: ElderColors.claySage,
+                                ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
                                     _obscurePassword
@@ -313,7 +338,10 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                                 ),
                                 filled: true,
                                 fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 18,
+                                ),
                               ),
                               validator: _validatePassword,
                               onChanged: (_) {
@@ -334,8 +362,12 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: ElderColors.gentleErrorBg,
-                                borderRadius: BorderRadius.circular(NirvanaRadii.button),
-                                boxShadow: NirvanaShadows.card(tint: ElderColors.gentleErrorPrimary),
+                                borderRadius: BorderRadius.circular(
+                                  NirvanaRadii.button,
+                                ),
+                                boxShadow: NirvanaShadows.card(
+                                  tint: ElderColors.gentleErrorPrimary,
+                                ),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,7 +420,8 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () => context.go('/caregiver/register'),
+                                  onTap: () =>
+                                      context.go('/caregiver/register'),
                                   child: const Text(
                                     'Create Account',
                                     style: TextStyle(

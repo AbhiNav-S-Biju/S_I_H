@@ -143,7 +143,6 @@ class StubCaregiverRepository implements ICaregiverRepository {
   @override
   Future<void> deleteReminder(String reminderId) async {}
 
-
   @override
   Future<List<DailyActivitySummary>> getSevenDayActivity(
     String patientId,
@@ -262,6 +261,14 @@ void main() {
       expect(find.text('Sign In to Dashboard'), findsOneWidget);
 
       // Tap Sign in — navigates to /caregiver/dashboard via GoRouter
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Email Address'),
+        'caregiver@example.com',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Password'),
+        'test-password',
+      );
       await tester.tap(find.text('Sign In to Dashboard'));
       await tester.pumpAndSettle();
 
@@ -312,7 +319,9 @@ void main() {
         // 7-day activity chart
         expect(find.text('7-Day Activity View'), findsOneWidget);
 
-        // Reminder & Game sections
+        // Reminder & Game sections live on the Reminders tab.
+        await tester.tap(find.text('Reminders').last);
+        await tester.pumpAndSettle();
         expect(find.text('Reminder Status'), findsOneWidget);
         expect(find.text('Morning Medicine'), findsOneWidget);
         expect(find.text('Recent Activity'), findsOneWidget);
