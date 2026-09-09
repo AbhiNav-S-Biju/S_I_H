@@ -292,6 +292,14 @@
   "@gameGroceryMemorySubtitle": {
     "description": "Subtitle of Grocery Memory game"
   },
+  "gameJigsawPuzzleTitle": "Familiar Jigsaw",
+  "@gameJigsawPuzzleTitle": {
+    "description": "Title of Dementia-Friendly Jigsaw Puzzle game"
+  },
+  "gameJigsawPuzzleSubtitle": "Put together comforting pictures piece by piece",
+  "@gameJigsawPuzzleSubtitle": {
+    "description": "Subtitle of Dementia-Friendly Jigsaw Puzzle game"
+  },
   "playActivityButton": "Play Activity ➔",
   "@playActivityButton": {
     "description": "Button to start an activity"

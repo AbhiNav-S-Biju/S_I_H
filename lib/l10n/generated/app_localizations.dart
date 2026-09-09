@@ -548,6 +548,18 @@ abstract class AppLocalizations {
   /// **'Collect everyday items from your shopping list'**
   String get gameGroceryMemorySubtitle;
 
+  /// Title of Dementia-Friendly Jigsaw Puzzle game
+  ///
+  /// In en, this message translates to:
+  /// **'Familiar Jigsaw'**
+  String get gameJigsawPuzzleTitle;
+
+  /// Subtitle of Dementia-Friendly Jigsaw Puzzle game
+  ///
+  /// In en, this message translates to:
+  /// **'Put together comforting pictures piece by piece'**
+  String get gameJigsawPuzzleSubtitle;
+
   /// Button to start an activity
   ///
   /// In en, this message translates to:

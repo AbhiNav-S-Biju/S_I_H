@@ -244,6 +244,13 @@ class AppLocalizationsNe extends AppLocalizations {
       'आफ्नो किनमेल सूचीबाट सामानहरू सङ्कलन गर्नुहोस्';
 
   @override
+  String get gameJigsawPuzzleTitle => 'Familiar Jigsaw';
+
+  @override
+  String get gameJigsawPuzzleSubtitle =>
+      'Put together comforting pictures piece by piece';
+
+  @override
   String get playActivityButton => 'गतिविधि सुरु गर्नुहोस् ➔';
 
   @override

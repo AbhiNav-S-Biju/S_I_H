@@ -9,7 +9,8 @@ import '../../../l10n/app_localizations.dart';
 enum GameType {
   rememberObjects,
   whoIsThis,
-  groceryMemory;
+  groceryMemory,
+  jigsawPuzzle;
 
   String get id {
     switch (this) {
@@ -19,6 +20,8 @@ enum GameType {
         return 'who_is_this';
       case GameType.groceryMemory:
         return 'grocery_memory';
+      case GameType.jigsawPuzzle:
+        return 'jigsaw_puzzle';
     }
   }
 
@@ -30,6 +33,8 @@ enum GameType {
         return 'Who Is This?';
       case GameType.groceryMemory:
         return 'Grocery Memory';
+      case GameType.jigsawPuzzle:
+        return 'Familiar Jigsaw';
     }
   }
 
@@ -41,6 +46,8 @@ enum GameType {
         return 'Recognize familiar faces and loved ones';
       case GameType.groceryMemory:
         return 'Collect everyday items from your shopping list';
+      case GameType.jigsawPuzzle:
+        return 'Put together comforting pictures piece by piece';
     }
   }
 
@@ -53,6 +60,8 @@ enum GameType {
         return l10n.gameWhoIsThisTitle;
       case GameType.groceryMemory:
         return l10n.gameGroceryMemoryTitle;
+      case GameType.jigsawPuzzle:
+        return l10n.gameJigsawPuzzleTitle;
     }
   }
 
@@ -65,6 +74,8 @@ enum GameType {
         return l10n.gameWhoIsThisSubtitle;
       case GameType.groceryMemory:
         return l10n.gameGroceryMemorySubtitle;
+      case GameType.jigsawPuzzle:
+        return l10n.gameJigsawPuzzleSubtitle;
     }
   }
 }
@@ -159,4 +170,31 @@ enum GameDifficulty {
         return 4;
     }
   }
+
+  /// Grid rows for Dementia-Friendly Jigsaw Puzzle
+  int get jigsawRows {
+    switch (this) {
+      case GameDifficulty.easy:
+        return 1;
+      case GameDifficulty.medium:
+        return 2;
+      case GameDifficulty.hard:
+        return 2;
+    }
+  }
+
+  /// Grid columns for Dementia-Friendly Jigsaw Puzzle
+  int get jigsawCols {
+    switch (this) {
+      case GameDifficulty.easy:
+        return 2;
+      case GameDifficulty.medium:
+        return 2;
+      case GameDifficulty.hard:
+        return 3;
+    }
+  }
+
+  /// Total piece count for Jigsaw Puzzle (2 in Easy, 4 in Medium, 6 in Hard)
+  int get jigsawPieceCount => jigsawRows * jigsawCols;
 }

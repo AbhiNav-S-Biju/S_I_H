@@ -243,6 +243,13 @@ class AppLocalizationsMni extends AppLocalizations {
       'Collect everyday items from your shopping list';
 
   @override
+  String get gameJigsawPuzzleTitle => 'Familiar Jigsaw';
+
+  @override
+  String get gameJigsawPuzzleSubtitle =>
+      'Put together comforting pictures piece by piece';
+
+  @override
   String get playActivityButton => 'Play Activity ➔';
 
   @override

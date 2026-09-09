@@ -10,6 +10,7 @@ import '../models/game_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers/accessibility_providers.dart';
 import 'grocery_memory/grocery_memory_screen.dart';
+import 'jigsaw_puzzle/jigsaw_puzzle_screen.dart';
 import 'remember_objects/remember_objects_screen.dart';
 import 'who_is_this/who_is_this_screen.dart';
 import 'widgets/elder_game_button.dart';
@@ -203,6 +204,23 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
               buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
               onPlay: () => _launchGame(
                 GroceryMemoryScreen(
+                  difficulty: _selectedDifficulty,
+                  onGameCompleted: widget.onSessionCompleted,
+                ),
+              ),
+            ),
+            const SizedBox(height: 18.0),
+
+            // 4. Familiar Jigsaw Card
+            _buildGameCard(
+              title: GameType.jigsawPuzzle.localizedTitle(l10n),
+              subtitle: GameType.jigsawPuzzle.localizedSubtitle(l10n),
+              emoji: '🧩',
+              badgeColor: const Color(0xFFF3E8FF),
+              textColor: const Color(0xFF6B21A8),
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
+              onPlay: () => _launchGame(
+                JigsawPuzzleScreen(
                   difficulty: _selectedDifficulty,
                   onGameCompleted: widget.onSessionCompleted,
                 ),

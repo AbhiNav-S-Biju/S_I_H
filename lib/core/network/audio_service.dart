@@ -663,7 +663,10 @@ final audioServiceProvider = Provider<IAudioService>((ref) {
     service.setLanguage(next.languageCode);
   });
 
-  ref.onDispose(() => service.dispose());
+  ref.onDispose(() {
+    service.onSpeakingChanged = null;
+    service.dispose();
+  });
   return service;
 });
 

@@ -244,6 +244,13 @@ class AppLocalizationsHi extends AppLocalizations {
       'अपनी खरीदारी सूची में से सामान चुनें';
 
   @override
+  String get gameJigsawPuzzleTitle => 'परिचित जिग्सॉ पहेली';
+
+  @override
+  String get gameJigsawPuzzleSubtitle =>
+      'सुखद यादों वाली तस्वीरों को एक-एक करके जोड़ें';
+
+  @override
   String get playActivityButton => 'गतिविधि शुरू करें ➔';
 
   @override

@@ -10,7 +10,7 @@ import 'package:nirvana/features/games/games.dart';
 
 void main() {
   group('Games Widget Smoke & UI Tests', () {
-    testWidgets('GamesHubScreen renders all 3 cognitive engagement games', (
+    testWidgets('GamesHubScreen renders all cognitive engagement games', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1080, 1920);
@@ -27,7 +27,32 @@ void main() {
       expect(find.text('Remember Objects'), findsOneWidget);
       expect(find.text('Who Is This?'), findsOneWidget);
       expect(find.text('Grocery Memory'), findsOneWidget);
+      expect(find.text('Familiar Jigsaw'), findsOneWidget);
       expect(find.text('Activity Pace:'), findsOneWidget);
+    });
+
+    testWidgets('JigsawPuzzleScreen renders board, tray pieces, and landmark guidance', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: JigsawPuzzleScreen(
+              difficulty: GameDifficulty.easy,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Familiar Jigsaw'), findsOneWidget);
+      expect(find.text('Gentle'), findsOneWidget);
+      expect(find.text('Morning Tea & Marigolds'), findsOneWidget);
+      expect(find.widgetWithText(ElderGameButton, 'Hint'), findsOneWidget);
+      expect(find.textContaining('Pieces to place'), findsOneWidget);
     });
 
     testWidgets(

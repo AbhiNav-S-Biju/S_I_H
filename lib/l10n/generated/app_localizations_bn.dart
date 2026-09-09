@@ -244,6 +244,13 @@ class AppLocalizationsBn extends AppLocalizations {
       'আপনার কেনাকাটার তালিকা থেকে জিনিস সংগ্রহ করুন';
 
   @override
+  String get gameJigsawPuzzleTitle => 'পরিচিত ছবির ধাঁধা';
+
+  @override
+  String get gameJigsawPuzzleSubtitle =>
+      'টুকরো টুকরো করে সুন্দর স্মৃতির ছবি সাজিয়ে তুলুন';
+
+  @override
   String get playActivityButton => 'কার্যকলাপ শুরু করুন ➔';
 
   @override

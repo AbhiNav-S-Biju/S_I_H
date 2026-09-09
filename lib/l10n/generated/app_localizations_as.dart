@@ -241,6 +241,13 @@ class AppLocalizationsAs extends AppLocalizations {
       'আপোনাৰ বজাৰৰ তালিকাৰ পৰা সামগ্ৰী বাছক';
 
   @override
+  String get gameJigsawPuzzleTitle => 'Familiar Jigsaw';
+
+  @override
+  String get gameJigsawPuzzleSubtitle =>
+      'Put together comforting pictures piece by piece';
+
+  @override
   String get playActivityButton => 'কাৰ্যকলাপ আৰম্ভ কৰক ➔';
 
   @override
