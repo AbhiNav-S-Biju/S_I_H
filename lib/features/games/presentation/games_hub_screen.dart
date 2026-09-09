@@ -7,9 +7,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/providers/accessibility_providers.dart';
 import '../../../app/theme/elder_theme.dart';
 import '../../../app/widgets/widgets.dart';
+import '../../../core/intelligence/difficulty_recommender.dart';
 import '../../../l10n/app_localizations.dart';
 import '../models/game_enums.dart';
 import '../models/game_level.dart';
@@ -28,15 +30,17 @@ class GamesHubScreen extends ConsumerStatefulWidget {
 }
 
 class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
-  void _openGameMap(GameType type) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => GameLevelMapScreen(gameType: type),
-      ),
-    );
-    if (mounted) {
-      setState(() {});
+  GameDifficulty _selectedDifficulty = GameDifficulty.easy;
+
+  void _launchGame(Widget screen) async {
+    final session = await Navigator.of(
+      context,
+    ).push<GameSession>(MaterialPageRoute(builder: (_) => screen));
+
+    if (session != null && widget.onSessionCompleted != null) {
+      widget.onSessionCompleted!(session);
     }
+  
   }
 
   @override
@@ -44,6 +48,12 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
     final activeLocale = ref.watch(localeProvider);
     final l10n = AppLocalizations.of(context);
     final langCode = activeLocale.languageCode;
+
+    // Watch the Smart Difficulty recommendation for Remember Objects.
+    // Other games are explicitly out of scope for this first pass.
+    final recommendedDifficulty = ref.watch(
+      recommendedDifficultyProvider(GameType.rememberObjects),
+    );
 
     return Scaffold(
       backgroundColor: ElderColors.background,
@@ -127,26 +137,114 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             const SizedBox(height: 20.0),
 
             // Section Header
-            Row(
-              children: [
-                const Icon(Icons.map_rounded, color: ElderColors.forestDeep, size: 24.0),
-                const SizedBox(width: 8.0),
-                Text(
-                  langCode == 'as'
-                      ? 'খেলৰ স্তৰ আৰু যাত্ৰা মানচিত্ৰ'
-                      : langCode == 'hi'
-                          ? 'खेल के स्तर और यात्रा मानचित्र'
-                          : langCode == 'bn'
-                              ? 'খেলার স্তর ও পরিক্রমা মানচিত্র'
-                              : 'Activity Level Journeys',
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w800,
-                    color: ElderColors.textPrimary,
+            Row(children: [
+  const Icon(
+    Icons.map_rounded,
+    color: ElderColors.forestDeep,
+    size: 24.0,
+  ),
+  const SizedBox(width: 8.0),
+  Text(
+    langCode == 'as'
+        ? 'খেলৰ স্তৰ আৰু যাত্ৰা মানচিত্ৰ'
+        : langCode == 'hi'
+            ? 'खेल के स्तर और यात्रा मानचित्र'
+            : langCode == 'bn'
+                ? 'খেলার স্তর ও পরিক্রমা মানচিত্র'
+                : 'Activity Level Journeys',
+    style: const TextStyle(
+      fontSize: 18.0,
+      fontWeight: FontWeight.w800,
+      color: ElderColors.textPrimary,
+    ),
+  ),
+],
+),
+
+const SizedBox(height: 10.0),
+
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: GameDifficulty.values.map((diff) {
+    final isSelected = _selectedDifficulty == diff;
+    final isSuggested = diff == recommendedDifficulty;
+
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: Column(
+          children: [
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _selectedDifficulty = diff;
+                });
+              },
+              borderRadius: BorderRadius.circular(14.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? ElderColors.forestDeep
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(14.0),
+                  border: Border.all(
+                    color: isSelected
+                        ? ElderColors.forestDeep
+                        : const Color(0xFFCBD5E1),
+                    width: 2.0,
                   ),
                 ),
-              ],
+                alignment: Alignment.center,
+                child: Text(
+                  diff.localizedLabel(l10n),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected
+                        ? Colors.white
+                        : ElderColors.textPrimary,
+                  ),
+                ),
+              ),
             ),
+            if (isSuggested) ...[
+              const SizedBox(height: 6.0),
+              const _SuggestedBadge(),
+            ] else
+              const SizedBox(height: 6.0 + _SuggestedBadge.height),
+          ],
+        ),
+      ),
+    );
+  }).toList(),
+),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  diff.localizedLabel(l10n),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected
+                        ? Colors.white
+                        : const Color(0xFF334155),
+                  ),
+                ),
+              ),
+            ),
+            if (isSuggested) ...[
+              const SizedBox(height: 6.0),
+              const _SuggestedBadge(),
+            ] else
+              const SizedBox(height: 6.0 + _SuggestedBadge.height),
+          ],
+        ),
+      ),
+    );
+  }).toList(),
+),
             const SizedBox(height: 14.0),
 
             // 1. Familiar Jigsaw Card (Pastel Peach)
@@ -387,6 +485,46 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             onPressed: onOpenMap,
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ==============================================================================
+// _SuggestedBadge — private, reusable pill using ElderColors only
+// ==============================================================================
+
+/// Small supportive pill shown below the recommended difficulty option.
+/// Uses [ElderColors.supportiveBg] / [ElderColors.supportiveText] — warm amber
+/// tones that feel encouraging rather than clinical or alarming.
+class _SuggestedBadge extends StatelessWidget {
+  /// Fixed pixel height used to reserve identical space in non-suggested pills,
+  /// keeping the pill row vertically aligned regardless of badge visibility.
+  static const double height = 24.0;
+
+  const _SuggestedBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+      decoration: BoxDecoration(
+        color: ElderColors.supportiveBg,
+        borderRadius: BorderRadius.circular(20.0),
+        border: Border.all(color: ElderColors.supportiveBorder, width: 1.0),
+      ),
+      alignment: Alignment.center,
+      child: const Text(
+        'Suggested for you',
+        style: TextStyle(
+          fontSize: 10.0,
+          fontWeight: FontWeight.w700,
+          color: ElderColors.supportiveText,
+          letterSpacing: 0.2,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

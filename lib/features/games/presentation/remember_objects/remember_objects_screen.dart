@@ -6,9 +6,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/providers/accessibility_providers.dart';
+import '../../../../core/intelligence/difficulty_recommender.dart';
 import '../../../../core/network/audio_service.dart';
 import '../../../../core/widgets/voice_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../caregiver/providers/caregiver_providers.dart';
 import '../../controllers/remember_objects_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_level.dart';
@@ -457,6 +459,12 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                   onPressed: selectedCount > 0
                       ? () async {
                           final session = _controller.completeGame();
+                          final patientId = ref.read(selectedPatientProvider)?.id ?? kDefaultPatientId;
+                          // Record this session for Smart Difficulty — fire-and-forget.
+                          ref
+                              .read(difficultyRecommenderProvider)
+                              .recordSession(patientId, session)
+                              .ignore();
                           await GameCompletionDialog.show(
                             context,
                             session: session,
