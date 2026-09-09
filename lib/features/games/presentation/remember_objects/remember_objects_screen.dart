@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/providers/accessibility_providers.dart';
 import '../../../../core/network/audio_service.dart';
 import '../../../../core/widgets/voice_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../controllers/remember_objects_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
@@ -49,10 +50,15 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
       if (!mounted) return;
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
-        final items = _controller.state.targetItems.map((e) => e.name).join(', ');
         final locale = ref.read(localeProvider);
+        final l10n = AppLocalizations.of(context);
+        final items = _controller.state.targetItems
+            .map((e) => e.localizedName(locale.languageCode))
+            .join(', ');
+        final prompt = l10n?.rememberObjectsLookCarefully ??
+            'Look at these items carefully. Take all the time you need.';
         ref.read(audioServiceProvider).speak(
-              'Look at these items carefully: $items. Take all the time you need.',
+              '$prompt $items',
               languageCode: locale.languageCode,
             );
       }
@@ -65,8 +71,11 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
         final locale = ref.read(localeProvider);
+        final l10n = AppLocalizations.of(context);
+        final prompt = l10n?.whichItemsDidYouSee ??
+            'Which items did you see? Tap them below.';
         ref.read(audioServiceProvider).speak(
-              'Which items did you see? Tap them below.',
+              prompt,
               languageCode: locale.languageCode,
             );
       }
@@ -90,7 +99,10 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final activeLocale = ref.watch(localeProvider);
+    final l10n = AppLocalizations.of(context);
     final state = _controller.state;
+    final langCode = activeLocale.languageCode;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -98,7 +110,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
         children: [
           // Header Bar
           GameHeader(
-            title: GameType.rememberObjects.displayName,
+            title: GameType.rememberObjects.localizedTitle(l10n),
             difficulty: state.difficulty,
             onExit: _handleExit,
             onHint: !state.isMemorizationPhase
@@ -106,11 +118,55 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                     setState(() {
                       _controller.useHint();
                     });
-                    final hint = _controller.state.lastFeedback;
-                    if (hint != null && ref.read(voiceEnabledProvider)) {
+                    if (ref.read(voiceEnabledProvider)) {
                       final locale = ref.read(localeProvider);
+                      final hintTargetId =
+                          _controller.state.hintHighlightedItemId;
+                      final hintItem = hintTargetId != null
+                          ? _controller.state.targetItems
+                              .where((e) => e.id == hintTargetId)
+                              .firstOrNull
+                          : null;
+                      final String hintText;
+                      if (hintItem != null) {
+                        final name =
+                            hintItem.localizedName(locale.languageCode);
+                        switch (locale.languageCode) {
+                          case 'hi':
+                            hintText = 'संकेत: $name को देखें!';
+                            break;
+                          case 'bn':
+                            hintText = 'ইঙ্গিত: $name দেখুন!';
+                            break;
+                          case 'as':
+                            hintText = 'ইংগিত: $name চাওক!';
+                            break;
+                          case 'ne':
+                            hintText = 'संकेत: $name हेर्नुहोस्!';
+                            break;
+                          default:
+                            hintText = 'Hint: Take a look at the $name!';
+                        }
+                      } else {
+                        switch (locale.languageCode) {
+                          case 'hi':
+                            hintText = 'आपने सभी वस्तुएं खोज ली हैं!';
+                            break;
+                          case 'bn':
+                            hintText = 'আপনি সমস্ত বস্তু খুঁজে পেয়েছেন!';
+                            break;
+                          case 'as':
+                            hintText = 'আপুনি সকলো বস্তু বিচাৰি পাইছে!';
+                            break;
+                          case 'ne':
+                            hintText = 'तपाईंले सबै वस्तुहरू फेला पार्नुभएको छ!';
+                            break;
+                          default:
+                            hintText = 'You have found all the items!';
+                        }
+                      }
                       ref.read(audioServiceProvider).speak(
-                            hint,
+                            hintText,
                             languageCode: locale.languageCode,
                           );
                     }
@@ -122,8 +178,8 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
           // Main Interactive Area
           Expanded(
             child: state.isMemorizationPhase
-                ? _buildMemorizationView(state)
-                : _buildRecallView(state),
+                ? _buildMemorizationView(state, l10n, langCode)
+                : _buildRecallView(state, l10n, langCode),
           ),
         ],
       ),
@@ -133,8 +189,14 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
   // ---------------------------------------------------------------------------
   // Phase 1: Memorization View
   // ---------------------------------------------------------------------------
-  Widget _buildMemorizationView(RememberObjectsState state) {
-    final itemsText = state.targetItems.map((e) => e.name).join(', ');
+  Widget _buildMemorizationView(
+    RememberObjectsState state,
+    AppLocalizations? l10n,
+    String langCode,
+  ) {
+    final itemsText = state.targetItems
+        .map((e) => e.localizedName(langCode))
+        .join(', ');
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
       child: Column(
@@ -144,21 +206,22 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
           Container(
             padding: const EdgeInsets.all(18.0),
             decoration: BoxDecoration(
-              color: const Color(0xFFF0FDF4), // Gentle mint
+              color: const Color(0xFFF0FDF4), // Warm mint
               borderRadius: BorderRadius.circular(16.0),
               border: Border.all(color: const Color(0xFFBBF7D0), width: 1.5),
             ),
             child: Row(
               children: [
                 const Icon(
-                  Icons.visibility_rounded,
+                  Icons.remove_red_eye_rounded,
                   color: Color(0xFF16A34A),
                   size: 32.0,
                 ),
                 const SizedBox(width: 14.0),
                 Expanded(
                   child: Text(
-                    'Look at these ${state.targetItems.length} items carefully.\nTake all the time you need.',
+                    l10n?.rememberObjectsLookCarefully ??
+                        'Look at these ${state.targetItems.length} items carefully.\nTake all the time you need.',
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w700,
@@ -167,7 +230,8 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                   ),
                 ),
                 SpeakButton(
-                  text: 'Look at these items carefully: $itemsText.',
+                  text:
+                      '${l10n?.rememberObjectsLookCarefully ?? 'Look at these items carefully: '} $itemsText',
                   size: 36.0,
                 ),
               ],
@@ -189,7 +253,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
             itemBuilder: (context, index) {
               final item = state.targetItems[index];
               return ElderGameCard(
-                title: item.name,
+                title: item.localizedName(langCode),
                 imagePath: item.imagePath,
                 emoji: item.emoji,
                 fallbackIcon: item.fallbackIcon,
@@ -202,7 +266,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
 
           // "I am Ready" Button
           ElderGameButton(
-            label: 'I am Ready ➔',
+            label: l10n?.iAmReadyButton ?? 'I am Ready ➔',
             icon: Icons.check_circle_outline_rounded,
             onPressed: () {
               setState(() {
@@ -220,11 +284,45 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
   // ---------------------------------------------------------------------------
   // Phase 2: Recall View
   // ---------------------------------------------------------------------------
-  Widget _buildRecallView(RememberObjectsState state) {
+  Widget _buildRecallView(
+    RememberObjectsState state,
+    AppLocalizations? l10n,
+    String langCode,
+  ) {
     final selectedCount = state.selectedItemIds.length;
     final totalTargetCount = state.targetItems.length;
-    final feedbackText =
-        state.lastFeedback ?? 'Which items did you see? Tap them below:';
+
+    final String feedbackText;
+    if (state.hintHighlightedItemId != null) {
+      final hintItem = state.targetItems
+          .where((e) => e.id == state.hintHighlightedItemId)
+          .firstOrNull;
+      if (hintItem != null) {
+        final name = hintItem.localizedName(langCode);
+        switch (langCode) {
+          case 'hi':
+            feedbackText = 'संकेत: $name को देखें!';
+            break;
+          case 'bn':
+            feedbackText = 'ইঙ্গিত: $name দেখুন!';
+            break;
+          case 'as':
+            feedbackText = 'ইংগিত: $name চাওক!';
+            break;
+          case 'ne':
+            feedbackText = 'संकेत: $name हेर्नुहोस्!';
+            break;
+          default:
+            feedbackText = 'Hint: Take a look at the $name!';
+        }
+      } else {
+        feedbackText = l10n?.whichItemsDidYouSee ??
+            'Which items did you see? Tap them below:';
+      }
+    } else {
+      feedbackText = l10n?.whichItemsDidYouSee ??
+          'Which items did you see? Tap them below:';
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -257,10 +355,10 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
         // Selection Grid
         Expanded(
           child: state.selectionOptions.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'Getting ready…',
-                    style: TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
+                    l10n?.loadingMessage ?? 'Getting ready…',
+                    style: const TextStyle(fontSize: 20.0, color: Color(0xFF64748B)),
                   ),
                 )
               : GridView.builder(
@@ -281,7 +379,8 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                     final isHint = state.hintHighlightedItemId == item.id;
 
                     return ElderGameCard(
-                      title: item.name,
+                      title: item.localizedName(langCode),
+                      imagePath: item.imagePath,
                       emoji: item.emoji,
                       fallbackIcon: item.fallbackIcon,
                       iconColor: item.tintColor,
@@ -313,7 +412,15 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                 // Selected Counter
                 Expanded(
                   child: Text(
-                    'Chosen: $selectedCount of $totalTargetCount',
+                    langCode == 'hi'
+                        ? 'चुने गए: $selectedCount / $totalTargetCount'
+                        : langCode == 'bn'
+                            ? 'নির্বাচিত: $selectedCount / $totalTargetCount'
+                            : langCode == 'as'
+                                ? 'নিৰ্বাচিত: $selectedCount / $totalTargetCount'
+                                : langCode == 'ne'
+                                    ? 'छानिएका: $selectedCount / $totalTargetCount'
+                                    : 'Chosen: $selectedCount of $totalTargetCount',
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w700,
@@ -323,7 +430,7 @@ class _RememberObjectsScreenState extends ConsumerState<RememberObjectsScreen> {
                 ),
                 const SizedBox(width: 12.0),
                 ElderGameButton(
-                  label: 'Complete Activity ➔',
+                  label: l10n?.completeActivityButton ?? 'Complete Activity ➔',
                   icon: Icons.done_all_rounded,
                   onPressed: selectedCount > 0
                       ? () async {

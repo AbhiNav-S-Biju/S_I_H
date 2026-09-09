@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/providers/accessibility_providers.dart';
 import '../../../../core/network/audio_service.dart';
 import '../../../../core/widgets/voice_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../controllers/who_is_this_controller.dart';
+import '../../models/family_member_item.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
 import '../widgets/elder_game_button.dart';
@@ -44,10 +46,14 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
         final currentMember = _controller.state.currentQuestion;
         if (currentMember != null) {
           final locale = ref.read(localeProvider);
+          final question =
+              currentMember.localizedQuestionPrompt(locale.languageCode);
+          final voiceNote =
+              currentMember.localizedVoiceNoteTranscription(locale.languageCode);
           ref
               .read(audioServiceProvider)
               .speak(
-                'Who is this? It is ${currentMember.name}. ${currentMember.voiceNoteTranscription}',
+                '$question. $voiceNote',
                 languageCode: locale.languageCode,
               );
         }
@@ -72,7 +78,10 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final activeLocale = ref.watch(localeProvider);
+    final l10n = AppLocalizations.of(context);
     final state = _controller.state;
+    final langCode = activeLocale.languageCode;
     final currentMember = state.currentQuestion;
 
     if (currentMember == null) {
@@ -87,16 +96,18 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
         children: [
           // Header Bar
           GameHeader(
-            title: GameType.whoIsThis.displayName,
+            title: GameType.whoIsThis.localizedTitle(l10n),
             difficulty: state.difficulty,
             onExit: _handleExit,
             onHint: () {
               setState(() {
                 _controller.useHint();
               });
-              final hint = _controller.state.activeHintText;
-              if (hint != null && ref.read(voiceEnabledProvider)) {
+              final currentMember = _controller.state.currentQuestion;
+              if (currentMember != null && ref.read(voiceEnabledProvider)) {
                 final locale = ref.read(localeProvider);
+                final hint =
+                    currentMember.localizedHintDescription(locale.languageCode);
                 ref
                     .read(audioServiceProvider)
                     .speak(hint, languageCode: locale.languageCode);
@@ -120,7 +131,15 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Family Card ${state.currentQuestionIndex + 1} of ${state.questions.length}',
+                        langCode == 'hi'
+                            ? 'कार्ड ${state.currentQuestionIndex + 1} / ${state.questions.length}'
+                            : langCode == 'bn'
+                                ? 'কার্ড ${state.currentQuestionIndex + 1} / ${state.questions.length}'
+                                : langCode == 'as'
+                                    ? 'কাৰ্ড ${state.currentQuestionIndex + 1} / ${state.questions.length}'
+                                    : langCode == 'ne'
+                                        ? 'कार्ड ${state.currentQuestionIndex + 1} / ${state.questions.length}'
+                                        : 'Card ${state.currentQuestionIndex + 1} / ${state.questions.length}',
                         style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w700,
@@ -136,9 +155,9 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                           color: const Color(0xFFE2E8F0),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
-                        child: const Text(
-                          'Family & Friends',
-                          style: TextStyle(
+                        child: Text(
+                          l10n?.familyAndFriends ?? 'Family & Friends',
+                          style: const TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.w600,
                           ),
@@ -188,7 +207,7 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                         ),
                         const SizedBox(height: 14.0),
                         Text(
-                          currentMember.name,
+                          currentMember.localizedName(langCode),
                           style: const TextStyle(
                             fontSize: 26.0,
                             fontWeight: FontWeight.w800,
@@ -217,7 +236,7 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                               const SizedBox(width: 10.0),
                               Expanded(
                                 child: Text(
-                                  '"${currentMember.voiceNoteTranscription}"',
+                                  '"${currentMember.localizedVoiceNoteTranscription(langCode)}"',
                                   style: const TextStyle(
                                     fontSize: 16.0,
                                     fontStyle: FontStyle.italic,
@@ -227,7 +246,8 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                                 ),
                               ),
                               SpeakButton(
-                                text: currentMember.voiceNoteTranscription,
+                                text: currentMember
+                                    .localizedVoiceNoteTranscription(langCode),
                                 size: 36.0,
                               ),
                             ],
@@ -256,7 +276,8 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                                 const SizedBox(width: 8.0),
                                 Expanded(
                                   child: Text(
-                                    state.activeHintText!,
+                                    currentMember
+                                        .localizedHintDescription(langCode),
                                     style: const TextStyle(
                                       fontSize: 15.0,
                                       fontWeight: FontWeight.w600,
@@ -275,7 +296,7 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
 
                   // Question Prompt
                   Text(
-                    'What is ${currentMember.name}\'s relationship to you?',
+                    currentMember.localizedQuestionPrompt(langCode),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 20.0,
@@ -291,13 +312,14 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                     final isEliminated = state.eliminatedDistractors.contains(
                       option,
                     );
+                    final localizedOption = FamilyMemberItem.localizeRelationship(option, langCode);
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: Semantics(
                         button: true,
                         selected: isSelected,
-                        label: '$option ${isEliminated ? 'Eliminated' : ''}',
+                        label: '$localizedOption ${isEliminated ? 'Eliminated' : ''}',
                         child: InkWell(
                           onTap: isEliminated
                               ? null
@@ -348,7 +370,7 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                                 const SizedBox(width: 14.0),
                                 Expanded(
                                   child: Text(
-                                    option,
+                                    localizedOption,
                                     style: TextStyle(
                                       fontSize: 19.0,
                                       fontWeight: FontWeight.w700,
@@ -373,8 +395,8 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                   // Navigation / Next Card Button
                   ElderGameButton(
                     label: state.isLastQuestion
-                        ? 'Complete Activity ➔'
-                        : 'Next Person ➔',
+                        ? (l10n?.completeActivityButton ?? 'Complete Activity ➔')
+                        : (l10n?.continueButton ?? 'Next Person ➔'),
                     icon: state.isLastQuestion
                         ? Icons.check_rounded
                         : Icons.arrow_forward_rounded,

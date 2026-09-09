@@ -53,6 +53,7 @@ dependencies:
   speech_to_text: ^7.0.0
   just_audio: ^0.9.36
   audio_session: ^0.1.18
+  just_audio_windows: ^0.2.3
 
 dev_dependencies:
   flutter_test:

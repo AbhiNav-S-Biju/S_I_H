@@ -4,23 +4,26 @@
 // ==============================================================================
 
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/game_enums.dart';
 import '../models/game_session.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../app/providers/accessibility_providers.dart';
 import 'grocery_memory/grocery_memory_screen.dart';
 import 'remember_objects/remember_objects_screen.dart';
 import 'who_is_this/who_is_this_screen.dart';
 import 'widgets/elder_game_button.dart';
 
-class GamesHubScreen extends StatefulWidget {
+class GamesHubScreen extends ConsumerStatefulWidget {
   final ValueChanged<GameSession>? onSessionCompleted;
 
   const GamesHubScreen({super.key, this.onSessionCompleted});
 
   @override
-  State<GamesHubScreen> createState() => _GamesHubScreenState();
+  ConsumerState<GamesHubScreen> createState() => _GamesHubScreenState();
 }
 
-class _GamesHubScreenState extends State<GamesHubScreen> {
+class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
   GameDifficulty _selectedDifficulty = GameDifficulty.easy;
 
   void _launchGame(Widget screen) async {
@@ -35,12 +38,15 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider);
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text(
-          'Daily Activities',
-          style: TextStyle(
+        title: Text(
+          l10n?.activitiesTitle ?? 'Daily Activities',
+          style: const TextStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.w800,
             color: Color(0xFF0F172A),
@@ -63,26 +69,27 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                 borderRadius: BorderRadius.circular(20.0),
                 border: Border.all(color: const Color(0xFFBBF7D0)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.spa_rounded, color: Color(0xFF16A34A), size: 36.0),
-                  SizedBox(width: 14.0),
+                  const Icon(Icons.spa_rounded, color: Color(0xFF16A34A), size: 36.0),
+                  const SizedBox(width: 14.0),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome to Today\'s Fun!',
-                          style: TextStyle(
+                          l10n?.activitiesBannerTitle ?? 'Welcome to Today\'s Fun!',
+                          style: const TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.w800,
                             color: Color(0xFF14532D),
                           ),
                         ),
-                        SizedBox(height: 4.0),
+                        const SizedBox(height: 4.0),
                         Text(
-                          'Choose an enjoyable activity below. Take all the time you like.',
-                          style: TextStyle(
+                          l10n?.activitiesBannerSubtitle ??
+                              'Choose an enjoyable activity below. Take all the time you like.',
+                          style: const TextStyle(
                             fontSize: 15.0,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF15803D),
@@ -97,9 +104,9 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
             const SizedBox(height: 24.0),
 
             // Difficulty Selector (Pill bar)
-            const Text(
-              'Activity Pace:',
-              style: TextStyle(
+            Text(
+              l10n?.activityPace ?? 'Activity Pace:',
+              style: const TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF334155),
@@ -135,7 +142,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          diff.label,
+                          diff.localizedLabel(l10n),
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w700,
@@ -154,11 +161,12 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
 
             // 1. Remember Objects Card
             _buildGameCard(
-              title: GameType.rememberObjects.displayName,
-              subtitle: GameType.rememberObjects.subtitle,
+              title: GameType.rememberObjects.localizedTitle(l10n),
+              subtitle: GameType.rememberObjects.localizedSubtitle(l10n),
               emoji: '🍎',
               badgeColor: const Color(0xFFDCFCE7),
               textColor: const Color(0xFF166534),
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
               onPlay: () => _launchGame(
                 RememberObjectsScreen(
                   difficulty: _selectedDifficulty,
@@ -170,11 +178,12 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
 
             // 2. Who Is This? Card
             _buildGameCard(
-              title: GameType.whoIsThis.displayName,
-              subtitle: GameType.whoIsThis.subtitle,
+              title: GameType.whoIsThis.localizedTitle(l10n),
+              subtitle: GameType.whoIsThis.localizedSubtitle(l10n),
               emoji: '👵',
               badgeColor: const Color(0xFFE0F2FE),
               textColor: const Color(0xFF075985),
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
               onPlay: () => _launchGame(
                 WhoIsThisScreen(
                   difficulty: _selectedDifficulty,
@@ -186,11 +195,12 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
 
             // 3. Grocery Memory Card
             _buildGameCard(
-              title: GameType.groceryMemory.displayName,
-              subtitle: GameType.groceryMemory.subtitle,
+              title: GameType.groceryMemory.localizedTitle(l10n),
+              subtitle: GameType.groceryMemory.localizedSubtitle(l10n),
               emoji: '🛒',
               badgeColor: const Color(0xFFFEF3C7),
               textColor: const Color(0xFF92400E),
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
               onPlay: () => _launchGame(
                 GroceryMemoryScreen(
                   difficulty: _selectedDifficulty,
@@ -211,6 +221,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
     required String emoji,
     required Color badgeColor,
     required Color textColor,
+    required String buttonLabel,
     required VoidCallback onPlay,
   }) {
     return Container(
@@ -271,7 +282,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
           ),
           const SizedBox(height: 18.0),
           ElderGameButton(
-            label: 'Play Activity ➔',
+            label: buttonLabel,
             icon: Icons.play_arrow_rounded,
             onPressed: onPlay,
           ),

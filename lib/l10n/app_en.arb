@@ -239,5 +239,129 @@
   "aboutAppVersion": "Version 1.0.0 • Compassionate Cognitive Care",
   "@aboutAppVersion": {
     "description": "About app version info"
+  },
+  "activitiesTitle": "Daily Activities",
+  "@activitiesTitle": {
+    "description": "Title for daily activities"
+  },
+  "activitiesBannerTitle": "Welcome to Today's Fun!",
+  "@activitiesBannerTitle": {
+    "description": "Banner title in activities screen"
+  },
+  "activitiesBannerSubtitle": "Choose an enjoyable activity below. Take all the time you like.",
+  "@activitiesBannerSubtitle": {
+    "description": "Banner subtitle in activities screen"
+  },
+  "activityPace": "Activity Pace:",
+  "@activityPace": {
+    "description": "Activity pace label"
+  },
+  "paceGentle": "Gentle",
+  "@paceGentle": {
+    "description": "Gentle pace option"
+  },
+  "paceStandard": "Standard",
+  "@paceStandard": {
+    "description": "Standard pace option"
+  },
+  "paceChallenge": "Challenge",
+  "@paceChallenge": {
+    "description": "Challenge pace option"
+  },
+  "gameRememberObjectsTitle": "Remember Objects",
+  "@gameRememberObjectsTitle": {
+    "description": "Title of Remember Objects game"
+  },
+  "gameRememberObjectsSubtitle": "Look at the friendly items, then tap what you saw",
+  "@gameRememberObjectsSubtitle": {
+    "description": "Subtitle of Remember Objects game"
+  },
+  "gameWhoIsThisTitle": "Who Is This?",
+  "@gameWhoIsThisTitle": {
+    "description": "Title of Who Is This game"
+  },
+  "gameWhoIsThisSubtitle": "Recognize familiar faces and loved ones",
+  "@gameWhoIsThisSubtitle": {
+    "description": "Subtitle of Who Is This game"
+  },
+  "gameGroceryMemoryTitle": "Grocery Memory",
+  "@gameGroceryMemoryTitle": {
+    "description": "Title of Grocery Memory game"
+  },
+  "gameGroceryMemorySubtitle": "Collect everyday items from your shopping list",
+  "@gameGroceryMemorySubtitle": {
+    "description": "Subtitle of Grocery Memory game"
+  },
+  "playActivityButton": "Play Activity ➔",
+  "@playActivityButton": {
+    "description": "Button to start an activity"
+  },
+  "exitActivityTooltip": "Exit Activity",
+  "@exitActivityTooltip": {
+    "description": "Tooltip for exiting activity"
+  },
+  "leaveActivityTitle": "Leave Activity?",
+  "@leaveActivityTitle": {
+    "description": "Title of exit confirmation dialog"
+  },
+  "leaveActivityMessage": "Are you sure you want to pause and return to the main screen? Your gentle progress is always saved.",
+  "@leaveActivityMessage": {
+    "description": "Body message of exit confirmation dialog"
+  },
+  "stayAndContinue": "Stay & Continue",
+  "@stayAndContinue": {
+    "description": "Button to stay in activity"
+  },
+  "yesExit": "Yes, Exit",
+  "@yesExit": {
+    "description": "Button to exit activity"
+  },
+  "hintButton": "Hint",
+  "@hintButton": {
+    "description": "Hint button label"
+  },
+  "activityCompletedTitle": "Activity Completed!",
+  "@activityCompletedTitle": {
+    "description": "Title for activity completion"
+  },
+  "finishButton": "Finish",
+  "@finishButton": {
+    "description": "Finish button label"
+  },
+  "rememberObjectsLookCarefully": "Look at these items carefully. Take all the time you need.",
+  "@rememberObjectsLookCarefully": {
+    "description": "Instructions for memorization phase"
+  },
+  "iAmReadyButton": "I am Ready ➔",
+  "@iAmReadyButton": {
+    "description": "Button to proceed to recall phase"
+  },
+  "whichItemsDidYouSee": "Which items did you see? Tap them below:",
+  "@whichItemsDidYouSee": {
+    "description": "Instructions for recall phase"
+  },
+  "completeActivityButton": "Complete Activity ➔",
+  "@completeActivityButton": {
+    "description": "Button to complete activity"
+  },
+  "familyAndFriends": "Family & Friends",
+  "@familyAndFriends": {
+    "description": "Family and friends tag"
+  },
+  "shoppingListTitle": "Your Shopping List",
+  "@shoppingListTitle": {
+    "description": "Shopping list title"
+  },
+  "shoppingListSubtitle": "Review these items, then tap 'Start Shopping' when ready.",
+  "@shoppingListSubtitle": {
+    "description": "Shopping list subtitle"
+  },
+  "startShoppingButton": "Start Shopping ➔",
+  "@startShoppingButton": {
+    "description": "Button to start shopping phase"
+  },
+  "findItemsOnShelf": "Tap items from your list to put them in your cart:",
+  "@findItemsOnShelf": {
+    "description": "Instructions for finding items on shelf"
   }
 }

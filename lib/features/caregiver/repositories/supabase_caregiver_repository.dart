@@ -108,26 +108,46 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     required String password,
   }) async {
     final activeClient = client;
+    final cleanEmail = email.trim();
 
     if (activeClient != null) {
       try {
         final response = await activeClient.auth.signInWithPassword(
-          email: email.trim(),
+          email: cleanEmail,
           password: password,
         );
 
         final user = response.user;
         if (user != null) {
           // Fetch profile details from profiles table
-          final profileData = await activeClient
+          Map<String, dynamic>? profileData = await activeClient
               .from('profiles')
               .select()
               .eq('id', user.id)
               .maybeSingle();
 
+          // Self-heal: If profile record is missing, create it
+          if (profileData == null) {
+            try {
+              final fullName = user.userMetadata?['full_name'] as String? ?? 'Caregiver';
+              final profileInsert = {
+                'id': user.id,
+                'email': user.email ?? cleanEmail,
+                'full_name': fullName,
+                'role': 'caregiver',
+                'created_at': DateTime.now().toUtc().toIso8601String(),
+                'updated_at': DateTime.now().toUtc().toIso8601String(),
+              };
+              await activeClient.from('profiles').upsert(profileInsert);
+              profileData = profileInsert;
+            } catch (profileErr) {
+              debugPrint('⚠️ Non-fatal profile creation warning: $profileErr');
+            }
+          }
+
           _cachedProfile = CaregiverProfile(
             id: user.id,
-            email: user.email ?? email,
+            email: user.email ?? cleanEmail,
             fullName: profileData?['full_name'] as String? ??
                 user.userMetadata?['full_name'] as String? ??
                 'Caregiver',
@@ -148,7 +168,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     // Offline / Demo Caregiver Mode (strictly when offline)
     _cachedProfile = CaregiverProfile(
       id: 'caregiver-local-001',
-      email: email.isEmpty ? 'caregiver@nirvana.care' : email,
+      email: cleanEmail.isEmpty ? 'caregiver@nirvana.care' : cleanEmail,
       fullName: 'Sarah Jenkins',
       role: 'primary_caregiver',
     );

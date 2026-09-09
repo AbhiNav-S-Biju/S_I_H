@@ -200,4 +200,104 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get aboutAppVersion => 'সংস্করণ ১.০.০ • সহৃদয় ও কোমল যত্ন';
+
+  @override
+  String get activitiesTitle => 'দৈনন্দিন কার্যকলাপ';
+
+  @override
+  String get activitiesBannerTitle => 'আজকের আনন্দে স্বাগতম!';
+
+  @override
+  String get activitiesBannerSubtitle =>
+      'নিচের যেকোনো একটি কার্যকলাপ বেছে নিন। নিজের মতো সময় নিন।';
+
+  @override
+  String get activityPace => 'কার্যকলাপের গতি:';
+
+  @override
+  String get paceGentle => 'সহজ';
+
+  @override
+  String get paceStandard => 'সাধারণ';
+
+  @override
+  String get paceChallenge => 'চ্যালেঞ্জিং';
+
+  @override
+  String get gameRememberObjectsTitle => 'জিনিস মনে রাখুন';
+
+  @override
+  String get gameRememberObjectsSubtitle =>
+      'জিনিসগুলো মনোযোগ দিয়ে দেখুন, তারপর যা দেখেছেন তা চিহ্নিত করুন';
+
+  @override
+  String get gameWhoIsThisTitle => 'ইনি কে?';
+
+  @override
+  String get gameWhoIsThisSubtitle => 'পরিচিত মুখ এবং প্রিয়জনদের চিনুন';
+
+  @override
+  String get gameGroceryMemoryTitle => 'বাজারের তালিকা';
+
+  @override
+  String get gameGroceryMemorySubtitle =>
+      'আপনার কেনাকাটার তালিকা থেকে জিনিস সংগ্রহ করুন';
+
+  @override
+  String get playActivityButton => 'কার্যকলাপ শুরু করুন ➔';
+
+  @override
+  String get exitActivityTooltip => 'কার্যকলাপ থেকে বের হন';
+
+  @override
+  String get leaveActivityTitle => 'কার্যকলাপ কি ছাড়তে চান?';
+
+  @override
+  String get leaveActivityMessage =>
+      'আপনি কি মূল পর্দায় ফিরে যেতে চান? আপনার অগ্রগতি সংরক্ষিত থাকবে।';
+
+  @override
+  String get stayAndContinue => 'চালিয়ে যান';
+
+  @override
+  String get yesExit => 'হ্যাঁ, বের হন';
+
+  @override
+  String get hintButton => 'ইঙ্গিত';
+
+  @override
+  String get activityCompletedTitle => 'কার্যকলাপ সম্পন্ন হয়েছে!';
+
+  @override
+  String get finishButton => 'সমাপ্ত করুন';
+
+  @override
+  String get rememberObjectsLookCarefully =>
+      'এই জিনিসগুলি মনোযোগ দিয়ে দেখুন। সম্পূর্ণ সময় নিন।';
+
+  @override
+  String get iAmReadyButton => 'আমি প্রস্তুত ➔';
+
+  @override
+  String get whichItemsDidYouSee =>
+      'আপনি কোন জিনিসগুলো দেখেছেন? নিচে বেছে নিন:';
+
+  @override
+  String get completeActivityButton => 'কার্যকলাপ সম্পন্ন করুন ➔';
+
+  @override
+  String get familyAndFriends => 'পরিবার ও বন্ধু';
+
+  @override
+  String get shoppingListTitle => 'আপনার কেনাকাটার তালিকা';
+
+  @override
+  String get shoppingListSubtitle =>
+      'জিনিসগুলো দেখে নিন, প্রস্তুত হলে \'কেনাকাটা শুরু করুন\' চাপুন।';
+
+  @override
+  String get startShoppingButton => 'কেনাকাটা শুরু করুন ➔';
+
+  @override
+  String get findItemsOnShelf => 'তালিকার জিনিসগুলো ঝুড়িতে রাখতে ট্যাপ করুন:';
 }
