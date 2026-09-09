@@ -79,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: reducedMotion,
-                  activeColor: theme.colorScheme.primary,
+                  activeThumbColor: theme.colorScheme.primary,
                   title: Text(
                     l10n?.reducedMotionTitle ?? 'Reduced Motion',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -111,7 +111,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: highContrast,
-                  activeColor: theme.colorScheme.primary,
+                  activeThumbColor: theme.colorScheme.primary,
                   title: Text(
                     l10n?.highContrastTitle ?? 'High Contrast Mode',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -143,7 +143,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: voiceEnabled,
-                  activeColor: theme.colorScheme.primary,
+                  activeThumbColor: theme.colorScheme.primary,
                   title: Text(
                     'Voice Assistance & Prompts',
                     style: theme.textTheme.titleMedium?.copyWith(

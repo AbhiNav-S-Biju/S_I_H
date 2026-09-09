@@ -14,6 +14,11 @@ export 'controllers/remember_objects_controller.dart';
 export 'controllers/who_is_this_controller.dart';
 export 'controllers/grocery_memory_controller.dart';
 
+// Repositories & Providers
+export 'repositories/game_session_repository.dart';
+export 'repositories/supabase_game_session_repository.dart';
+export 'providers/game_session_providers.dart';
+
 // Presentation
 export 'presentation/remember_objects/remember_objects_screen.dart';
 export 'presentation/who_is_this/who_is_this_screen.dart';

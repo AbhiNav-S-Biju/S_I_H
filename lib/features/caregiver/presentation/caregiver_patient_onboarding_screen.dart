@@ -421,7 +421,7 @@ class _CaregiverPatientOnboardingScreenState
           // Relationship
           _buildFieldLabel('Relationship to Caregiver *'),
           DropdownButtonFormField<String>(
-            value: _selectedRelationship,
+            initialValue: _selectedRelationship,
             decoration: _inputDecoration('Select Relationship', Icons.people_outline),
             items: _relationshipOptions.map((rel) {
               return DropdownMenuItem(value: rel, child: Text(rel));
@@ -492,7 +492,7 @@ class _CaregiverPatientOnboardingScreenState
           // Timezone
           _buildFieldLabel('Timezone'),
           DropdownButtonFormField<String>(
-            value: _selectedTimezone,
+            initialValue: _selectedTimezone,
             decoration: _inputDecoration('Select Timezone', Icons.access_time),
             items: _timezoneOptions.map((tz) {
               return DropdownMenuItem(value: tz, child: Text(tz));
@@ -649,7 +649,7 @@ class _CaregiverPatientOnboardingScreenState
                 Switch(
                   value: item.isEnabled,
                   activeTrackColor: ElderColors.primary.withValues(alpha: 0.5),
-                  activeColor: ElderColors.primary,
+                  activeThumbColor: ElderColors.primary,
                   onChanged: (v) {
                     setState(() => item.isEnabled = v);
                   },
@@ -754,7 +754,7 @@ class _CaregiverPatientOnboardingScreenState
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: reminderType,
+                  initialValue: reminderType,
                   decoration: _inputDecoration('Type', Icons.category),
                   items: const [
                     DropdownMenuItem(value: 'medication', child: Text('Medication')),
@@ -1048,7 +1048,7 @@ class _CaregiverPatientOnboardingScreenState
           Switch(
             value: value,
             activeTrackColor: ElderColors.primary.withValues(alpha: 0.5),
-            activeColor: ElderColors.primary,
+            activeThumbColor: ElderColors.primary,
             onChanged: onChanged,
           ),
         ],

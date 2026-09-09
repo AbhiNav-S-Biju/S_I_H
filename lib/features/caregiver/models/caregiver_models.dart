@@ -648,3 +648,92 @@ class PairDeviceResult {
   }
 }
 
+/// Notification Feed record for Caregivers and Family Members
+class CaregiverNotification {
+  final String id;
+  final String caregiverId;
+  final String patientId;
+  final String notificationType; // 'reminder_completed', 'reminder_missed', 'reminder_snoozed', 'game_completed', 'device_paired', 'device_revoked', 'sync_restored', 'sync_error'
+  final String title;
+  final String message;
+  final String? relatedReminderId;
+  final String? relatedGameSessionId;
+  final bool isRead;
+  final DateTime createdAt;
+  final String? patientName;
+
+  const CaregiverNotification({
+    required this.id,
+    required this.caregiverId,
+    required this.patientId,
+    required this.notificationType,
+    required this.title,
+    required this.message,
+    this.relatedReminderId,
+    this.relatedGameSessionId,
+    this.isRead = false,
+    required this.createdAt,
+    this.patientName,
+  });
+
+  factory CaregiverNotification.fromMap(Map<String, dynamic> map) {
+    return CaregiverNotification(
+      id: map['id'] as String? ?? '',
+      caregiverId: map['caregiver_id'] as String? ?? '',
+      patientId: map['patient_id'] as String? ?? '',
+      notificationType: map['notification_type'] as String? ?? 'reminder_completed',
+      title: map['title'] as String? ?? 'Notification',
+      message: map['message'] as String? ?? '',
+      relatedReminderId: map['related_reminder_id'] as String?,
+      relatedGameSessionId: map['related_game_session_id'] as String?,
+      isRead: map['is_read'] as bool? ?? false,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'] as String) ?? DateTime.now()
+          : DateTime.now(),
+      patientName: map['patient_name'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'caregiver_id': caregiverId,
+    'patient_id': patientId,
+    'notification_type': notificationType,
+    'title': title,
+    'message': message,
+    if (relatedReminderId != null) 'related_reminder_id': relatedReminderId,
+    if (relatedGameSessionId != null)
+      'related_game_session_id': relatedGameSessionId,
+    'is_read': isRead,
+    'created_at': createdAt.toUtc().toIso8601String(),
+  };
+
+  CaregiverNotification copyWith({
+    String? id,
+    String? caregiverId,
+    String? patientId,
+    String? notificationType,
+    String? title,
+    String? message,
+    String? relatedReminderId,
+    String? relatedGameSessionId,
+    bool? isRead,
+    DateTime? createdAt,
+    String? patientName,
+  }) {
+    return CaregiverNotification(
+      id: id ?? this.id,
+      caregiverId: caregiverId ?? this.caregiverId,
+      patientId: patientId ?? this.patientId,
+      notificationType: notificationType ?? this.notificationType,
+      title: title ?? this.title,
+      message: message ?? this.message,
+      relatedReminderId: relatedReminderId ?? this.relatedReminderId,
+      relatedGameSessionId: relatedGameSessionId ?? this.relatedGameSessionId,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt ?? this.createdAt,
+      patientName: patientName ?? this.patientName,
+    );
+  }
+}
+

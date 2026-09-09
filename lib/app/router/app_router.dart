@@ -169,8 +169,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/games',
                 builder: (context, state) => GamesHubScreen(
-                  onSessionCompleted: (session) {
+                  onSessionCompleted: (session) async {
                     debugPrint('Activity Session Completed: $session');
+
+                    // Determine active patient ID:
+                    // 1. Selected patient in Caregiver View (if active)
+                    // 2. Paired patient session in Hive (if paired elder device)
+                    // 3. First assigned patient if available
+                    final selected = ref.read(selectedPatientProvider);
+                    final pairedId = HiveDatabase.pairedPatientId ??
+                        HiveDatabase.currentPatientSession?.patientId;
+                    final assigned = ref.read(assignedPatientsProvider).value;
+
+                    final effectivePatientId = selected?.id ??
+                        pairedId ??
+                        (assigned != null && assigned.isNotEmpty
+                            ? assigned.first.id
+                            : null);
+
+                    if (effectivePatientId != null &&
+                        effectivePatientId.isNotEmpty) {
+                      await ref
+                          .read(gameSessionRepositoryProvider)
+                          .recordGameSession(
+                            session: session,
+                            patientId: effectivePatientId,
+                          );
+
+                      // Invalidate caregiver dashboard telemetry providers
+                      ref.invalidate(selectedPatientGameHistoryProvider);
+                      ref.invalidate(selectedPatientSevenDayActivityProvider);
+                      ref.invalidate(caregiverSyncStatusProvider);
+                    }
                   },
                 ),
               ),
