@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers/accessibility_providers.dart';
 import 'grocery_memory/grocery_memory_screen.dart';
 import 'jigsaw_puzzle/jigsaw_puzzle_screen.dart';
+import 'my_days/my_days_screen.dart';
 import 'remember_objects/remember_objects_screen.dart';
 import 'who_is_this/who_is_this_screen.dart';
 import 'widgets/elder_game_button.dart';
@@ -221,6 +222,23 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
               buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
               onPlay: () => _launchGame(
                 JigsawPuzzleScreen(
+                  difficulty: _selectedDifficulty,
+                  onGameCompleted: widget.onSessionCompleted,
+                ),
+              ),
+            ),
+            const SizedBox(height: 18.0),
+
+            // 5. My Days Card
+            _buildGameCard(
+              title: GameType.myDays.localizedTitle(l10n),
+              subtitle: GameType.myDays.localizedSubtitle(l10n),
+              emoji: '🌅',
+              badgeColor: const Color(0xFFFFE4E6),
+              textColor: const Color(0xFF9F1239),
+              buttonLabel: l10n?.playActivityButton ?? 'Play Activity ➔',
+              onPlay: () => _launchGame(
+                MyDaysScreen(
                   difficulty: _selectedDifficulty,
                   onGameCompleted: widget.onSessionCompleted,
                 ),

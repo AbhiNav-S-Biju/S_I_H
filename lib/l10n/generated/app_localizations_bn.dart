@@ -251,6 +251,129 @@ class AppLocalizationsBn extends AppLocalizations {
       'টুকরো টুকরো করে সুন্দর স্মৃতির ছবি সাজিয়ে তুলুন';
 
   @override
+  String get gameMyDaysTitle => 'আমার দিন';
+
+  @override
+  String get gameMyDaysSubtitle => 'পরিচিত দিনচর্যার শান্ত কার্যক্রম';
+
+  @override
+  String get myDaysChooseMode =>
+      'একটি পরিচিত দিন নিয়ে খেলার শান্ত উপায় বেছে নিন।';
+
+  @override
+  String get myDaysModeNextTitle => 'এরপর কী আসে?';
+
+  @override
+  String get myDaysModeNextSubtitle =>
+      'সকাল দেখুন, তারপর যা সাধারণত পরে আসে তা বেছে নিন।';
+
+  @override
+  String get myDaysModeOrderTitle => 'আমার দিন সাজান';
+
+  @override
+  String get myDaysModeOrderSubtitle =>
+      'পরিচিত দিনের ক্রমে কাজগুলো স্পর্শ করুন।';
+
+  @override
+  String get myDaysModeRememberTitle => 'আমার দিন মনে রাখুন';
+
+  @override
+  String get myDaysModeRememberSubtitle =>
+      'কয়েকটি কাজ দেখুন, তারপর একটি মনে করুন।';
+
+  @override
+  String get myDaysWhatComesNextPrompt => 'এরপর কোন কাজ আসে?';
+
+  @override
+  String get myDaysPutInOrderPrompt => 'এই কাজগুলো সঠিক ক্রমে সাজান।';
+
+  @override
+  String get myDaysRememberThese => 'এই কাজগুলো মনে রাখুন।';
+
+  @override
+  String get myDaysWhichWasPartOfDay => 'আপনার দিনে কোন কাজটি ছিল?';
+
+  @override
+  String myDaysYouHadActivity(String activity) {
+    return 'আপনি $activity করেছেন। আর কী করেছেন?';
+  }
+
+  @override
+  String myDaysNextCorrect(String previous, String next) {
+    return 'দারুণ! $previous এর পর $next করার সময়।';
+  }
+
+  @override
+  String get myDaysNextIncorrect => 'কোনো সমস্যা নেই। আবার চেষ্টা করুন।';
+
+  @override
+  String get myDaysOrderCorrect => 'চমৎকার! এটি দিনের পরিচিত ক্রম।';
+
+  @override
+  String get myDaysOrderIncorrect => 'প্রায় ঠিক। ভাবুন সাধারণত পরে কী আসে।';
+
+  @override
+  String get myDaysRememberCorrect => 'ভালো মনে পড়েছে! আপনি ভালো করছেন।';
+
+  @override
+  String get myDaysRememberIncorrect => 'কোনো সমস্যা নেই। দিনটি একসাথে দেখি।';
+
+  @override
+  String myDaysRoundProgress(int current, int total) {
+    return 'অংশ $current / $total';
+  }
+
+  @override
+  String get myDaysMorning => 'সকাল';
+
+  @override
+  String get myDaysAfternoon => 'দুপুর';
+
+  @override
+  String get myDaysEvening => 'সন্ধ্যা';
+
+  @override
+  String get myDaysNight => 'রাত';
+
+  @override
+  String get myDaysYourOrder => 'আপনার ক্রম';
+
+  @override
+  String get myDaysUndo => 'ফেরত';
+
+  @override
+  String get myDaysCheckOrder => 'ক্রম দেখুন';
+
+  @override
+  String get myDaysCorrectSequence => 'একটি পরিচিত ক্রম';
+
+  @override
+  String get myDaysReplayRound => 'এটি আবার চেষ্টা করুন';
+
+  @override
+  String get myDaysCompleteTitle => 'আমার দিন শেষ!';
+
+  @override
+  String myDaysRememberedSummary(int count, int total) {
+    return 'অসাধারণ! আপনি $totalটির মধ্যে $countটি কাজ মনে রেখেছেন।';
+  }
+
+  @override
+  String get myDaysActivitiesCompleted => 'শেষ হওয়া কাজ';
+
+  @override
+  String get myDaysGentleMatches => 'মিলে যাওয়া কাজ';
+
+  @override
+  String get myDaysPlayAgain => 'আবার খেলুন';
+
+  @override
+  String get myDaysBackToGames => 'খেলায় ফিরে যান';
+
+  @override
+  String get myDaysTakeYourTime => 'তাড়াহুড়ো নেই। নিজের সময় নিন।';
+
+  @override
   String get playActivityButton => 'কার্যকলাপ শুরু করুন ➔';
 
   @override

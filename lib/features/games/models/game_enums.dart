@@ -10,7 +10,8 @@ enum GameType {
   rememberObjects,
   whoIsThis,
   groceryMemory,
-  jigsawPuzzle;
+  jigsawPuzzle,
+  myDays;
 
   String get id {
     switch (this) {
@@ -22,6 +23,8 @@ enum GameType {
         return 'grocery_memory';
       case GameType.jigsawPuzzle:
         return 'jigsaw_puzzle';
+      case GameType.myDays:
+        return 'my_days';
     }
   }
 
@@ -35,6 +38,8 @@ enum GameType {
         return 'Grocery Memory';
       case GameType.jigsawPuzzle:
         return 'Familiar Jigsaw';
+      case GameType.myDays:
+        return 'My Days';
     }
   }
 
@@ -48,6 +53,8 @@ enum GameType {
         return 'Collect everyday items from your shopping list';
       case GameType.jigsawPuzzle:
         return 'Put together comforting pictures piece by piece';
+      case GameType.myDays:
+        return 'Gentle activities about a familiar daily routine';
     }
   }
 
@@ -62,6 +69,8 @@ enum GameType {
         return l10n.gameGroceryMemoryTitle;
       case GameType.jigsawPuzzle:
         return l10n.gameJigsawPuzzleTitle;
+      case GameType.myDays:
+        return l10n.gameMyDaysTitle;
     }
   }
 
@@ -76,6 +85,8 @@ enum GameType {
         return l10n.gameGroceryMemorySubtitle;
       case GameType.jigsawPuzzle:
         return l10n.gameJigsawPuzzleSubtitle;
+      case GameType.myDays:
+        return l10n.gameMyDaysSubtitle;
     }
   }
 }
@@ -197,4 +208,40 @@ enum GameDifficulty {
 
   /// Total piece count for Jigsaw Puzzle (2 in Easy, 4 in Medium, 6 in Hard)
   int get jigsawPieceCount => jigsawRows * jigsawCols;
+
+  /// Number of familiar daily activities used in My Days
+  int get myDaysActivityCount {
+    switch (this) {
+      case GameDifficulty.easy:
+        return 3;
+      case GameDifficulty.medium:
+        return 4;
+      case GameDifficulty.hard:
+        return 5;
+    }
+  }
+
+  /// Number of large answer choices in My Days
+  int get myDaysChoiceCount {
+    switch (this) {
+      case GameDifficulty.easy:
+        return 3;
+      case GameDifficulty.medium:
+        return 4;
+      case GameDifficulty.hard:
+        return 4;
+    }
+  }
+
+  /// Memorization wait for Remember My Day. Easy has no auto-hide.
+  Duration get myDaysMemorizeDuration {
+    switch (this) {
+      case GameDifficulty.easy:
+        return Duration.zero;
+      case GameDifficulty.medium:
+        return const Duration(seconds: 8);
+      case GameDifficulty.hard:
+        return const Duration(seconds: 5);
+    }
+  }
 }

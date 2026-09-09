@@ -300,6 +300,183 @@
   "@gameJigsawPuzzleSubtitle": {
     "description": "Subtitle of Dementia-Friendly Jigsaw Puzzle game"
   },
+  "gameMyDaysTitle": "My Days",
+  "@gameMyDaysTitle": {
+    "description": "Title of My Days daily-routine game"
+  },
+  "gameMyDaysSubtitle": "Gentle activities about a familiar daily routine",
+  "@gameMyDaysSubtitle": {
+    "description": "Subtitle of My Days game"
+  },
+  "myDaysChooseMode": "Choose a gentle way to play with a familiar day.",
+  "@myDaysChooseMode": {
+    "description": "Mode selection instruction"
+  },
+  "myDaysModeNextTitle": "What Comes Next?",
+  "@myDaysModeNextTitle": {
+    "description": "My Days mode 1 title"
+  },
+  "myDaysModeNextSubtitle": "Look at the morning, then choose what usually follows.",
+  "@myDaysModeNextSubtitle": {
+    "description": "My Days mode 1 subtitle"
+  },
+  "myDaysModeOrderTitle": "Put My Day in Order",
+  "@myDaysModeOrderTitle": {
+    "description": "My Days mode 2 title"
+  },
+  "myDaysModeOrderSubtitle": "Tap the activities in the order of a familiar day.",
+  "@myDaysModeOrderSubtitle": {
+    "description": "My Days mode 2 subtitle"
+  },
+  "myDaysModeRememberTitle": "Remember My Day",
+  "@myDaysModeRememberTitle": {
+    "description": "My Days mode 3 title"
+  },
+  "myDaysModeRememberSubtitle": "Look at a few activities, then remember one of them.",
+  "@myDaysModeRememberSubtitle": {
+    "description": "My Days mode 3 subtitle"
+  },
+  "myDaysWhatComesNextPrompt": "Which activity comes next?",
+  "@myDaysWhatComesNextPrompt": {
+    "description": "Prompt for What Comes Next mode"
+  },
+  "myDaysPutInOrderPrompt": "Put these activities in the correct order.",
+  "@myDaysPutInOrderPrompt": {
+    "description": "Prompt for Put My Day in Order mode"
+  },
+  "myDaysRememberThese": "Remember these activities.",
+  "@myDaysRememberThese": {
+    "description": "Memorization prompt"
+  },
+  "myDaysWhichWasPartOfDay": "Which activity was part of your day?",
+  "@myDaysWhichWasPartOfDay": {
+    "description": "Recall prompt without a named activity"
+  },
+  "myDaysYouHadActivity": "You had {activity}. What else did you do?",
+  "@myDaysYouHadActivity": {
+    "description": "Recall prompt naming one activity",
+    "placeholders": {
+      "activity": {
+        "type": "String"
+      }
+    }
+  },
+  "myDaysNextCorrect": "Well done! After {previous}, it's time for {next}.",
+  "@myDaysNextCorrect": {
+    "description": "Encouraging correct feedback for sequence",
+    "placeholders": {
+      "previous": {
+        "type": "String"
+      },
+      "next": {
+        "type": "String"
+      }
+    }
+  },
+  "myDaysNextIncorrect": "That's okay. Let's try again.",
+  "@myDaysNextIncorrect": {
+    "description": "Gentle incorrect feedback"
+  },
+  "myDaysOrderCorrect": "Wonderful! That is a familiar order for the day.",
+  "@myDaysOrderCorrect": {
+    "description": "Correct order feedback"
+  },
+  "myDaysOrderIncorrect": "Not quite. Let's think about what usually comes next.",
+  "@myDaysOrderIncorrect": {
+    "description": "Incorrect order feedback"
+  },
+  "myDaysRememberCorrect": "Nice memory! You are doing well.",
+  "@myDaysRememberCorrect": {
+    "description": "Correct recall feedback"
+  },
+  "myDaysRememberIncorrect": "That's okay. Let's look at the day together.",
+  "@myDaysRememberIncorrect": {
+    "description": "Incorrect recall feedback"
+  },
+  "myDaysRoundProgress": "Part {current} of {total}",
+  "@myDaysRoundProgress": {
+    "description": "Round progress label",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "myDaysMorning": "Morning",
+  "@myDaysMorning": {
+    "description": "Morning period label"
+  },
+  "myDaysAfternoon": "Afternoon",
+  "@myDaysAfternoon": {
+    "description": "Afternoon period label"
+  },
+  "myDaysEvening": "Evening",
+  "@myDaysEvening": {
+    "description": "Evening period label"
+  },
+  "myDaysNight": "Night",
+  "@myDaysNight": {
+    "description": "Night period label"
+  },
+  "myDaysYourOrder": "Your order",
+  "@myDaysYourOrder": {
+    "description": "Label for tapped order"
+  },
+  "myDaysUndo": "Undo",
+  "@myDaysUndo": {
+    "description": "Undo last tap"
+  },
+  "myDaysCheckOrder": "Check Order",
+  "@myDaysCheckOrder": {
+    "description": "Check arranged order"
+  },
+  "myDaysCorrectSequence": "A familiar order",
+  "@myDaysCorrectSequence": {
+    "description": "Heading showing the familiar sequence"
+  },
+  "myDaysReplayRound": "Try this one again",
+  "@myDaysReplayRound": {
+    "description": "Replay current round"
+  },
+  "myDaysCompleteTitle": "My Day Complete!",
+  "@myDaysCompleteTitle": {
+    "description": "End-of-game title"
+  },
+  "myDaysRememberedSummary": "Wonderful! You remembered {count} out of {total} activities.",
+  "@myDaysRememberedSummary": {
+    "description": "Encouraging completion summary",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "myDaysActivitiesCompleted": "Activities completed",
+  "@myDaysActivitiesCompleted": {
+    "description": "Results label"
+  },
+  "myDaysGentleMatches": "Gentle matches",
+  "@myDaysGentleMatches": {
+    "description": "Results label for correct answers"
+  },
+  "myDaysPlayAgain": "Play Again",
+  "@myDaysPlayAgain": {
+    "description": "Replay whole game"
+  },
+  "myDaysBackToGames": "Back to Games",
+  "@myDaysBackToGames": {
+    "description": "Return to games hub"
+  },
+  "myDaysTakeYourTime": "Take your time. There is no rush.",
+  "@myDaysTakeYourTime": {
+    "description": "No-timer reassurance"
+  },
   "playActivityButton": "Play Activity ➔",
   "@playActivityButton": {
     "description": "Button to start an activity"

@@ -560,6 +560,228 @@ abstract class AppLocalizations {
   /// **'Put together comforting pictures piece by piece'**
   String get gameJigsawPuzzleSubtitle;
 
+  /// Title of My Days daily-routine game
+  ///
+  /// In en, this message translates to:
+  /// **'My Days'**
+  String get gameMyDaysTitle;
+
+  /// Subtitle of My Days game
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle activities about a familiar daily routine'**
+  String get gameMyDaysSubtitle;
+
+  /// Mode selection instruction
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a gentle way to play with a familiar day.'**
+  String get myDaysChooseMode;
+
+  /// My Days mode 1 title
+  ///
+  /// In en, this message translates to:
+  /// **'What Comes Next?'**
+  String get myDaysModeNextTitle;
+
+  /// My Days mode 1 subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Look at the morning, then choose what usually follows.'**
+  String get myDaysModeNextSubtitle;
+
+  /// My Days mode 2 title
+  ///
+  /// In en, this message translates to:
+  /// **'Put My Day in Order'**
+  String get myDaysModeOrderTitle;
+
+  /// My Days mode 2 subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the activities in the order of a familiar day.'**
+  String get myDaysModeOrderSubtitle;
+
+  /// My Days mode 3 title
+  ///
+  /// In en, this message translates to:
+  /// **'Remember My Day'**
+  String get myDaysModeRememberTitle;
+
+  /// My Days mode 3 subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Look at a few activities, then remember one of them.'**
+  String get myDaysModeRememberSubtitle;
+
+  /// Prompt for What Comes Next mode
+  ///
+  /// In en, this message translates to:
+  /// **'Which activity comes next?'**
+  String get myDaysWhatComesNextPrompt;
+
+  /// Prompt for Put My Day in Order mode
+  ///
+  /// In en, this message translates to:
+  /// **'Put these activities in the correct order.'**
+  String get myDaysPutInOrderPrompt;
+
+  /// Memorization prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Remember these activities.'**
+  String get myDaysRememberThese;
+
+  /// Recall prompt without a named activity
+  ///
+  /// In en, this message translates to:
+  /// **'Which activity was part of your day?'**
+  String get myDaysWhichWasPartOfDay;
+
+  /// Recall prompt naming one activity
+  ///
+  /// In en, this message translates to:
+  /// **'You had {activity}. What else did you do?'**
+  String myDaysYouHadActivity(String activity);
+
+  /// Encouraging correct feedback for sequence
+  ///
+  /// In en, this message translates to:
+  /// **'Well done! After {previous}, it\'s time for {next}.'**
+  String myDaysNextCorrect(String previous, String next);
+
+  /// Gentle incorrect feedback
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s okay. Let\'s try again.'**
+  String get myDaysNextIncorrect;
+
+  /// Correct order feedback
+  ///
+  /// In en, this message translates to:
+  /// **'Wonderful! That is a familiar order for the day.'**
+  String get myDaysOrderCorrect;
+
+  /// Incorrect order feedback
+  ///
+  /// In en, this message translates to:
+  /// **'Not quite. Let\'s think about what usually comes next.'**
+  String get myDaysOrderIncorrect;
+
+  /// Correct recall feedback
+  ///
+  /// In en, this message translates to:
+  /// **'Nice memory! You are doing well.'**
+  String get myDaysRememberCorrect;
+
+  /// Incorrect recall feedback
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s okay. Let\'s look at the day together.'**
+  String get myDaysRememberIncorrect;
+
+  /// Round progress label
+  ///
+  /// In en, this message translates to:
+  /// **'Part {current} of {total}'**
+  String myDaysRoundProgress(int current, int total);
+
+  /// Morning period label
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get myDaysMorning;
+
+  /// Afternoon period label
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get myDaysAfternoon;
+
+  /// Evening period label
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get myDaysEvening;
+
+  /// Night period label
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get myDaysNight;
+
+  /// Label for tapped order
+  ///
+  /// In en, this message translates to:
+  /// **'Your order'**
+  String get myDaysYourOrder;
+
+  /// Undo last tap
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get myDaysUndo;
+
+  /// Check arranged order
+  ///
+  /// In en, this message translates to:
+  /// **'Check Order'**
+  String get myDaysCheckOrder;
+
+  /// Heading showing the familiar sequence
+  ///
+  /// In en, this message translates to:
+  /// **'A familiar order'**
+  String get myDaysCorrectSequence;
+
+  /// Replay current round
+  ///
+  /// In en, this message translates to:
+  /// **'Try this one again'**
+  String get myDaysReplayRound;
+
+  /// End-of-game title
+  ///
+  /// In en, this message translates to:
+  /// **'My Day Complete!'**
+  String get myDaysCompleteTitle;
+
+  /// Encouraging completion summary
+  ///
+  /// In en, this message translates to:
+  /// **'Wonderful! You remembered {count} out of {total} activities.'**
+  String myDaysRememberedSummary(int count, int total);
+
+  /// Results label
+  ///
+  /// In en, this message translates to:
+  /// **'Activities completed'**
+  String get myDaysActivitiesCompleted;
+
+  /// Results label for correct answers
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle matches'**
+  String get myDaysGentleMatches;
+
+  /// Replay whole game
+  ///
+  /// In en, this message translates to:
+  /// **'Play Again'**
+  String get myDaysPlayAgain;
+
+  /// Return to games hub
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Games'**
+  String get myDaysBackToGames;
+
+  /// No-timer reassurance
+  ///
+  /// In en, this message translates to:
+  /// **'Take your time. There is no rush.'**
+  String get myDaysTakeYourTime;
+
   /// Button to start an activity
   ///
   /// In en, this message translates to:

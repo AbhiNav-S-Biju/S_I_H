@@ -28,6 +28,7 @@ void main() {
       expect(find.text('Who Is This?'), findsOneWidget);
       expect(find.text('Grocery Memory'), findsOneWidget);
       expect(find.text('Familiar Jigsaw'), findsOneWidget);
+      expect(find.text('My Days'), findsOneWidget);
       expect(find.text('Activity Pace:'), findsOneWidget);
     });
 
@@ -248,5 +249,32 @@ void main() {
         expect(completedSession!.gameType, equals(GameType.groceryMemory));
       },
     );
+
+    testWidgets('MyDaysScreen opens mode select and starts What Comes Next', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: MyDaysScreen(difficulty: GameDifficulty.easy),
+          ),
+        ),
+      );
+
+      expect(find.text('My Days'), findsOneWidget);
+      expect(find.text('What Comes Next?'), findsOneWidget);
+      expect(find.text('Put My Day in Order'), findsOneWidget);
+      expect(find.text('Remember My Day'), findsOneWidget);
+
+      await tester.tap(find.text('Play Activity ➔').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Which activity comes next?'), findsOneWidget);
+      expect(find.textContaining('Part 1 of'), findsOneWidget);
+    });
   });
 }

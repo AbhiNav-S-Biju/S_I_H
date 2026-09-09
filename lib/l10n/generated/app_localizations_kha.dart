@@ -251,6 +251,134 @@ class AppLocalizationsKha extends AppLocalizations {
       'Put together comforting pictures piece by piece';
 
   @override
+  String get gameMyDaysTitle => 'My Days';
+
+  @override
+  String get gameMyDaysSubtitle =>
+      'Gentle activities about a familiar daily routine';
+
+  @override
+  String get myDaysChooseMode =>
+      'Choose a gentle way to play with a familiar day.';
+
+  @override
+  String get myDaysModeNextTitle => 'What Comes Next?';
+
+  @override
+  String get myDaysModeNextSubtitle =>
+      'Look at the morning, then choose what usually follows.';
+
+  @override
+  String get myDaysModeOrderTitle => 'Put My Day in Order';
+
+  @override
+  String get myDaysModeOrderSubtitle =>
+      'Tap the activities in the order of a familiar day.';
+
+  @override
+  String get myDaysModeRememberTitle => 'Remember My Day';
+
+  @override
+  String get myDaysModeRememberSubtitle =>
+      'Look at a few activities, then remember one of them.';
+
+  @override
+  String get myDaysWhatComesNextPrompt => 'Which activity comes next?';
+
+  @override
+  String get myDaysPutInOrderPrompt =>
+      'Put these activities in the correct order.';
+
+  @override
+  String get myDaysRememberThese => 'Remember these activities.';
+
+  @override
+  String get myDaysWhichWasPartOfDay => 'Which activity was part of your day?';
+
+  @override
+  String myDaysYouHadActivity(String activity) {
+    return 'You had $activity. What else did you do?';
+  }
+
+  @override
+  String myDaysNextCorrect(String previous, String next) {
+    return 'Well done! After $previous, it\'s time for $next.';
+  }
+
+  @override
+  String get myDaysNextIncorrect => 'That\'s okay. Let\'s try again.';
+
+  @override
+  String get myDaysOrderCorrect =>
+      'Wonderful! That is a familiar order for the day.';
+
+  @override
+  String get myDaysOrderIncorrect =>
+      'Not quite. Let\'s think about what usually comes next.';
+
+  @override
+  String get myDaysRememberCorrect => 'Nice memory! You are doing well.';
+
+  @override
+  String get myDaysRememberIncorrect =>
+      'That\'s okay. Let\'s look at the day together.';
+
+  @override
+  String myDaysRoundProgress(int current, int total) {
+    return 'Part $current of $total';
+  }
+
+  @override
+  String get myDaysMorning => 'Morning';
+
+  @override
+  String get myDaysAfternoon => 'Afternoon';
+
+  @override
+  String get myDaysEvening => 'Evening';
+
+  @override
+  String get myDaysNight => 'Night';
+
+  @override
+  String get myDaysYourOrder => 'Your order';
+
+  @override
+  String get myDaysUndo => 'Undo';
+
+  @override
+  String get myDaysCheckOrder => 'Check Order';
+
+  @override
+  String get myDaysCorrectSequence => 'A familiar order';
+
+  @override
+  String get myDaysReplayRound => 'Try this one again';
+
+  @override
+  String get myDaysCompleteTitle => 'My Day Complete!';
+
+  @override
+  String myDaysRememberedSummary(int count, int total) {
+    return 'Wonderful! You remembered $count out of $total activities.';
+  }
+
+  @override
+  String get myDaysActivitiesCompleted => 'Activities completed';
+
+  @override
+  String get myDaysGentleMatches => 'Gentle matches';
+
+  @override
+  String get myDaysPlayAgain => 'Play Again';
+
+  @override
+  String get myDaysBackToGames => 'Back to Games';
+
+  @override
+  String get myDaysTakeYourTime => 'Take your time. There is no rush.';
+
+  @override
   String get playActivityButton => 'Play Activity ➔';
 
   @override

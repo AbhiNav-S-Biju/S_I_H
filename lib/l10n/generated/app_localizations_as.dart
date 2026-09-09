@@ -248,6 +248,130 @@ class AppLocalizationsAs extends AppLocalizations {
       'Put together comforting pictures piece by piece';
 
   @override
+  String get gameMyDaysTitle => 'মোৰ দিন';
+
+  @override
+  String get gameMyDaysSubtitle => 'চিনাকি দিনচৰ্যাৰ শান্ত কাৰ্যকলাপ';
+
+  @override
+  String get myDaysChooseMode =>
+      'এটা চিনাকি দিনৰ সৈতে খেলিবলৈ এটা শান্ত উপায় বাছক।';
+
+  @override
+  String get myDaysModeNextTitle => 'পিছত কি আহে?';
+
+  @override
+  String get myDaysModeNextSubtitle =>
+      'ৰাতিপুৱা চাওক, তাৰ পিছত সাধাৰণতে কি আহে বাছক।';
+
+  @override
+  String get myDaysModeOrderTitle => 'মোৰ দিন শৃংখলিত কৰক';
+
+  @override
+  String get myDaysModeOrderSubtitle =>
+      'চিনাকি দিনৰ ক্ৰমত কাৰ্যকলাপবোৰ স্পৰ্শ কৰক।';
+
+  @override
+  String get myDaysModeRememberTitle => 'মোৰ দিন মনত ৰাখক';
+
+  @override
+  String get myDaysModeRememberSubtitle =>
+      'কেইটামান কাৰ্যকলাপ চাওক, তাৰ পিছত এটা মনত ৰাখক।';
+
+  @override
+  String get myDaysWhatComesNextPrompt => 'পিছত কোনটো কাৰ্যকলাপ আহে?';
+
+  @override
+  String get myDaysPutInOrderPrompt => 'এই কাৰ্যকলাপবোৰ শুদ্ধ ক্ৰমত ৰাখক।';
+
+  @override
+  String get myDaysRememberThese => 'এই কাৰ্যকলাপবোৰ মনত ৰাখক।';
+
+  @override
+  String get myDaysWhichWasPartOfDay => 'আপোনাৰ দিনত কোনটো কাৰ্যকলাপ আছিল?';
+
+  @override
+  String myDaysYouHadActivity(String activity) {
+    return 'আপুনি $activity কৰিলে। আৰু কি কৰিলে?';
+  }
+
+  @override
+  String myDaysNextCorrect(String previous, String next) {
+    return 'বঢ়িয়া! $previousৰ পিছত $nextৰ সময়।';
+  }
+
+  @override
+  String get myDaysNextIncorrect => 'কোনো কথা নাই। আকৌ চেষ্টা কৰক।';
+
+  @override
+  String get myDaysOrderCorrect => 'অতি সুন্দৰ! এইটো দিনৰ চিনাকি ক্ৰম।';
+
+  @override
+  String get myDaysOrderIncorrect =>
+      'প্ৰায় শুদ্ধ। সাধাৰণতে পিছত কি আহে ভাবি চাওক।';
+
+  @override
+  String get myDaysRememberCorrect => 'ভালকৈ মনত পৰিল! আপুনি ভালকৈ কৰি আছে।';
+
+  @override
+  String get myDaysRememberIncorrect => 'কোনো কথা নাই। দিনটো একেলগে চাওঁ।';
+
+  @override
+  String myDaysRoundProgress(int current, int total) {
+    return 'অংশ $current / $total';
+  }
+
+  @override
+  String get myDaysMorning => 'ৰাতিপুৱা';
+
+  @override
+  String get myDaysAfternoon => 'দুপৰীয়া';
+
+  @override
+  String get myDaysEvening => 'গধূলি';
+
+  @override
+  String get myDaysNight => 'ৰাতি';
+
+  @override
+  String get myDaysYourOrder => 'আপোনাৰ ক্ৰম';
+
+  @override
+  String get myDaysUndo => 'উভতাই আনক';
+
+  @override
+  String get myDaysCheckOrder => 'ক্ৰম চাওক';
+
+  @override
+  String get myDaysCorrectSequence => 'এটা চিনাকি ক্ৰম';
+
+  @override
+  String get myDaysReplayRound => 'এইটো আকৌ চেষ্টা কৰক';
+
+  @override
+  String get myDaysCompleteTitle => 'মোৰ দিন সম্পূৰ্ণ!';
+
+  @override
+  String myDaysRememberedSummary(int count, int total) {
+    return 'চমৎকাৰ! আপুনি $total টাৰ ভিতৰত $count টা কাৰ্যকলাপ মনত ৰাখিলে।';
+  }
+
+  @override
+  String get myDaysActivitiesCompleted => 'সম্পূৰ্ণ কাৰ্যকলাপ';
+
+  @override
+  String get myDaysGentleMatches => 'মিল থকা উত্তৰ';
+
+  @override
+  String get myDaysPlayAgain => 'আকৌ খেলক';
+
+  @override
+  String get myDaysBackToGames => 'খেললৈ উভতি যাওক';
+
+  @override
+  String get myDaysTakeYourTime => 'জৰুৰী নহয়। নিজৰ সময় লওক।';
+
+  @override
   String get playActivityButton => 'কাৰ্যকলাপ আৰম্ভ কৰক ➔';
 
   @override

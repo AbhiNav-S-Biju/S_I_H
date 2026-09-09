@@ -251,6 +251,130 @@ class AppLocalizationsNe extends AppLocalizations {
       'Put together comforting pictures piece by piece';
 
   @override
+  String get gameMyDaysTitle => 'मेरो दिन';
+
+  @override
+  String get gameMyDaysSubtitle => 'परिचित दिनचर्याका शान्त गतिविधिहरू';
+
+  @override
+  String get myDaysChooseMode => 'परिचित दिनसँग खेल्ने शान्त तरिका छान्नुहोस्।';
+
+  @override
+  String get myDaysModeNextTitle => 'अर्को के आउँछ?';
+
+  @override
+  String get myDaysModeNextSubtitle =>
+      'बिहान हेर्नुहोस्, त्यसपछि सामान्यतया के आउँछ छान्नुहोस्।';
+
+  @override
+  String get myDaysModeOrderTitle => 'मेरो दिन क्रममा राख्नुहोस्';
+
+  @override
+  String get myDaysModeOrderSubtitle =>
+      'परिचित दिनको क्रममा गतिविधिहरू छुनुहोस्।';
+
+  @override
+  String get myDaysModeRememberTitle => 'मेरो दिन सम्झनुहोस्';
+
+  @override
+  String get myDaysModeRememberSubtitle =>
+      'केही गतिविधि हेर्नुहोस्, त्यसपछि एउटा सम्झनुहोस्।';
+
+  @override
+  String get myDaysWhatComesNextPrompt => 'अर्को कुन गतिविधि आउँछ?';
+
+  @override
+  String get myDaysPutInOrderPrompt => 'यी गतिविधिहरू सही क्रममा राख्नुहोस्।';
+
+  @override
+  String get myDaysRememberThese => 'यी गतिविधिहरू सम्झनुहोस्।';
+
+  @override
+  String get myDaysWhichWasPartOfDay => 'तपाईंको दिनमा कुन गतिविधि थियो?';
+
+  @override
+  String myDaysYouHadActivity(String activity) {
+    return 'तपाईंले $activity गर्नुभयो। अरू के गर्नुभयो?';
+  }
+
+  @override
+  String myDaysNextCorrect(String previous, String next) {
+    return 'राम्रो! $previous पछि $next गर्ने बेला हो।';
+  }
+
+  @override
+  String get myDaysNextIncorrect => 'ठिकै छ। फेरि प्रयास गरौँ।';
+
+  @override
+  String get myDaysOrderCorrect => 'अद्भुत! यो दिनको परिचित क्रम हो।';
+
+  @override
+  String get myDaysOrderIncorrect =>
+      'अलिकति फरक। सामान्यतया पछि के आउँछ सोचौँ।';
+
+  @override
+  String get myDaysRememberCorrect =>
+      'राम्रो सम्झना! तपाईं राम्रो गर्दै हुनुहुन्छ।';
+
+  @override
+  String get myDaysRememberIncorrect => 'ठिकै छ। दिनलाई सँगै हेरौँ।';
+
+  @override
+  String myDaysRoundProgress(int current, int total) {
+    return 'भाग $current / $total';
+  }
+
+  @override
+  String get myDaysMorning => 'बिहान';
+
+  @override
+  String get myDaysAfternoon => 'दिउँसो';
+
+  @override
+  String get myDaysEvening => 'साँझ';
+
+  @override
+  String get myDaysNight => 'रात';
+
+  @override
+  String get myDaysYourOrder => 'तपाईंको क्रम';
+
+  @override
+  String get myDaysUndo => 'फर्काउनुहोस्';
+
+  @override
+  String get myDaysCheckOrder => 'क्रम जाँच्नुहोस्';
+
+  @override
+  String get myDaysCorrectSequence => 'एउटा परिचित क्रम';
+
+  @override
+  String get myDaysReplayRound => 'यो फेरि प्रयास गर्नुहोस्';
+
+  @override
+  String get myDaysCompleteTitle => 'मेरो दिन पूरा भयो!';
+
+  @override
+  String myDaysRememberedSummary(int count, int total) {
+    return 'राम्रो! तपाईंले $total मध्ये $count गतिविधि सम्झनुभयो।';
+  }
+
+  @override
+  String get myDaysActivitiesCompleted => 'पूरा भएका गतिविधि';
+
+  @override
+  String get myDaysGentleMatches => 'मिल्ने उत्तर';
+
+  @override
+  String get myDaysPlayAgain => 'फेरि खेल्नुहोस्';
+
+  @override
+  String get myDaysBackToGames => 'खेलमा फर्कनुहोस्';
+
+  @override
+  String get myDaysTakeYourTime => 'हतार छैन। आफ्नो समय लिनुहोस्।';
+
+  @override
   String get playActivityButton => 'गतिविधि सुरु गर्नुहोस् ➔';
 
   @override
