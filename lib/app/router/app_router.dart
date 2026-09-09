@@ -149,6 +149,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     totalQuestions: session.totalQuestions,
                     gameSessionId: session.id,
                   );
+
+              ref.invalidate(selectedPatientGameHistoryProvider);
+              ref.invalidate(selectedPatientSevenDayActivityProvider);
+              ref.invalidate(caregiverSyncStatusProvider);
             }
           },
         ),

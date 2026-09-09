@@ -24,10 +24,12 @@ import 'widgets/level_preview_sheet.dart';
 
 class GameLevelMapScreen extends ConsumerStatefulWidget {
   final GameType gameType;
+  final ValueChanged<GameSession>? onSessionCompleted;
 
   const GameLevelMapScreen({
     super.key,
     required this.gameType,
+    this.onSessionCompleted,
   });
 
   @override
@@ -51,19 +53,28 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
         title: Row(
           children: [
-            const Icon(Icons.refresh_rounded, color: Color(0xFF0F766E), size: 28.0),
+            const Icon(
+              Icons.refresh_rounded,
+              color: Color(0xFF0F766E),
+              size: 28.0,
+            ),
             const SizedBox(width: 10.0),
             Expanded(
               child: Text(
                 langCode == 'as'
                     ? 'নতুনকৈ খেলিবনে?'
                     : langCode == 'hi'
-                        ? 'क्या नए सिरे से शुरू करना चाहते हैं?'
-                        : 'Start Afresh?',
-                style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
+                    ? 'क्या नए सिरे से शुरू करना चाहते हैं?'
+                    : 'Start Afresh?',
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ],
@@ -72,23 +83,36 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
           langCode == 'as'
               ? 'এই খেলৰ ৮ টা স্তৰ আকৌ ১ নং স্তৰৰ পৰা আৰম্ভ হ’ব যাতে আপুনি সকলো স্তৰ নতুনকৈ খেলিব পাৰে।'
               : langCode == 'hi'
-                  ? 'सभी 8 स्तर पुनः स्तर 1 से शुरू होंगे ताकि आप फिर से इनका आनंद ले सकें।'
-                  : 'This will reset the 8 levels back to Level 1 so you can enjoy the journey afresh.',
-          style: const TextStyle(fontSize: 16.0, color: Color(0xFF334155), height: 1.4),
+              ? 'सभी 8 स्तर पुनः स्तर 1 से शुरू होंगे ताकि आप फिर से इनका आनंद ले सकें।'
+              : 'This will reset the 8 levels back to Level 1 so you can enjoy the journey afresh.',
+          style: const TextStyle(
+            fontSize: 16.0,
+            color: Color(0xFF334155),
+            height: 1.4,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
-              langCode == 'as' ? 'বাতিল' : langCode == 'hi' ? 'रद्द करें' : 'Cancel',
-              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
+              langCode == 'as'
+                  ? 'বাতিল'
+                  : langCode == 'hi'
+                  ? 'रद्द करें'
+                  : 'Cancel',
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF0F766E),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -96,8 +120,15 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
               if (mounted) setState(() {});
             },
             child: Text(
-              langCode == 'as' ? 'নতুনকৈ আৰম্ভ কৰক' : langCode == 'hi' ? 'शुरू करें' : 'Reset & Start Afresh',
-              style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w700),
+              langCode == 'as'
+                  ? 'নতুনকৈ আৰম্ভ কৰক'
+                  : langCode == 'hi'
+                  ? 'शुरू करें'
+                  : 'Reset & Start Afresh',
+              style: const TextStyle(
+                fontSize: 15.0,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -115,12 +146,17 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
     final voiceEnabled = ref.read(voiceEnabledProvider);
     if (!voiceEnabled) return;
     final locale = ref.read(localeProvider);
-    final title = GameLevel.getJourneyTitle(widget.gameType, locale.languageCode);
-    final subtitle = GameLevel.getJourneySubtitle(widget.gameType, locale.languageCode);
-    ref.read(audioServiceProvider).speak(
-          '$title. $subtitle',
-          languageCode: locale.languageCode,
-        );
+    final title = GameLevel.getJourneyTitle(
+      widget.gameType,
+      locale.languageCode,
+    );
+    final subtitle = GameLevel.getJourneySubtitle(
+      widget.gameType,
+      locale.languageCode,
+    );
+    ref
+        .read(audioServiceProvider)
+        .speak('$title. $subtitle', languageCode: locale.languageCode);
   }
 
   void _onLevelTapped(GameLevel level, GameLevelProgress? progress) {
@@ -137,25 +173,36 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.lock_outline_rounded, color: Colors.white, size: 22.0),
+              const Icon(
+                Icons.lock_outline_rounded,
+                color: Colors.white,
+                size: 22.0,
+              ),
               const SizedBox(width: 10.0),
               Expanded(
                 child: Text(
                   msg,
-                  style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
           backgroundColor: const Color(0xFF334155),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
           duration: const Duration(seconds: 3),
         ),
       );
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
-        ref.read(audioServiceProvider).speak(msg, languageCode: locale.languageCode);
+        ref
+            .read(audioServiceProvider)
+            .speak(msg, languageCode: locale.languageCode);
       }
       return;
     }
@@ -213,9 +260,7 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
         break;
     }
 
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => screen),
-    );
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
 
     if (mounted) {
       ref.invalidate(gameLevelProgressProvider(widget.gameType));
@@ -224,6 +269,8 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
   }
 
   void _onGameFinished(GameLevel level, GameSession session) {
+    widget.onSessionCompleted?.call(session);
+
     // Refresh Riverpod provider so map updates immediately
     ref.invalidate(gameLevelProgressProvider(widget.gameType));
     setState(() {});
@@ -238,17 +285,22 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
     final progressMap = ref.watch(gameLevelProgressProvider(widget.gameType));
 
     final levels = GameLevel.getLevelsForGame(widget.gameType);
-    final totalStars = GameProgressService.instance.getTotalStarsEarned(widget.gameType);
+    final totalStars = GameProgressService.instance.getTotalStarsEarned(
+      widget.gameType,
+    );
     final maxStars = levels.length * 3;
-    final highestUnlocked =
-        GameProgressService.instance.getHighestUnlockedLevel(widget.gameType);
+    final highestUnlocked = GameProgressService.instance
+        .getHighestUnlockedLevel(widget.gameType);
     final currentLevel = levels.firstWhere(
       (l) => l.levelNumber == highestUnlocked,
       orElse: () => levels.first,
     );
 
     final journeyTitle = GameLevel.getJourneyTitle(widget.gameType, langCode);
-    final journeySubtitle = GameLevel.getJourneySubtitle(widget.gameType, langCode);
+    final journeySubtitle = GameLevel.getJourneySubtitle(
+      widget.gameType,
+      langCode,
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -394,7 +446,10 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
 
           // Stars Counter Pill
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 6.0,
+            ),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFFFEF3C7), Color(0xFFFDE68A)],
@@ -412,7 +467,11 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.star_rounded, color: Color(0xFFD97706), size: 20.0),
+                const Icon(
+                  Icons.star_rounded,
+                  color: Color(0xFFD97706),
+                  size: 20.0,
+                ),
                 const SizedBox(width: 5.0),
                 Text(
                   '$totalStars / $maxStars',
@@ -440,7 +499,8 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
 
           // Speak Button
           SpeakButton(
-            text: '$title. $subtitle. Total stars: $totalStars out of $maxStars.',
+            text:
+                '$title. $subtitle. Total stars: $totalStars out of $maxStars.',
             size: 40.0,
           ),
         ],
@@ -454,32 +514,35 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
     required String langCode,
     required AppLocalizations? l10n,
   }) {
-    final isCompleted = progressMap[currentLevel.levelNumber]?.isCompleted ?? false;
-    final allCompleted = GameProgressService.instance.areAllLevelsCompleted(widget.gameType);
+    final isCompleted =
+        progressMap[currentLevel.levelNumber]?.isCompleted ?? false;
+    final allCompleted = GameProgressService.instance.areAllLevelsCompleted(
+      widget.gameType,
+    );
 
     final buttonLabel = allCompleted
         ? (langCode == 'as'
-            ? 'আকৌ নতুনকৈ খেলক ↺'
-            : langCode == 'hi'
-                ? 'पुनः खेलें ↺'
-                : langCode == 'bn'
-                    ? 'আবার খেলুন ↺'
-                    : 'Start Afresh ↺')
+              ? 'আকৌ নতুনকৈ খেলক ↺'
+              : langCode == 'hi'
+              ? 'पुनः खेलें ↺'
+              : langCode == 'bn'
+              ? 'আবার খেলুন ↺'
+              : 'Start Afresh ↺')
         : isCompleted
-            ? (langCode == 'as'
-                ? 'পৰবৰ্তী স্তৰ খেলক ➔'
-                : langCode == 'hi'
-                    ? 'अगला स्तर खेलें ➔'
-                    : langCode == 'bn'
-                        ? 'পরবর্তী ধাপ খেলুন ➔'
-                        : 'Play Next Level ➔')
-            : (langCode == 'as'
-                ? 'স্তৰ ${currentLevel.levelNumber} আৰম্ভ কৰক ➔'
-                : langCode == 'hi'
-                    ? 'स्तर ${currentLevel.levelNumber} शुरू करें ➔'
-                    : langCode == 'bn'
-                        ? 'ধাপ ${currentLevel.levelNumber} শুরু করুন ➔'
-                        : 'Start Level ${currentLevel.levelNumber} ➔');
+        ? (langCode == 'as'
+              ? 'পৰবৰ্তী স্তৰ খেলক ➔'
+              : langCode == 'hi'
+              ? 'अगला स्तर खेलें ➔'
+              : langCode == 'bn'
+              ? 'পরবর্তী ধাপ খেলুন ➔'
+              : 'Play Next Level ➔')
+        : (langCode == 'as'
+              ? 'স্তৰ ${currentLevel.levelNumber} আৰম্ভ কৰক ➔'
+              : langCode == 'hi'
+              ? 'स्तर ${currentLevel.levelNumber} शुरू करें ➔'
+              : langCode == 'bn'
+              ? 'ধাপ ${currentLevel.levelNumber} শুরু করুন ➔'
+              : 'Start Level ${currentLevel.levelNumber} ➔');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
@@ -512,7 +575,9 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
                           vertical: 2.0,
                         ),
                         decoration: BoxDecoration(
-                          color: currentLevel.themeColor.withValues(alpha: 0.12),
+                          color: currentLevel.themeColor.withValues(
+                            alpha: 0.12,
+                          ),
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                         child: Text(
@@ -524,10 +589,14 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
                           ),
                         ),
                       ),
-                      if (currentLevel.levelNumber == 4 || currentLevel.levelNumber == 8) ...[
+                      if (currentLevel.levelNumber == 4 ||
+                          currentLevel.levelNumber == 8) ...[
                         const SizedBox(width: 8.0),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6.0,
+                            vertical: 2.0,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFEF3C7),
                             borderRadius: BorderRadius.circular(6.0),
@@ -535,7 +604,11 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.star_rounded, size: 12.0, color: Color(0xFFD97706)),
+                              Icon(
+                                Icons.star_rounded,
+                                size: 12.0,
+                                color: Color(0xFFD97706),
+                              ),
                               SizedBox(width: 2.0),
                               Text(
                                 'Milestone',
@@ -576,7 +649,10 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
                 if (allCompleted) {
                   _confirmReset(context, langCode);
                 } else {
-                  _onLevelTapped(currentLevel, progressMap[currentLevel.levelNumber]);
+                  _onLevelTapped(
+                    currentLevel,
+                    progressMap[currentLevel.levelNumber],
+                  );
                 }
               },
             ),

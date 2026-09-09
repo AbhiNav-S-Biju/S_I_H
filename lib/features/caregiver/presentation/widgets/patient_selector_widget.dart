@@ -51,7 +51,10 @@ class PatientSelectorWidget extends ConsumerWidget {
                 const SizedBox(height: 6),
                 const Text(
                   'Add a care recipient to start monitoring activity and pairing devices.',
-                  style: TextStyle(fontSize: 14, color: ElderColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ElderColors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -66,7 +69,8 @@ class PatientSelectorWidget extends ConsumerWidget {
           );
         }
 
-        final effectiveSelected = (selectedPatient != null &&
+        final effectiveSelected =
+            (selectedPatient != null &&
                 patients.any((p) => p.id == selectedPatient.id))
             ? patients.firstWhere((p) => p.id == selectedPatient.id)
             : patients.first;
@@ -107,6 +111,7 @@ class PatientSelectorWidget extends ConsumerWidget {
                         key: const Key('patient_selector_dropdown'),
                         value: effectiveSelected,
                         isDense: true,
+                        isExpanded: true,
                         icon: const Icon(
                           Icons.arrow_drop_down_rounded,
                           color: ElderColors.clayLavender,
@@ -122,6 +127,8 @@ class PatientSelectorWidget extends ConsumerWidget {
                             value: patient,
                             child: Text(
                               '${patient.fullName} (${patient.relationship})',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           );
                         }).toList(),
@@ -138,7 +145,10 @@ class PatientSelectorWidget extends ConsumerWidget {
               ),
               IconButton(
                 key: const Key('patient_selector_add_button'),
-                icon: const Icon(Icons.person_add_alt_1_rounded, color: ElderColors.clayLavender),
+                icon: const Icon(
+                  Icons.person_add_alt_1_rounded,
+                  color: ElderColors.clayLavender,
+                ),
                 tooltip: 'Add Loved One',
                 onPressed: () => context.push('/caregiver/onboarding'),
               ),

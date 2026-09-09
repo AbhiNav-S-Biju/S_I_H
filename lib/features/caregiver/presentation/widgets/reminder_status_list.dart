@@ -23,45 +23,71 @@ class ReminderStatusList extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header with Add Button
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Row(
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final addButton = selectedPatient == null
+                ? null
+                : FilledButton.icon(
+                    onPressed: () => _showAddOrEditDialog(
+                      context,
+                      ref,
+                      patientId: selectedPatient.id,
+                    ),
+                    icon: const Icon(Icons.add, size: 16),
+                    label: const Text(
+                      'Add Reminder',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: ElderColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+
+            final title = const Row(
               children: [
                 Icon(Icons.alarm, size: 20, color: ElderColors.primary),
                 SizedBox(width: 8),
-                Text(
-                  'Daily Reminders & Routines',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: ElderColors.textPrimary,
+                Expanded(
+                  child: Text(
+                    'Daily Reminders & Routines',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: ElderColors.textPrimary,
+                    ),
                   ),
                 ),
               ],
-            ),
-            if (selectedPatient != null)
-              FilledButton.icon(
-                onPressed: () => _showAddOrEditDialog(
-                  context,
-                  ref,
-                  patientId: selectedPatient.id,
-                ),
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text('Add Reminder', style: TextStyle(fontSize: 13)),
-                style: FilledButton.styleFrom(
-                  backgroundColor: ElderColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-          ],
+            );
+
+            if (constraints.maxWidth < 420 && addButton != null) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  title,
+                  const SizedBox(height: 8),
+                  Align(alignment: Alignment.centerLeft, child: addButton),
+                ],
+              );
+            }
+
+            return Row(
+              children: [
+                Expanded(child: title),
+                if (addButton != null) ...[const SizedBox(width: 8), addButton],
+              ],
+            );
+          },
         ),
         const SizedBox(height: 10),
 
@@ -71,7 +97,10 @@ class ReminderStatusList extends ConsumerWidget {
             if (reminders.isEmpty) {
               return Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 28,
+                  horizontal: 20,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -206,10 +235,8 @@ class ReminderStatusList extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _AddOrEditReminderSheet(
-        reminder: reminder,
-        patientId: patientId,
-      ),
+      builder: (ctx) =>
+          _AddOrEditReminderSheet(reminder: reminder, patientId: patientId),
     );
   }
 }
@@ -221,10 +248,7 @@ class _ReminderTile extends ConsumerWidget {
   final CaregiverReminderRecord reminder;
   final String patientId;
 
-  const _ReminderTile({
-    required this.reminder,
-    required this.patientId,
-  });
+  const _ReminderTile({required this.reminder, required this.patientId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -255,7 +279,10 @@ class _ReminderTile extends ConsumerWidget {
     }
 
     final typeIcon = _getReminderTypeIcon(reminder.reminderType);
-    final formattedTime = _formatTime(reminder.scheduleTime, reminder.scheduledAt);
+    final formattedTime = _formatTime(
+      reminder.scheduleTime,
+      reminder.scheduledAt,
+    );
 
     return InkWell(
       onTap: () => ReminderStatusList._showAddOrEditDialog(
@@ -490,7 +517,6 @@ class _ReminderTile extends ConsumerWidget {
     );
   }
 
-
   static IconData _getReminderTypeIcon(String type) {
     switch (type.toLowerCase()) {
       case 'medication':
@@ -539,7 +565,9 @@ class _ReminderTile extends ConsumerWidget {
     if (days.length == 2 && days.contains('sat') && days.contains('sun')) {
       return 'Weekends';
     }
-    return days.map((d) => d.substring(0, 1).toUpperCase() + d.substring(1, 3)).join(', ');
+    return days
+        .map((d) => d.substring(0, 1).toUpperCase() + d.substring(1, 3))
+        .join(', ');
   }
 
   static String _formatStatusDetail(
@@ -571,10 +599,7 @@ class _AddOrEditReminderSheet extends ConsumerStatefulWidget {
   final CaregiverReminderRecord? reminder;
   final String patientId;
 
-  const _AddOrEditReminderSheet({
-    this.reminder,
-    required this.patientId,
-  });
+  const _AddOrEditReminderSheet({this.reminder, required this.patientId});
 
   @override
   ConsumerState<_AddOrEditReminderSheet> createState() =>
@@ -729,335 +754,347 @@ class _AddOrEditReminderSheetState
           bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
         child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle bar
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Title header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isEditing ? 'Edit Reminder' : 'Add New Reminder',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: ElderColors.textPrimary,
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Reminder Type Chips
-              const Text(
-                'Reminder Type',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: ElderColors.textPrimary,
                 ),
-              ),
-              const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _types.map((t) {
-                    final isSelected = _reminderType == t['key'];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        avatar: Icon(
-                          t['icon'] as IconData,
-                          size: 16,
-                          color: isSelected ? Colors.white : Colors.grey[700],
+                const SizedBox(height: 16),
+
+                // Title header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isEditing ? 'Edit Reminder' : 'Add New Reminder',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: ElderColors.textPrimary,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Reminder Type Chips
+                const Text(
+                  'Reminder Type',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: ElderColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _types.map((t) {
+                      final isSelected = _reminderType == t['key'];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          avatar: Icon(
+                            t['icon'] as IconData,
+                            size: 16,
+                            color: isSelected ? Colors.white : Colors.grey[700],
+                          ),
+                          label: Text(t['label'] as String),
+                          selected: isSelected,
+                          selectedColor: ElderColors.primary,
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.grey[800],
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            fontSize: 13,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          onSelected: (selected) {
+                            if (selected) {
+                              setState(
+                                () => _reminderType = t['key'] as String,
+                              );
+                            }
+                          },
                         ),
-                        label: Text(t['label'] as String),
-                        selected: isSelected,
-                        selectedColor: ElderColors.primary,
-                        labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : Colors.grey[800],
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 13,
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Reminder Title
+                const Text(
+                  'Reminder Title *',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: ElderColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    hintText: 'e.g., Morning Blood Pressure Medication',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                  ),
+                  validator: (val) => (val == null || val.trim().isEmpty)
+                      ? 'Please enter a title'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+
+                // Schedule Time Picker
+                const Text(
+                  'Schedule Time *',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: ElderColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                InkWell(
+                  onTap: _pickTime,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.access_time,
+                          color: ElderColors.primary,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        const SizedBox(width: 12),
+                        Text(
+                          _selectedTime.format(context),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: ElderColors.textPrimary,
+                          ),
                         ),
-                        onSelected: (selected) {
-                          if (selected) {
-                            setState(() => _reminderType = t['key'] as String);
+                        const Spacer(),
+                        const Text(
+                          'Change',
+                          style: TextStyle(
+                            color: ElderColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Recurrence Days
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Repeat On',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: ElderColors.textPrimary,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        _PresetButton(
+                          label: 'Daily',
+                          isSelected: _recurrenceDays.length == 7,
+                          onTap: () => _setPresetRecurrence('daily'),
+                        ),
+                        const SizedBox(width: 4),
+                        _PresetButton(
+                          label: 'Weekdays',
+                          isSelected:
+                              _recurrenceDays.length == 5 &&
+                              !_recurrenceDays.contains('sat') &&
+                              !_recurrenceDays.contains('sun'),
+                          onTap: () => _setPresetRecurrence('weekdays'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: _allDays.map((d) {
+                    final key = d['key']!;
+                    final isSelected = _recurrenceDays.contains(key);
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (isSelected) {
+                            if (_recurrenceDays.length > 1) {
+                              _recurrenceDays.remove(key);
+                            }
+                          } else {
+                            _recurrenceDays.add(key);
                           }
-                        },
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isSelected
+                              ? ElderColors.primary
+                              : Colors.grey.shade100,
+                          border: Border.all(
+                            color: isSelected
+                                ? ElderColors.primary
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            d['label']!,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.grey[700],
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   }).toList(),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Reminder Title
-              const Text(
-                'Reminder Title *',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: ElderColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  hintText: 'e.g., Morning Blood Pressure Medication',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
+                // Optional Notes / Description
+                const Text(
+                  'Notes & Instructions (Optional)',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: ElderColors.textPrimary,
                   ),
                 ),
-                validator: (val) =>
-                    (val == null || val.trim().isEmpty) ? 'Please enter a title' : null,
-              ),
-              const SizedBox(height: 16),
-
-              // Schedule Time Picker
-              const Text(
-                'Schedule Time *',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: ElderColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              InkWell(
-                onTap: _pickTime,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.access_time, color: ElderColors.primary),
-                      const SizedBox(width: 12),
-                      Text(
-                        _selectedTime.format(context),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ElderColors.textPrimary,
-                        ),
-                      ),
-                      const Spacer(),
-                      const Text(
-                        'Change',
-                        style: TextStyle(
-                          color: ElderColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Recurrence Days
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Repeat On',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: ElderColors.textPrimary,
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: _descController,
+                  maxLines: 2,
+                  decoration: InputDecoration(
+                    hintText:
+                        'e.g., Take with a full glass of water after food',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
                     ),
                   ),
-                  Row(
-                    children: [
-                      _PresetButton(
-                        label: 'Daily',
-                        isSelected: _recurrenceDays.length == 7,
-                        onTap: () => _setPresetRecurrence('daily'),
-                      ),
-                      const SizedBox(width: 4),
-                      _PresetButton(
-                        label: 'Weekdays',
-                        isSelected: _recurrenceDays.length == 5 &&
-                            !_recurrenceDays.contains('sat') &&
-                            !_recurrenceDays.contains('sun'),
-                        onTap: () => _setPresetRecurrence('weekdays'),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 16),
+
+                // Active switch
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Reminder is Active',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: _allDays.map((d) {
-                  final key = d['key']!;
-                  final isSelected = _recurrenceDays.contains(key);
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        if (isSelected) {
-                          if (_recurrenceDays.length > 1) {
-                            _recurrenceDays.remove(key);
-                          }
-                        } else {
-                          _recurrenceDays.add(key);
-                        }
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isSelected
-                            ? ElderColors.primary
-                            : Colors.grey.shade100,
-                        border: Border.all(
-                          color: isSelected
-                              ? ElderColors.primary
-                              : Colors.grey.shade300,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          d['label']!,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            color: isSelected ? Colors.white : Colors.grey[700],
+                  subtitle: Text(
+                    _isActive
+                        ? 'Notifications will alert on the patient device'
+                        : 'Reminder is paused',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  value: _isActive,
+                  activeTrackColor: ElderColors.primary,
+                  onChanged: (val) => setState(() => _isActive = val),
+                ),
+                const SizedBox(height: 20),
+
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        child: const Text('Cancel'),
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-
-              // Optional Notes / Description
-              const Text(
-                'Notes & Instructions (Optional)',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: ElderColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: _descController,
-                maxLines: 2,
-                decoration: InputDecoration(
-                  hintText: 'e.g., Take with a full glass of water after food',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Active switch
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text(
-                  'Reminder is Active',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                ),
-                subtitle: Text(
-                  _isActive
-                      ? 'Notifications will alert on the patient device'
-                      : 'Reminder is paused',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-                value: _isActive,
-                activeTrackColor: ElderColors.primary,
-                onChanged: (val) => setState(() => _isActive = val),
-              ),
-              const SizedBox(height: 20),
-
-              // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: _isSaving ? null : _save,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: ElderColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
+                        child: _isSaving
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(isEditing ? 'Save Changes' : 'Add Reminder'),
                       ),
-                      child: const Text('Cancel'),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _isSaving ? null : _save,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: ElderColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(isEditing ? 'Save Changes' : 'Add Reminder'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
-import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 import 'caregiver_dashboard_pages.dart';
@@ -67,27 +66,14 @@ class _CaregiverDashboardScreenState
                 ),
                 child: Row(
                   children: [
-                    LargeIconButton(
-                      icon: Icons.arrow_back_rounded,
-                      tooltip: 'Back to Landing',
-                      backgroundColor: Colors.white,
-                      iconColor: ElderColors.textPrimary,
-                      size: 52.0,
-                      onPressed: () {
-                        if (context.canPop()) {
-                          context.pop();
-                        } else {
-                          context.go('/');
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 14.0),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             _titles[_selectedIndex],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
@@ -106,30 +92,6 @@ class _CaregiverDashboardScreenState
                           ),
                         ],
                       ),
-                    ),
-                    // Add Loved One Action
-                    IconButton(
-                      icon: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x0A000000),
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.person_add_rounded,
-                          color: ElderColors.clayLavender,
-                          size: 22,
-                        ),
-                      ),
-                      tooltip: 'Add Loved One',
-                      onPressed: () => context.push('/caregiver/onboarding'),
                     ),
                     // Refresh Action
                     IconButton(

@@ -54,24 +54,31 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
   @override
   void initState() {
     super.initState();
-    _calculateAndSaveProgress();
+    _calculateStars();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _saveProgress();
+
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
         final locale = ref.read(localeProvider);
-        final feedbackMsg =
-            widget.session.localizedSupportiveFeedback(locale.languageCode);
+        final feedbackMsg = widget.session.localizedSupportiveFeedback(
+          locale.languageCode,
+        );
         final starMsg = _getStarEncouragement(locale.languageCode);
-        ref.read(audioServiceProvider).speak(
-              '$starMsg. $feedbackMsg',
-              languageCode: locale.languageCode,
-            );
+        ref
+            .read(audioServiceProvider)
+            .speak('$starMsg. $feedbackMsg', languageCode: locale.languageCode)
+            .catchError((error) {
+              debugPrint('TTS completion feedback ended: $error');
+            });
       }
     });
   }
 
-  void _calculateAndSaveProgress() {
+  void _calculateStars() {
     final acc = widget.session.completionRate;
     final hints = widget.session.hintsUsed;
     if (acc >= 0.85 && hints <= 1) {
@@ -81,7 +88,9 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     } else {
       _starsEarned = 1;
     }
+  }
 
+  void _saveProgress() {
     if (widget.level != null) {
       GameProgressService.instance.completeLevel(
         gameType: widget.level!.gameType,
@@ -133,8 +142,9 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final activeLocale = ref.watch(localeProvider);
-    final feedbackMsg =
-        widget.session.localizedSupportiveFeedback(activeLocale.languageCode);
+    final feedbackMsg = widget.session.localizedSupportiveFeedback(
+      activeLocale.languageCode,
+    );
     final starEncouragement = _getStarEncouragement(activeLocale.languageCode);
 
     final String itemsFoundLabel;
@@ -162,9 +172,8 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     }
 
     final level = widget.level;
-    final hasNextLevel = level != null &&
-        level.levelNumber < 8 &&
-        widget.onNextLevel != null;
+    final hasNextLevel =
+        level != null && level.levelNumber < 8 && widget.onNextLevel != null;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.0)),
@@ -232,7 +241,9 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6.0),
                       child: Icon(
-                        isFilled ? Icons.star_rounded : Icons.star_border_rounded,
+                        isFilled
+                            ? Icons.star_rounded
+                            : Icons.star_border_rounded,
                         size: 40.0,
                         color: isFilled
                             ? ElderColors.amberDeep
@@ -272,7 +283,9 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: ElderColors.pastelSageBg,
-                borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+                borderRadius: BorderRadius.circular(
+                  ElderTheme.cardBorderRadius,
+                ),
                 boxShadow: NirvanaShadows.card(tint: ElderColors.forestDeep),
               ),
               child: Row(
@@ -304,7 +317,9 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
               padding: const EdgeInsets.all(14.0),
               decoration: BoxDecoration(
                 color: ElderColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
+                borderRadius: BorderRadius.circular(
+                  ElderTheme.cardBorderRadius,
+                ),
                 boxShadow: NirvanaShadows.input,
               ),
               child: Row(
@@ -340,10 +355,10 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 label: activeLocale.languageCode == 'as'
                     ? 'পৰবৰ্তী স্তৰ ➔'
                     : activeLocale.languageCode == 'hi'
-                        ? 'अगला स्तर ➔'
-                        : activeLocale.languageCode == 'bn'
-                            ? 'পরবর্তী ধাপ ➔'
-                            : 'Next Level ➔',
+                    ? 'अगला स्तर ➔'
+                    : activeLocale.languageCode == 'bn'
+                    ? 'পরবর্তী ধাপ ➔'
+                    : 'Next Level ➔',
                 icon: Icons.arrow_forward_rounded,
                 backgroundColor: level.themeColor,
                 onPressed: () {
@@ -356,10 +371,10 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 label: activeLocale.languageCode == 'as'
                     ? 'মানচিত্ৰলৈ উভতি যাওক'
                     : activeLocale.languageCode == 'hi'
-                        ? 'मानचित्र पर वापस'
-                        : activeLocale.languageCode == 'bn'
-                            ? 'মানচিত্রে ফিরে যান'
-                            : 'Back to Map',
+                    ? 'मानचित्र पर वापस'
+                    : activeLocale.languageCode == 'bn'
+                    ? 'মানচিত্রে ফিরে যান'
+                    : 'Back to Map',
                 icon: Icons.map_outlined,
                 isSecondary: true,
                 onPressed: () {
@@ -371,12 +386,12 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
               ElderGameButton(
                 label: level != null
                     ? (activeLocale.languageCode == 'as'
-                        ? 'মানচিত্ৰলৈ উভতি যাওক'
-                        : activeLocale.languageCode == 'hi'
-                            ? 'मानचित्र पर वापस'
-                            : activeLocale.languageCode == 'bn'
-                                ? 'মানচিত্রে ফিরে যান'
-                                : 'Back to Map')
+                          ? 'মানচিত্ৰলৈ উভতি যাওক'
+                          : activeLocale.languageCode == 'hi'
+                          ? 'मानचित्र पर वापस'
+                          : activeLocale.languageCode == 'bn'
+                          ? 'মানচিত্রে ফিরে যান'
+                          : 'Back to Map')
                     : (l10n?.finishButton ?? 'All Done'),
                 icon: Icons.check_rounded,
                 backgroundColor: level?.themeColor ?? ElderColors.forestDeep,

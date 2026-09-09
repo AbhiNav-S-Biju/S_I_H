@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/database/hive_database.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
@@ -56,135 +57,137 @@ class PatientHomeScreen extends ConsumerWidget {
     final greeting = _timeGreeting();
 
     return Scaffold(
-      backgroundColor: ElderColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ----------------------------------------------------------------
-              // Header: Warm Greeting & Avatar
-              // ----------------------------------------------------------------
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0,
-                            vertical: 4.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: ElderColors.pastelButtercup,
-                            borderRadius: BorderRadius.circular(14.0),
-                          ),
-                          child: Text(
-                            _formattedDate(),
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: ElderColors.amberDeep,
+      backgroundColor: Clay3DTheme.canvas,
+      body: ClayBackdrop3D(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ----------------------------------------------------------------
+                // Header: Warm Greeting & Avatar
+                // ----------------------------------------------------------------
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12.0,
+                              vertical: 4.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: ElderColors.pastelButtercup,
+                              borderRadius: BorderRadius.circular(14.0),
+                            ),
+                            child: Text(
+                              _formattedDate(),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: ElderColors.amberDeep,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          greeting,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            color: ElderColors.textSecondary,
-                            fontWeight: FontWeight.w600,
+                          const SizedBox(height: 8),
+                          Text(
+                            greeting,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              color: ElderColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          preferredName,
-                          style: const TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.w900,
-                            color: ElderColors.textPrimary,
-                            letterSpacing: -0.5,
+                          const SizedBox(height: 2),
+                          Text(
+                            preferredName,
+                            style: const TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w900,
+                              color: ElderColors.textPrimary,
+                              letterSpacing: -0.5,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: ElderColors.primaryContainer,
-                      shape: BoxShape.circle,
-                      boxShadow: NirvanaShadows.float(
-                        tint: ElderColors.primary,
+                        ],
                       ),
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.favorite_rounded,
-                        size: 32,
-                        color: ElderColors.primary,
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: ElderColors.primaryContainer,
+                        shape: BoxShape.circle,
+                        boxShadow: NirvanaShadows.float(
+                          tint: ElderColors.primary,
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.favorite_rounded,
+                          size: 32,
+                          color: ElderColors.primary,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => _logout(context),
-                    tooltip: 'Log out',
-                    icon: const Icon(
-                      Icons.logout_rounded,
-                      color: ElderColors.textSecondary,
+                    IconButton(
+                      onPressed: () => _logout(context),
+                      tooltip: 'Log out',
+                      icon: const Icon(
+                        Icons.logout_rounded,
+                        color: ElderColors.textSecondary,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 28),
-
-              // ----------------------------------------------------------------
-              // Today's Wellness Motivation Card
-              // ----------------------------------------------------------------
-              _ClayWellnessCard(),
-              const SizedBox(height: 20),
-
-              // ----------------------------------------------------------------
-              // Next Routine / Reminder Card
-              // ----------------------------------------------------------------
-              _UpcomingReminderCard(patientId: session?.patientId ?? ''),
-              const SizedBox(height: 28),
-
-              // ----------------------------------------------------------------
-              // Quick Access Grid
-              // ----------------------------------------------------------------
-              const Text(
-                'What would you like to do?',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: ElderColors.textPrimary,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
 
-              _QuickAccessGrid(),
-              const SizedBox(height: 28),
+                const SizedBox(height: 28),
 
-              // ----------------------------------------------------------------
-              // Encouragement Message
-              // ----------------------------------------------------------------
-              SupportiveMessage(
-                message:
-                    'Remember: your caregiver is always just a touch away, $preferredName.',
-                icon: Icons.lightbulb_rounded,
-                backgroundColor: ElderColors.pastelSage,
-                accentColor: ElderColors.forestDeep,
-              ),
-              const SizedBox(height: 20),
-            ],
+                // ----------------------------------------------------------------
+                // Today's Wellness Motivation Card
+                // ----------------------------------------------------------------
+                _ClayWellnessCard(),
+                const SizedBox(height: 20),
+
+                // ----------------------------------------------------------------
+                // Next Routine / Reminder Card
+                // ----------------------------------------------------------------
+                _UpcomingReminderCard(patientId: session?.patientId ?? ''),
+                const SizedBox(height: 28),
+
+                // ----------------------------------------------------------------
+                // Quick Access Grid
+                // ----------------------------------------------------------------
+                const Text(
+                  'What would you like to do?',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: ElderColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                _QuickAccessGrid(),
+                const SizedBox(height: 28),
+
+                // ----------------------------------------------------------------
+                // Encouragement Message
+                // ----------------------------------------------------------------
+                SupportiveMessage(
+                  message:
+                      'Remember: your caregiver is always just a touch away, $preferredName.',
+                  icon: Icons.lightbulb_rounded,
+                  backgroundColor: ElderColors.pastelSage,
+                  accentColor: ElderColors.forestDeep,
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -356,14 +359,23 @@ class _QuickAccessGrid extends StatelessWidget {
       ),
     ];
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 0.96,
-      children: tiles,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final tileHeight = constraints.maxWidth < 360 ? 196.0 : 188.0;
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            mainAxisExtent: tileHeight,
+          ),
+          itemCount: tiles.length,
+          itemBuilder: (context, index) => tiles[index],
+        );
+      },
     );
   }
 }
@@ -439,6 +451,8 @@ class _ClayQuickTile extends StatelessWidget {
                   ),
                   child: Text(
                     tag,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
@@ -450,6 +464,8 @@ class _ClayQuickTile extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,

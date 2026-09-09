@@ -50,20 +50,25 @@ class SyncStatusCard extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          'Sync status: ',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: badgeColor,
+                        Flexible(
+                          child: Text(
+                            'Sync status: ',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: badgeColor,
+                            ),
                           ),
                         ),
-                        Text(
-                          isOnline ? 'Online' : 'Offline Mode',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: ElderColors.textPrimary,
+                        Flexible(
+                          child: Text(
+                            isOnline ? 'Online' : 'Offline Mode',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: ElderColors.textPrimary,
+                            ),
                           ),
                         ),
                       ],
@@ -105,7 +110,9 @@ class SyncStatusCard extends ConsumerWidget {
       },
       loading: () => const SizedBox(
         height: 48,
-        child: Center(child: CircularProgressIndicator(color: ElderColors.clayLavender)),
+        child: Center(
+          child: CircularProgressIndicator(color: ElderColors.clayLavender),
+        ),
       ),
       error: (_, __) => const SizedBox.shrink(),
     );

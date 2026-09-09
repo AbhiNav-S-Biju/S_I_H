@@ -12,6 +12,7 @@ abstract class IGameSessionRepository {
   Future<void> recordGameSession({
     required GameSession session,
     String? patientId,
+    String? deviceId,
   });
 
   /// Retrieves historical game sessions for a patient.

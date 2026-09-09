@@ -33,10 +33,10 @@ class SevenDayActivityChart extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
                     '7-Day Activity View',
                     style: TextStyle(
                       fontSize: 18,
@@ -44,13 +44,15 @@ class SevenDayActivityChart extends ConsumerWidget {
                       color: ElderColors.textPrimary,
                     ),
                   ),
-                  Row(
+                  const SizedBox(height: 8),
+                  const Wrap(
+                    spacing: 12,
+                    runSpacing: 4,
                     children: [
                       _LegendIndicator(
                         color: ElderColors.clayLavender,
                         label: 'Games',
                       ),
-                      SizedBox(width: 12),
                       _LegendIndicator(
                         color: ElderColors.claySage,
                         label: 'Reminders',
@@ -127,7 +129,9 @@ class SevenDayActivityChart extends ConsumerWidget {
       },
       loading: () => const SizedBox(
         height: 160,
-        child: Center(child: CircularProgressIndicator(color: ElderColors.clayLavender)),
+        child: Center(
+          child: CircularProgressIndicator(color: ElderColors.clayLavender),
+        ),
       ),
       error: (e, _) => Text('Error loading 7-day activity: $e'),
     );

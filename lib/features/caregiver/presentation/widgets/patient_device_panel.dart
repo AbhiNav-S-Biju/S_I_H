@@ -95,16 +95,20 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
         final selected = ref.read(selectedPatientProvider);
         await ref.read(pairingRepositoryProvider).revokeDevice(deviceId);
         if (selected != null) {
-          await ref.read(caregiverEventNotificationServiceProvider).notifyDeviceRevoked(
-            patientId: selected.id,
-            patientName: selected.preferredName ?? selected.fullName,
-          );
+          await ref
+              .read(caregiverEventNotificationServiceProvider)
+              .notifyDeviceRevoked(
+                patientId: selected.id,
+                patientName: selected.preferredName ?? selected.fullName,
+              );
         }
         ref.invalidate(patientLinkedDeviceProvider);
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not revoke device. Try again.')),
+            const SnackBar(
+              content: Text('Could not revoke device. Try again.'),
+            ),
           );
         }
       }
@@ -155,12 +159,14 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Patient Device',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: ElderColors.textPrimary,
+                Expanded(
+                  child: Text(
+                    'Patient Device',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: ElderColors.textPrimary,
+                    ),
                   ),
                 ),
                 const Spacer(),
@@ -237,10 +243,10 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
                   pairingState.isLoading
                       ? 'Generating…'
                       : (pairingState.code != null &&
-                              !pairingState.code!.isExpired &&
-                              _remainingSeconds > 0
-                          ? 'Generate New Code'
-                          : 'Generate Pairing Code'),
+                                !pairingState.code!.isExpired &&
+                                _remainingSeconds > 0
+                            ? 'Generate New Code'
+                            : 'Generate Pairing Code'),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -273,10 +279,7 @@ class _DeviceStatusSection extends StatelessWidget {
     return deviceAsync.when(
       data: (device) {
         if (device != null && device.isActive) {
-          return _ConnectedDeviceCard(
-            device: device,
-            onRevoke: onRevoke,
-          );
+          return _ConnectedDeviceCard(device: device, onRevoke: onRevoke);
         }
         return const _NotConnectedCard();
       },
@@ -366,10 +369,7 @@ class _ConnectedDeviceCard extends StatelessWidget {
   final PatientDeviceSummary device;
   final VoidCallback onRevoke;
 
-  const _ConnectedDeviceCard({
-    required this.device,
-    required this.onRevoke,
-  });
+  const _ConnectedDeviceCard({required this.device, required this.onRevoke});
 
   @override
   Widget build(BuildContext context) {
@@ -586,7 +586,11 @@ class _ShareTipCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.lightbulb_outline, size: 18, color: ElderColors.primary),
+          const Icon(
+            Icons.lightbulb_outline,
+            size: 18,
+            color: ElderColors.primary,
+          ),
           const SizedBox(width: 8),
           const Expanded(
             child: Text(

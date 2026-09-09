@@ -30,7 +30,12 @@ class GamesHubScreen extends ConsumerStatefulWidget {
 class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
   void _openGameMap(GameType type) async {
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => GameLevelMapScreen(gameType: type)),
+      MaterialPageRoute(
+        builder: (_) => GameLevelMapScreen(
+          gameType: type,
+          onSessionCompleted: widget.onSessionCompleted,
+        ),
+      ),
     );
     if (mounted) {
       setState(() {});

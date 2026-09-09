@@ -183,6 +183,7 @@ class PatientDashboard extends ConsumerWidget {
       builder: (context, constraints) {
         const spacing = 16.0;
         final cardWidth = (constraints.maxWidth - spacing) / 2.0;
+        final cardHeight = constraints.maxWidth < 360.0 ? 214.0 : 198.0;
 
         final items = [
           _ActionCardItem(
@@ -245,7 +246,7 @@ class PatientDashboard extends ConsumerWidget {
           children: items.map((item) {
             return SizedBox(
               width: cardWidth,
-              height: 184.0,
+              height: cardHeight,
               child: ClayActionCard(
                 tokenType: item.tokenType,
                 tokenColor: item.tokenColor,
@@ -697,18 +698,31 @@ class _FloatingAmbient3DLayer extends StatelessWidget {
         children: [
           // 1. Left Puffy Cloud under the banner edge
           const Positioned(
-            top: 260.0,
-            left: -32.0,
+            top: 220.0,
+            left: -36.0,
             child: SizedBox(
-              width: 80.0,
-              height: 48.0,
+              width: 112.0,
+              height: 66.0,
               child: CustomPaint(
                 painter: _ClayCloud3DPainter(color: Color(0xFFC7BAEE)),
               ),
             ),
           ),
 
-          // 2. Middle-Right Teal Clay Kidney/Pebble
+          // 2. Floating lavender cloud on the upper-right background
+          const Positioned(
+            top: 150.0,
+            right: -28.0,
+            child: SizedBox(
+              width: 118.0,
+              height: 68.0,
+              child: CustomPaint(
+                painter: _ClayCloud3DPainter(color: Color(0xFFD8D0F4)),
+              ),
+            ),
+          ),
+
+          // 3. Middle-Right Teal Clay Kidney/Pebble
           const Positioned(
             top: 285.0,
             right: -15.0,
@@ -724,7 +738,7 @@ class _FloatingAmbient3DLayer extends StatelessWidget {
             ),
           ),
 
-          // 3. Middle-Right Coral Clay Pebble
+          // 4. Middle-Right Coral Clay Pebble
           const Positioned(
             top: 335.0,
             right: 22.0,
@@ -739,7 +753,7 @@ class _FloatingAmbient3DLayer extends StatelessWidget {
             ),
           ),
 
-          // 4. Middle-Right Small Teal Drop Pebble
+          // 5. Middle-Right Small Teal Drop Pebble
           const Positioned(
             top: 365.0,
             right: -8.0,
@@ -755,7 +769,7 @@ class _FloatingAmbient3DLayer extends StatelessWidget {
             ),
           ),
 
-          // 5. Lower-Left Coral/Peach Organic Blob
+          // 6. Lower-Left Coral/Peach Organic Blob
           const Positioned(
             top: 670.0,
             left: -20.0,
@@ -771,7 +785,7 @@ class _FloatingAmbient3DLayer extends StatelessWidget {
             ),
           ),
 
-          // 6. Bottom-Right 3D Wave Landscape + Glossy Gold Ribbon & Pebbles
+          // 7. Bottom-Right 3D Wave Landscape + Glossy Gold Ribbon & Pebbles
           const Positioned(
             bottom: -20.0,
             right: -20.0,

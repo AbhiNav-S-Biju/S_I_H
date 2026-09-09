@@ -21,8 +21,8 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
   SupabaseGameSessionRepository({
     SupabaseClient? client,
     IConnectivityMonitor? connectivityMonitor,
-  })  : _client = client,
-        _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
+  }) : _client = client,
+       _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
 
   SupabaseClient? get _activeClient {
     if (_client != null) return _client;
@@ -57,13 +57,17 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
   Future<void> recordGameSession({
     required GameSession session,
     String? patientId,
+    String? deviceId,
   }) async {
-    final effectivePatientId = patientId ??
+    final effectivePatientId =
+        patientId ??
         HiveDatabase.pairedPatientId ??
         HiveDatabase.currentPatientSession?.patientId;
 
     if (effectivePatientId == null || effectivePatientId.isEmpty) {
-      debugPrint('⚠️ Warning: No active patient ID found for recording game session.');
+      debugPrint(
+        '⚠️ Warning: No active patient ID found for recording game session.',
+      );
       return;
     }
 
@@ -90,13 +94,44 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
     final client = _activeClient;
     final status = await _connectivityMonitor.checkStatus();
 
-    // 1. Direct Supabase insert when online
+    // Patient devices use the anonymous Supabase role. Write through the
+    // device-authorized RPC instead of attempting a caregiver-only RLS insert.
     if (client != null && status == NetworkStatus.online) {
-      try {
-        await client.from('game_sessions').upsert(payload);
-        debugPrint('✅ Game session successfully recorded in Supabase for patient: $effectivePatientId');
-      } catch (e) {
-        debugPrint('⚠️ Failed to directly insert game session to Supabase: $e');
+      final isAuthenticated = client.auth.currentUser != null;
+      if (!isAuthenticated) {
+        try {
+          final pairedDeviceId = deviceId ?? HiveDatabase.getOrCreateDeviceId();
+          await client.rpc(
+            'record_patient_game_session',
+            params: {
+              'p_patient_id': effectivePatientId,
+              'p_device_id': pairedDeviceId,
+              'p_session': payload,
+            },
+          );
+          debugPrint(
+            '✅ Patient game session recorded through paired-device RPC for patient: $effectivePatientId',
+          );
+          return;
+        } catch (e) {
+          debugPrint(
+            '⚠️ Patient game session RPC failed; queueing sync event: $e',
+          );
+        }
+      }
+
+      if (isAuthenticated) {
+        // Caregiver-authenticated clients can use the existing RLS insert.
+        try {
+          await client.from('game_sessions').upsert(payload);
+          debugPrint(
+            '✅ Game session successfully recorded in Supabase for patient: $effectivePatientId',
+          );
+        } catch (e) {
+          debugPrint(
+            '⚠️ Failed to directly insert game session to Supabase: $e',
+          );
+        }
       }
     }
 
@@ -126,7 +161,9 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
     final client = _activeClient;
     final status = await _connectivityMonitor.checkStatus();
 
-    if (client != null && status == NetworkStatus.online && patientId.isNotEmpty) {
+    if (client != null &&
+        status == NetworkStatus.online &&
+        patientId.isNotEmpty) {
       try {
         final response = await client
             .from('game_sessions')
@@ -158,9 +195,11 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
             totalQuestions: (map['total_trials'] as num?)?.toInt() ?? 0,
             hintsUsed: 0,
             durationSeconds: (map['duration_seconds'] as num?)?.toInt() ?? 0,
-            completedAt: DateTime.tryParse(map['completed_at'] as String? ?? '') ??
+            completedAt:
+                DateTime.tryParse(map['completed_at'] as String? ?? '') ??
                 DateTime.now(),
-            activityMetadata: (map['activity_metadata'] as Map<String, dynamic>?) ?? {},
+            activityMetadata:
+                (map['activity_metadata'] as Map<String, dynamic>?) ?? {},
           );
         }).toList();
       } catch (e) {

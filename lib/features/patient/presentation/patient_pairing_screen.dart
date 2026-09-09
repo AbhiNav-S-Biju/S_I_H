@@ -23,10 +23,14 @@ class PatientPairingScreen extends ConsumerStatefulWidget {
 
 class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
   static const int _codeLength = 6;
-  final List<TextEditingController> _controllers =
-      List.generate(_codeLength, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes =
-      List.generate(_codeLength, (_) => FocusNode());
+  final List<TextEditingController> _controllers = List.generate(
+    _codeLength,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(
+    _codeLength,
+    (_) => FocusNode(),
+  );
 
   bool _hasNavigated = false;
 
@@ -41,15 +45,15 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
     super.dispose();
   }
 
-  String get _currentCode =>
-      _controllers.map((c) => c.text).join();
+  String get _currentCode => _controllers.map((c) => c.text).join();
 
   void _onDigitChanged(int index, String value) {
     if (value.length > 1) {
       final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
       for (int i = 0; i < _codeLength && i < digits.length; i++) {
         _controllers[index + i < _codeLength ? index + i : _codeLength - 1]
-            .text = digits[i];
+                .text =
+            digits[i];
       }
       final nextFocus = (index + digits.length).clamp(0, _codeLength - 1);
       _focusNodes[nextFocus].requestFocus();
@@ -187,21 +191,34 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
           const SizedBox(height: 32),
 
           // 6-digit 3D Embossed PIN boxes
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_codeLength, (i) {
-              return Padding(
-                padding: EdgeInsets.only(right: i < _codeLength - 1 ? 8 : 0),
-                child: _Clay3DPinBox(
-                  controller: _controllers[i],
-                  focusNode: _focusNodes[i],
-                  hasError: pairingState.isError,
-                  onChanged: (v) => _onDigitChanged(i, v),
-                  onKeyEvent: (e) => _onKeyEvent(i, e),
-                  autofocus: i == 0,
-                ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 8.0;
+              final pinWidth =
+                  ((constraints.maxWidth - spacing * (_codeLength - 1)) /
+                          _codeLength)
+                      .clamp(40.0, 48.0);
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(_codeLength, (i) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      right: i < _codeLength - 1 ? spacing : 0,
+                    ),
+                    child: _Clay3DPinBox(
+                      width: pinWidth,
+                      controller: _controllers[i],
+                      focusNode: _focusNodes[i],
+                      hasError: pairingState.isError,
+                      onChanged: (v) => _onDigitChanged(i, v),
+                      onKeyEvent: (e) => _onKeyEvent(i, e),
+                      autofocus: i == 0,
+                    ),
+                  );
+                }),
               );
-            }),
+            },
           ),
 
           const SizedBox(height: 20),
@@ -212,7 +229,10 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
             child: pairingState.isError
                 ? ClayCard3D(
                     key: const ValueKey('error'),
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
                     borderRadius: 20,
                     color: const Color(0xFFFBE4E0),
                     child: Row(
@@ -314,6 +334,7 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
 // 3D Embossed PIN Box Widget
 // ==============================================================================
 class _Clay3DPinBox extends StatelessWidget {
+  final double width;
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool hasError;
@@ -322,6 +343,7 @@ class _Clay3DPinBox extends StatelessWidget {
   final ValueChanged<KeyEvent> onKeyEvent;
 
   const _Clay3DPinBox({
+    required this.width,
     required this.controller,
     required this.focusNode,
     required this.hasError,
@@ -335,7 +357,7 @@ class _Clay3DPinBox extends StatelessWidget {
     final hasValue = controller.text.isNotEmpty;
 
     return Container(
-      width: 48,
+      width: width,
       height: 64,
       decoration: BoxDecoration(
         color: hasValue
