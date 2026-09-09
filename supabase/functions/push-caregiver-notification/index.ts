@@ -9,7 +9,17 @@
 // - No service credentials are ever stored in or transmitted to the mobile client.
 // ==============================================================================
 
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+// Setup type definitions for Supabase Edge Runtime
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
+// Ambient type declaration for Deno APIs when IDE Deno language server is inactive
+declare const Deno: {
+  serve: (handler: (req: Request) => Promise<Response> | Response) => void;
+  env: {
+    get: (key: string) => string | undefined;
+  };
+};
+// @ts-ignore: Resolved at runtime by Deno / Supabase Edge Runtime
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
 interface WebhookPayload {
@@ -100,7 +110,7 @@ async function getAccessToken(serviceAccount: ServiceAccountKey): Promise<string
   return json.access_token;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // CORS Preflight
   if (req.method === "OPTIONS") {
     return new Response("OK", {

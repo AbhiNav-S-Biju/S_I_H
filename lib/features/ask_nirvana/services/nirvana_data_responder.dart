@@ -12,15 +12,21 @@ import '../../games/providers/game_session_providers.dart';
 import '../../reminders/models/reminder.dart';
 import '../../reminders/providers/reminder_providers.dart';
 import '../domain/ask_nirvana_intent.dart';
+import 'ai_assistant_service.dart';
 import 'nirvana_intent_router.dart';
+import 'nirvana_story_service.dart';
 
 class NirvanaDataResponder {
   final Ref _ref;
   final NirvanaIntentRouter _router;
+  final IAiAssistantService? _aiService;
+  final NirvanaStoryService? _storyService;
 
   const NirvanaDataResponder(
     this._ref, [
     this._router = const NirvanaIntentRouter(),
+    this._aiService,
+    this._storyService,
   ]);
 
   static const unavailable = "I don't have that information right now.";
@@ -29,26 +35,68 @@ class NirvanaDataResponder {
     final result = _router.route(query);
     debugPrint('Ask NIRVANA intent: ${result.intent}');
     switch (result.intent) {
-      case NirvanaIntent.nextReminder:
+      // 1. Stories
+      case NirvanaIntent.tellStory:
+      case NirvanaIntent.tellAnotherStory:
+        return _storyResponse(result, langCode);
+
+      // 2. Reminders & Medicine
+      case NirvanaIntent.getNextReminder:
         return _reminderResponse(result.isMedicineSpecific, false, langCode);
-      case NirvanaIntent.todaysReminders:
+      case NirvanaIntent.getTodaysReminders:
         return _reminderResponse(result.isMedicineSpecific, true, langCode);
-      case NirvanaIntent.dailyRoutine:
+
+      // 3. Daily Routine
+      case NirvanaIntent.getDailyRoutine:
         return _routineResponse(result.routinePeriod);
-      case NirvanaIntent.familyInfo:
+
+      // 4. Family & Relatives
+      case NirvanaIntent.familyQuery:
         return _familyResponse(result.specificRelation);
-      case NirvanaIntent.memories:
+
+      // 5. Memories
+      case NirvanaIntent.memoryQuery:
         return _memoryResponse();
-      case NirvanaIntent.games:
-        return _gameResponse(result.gameAction);
-      case NirvanaIntent.orientation:
+
+      // 6. Games & Boredom
+      case NirvanaIntent.startGame:
+        return _gameResponse(GameIntentAction.startGame, false, langCode);
+      case NirvanaIntent.recommendGame:
+        return _gameResponse(result.gameAction, result.isBoredQuery, langCode);
+
+      // 7. Orientation: Time, Day, Date
+      case NirvanaIntent.getTime:
+        return _orientationResponse(OrientationTarget.time);
+      case NirvanaIntent.getDay:
+        return _orientationResponse(OrientationTarget.dayOfWeek);
+      case NirvanaIntent.getDate:
         return _orientationResponse(result.orientationTarget);
-      case NirvanaIntent.activity:
+
+      // 8. Activity
+      case NirvanaIntent.getTodaysActivity:
         return _activityResponse();
+
+      // 9. Social: Greeting, Gratitude, Goodbye
+      case NirvanaIntent.greeting:
+        return _greetingResponse(langCode);
+      case NirvanaIntent.gratitude:
+        return _gratitudeResponse(langCode);
+      case NirvanaIntent.goodbye:
+        return _goodbyeResponse(langCode);
+
+      // 10. Help
       case NirvanaIntent.help:
         return _helpResponse();
-      case NirvanaIntent.fallback:
-        return unavailable;
+
+      // 11. General Conversation -> AI Fallback
+      case NirvanaIntent.generalConversation:
+        final IAiAssistantService aiService =
+            _aiService ?? _ref.read(aiAssistantServiceProvider);
+        return await aiService.getAiFallbackResponse(
+          query: query,
+          languageCode: langCode,
+          patientContext: _patientId.isNotEmpty ? 'Patient ID: $_patientId' : null,
+        );
     }
   }
 
@@ -57,6 +105,23 @@ class NirvanaDataResponder {
       HiveDatabase.currentPatientSession?.patientId ??
       '';
 
+  // ---------------------------------------------------------------------------
+  // Story handler
+  // ---------------------------------------------------------------------------
+  String _storyResponse(NirvanaIntentResult result, String langCode) {
+    final NirvanaStoryService storyService =
+        _storyService ?? _ref.read(nirvanaStoryServiceProvider);
+    final story = storyService.getStory(
+      languageCode: langCode,
+      category: result.storyCategory,
+      isAnother: result.intent == NirvanaIntent.tellAnotherStory,
+    );
+    return storyService.formatStoryResponse(story, langCode);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Reminder handler
+  // ---------------------------------------------------------------------------
   Future<List<Reminder>> _reminders() async {
     final local = await _ref
         .read(reminderRepositoryProvider)
@@ -102,7 +167,10 @@ class NirvanaDataResponder {
         return text.contains('med') ||
             text.contains('pill') ||
             text.contains('tablet') ||
-            text.contains('dose');
+            text.contains('dose') ||
+            text.contains('दवा') ||
+            text.contains('औषध') ||
+            text.contains('ঔষধ');
       }).toList();
     }
     final now = DateTime.now();
@@ -120,6 +188,9 @@ class NirvanaDataResponder {
     return 'Today you have ${reminders.length} reminder(s): ${reminders.map((r) => '${r.title} at ${DateFormat.jm().format(r.scheduledAt)}').join(', ')}.';
   }
 
+  // ---------------------------------------------------------------------------
+  // Routine handler
+  // ---------------------------------------------------------------------------
   Future<String> _routineResponse(RoutinePeriod period) async {
     final now = DateTime.now();
     var items = (await _reminders())
@@ -143,6 +214,9 @@ class NirvanaDataResponder {
     return 'Here is your routine: ${items.map((r) => '${DateFormat.jm().format(r.scheduledAt)} - ${r.title}').join(', ')}.';
   }
 
+  // ---------------------------------------------------------------------------
+  // Family & Memories handler
+  // ---------------------------------------------------------------------------
   Future<List<Map<String, dynamic>>> _familyPhotos() async {
     if (_patientId.isEmpty) return [];
     try {
@@ -177,11 +251,36 @@ class NirvanaDataResponder {
     return 'I found ${records.length} family memory photo(s): ${records.map(_recordName).join(', ')}.';
   }
 
-  String _gameResponse(GameIntentAction? action) =>
-      action == GameIntentAction.startGame
-      ? 'START_GAME: Opening Games.'
-      : 'RECOMMEND_GAME: I recommend Who Is This? or Remember Objects. Open Games to choose one.';
+  // ---------------------------------------------------------------------------
+  // Games & Boredom handler
+  // ---------------------------------------------------------------------------
+  String _gameResponse(GameIntentAction? action, bool isBored, String langCode) {
+    if (isBored) {
+      const boredMessages = {
+        'en':
+            'We can play a memory game, look at your memories, or I can tell you a story. What would you like?',
+        'hi':
+            'हम एक मेमोरी गेम खेल सकते हैं, आपकी पुरानी यादें देख सकते हैं, या मैं आपको एक कहानी सुना सकता हूँ। आप क्या पसंद करेंगे?',
+        'bn':
+            'আমরা একটি মেমরি গেম খেলতে পারি, আপনার স্মৃতি দেখতে পারি, অথবা আমি আপনাকে একটি গল্প বলতে পারি। আপনি কী চান?',
+        'as':
+            'আমি এটা স্মৃতিৰ খেল খেলিব পাৰোঁ, আপোনাৰ পুৰণি স্মৃতি চাব পাৰোঁ, নাইবা মই এটি সাধু ক’ব পাৰোঁ। আপুনি কি বিচাৰে?',
+        'ne':
+            'हामी एउटा मेमोरी गेम खेल्न सक्छौं, तपाईंका सम्झनाहरू हेर्न सक्छौं, वा म तपाईंलाई एउटा कथा सुनाउन सक्छु। तपाईं के चाहनुहुन्छ?',
+      };
+      return boredMessages[langCode] ?? boredMessages['en']!;
+    }
 
+    if (action == GameIntentAction.startGame) {
+      return 'START_GAME: Opening Games.';
+    }
+
+    return 'RECOMMEND_GAME: I recommend Who Is This? or Remember Objects. Open Games to choose one.';
+  }
+
+  // ---------------------------------------------------------------------------
+  // Orientation handler
+  // ---------------------------------------------------------------------------
   String _orientationResponse(OrientationTarget target) {
     final now = DateTime.now();
     final time = DateFormat.jm().format(now);
@@ -199,6 +298,9 @@ class NirvanaDataResponder {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Activity handler
+  // ---------------------------------------------------------------------------
   Future<String> _activityResponse() async {
     final now = DateTime.now();
     var reminders = 0;
@@ -227,8 +329,57 @@ class NirvanaDataResponder {
     return 'Today you completed $reminders reminder(s) and played $games game(s).';
   }
 
+  // ---------------------------------------------------------------------------
+  // Social handler: Greeting, Gratitude, Goodbye
+  // ---------------------------------------------------------------------------
+  String _greetingResponse(String langCode) {
+    const greetings = {
+      'en':
+          'Hello! It is wonderful to talk with you. How can I help you today?',
+      'hi':
+          'नमस्ते! आपसे बात करके बहुत अच्छा लगा। आज मैं आपकी क्या मदद कर सकता हूँ?',
+      'bn':
+          'নমস্কার! আপনার সাথে কথা বলে খুব ভালো লাগছে। আজ আমি আপনাকে কিভাবে সাহায্য করতে পারি?',
+      'as':
+          'নমস্কাৰ! আপোনাৰ লগত কথা পাতি বৰ ভাল লাগিছে। মই আজি আপোনাক কি সহায় কৰিব পাৰোঁ?',
+      'ne':
+          'नमस्ते! तपाईंसँग कुरा गर्न पाउँदा धेरै खुसी लाग्यो। आज म तपाईंलाई के मद्दत गर्न सक्छु?',
+    };
+    return greetings[langCode] ?? greetings['en']!;
+  }
+
+  String _gratitudeResponse(String langCode) {
+    const responses = {
+      'en': 'You are always welcome. I am right here with you.',
+      'hi': 'आपका हमेशा स्वागत है। मैं हमेशा आपके साथ हूँ।',
+      'bn': 'আপনাকে সবসময় স্বাগতম। আমি আপনার সাথেই আছি।',
+      'as': 'আপোনাক সদায় স্বাগতম। মই আপোনাৰ লগতেই আছোঁ।',
+      'ne': 'तपाईंलाई सधैं स्वागत छ। म तपाईंसँगै छु।',
+    };
+    return responses[langCode] ?? responses['en']!;
+  }
+
+  String _goodbyeResponse(String langCode) {
+    const goodbyes = {
+      'en':
+          'Take care and rest well. I will be right here whenever you need me.',
+      'hi':
+          'अपना ख्याल रखिए और आराम कीजिए। जब भी जरूरत हो, मैं यहीं हूँ।',
+      'bn':
+          'নিজের খেয়াল রাখুন এবং বিশ্রাম নিন। যখনই প্রয়োজন হবে আমি এখানেই আছি।',
+      'as':
+          'নিজৰ যত্ন লওক আৰু বিশ্ৰাম কৰক। প্ৰয়োজন হ’লেই মই ইয়াতেই আছোঁ।',
+      'ne':
+          'आफ्नो ख्याल राख्नुहोस् र आराम गर्नुहोस्। तपाईंलाई आवश्यक पर्दा म यहीँ हुनेछु।',
+    };
+    return goodbyes[langCode] ?? goodbyes['en']!;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Help handler
+  // ---------------------------------------------------------------------------
   String _helpResponse() =>
-      'I am NIRVANA. I can check reminders, your daily routine, family photos and memories, games, the date and time, and recorded activity.';
+      'I am NIRVANA. I can tell stories, check reminders, your daily routine, family photos and memories, games, the date and time, and recorded activity.';
 
   String _recordName(Map<String, dynamic> record) {
     final title = record['title'] as String?;

@@ -227,8 +227,13 @@ class JigsawPuzzleController {
 
   /// Randomly selects a different familiar scene for variety
   PuzzleImage pickRandomImage({bool avoidCurrent = true}) {
-    final newImage =
+    var newImage =
         getNextRotatingImage(pool: availableImages, rng: _random);
+    if (avoidCurrent && availableImages.length > 1) {
+      while (newImage.id == _state.activeImage.id) {
+        newImage = getNextRotatingImage(pool: availableImages, rng: _random);
+      }
+    }
     changeImage(newImage);
     return newImage;
   }

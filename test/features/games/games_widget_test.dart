@@ -28,7 +28,8 @@ void main() {
       expect(find.text('Who Is This?'), findsOneWidget);
       expect(find.text('Grocery Memory'), findsOneWidget);
       expect(find.text('Familiar Jigsaw'), findsOneWidget);
-      expect(find.text('Activity Pace:'), findsOneWidget);
+      expect(find.text('Activity Level Journeys'), findsOneWidget);
+      expect(find.text('Activity Pace:'), findsNothing);
     });
 
     testWidgets('JigsawPuzzleScreen renders board, tray pieces, and landmark guidance', (
@@ -50,7 +51,8 @@ void main() {
       );
 
       expect(find.text('Familiar Jigsaw'), findsOneWidget);
-      expect(find.text('Gentle'), findsOneWidget);
+      expect(find.text('Activity'), findsOneWidget);
+      expect(find.text('Gentle'), findsNothing);
       expect(find.text('Kaziranga One-Horned Rhino'), findsOneWidget);
       expect(find.widgetWithText(ElderGameButton, 'Hint'), findsOneWidget);
       expect(find.textContaining('Pieces to place'), findsOneWidget);

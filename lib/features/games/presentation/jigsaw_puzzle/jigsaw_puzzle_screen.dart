@@ -11,6 +11,7 @@ import '../../../../core/widgets/voice_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../controllers/jigsaw_puzzle_controller.dart';
 import '../../models/game_enums.dart';
+import '../../models/game_level.dart';
 import '../../models/game_session.dart';
 import '../../models/puzzle_item.dart';
 import '../widgets/elder_game_button.dart';
@@ -25,6 +26,7 @@ class JigsawPuzzleScreen extends ConsumerStatefulWidget {
   final PuzzleImage? initialImage;
   final ValueChanged<GameSession>? onGameCompleted;
   final VoidCallback? onExit;
+  final GameLevel? level;
 
   const JigsawPuzzleScreen({
     super.key,
@@ -32,6 +34,7 @@ class JigsawPuzzleScreen extends ConsumerStatefulWidget {
     this.initialImage,
     this.onGameCompleted,
     this.onExit,
+    this.level,
   });
 
   @override
@@ -44,9 +47,12 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
   @override
   void initState() {
     super.initState();
+    final effectiveDifficulty = widget.level?.difficulty ?? widget.difficulty;
+    final effectiveImage = (widget.level?.config['image'] as PuzzleImage?) ?? widget.initialImage;
+
     _controller = JigsawPuzzleController(
-      initialDifficulty: widget.difficulty,
-      initialImage: widget.initialImage,
+      initialDifficulty: effectiveDifficulty,
+      initialImage: effectiveImage,
     );
     _speakInitialPrompt();
   }
@@ -118,11 +124,37 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
 
     if (success && _controller.state.isCompleted) {
       final session = _controller.completeGame();
-      await GameCompletionDialog.show(context, session: session);
-      if (mounted) {
-        _handleCompletion(session);
-      }
+      await GameCompletionDialog.show(
+        context,
+        session: session,
+        level: widget.level,
+        onNextLevel: widget.level != null && widget.level!.levelNumber < 8
+            ? () => _loadNextLevel(widget.level!.levelNumber + 1)
+            : null,
+        onFinish: () {
+          if (mounted) {
+            _handleCompletion(session);
+          }
+        },
+      );
     }
+  }
+
+  void _loadNextLevel(int nextLevelNumber) {
+    final allLevels = GameLevel.getLevelsForGame(GameType.jigsawPuzzle);
+    final next = allLevels.firstWhere(
+      (l) => l.levelNumber == nextLevelNumber,
+      orElse: () => allLevels.last,
+    );
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => JigsawPuzzleScreen(
+          level: next,
+          onGameCompleted: widget.onGameCompleted,
+          onExit: widget.onExit,
+        ),
+      ),
+    );
   }
 
   void _handleSlotTap(int row, int col) async {
@@ -172,7 +204,9 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
         children: [
           // 1. Header Bar
           GameHeader(
-            title: GameType.jigsawPuzzle.localizedTitle(l10n),
+            title: widget.level != null
+                ? 'Level ${widget.level!.levelNumber}: ${widget.level!.localizedTitle(langCode)}'
+                : GameType.jigsawPuzzle.localizedTitle(l10n),
             difficulty: state.difficulty,
             onExit: _handleExit,
             onHint: _handleHint,

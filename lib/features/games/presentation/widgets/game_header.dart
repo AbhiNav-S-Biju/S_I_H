@@ -33,12 +33,9 @@ class GameHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: ElderColors.surface,
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24.0)),
-        boxShadow: ElderColors.clayShadow(),
-        border: const Border(
-          bottom: BorderSide(color: ElderColors.borderLight, width: 1.5),
-        ),
+        boxShadow: NirvanaShadows.card(),
       ),
       child: SafeArea(
         bottom: false,
@@ -70,39 +67,14 @@ class GameHeader extends StatelessWidget {
                       color: ElderColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4.0),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 6.0,
-                    runSpacing: 2.0,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0,
-                          vertical: 3.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: ElderColors.pastelSky,
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Text(
-                          difficulty.localizedLabel(l10n),
-                          style: const TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.w800,
-                            color: ElderColors.skyDeep,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '• ${l10n?.activitiesNavLabel ?? 'Activity'}',
-                        style: const TextStyle(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.w600,
-                          color: ElderColors.textSecondary,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 2.0),
+                  Text(
+                    l10n?.activitiesNavLabel ?? 'Activity',
+                    style: const TextStyle(
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.w600,
+                      color: ElderColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -115,13 +87,13 @@ class GameHeader extends StatelessWidget {
                 label: 'Get a helpful hint',
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isHintAvailable ? ElderColors.pastelButtercup : ElderColors.surfaceElevated,
+                    color: isHintAvailable ? ElderColors.pastelButtercupBg : ElderColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(
                       color: isHintAvailable ? ElderColors.amberDeep.withValues(alpha: 0.3) : ElderColors.borderLight,
                       width: 1.5,
                     ),
-                    boxShadow: isHintAvailable ? ElderColors.clayShadow(color: ElderColors.pastelButtercup) : null,
+                    boxShadow: isHintAvailable ? NirvanaShadows.float(tint: ElderColors.amberDeep) : null,
                   ),
                   child: Material(
                     color: Colors.transparent,
@@ -223,4 +195,3 @@ class GameHeader extends StatelessWidget {
     );
   }
 }
-

@@ -6,6 +6,7 @@ import '../../../../core/widgets/voice_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../controllers/grocery_memory_controller.dart';
 import '../../models/game_enums.dart';
+import '../../models/game_level.dart';
 import '../../models/game_session.dart';
 import '../widgets/elder_game_button.dart';
 import '../widgets/elder_game_card.dart';
@@ -16,12 +17,14 @@ class GroceryMemoryScreen extends ConsumerStatefulWidget {
   final GameDifficulty difficulty;
   final ValueChanged<GameSession>? onGameCompleted;
   final VoidCallback? onExit;
+  final GameLevel? level;
 
   const GroceryMemoryScreen({
     super.key,
     this.difficulty = GameDifficulty.easy,
     this.onGameCompleted,
     this.onExit,
+    this.level,
   });
 
   @override
@@ -35,7 +38,9 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = GroceryMemoryController(initialDifficulty: widget.difficulty);
+    _controller = GroceryMemoryController(
+      initialDifficulty: widget.level?.difficulty ?? widget.difficulty,
+    );
     _speakShoppingList();
   }
 
@@ -88,12 +93,35 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
     await GameCompletionDialog.show(
       context,
       session: session,
+      level: widget.level,
+      onNextLevel: widget.level != null && widget.level!.levelNumber < 8
+          ? () => _loadNextLevel(widget.level!.levelNumber + 1)
+          : null,
+      onFinish: () {
+        if (!mounted) return;
+        if (widget.onGameCompleted != null) {
+          widget.onGameCompleted!(session);
+        }
+        Navigator.of(context).maybePop(session);
+      },
     );
-    if (!mounted) return;
-    if (widget.onGameCompleted != null) {
-      widget.onGameCompleted!(session);
-    }
-    Navigator.of(context).maybePop(session);
+  }
+
+  void _loadNextLevel(int nextLevelNumber) {
+    final allLevels = GameLevel.getLevelsForGame(GameType.groceryMemory);
+    final next = allLevels.firstWhere(
+      (l) => l.levelNumber == nextLevelNumber,
+      orElse: () => allLevels.last,
+    );
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => GroceryMemoryScreen(
+          level: next,
+          onGameCompleted: widget.onGameCompleted,
+          onExit: widget.onExit,
+        ),
+      ),
+    );
   }
 
   @override
@@ -109,7 +137,9 @@ class _GroceryMemoryScreenState extends ConsumerState<GroceryMemoryScreen> {
         children: [
           // Header Bar
           GameHeader(
-            title: GameType.groceryMemory.localizedTitle(l10n),
+            title: widget.level != null
+                ? 'Level ${widget.level!.levelNumber}: ${widget.level!.localizedTitle(langCode)}'
+                : GameType.groceryMemory.localizedTitle(l10n),
             difficulty: state.difficulty,
             onExit: _handleExit,
             onHint: !state.isListPhase
