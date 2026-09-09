@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import '../theme/elder_theme.dart';
+import 'clay_3d/clay_3d_theme.dart';
 
 enum LargeActionButtonVariant { primary, secondary, gentleWarning, sage, peach, buttercup }
 typedef ElderButtonScheme = LargeActionButtonVariant;
@@ -50,32 +51,32 @@ class LargeActionButton extends StatelessWidget {
         bg = ElderColors.primary;
         fg = Colors.white;
         border = BorderSide.none;
-        shadow = ElderColors.buttonShadow(color: ElderColors.primary);
+        shadow = Clay3DTheme.buttonShadow(tint: ElderColors.primary);
         break;
       case LargeActionButtonVariant.secondary:
         bg = ElderColors.surface;
         fg = ElderColors.textPrimary;
         border = const BorderSide(color: ElderColors.borderLight, width: 2.0);
-        shadow = ElderColors.clayShadow();
+        shadow = Clay3DTheme.cardShadow(blur: 12, offset: 5);
         break;
       case LargeActionButtonVariant.gentleWarning:
       case LargeActionButtonVariant.peach:
         bg = ElderColors.pastelPeach;
         fg = Colors.white;
         border = BorderSide.none;
-        shadow = ElderColors.buttonShadow(color: ElderColors.pastelPeach);
+        shadow = Clay3DTheme.buttonShadow(tint: ElderColors.pastelPeach);
         break;
       case LargeActionButtonVariant.sage:
         bg = ElderColors.pastelSage;
         fg = Colors.white;
         border = BorderSide.none;
-        shadow = ElderColors.buttonShadow(color: ElderColors.pastelSage);
+        shadow = Clay3DTheme.buttonShadow(tint: ElderColors.pastelSage);
         break;
       case LargeActionButtonVariant.buttercup:
         bg = ElderColors.pastelButtercup;
         fg = Colors.white;
         border = BorderSide.none;
-        shadow = ElderColors.buttonShadow(color: ElderColors.pastelButtercup);
+        shadow = Clay3DTheme.buttonShadow(tint: ElderColors.pastelButtercup);
         break;
     }
 

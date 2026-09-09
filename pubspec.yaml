@@ -56,6 +56,9 @@ dependencies:
   just_audio_windows: ^0.2.3
   firebase_core: ">=3.0.0 <4.0.0"
   firebase_messaging: ">=15.0.0 <16.0.0"
+  clay_containers: ^0.3.2
+  google_fonts: ^6.2.1
+  spline_flutter: any
 
 dev_dependencies:
   flutter_test:

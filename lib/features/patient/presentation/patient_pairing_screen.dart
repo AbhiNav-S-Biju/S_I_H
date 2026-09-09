@@ -1,17 +1,17 @@
 // ==============================================================================
-// NIRVANA - Patient Pairing Screen
-// Description: 6-digit PIN entry screen for elderly patients.
-// Claymorphic design with large touch targets, auto-advance focus,
-// clear feedback in plain language, and soft dual shadows.
+// NIRVANA - Patient Pairing Screen (3D Claymorphism)
+// Description: Tactile 6-digit PIN entry screen for elderly patients with embossed PIN boxes,
+// large touch targets, floating ambient 3D decorations, and calm feedback.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nirvana/app/theme/elder_theme.dart';
-import 'package:nirvana/app/widgets/widgets.dart';
-import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../app/widgets/clay_3d/clay_3d.dart';
+import '../../../features/patient/providers/patient_pairing_providers.dart';
 
 class PatientPairingScreen extends ConsumerStatefulWidget {
   const PatientPairingScreen({super.key});
@@ -107,188 +107,213 @@ class _PatientPairingScreenState extends ConsumerState<PatientPairingScreen> {
 
     final isComplete = _currentCode.length == _codeLength;
 
-    return Scaffold(
-      backgroundColor: ElderColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: LargeIconButton(
-            icon: Icons.arrow_back_rounded,
-            semanticLabel: 'Go back',
-            onPressed: () => context.go('/patient/welcome'),
-            size: 48,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+    return ClayScaffold3D(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Top Navigation Row
+          Row(
             children: [
-              const SizedBox(height: 12),
-
-              // Dialpad Icon Clay Bubble
-              Container(
-                width: 88,
-                height: 88,
-                decoration: BoxDecoration(
-                  color: ElderColors.primaryContainer,
-                  shape: BoxShape.circle,
-                  boxShadow: NirvanaShadows.float(tint: ElderColors.primary),
-                ),
-                child: const Icon(
-                  Icons.dialpad_rounded,
-                  size: 44,
-                  color: ElderColors.primary,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Heading
-              const Text(
-                'Enter Your Code',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w900,
-                  color: ElderColors.textPrimary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-
-              const Text(
-                'Your caregiver showed you a 6-digit number.\nType it below.',
-                style: TextStyle(
-                  fontSize: 17,
-                  color: ElderColors.textSecondary,
-                  height: 1.4,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 36),
-
-              // 6-digit PIN boxes
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_codeLength, (i) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: i < _codeLength - 1 ? 8 : 0),
-                    child: _ClayPinBox(
-                      controller: _controllers[i],
-                      focusNode: _focusNodes[i],
-                      hasError: pairingState.isError,
-                      onChanged: (v) => _onDigitChanged(i, v),
-                      onKeyEvent: (e) => _onKeyEvent(i, e),
-                      autofocus: i == 0,
+              GestureDetector(
+                onTap: () => context.go('/patient/welcome'),
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Clay3DTheme.cardSurface,
+                    shape: BoxShape.circle,
+                    boxShadow: Clay3DTheme.cardShadow(blur: 8, offset: 3),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_back_rounded,
+                      size: 24,
+                      color: Clay3DTheme.textDark,
                     ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 24),
-
-              // Error message
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: pairingState.isError
-                    ? Container(
-                        key: const ValueKey('error'),
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: ElderColors.gentleErrorBg,
-                          borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-                          boxShadow: NirvanaShadows.card(tint: ElderColors.gentleErrorPrimary),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.info_outline_rounded,
-                              color: ElderColors.coralDeep,
-                              size: 28,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                pairingState.errorMessage ??
-                                    'Incorrect code. Please try again.',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: ElderColors.coralDeep,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.shrink(key: ValueKey('no-error')),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Verify button
-              SizedBox(
-                width: double.infinity,
-                child: LargeActionButton(
-                  label: 'Verify Code',
-                  isLoading: pairingState.isLoading,
-                  icon: Icons.check_circle_rounded,
-                  variant: LargeActionButtonVariant.primary,
-                  onPressed: isComplete && !pairingState.isLoading ? _verify : null,
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              // Clear button
-              TextButton.icon(
-                onPressed: _clearAll,
-                icon: const Icon(Icons.refresh_rounded, size: 22),
-                label: const Text(
-                  'Clear All Digits',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-                ),
-                style: TextButton.styleFrom(
-                  foregroundColor: ElderColors.textSecondary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
                   ),
                 ),
               ),
-
-              const SizedBox(height: 24),
-
-              // Help hint
-              SupportiveMessage(
-                message: 'If you do not have a code, ask your caregiver to tap "Generate Pairing Code" on their phone.',
-                icon: Icons.lightbulb_outline_rounded,
-                backgroundColor: ElderColors.pastelSage,
-                accentColor: ElderColors.forestDeep,
-              ),
-
-              const SizedBox(height: 24),
+              const Spacer(),
             ],
           ),
-        ),
+
+          const SizedBox(height: 12),
+
+          // 3D Dialpad Token
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Clay3DTheme.lavenderLight,
+              shape: BoxShape.circle,
+              boxShadow: Clay3DTheme.deepShadow(blur: 16, offset: 6),
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.dialpad_rounded,
+                size: 40,
+                color: Color(0xFF6B58A0),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          // Heading
+          Text(
+            'Enter Your Code',
+            style: GoogleFonts.nunito(
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              color: Clay3DTheme.textDark,
+              letterSpacing: -0.3,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            'Your caregiver showed you a 6-digit number.\nType it below.',
+            style: GoogleFonts.nunito(
+              fontSize: 15,
+              color: Clay3DTheme.textMuted,
+              height: 1.35,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 32),
+
+          // 6-digit 3D Embossed PIN boxes
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_codeLength, (i) {
+              return Padding(
+                padding: EdgeInsets.only(right: i < _codeLength - 1 ? 8 : 0),
+                child: _Clay3DPinBox(
+                  controller: _controllers[i],
+                  focusNode: _focusNodes[i],
+                  hasError: pairingState.isError,
+                  onChanged: (v) => _onDigitChanged(i, v),
+                  onKeyEvent: (e) => _onKeyEvent(i, e),
+                  autofocus: i == 0,
+                ),
+              );
+            }),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Error message
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: pairingState.isError
+                ? ClayCard3D(
+                    key: const ValueKey('error'),
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    borderRadius: 20,
+                    color: const Color(0xFFFBE4E0),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline_rounded,
+                          color: Clay3DTheme.coral,
+                          size: 26,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            pairingState.errorMessage ??
+                                'Incorrect code. Please try again.',
+                            style: GoogleFonts.nunito(
+                              fontSize: 15,
+                              color: Clay3DTheme.coral,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(key: ValueKey('no-error')),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Verify Button
+          SizedBox(
+            width: double.infinity,
+            child: ClayButton3D(
+              label: 'Verify Code',
+              icon: Icons.check_circle_rounded,
+              color: Clay3DTheme.lavender,
+              isLoading: pairingState.isLoading,
+              onPressed: isComplete && !pairingState.isLoading ? _verify : null,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // Clear Button
+          TextButton.icon(
+            onPressed: _clearAll,
+            icon: const Icon(Icons.refresh_rounded, size: 20),
+            label: Text(
+              'Clear All Digits',
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: Clay3DTheme.textMuted,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Help hint 3D card
+          ClayCard3D(
+            padding: const EdgeInsets.all(16),
+            borderRadius: 20,
+            color: const Color(0xFFE9F4F0),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.lightbulb_outline_rounded,
+                  color: Color(0xFF286D6D),
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'If you do not have a code, ask your caregiver to tap "Generate Pairing Code" on their phone.',
+                    style: GoogleFonts.nunito(
+                      fontSize: 13.5,
+                      color: const Color(0xFF286D6D),
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }
 }
 
 // ==============================================================================
-// Claymorphic PIN Box Widget
+// 3D Embossed PIN Box Widget
 // ==============================================================================
-
-class _ClayPinBox extends StatelessWidget {
+class _Clay3DPinBox extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool hasError;
@@ -296,7 +321,7 @@ class _ClayPinBox extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final ValueChanged<KeyEvent> onKeyEvent;
 
-  const _ClayPinBox({
+  const _Clay3DPinBox({
     required this.controller,
     required this.focusNode,
     required this.hasError,
@@ -313,15 +338,24 @@ class _ClayPinBox extends StatelessWidget {
       width: 48,
       height: 64,
       decoration: BoxDecoration(
-        color: hasValue ? ElderColors.primaryContainer : ElderColors.surface,
-        borderRadius: BorderRadius.circular(NirvanaRadii.icon),
-        border: Border.all(
-          color: hasError
-              ? ElderColors.gentleErrorPrimary
-              : (hasValue ? ElderColors.primary : ElderColors.border),
-          width: hasValue ? 1.5 : 1.0,
-        ),
-        boxShadow: NirvanaShadows.input,
+        color: hasValue
+            ? Clay3DTheme.lavenderLight.withValues(alpha: 0.70)
+            : Clay3DTheme.cardSurface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: hasValue
+            ? Clay3DTheme.cardShadow(blur: 8, offset: 3)
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.10),
+                  offset: const Offset(3, 3),
+                  blurRadius: 6,
+                ),
+                const BoxShadow(
+                  color: Colors.white,
+                  offset: Offset(-2, -2),
+                  blurRadius: 5,
+                ),
+              ],
       ),
       child: KeyboardListener(
         focusNode: FocusNode(skipTraversal: true),
@@ -334,12 +368,12 @@ class _ClayPinBox extends StatelessWidget {
           textAlign: TextAlign.center,
           maxLength: 2,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: TextStyle(
-            fontSize: 28,
+          style: GoogleFonts.nunito(
+            fontSize: 26,
             fontWeight: FontWeight.w900,
             color: hasError
-                ? ElderColors.coralDeep
-                : (hasValue ? ElderColors.primary : ElderColors.textPrimary),
+                ? Clay3DTheme.coral
+                : (hasValue ? const Color(0xFF5D4A8C) : Clay3DTheme.textDark),
           ),
           decoration: const InputDecoration(
             counterText: '',
@@ -355,4 +389,3 @@ class _ClayPinBox extends StatelessWidget {
     );
   }
 }
-

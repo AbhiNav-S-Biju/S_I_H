@@ -1,21 +1,21 @@
 // ==============================================================================
-// NIRVANA - Patient Reminders Screen
+// NIRVANA - Patient Reminders Screen (3D Claymorphism)
 // Description: Senior-accessible daily routine and reminder checklist.
-// Claymorphic wellness design with soft dual shadows, progress tracking,
-// large touch targets (>64dp), and clear Done / Snooze / Later actions.
-// Operates 100% offline via Hive with automated SyncEngine background sync.
+// Features 3D volumetric progress banner, tactile reminder cards with dual-layer shadows,
+// embossed status pills, and large tactile Done / Snooze action buttons.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nirvana/app/theme/elder_theme.dart';
-import 'package:nirvana/app/widgets/widgets.dart';
-import 'package:nirvana/database/hive_database.dart';
-import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
-import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
-import 'package:nirvana/features/reminders/models/reminder.dart';
-import 'package:nirvana/features/reminders/providers/reminder_providers.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../app/widgets/clay_3d/clay_3d.dart';
+import '../../../database/hive_database.dart';
+import '../../../features/caregiver/providers/caregiver_providers.dart';
+import '../../../features/patient/providers/patient_pairing_providers.dart';
+import '../../../features/reminders/models/reminder.dart';
+import '../../../features/reminders/providers/reminder_providers.dart';
 
 class PatientRemindersScreen extends ConsumerWidget {
   const PatientRemindersScreen({super.key});
@@ -27,84 +27,145 @@ class PatientRemindersScreen extends ConsumerWidget {
 
     final remindersAsync = ref.watch(activeRemindersProvider(patientId));
 
-    return Scaffold(
-      backgroundColor: ElderColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: LargeIconButton(
-            icon: Icons.arrow_back_rounded,
-            semanticLabel: 'Back to Home',
-            size: 48,
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/patient/home');
-              }
-            },
+    return ClayScaffold3D(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Navigation Row
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/patient/home');
+                  }
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Clay3DTheme.cardSurface,
+                    shape: BoxShape.circle,
+                    boxShadow: Clay3DTheme.cardShadow(blur: 8, offset: 3),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_back_rounded,
+                      size: 24,
+                      color: Clay3DTheme.textDark,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              ClaySlab3D(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                borderRadius: 18,
+                child: Text(
+                  'Daily Routines',
+                  style: GoogleFonts.nunito(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Clay3DTheme.textDark,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => ref.invalidate(activeRemindersProvider(patientId)),
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Clay3DTheme.cardSurface,
+                    shape: BoxShape.circle,
+                    boxShadow: Clay3DTheme.cardShadow(blur: 8, offset: 3),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.refresh_rounded,
+                      size: 24,
+                      color: Clay3DTheme.textDark,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        title: const Text(
-          'Daily Routines',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w900,
-            color: ElderColors.textPrimary,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: LargeIconButton(
-              icon: Icons.refresh_rounded,
-              semanticLabel: 'Refresh',
-              size: 48,
-              onPressed: () => ref.invalidate(activeRemindersProvider(patientId)),
-            ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: remindersAsync.when(
-          data: (reminders) {
-            final allReminders = HiveDatabase.remindersBox.values.where((r) {
-              return (patientId.isEmpty || r.patientId == patientId) && r.isActive;
-            }).map(Reminder.fromHive).toList();
 
-            allReminders.sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+          const SizedBox(height: 20),
 
-            final completedCount = allReminders.where((r) => r.isCompleted).length;
-            final totalCount = allReminders.length;
+          remindersAsync.when(
+            data: (reminders) {
+              final allReminders = HiveDatabase.remindersBox.values.where((r) {
+                return (patientId.isEmpty || r.patientId == patientId) && r.isActive;
+              }).map(Reminder.fromHive).toList();
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
+              allReminders.sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+
+              final completedCount = allReminders.where((r) => r.isCompleted).length;
+              final totalCount = allReminders.length;
+
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Motivational Progress Header
-                  _ClayProgressBanner(
+                  // 1. Motivational 3D Progress Banner
+                  _ClayProgressBanner3D(
                     completedCount: completedCount,
                     totalCount: totalCount,
                   ),
                   const SizedBox(height: 24),
 
-                  // 2. Reminders Header
-                  const Text(
-                    'Today\'s Schedule',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: ElderColors.textPrimary,
+                  // 2. Schedule Section Title
+                  ClaySlab3D(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      'Today\'s Schedule',
+                      style: GoogleFonts.nunito(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: Clay3DTheme.textDark,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
 
                   // 3. Reminders List
                   if (allReminders.isEmpty)
-                    const _ClayEmptyRemindersCard()
+                    ClayCard3D(
+                      padding: const EdgeInsets.all(24),
+                      borderRadius: 24,
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.spa_rounded,
+                            size: 48,
+                            color: Clay3DTheme.lavender,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No reminders for today',
+                            style: GoogleFonts.nunito(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: Clay3DTheme.textDark,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'You are all caught up. Have a peaceful, restful day! 🌸',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.nunito(
+                              fontSize: 14.5,
+                              color: Clay3DTheme.textMuted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   else
                     ListView.separated(
                       shrinkWrap: true,
@@ -113,7 +174,7 @@ class PatientRemindersScreen extends ConsumerWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final reminder = allReminders[index];
-                        return _ClayPatientReminderCard(
+                        return _ClayPatientReminderCard3D(
                           reminder: reminder,
                           patientId: patientId,
                         );
@@ -122,30 +183,35 @@ class PatientRemindersScreen extends ConsumerWidget {
 
                   const SizedBox(height: 32),
                 ],
+              );
+            },
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: CircularProgressIndicator(color: Clay3DTheme.lavender),
               ),
-            );
-          },
-          loading: () => const LoadingState(message: 'Loading your routines...'),
-          error: (e, _) => ErrorState(
-            title: 'Could not load reminders',
-            message: e.toString(),
-            onRetry: () => ref.invalidate(activeRemindersProvider(patientId)),
+            ),
+            error: (e, _) => Center(
+              child: Text(
+                'Could not load routines: $e',
+                style: GoogleFonts.nunito(color: Clay3DTheme.coral),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
 // ==============================================================================
-// Motivational Clay Progress Banner
+// 3D Progress Banner
 // ==============================================================================
-
-class _ClayProgressBanner extends StatelessWidget {
+class _ClayProgressBanner3D extends StatelessWidget {
   final int completedCount;
   final int totalCount;
 
-  const _ClayProgressBanner({
+  const _ClayProgressBanner3D({
     required this.completedCount,
     required this.totalCount,
   });
@@ -155,33 +221,28 @@ class _ClayProgressBanner extends StatelessWidget {
     final double progress = totalCount > 0 ? (completedCount / totalCount) : 1.0;
     final allDone = totalCount > 0 && completedCount >= totalCount;
 
-    return Container(
-      width: double.infinity,
+    return ClayCard3D(
       padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: allDone ? ElderColors.forestBg : ElderColors.surface,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-        boxShadow: NirvanaShadows.card(tint: allDone ? ElderColors.forestDeep : null),
-      ),
+      borderRadius: 26,
+      color: allDone ? const Color(0xFFE5F5EF) : Clay3DTheme.cardSurface,
+      customShadows: Clay3DTheme.deepShadow(blur: 18, offset: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
-                  color: allDone ? ElderColors.forestBg : ElderColors.primaryContainer,
+                  color: allDone ? Clay3DTheme.tealLight : Clay3DTheme.lavenderLight,
                   shape: BoxShape.circle,
-                  boxShadow: NirvanaShadows.float(
-                    tint: allDone ? ElderColors.forestDeep : ElderColors.primary,
-                  ),
+                  boxShadow: Clay3DTheme.cardShadow(blur: 8, offset: 3),
                 ),
                 child: Icon(
                   allDone ? Icons.celebration_rounded : Icons.checklist_rounded,
                   size: 26,
-                  color: allDone ? ElderColors.forestDeep : ElderColors.primary,
+                  color: allDone ? const Color(0xFF1F5C5C) : const Color(0xFF5D4A8C),
                 ),
               ),
               const SizedBox(width: 14),
@@ -190,10 +251,10 @@ class _ClayProgressBanner extends StatelessWidget {
                   allDone
                       ? 'All caught up for today! 🎉'
                       : '$completedCount of $totalCount Completed',
-                  style: TextStyle(
+                  style: GoogleFonts.nunito(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: allDone ? ElderColors.forestDeep : ElderColors.textPrimary,
+                    color: Clay3DTheme.textDark,
                   ),
                 ),
               ),
@@ -201,13 +262,13 @@ class _ClayProgressBanner extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ClipRRect(
-            borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+            borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               minHeight: 12,
-              backgroundColor: ElderColors.border,
+              backgroundColor: const Color(0xFFE5DDD0),
               valueColor: AlwaysStoppedAnimation<Color>(
-                allDone ? ElderColors.forestDeep : ElderColors.primary,
+                allDone ? Clay3DTheme.teal : Clay3DTheme.lavender,
               ),
             ),
           ),
@@ -216,10 +277,10 @@ class _ClayProgressBanner extends StatelessWidget {
             allDone
                 ? 'Great job keeping up with your health routines today.'
                 : 'Take your time and complete each activity as scheduled.',
-            style: TextStyle(
-              fontSize: 14,
+            style: GoogleFonts.nunito(
+              fontSize: 13.5,
               fontWeight: FontWeight.w600,
-              color: allDone ? ElderColors.forestDeep : ElderColors.textSecondary,
+              color: Clay3DTheme.textMuted,
             ),
           ),
         ],
@@ -229,14 +290,13 @@ class _ClayProgressBanner extends StatelessWidget {
 }
 
 // ==============================================================================
-// Claymorphic Patient Reminder Card
+// 3D Patient Reminder Card
 // ==============================================================================
-
-class _ClayPatientReminderCard extends ConsumerWidget {
+class _ClayPatientReminderCard3D extends ConsumerWidget {
   final Reminder reminder;
   final String patientId;
 
-  const _ClayPatientReminderCard({
+  const _ClayPatientReminderCard3D({
     required this.reminder,
     required this.patientId,
   });
@@ -253,46 +313,40 @@ class _ClayPatientReminderCard extends ConsumerWidget {
     final minuteStr = minute.toString().padLeft(2, '0');
     final formattedTime = '$displayHour:$minuteStr $period';
 
-    Color cardBg = ElderColors.surface;
-    Color iconBg = ElderColors.skyBg;
-    Color iconColor = ElderColors.skyDeep;
+    Color iconBg = Clay3DTheme.tealLight;
+    Color iconColor = const Color(0xFF1F5C5C);
     IconData icon = Icons.alarm_rounded;
 
     if (isCompleted) {
-      cardBg = ElderColors.forestBg;
-      iconBg = ElderColors.forestBg;
-      iconColor = ElderColors.forestDeep;
+      iconBg = const Color(0xFFC8E6D9);
+      iconColor = const Color(0xFF1B634B);
       icon = Icons.check_circle_rounded;
     } else if (isSnoozed) {
-      cardBg = ElderColors.amberBg;
-      iconBg = ElderColors.amberBg;
-      iconColor = ElderColors.amberDeep;
+      iconBg = const Color(0xFFFDE8C0);
+      iconColor = const Color(0xFF8C6212);
       icon = Icons.snooze_rounded;
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-        boxShadow: isCompleted ? NirvanaShadows.card(tint: ElderColors.forestDeep) : NirvanaShadows.card(),
-      ),
+    return ClayCard3D(
       padding: const EdgeInsets.all(20),
+      borderRadius: 24,
+      color: isCompleted ? const Color(0xFFEFF8F4) : Clay3DTheme.cardSurface,
+      customShadows: Clay3DTheme.deepShadow(blur: 16, offset: 7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row: Icon bubble, Time, Status Pill
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   color: iconBg,
                   shape: BoxShape.circle,
-                  boxShadow: NirvanaShadows.float(tint: iconColor),
+                  boxShadow: Clay3DTheme.cardShadow(blur: 8, offset: 3),
                 ),
-                child: Icon(icon, size: 28, color: iconColor),
+                child: Icon(icon, size: 26, color: iconColor),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -301,28 +355,28 @@ class _ClayPatientReminderCard extends ConsumerWidget {
                   children: [
                     Text(
                       formattedTime,
-                      style: TextStyle(
-                        fontSize: 22,
+                      style: GoogleFonts.nunito(
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        color: isCompleted ? ElderColors.textMuted : ElderColors.textPrimary,
+                        color: isCompleted ? Clay3DTheme.textMuted : Clay3DTheme.textDark,
                       ),
                     ),
                     if (isCompleted && reminder.completedAt != null)
-                      const Text(
+                      Text(
                         'Completed today ✓',
-                        style: TextStyle(
-                          fontSize: 13,
+                        style: GoogleFonts.nunito(
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w800,
-                          color: ElderColors.forestDeep,
+                          color: const Color(0xFF1B634B),
                         ),
                       )
                     else if (isSnoozed && reminder.snoozedUntil != null)
                       Text(
                         'Snoozed until ${_formatTimeOfDay(reminder.snoozedUntil!)}',
-                        style: const TextStyle(
-                          fontSize: 13,
+                        style: GoogleFonts.nunito(
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w800,
-                          color: ElderColors.amberDeep,
+                          color: const Color(0xFF8C6212),
                         ),
                       ),
                   ],
@@ -330,45 +384,42 @@ class _ClayPatientReminderCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
-          // Title
           Text(
             reminder.title,
-            style: TextStyle(
-              fontSize: 19,
+            style: GoogleFonts.nunito(
+              fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: isCompleted ? ElderColors.textMuted : ElderColors.textPrimary,
+              color: isCompleted ? Clay3DTheme.textMuted : Clay3DTheme.textDark,
               decoration: isCompleted ? TextDecoration.lineThrough : null,
             ),
           ),
 
-          // Description
           if (reminder.body.isNotEmpty) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               reminder.body,
-              style: TextStyle(
-                fontSize: 15,
-                color: isCompleted ? ElderColors.textMuted : ElderColors.textSecondary,
-                height: 1.4,
+              style: GoogleFonts.nunito(
+                fontSize: 14,
+                color: isCompleted ? Clay3DTheme.textMuted : Clay3DTheme.textDark,
+                height: 1.35,
               ),
             ),
           ],
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
-          // Action Buttons
           if (!isCompleted) ...[
             Row(
               children: [
-                // DONE BUTTON
                 Expanded(
                   flex: 3,
-                  child: LargeActionButton(
+                  child: ClayButton3D(
                     label: 'Done',
                     icon: Icons.check_rounded,
-                    variant: LargeActionButtonVariant.sage,
-                    minHeight: 52,
+                    color: Clay3DTheme.teal,
+                    minHeight: 48,
+                    borderRadius: 18,
                     onPressed: () async {
                       final repo = ref.read(reminderRepositoryProvider);
                       final notif = ref.read(notificationServiceProvider);
@@ -387,9 +438,9 @@ class _ClayPatientReminderCard extends ConsumerWidget {
                           SnackBar(
                             content: Text(
                               'Wonderful! "${reminder.title}" marked as complete. 🌟',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                              style: GoogleFonts.nunito(fontSize: 15, fontWeight: FontWeight.w700),
                             ),
-                            backgroundColor: ElderColors.forestDeep,
+                            backgroundColor: const Color(0xFF1B634B),
                             duration: const Duration(seconds: 3),
                           ),
                         );
@@ -398,15 +449,15 @@ class _ClayPatientReminderCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-
-                // SNOOZE BUTTON
                 Expanded(
                   flex: 2,
-                  child: LargeActionButton(
+                  child: ClayButton3D(
                     label: '15 min',
                     icon: Icons.snooze_rounded,
-                    variant: LargeActionButtonVariant.buttercup,
-                    minHeight: 52,
+                    color: const Color(0xFFE5C067),
+                    textColor: Clay3DTheme.textDark,
+                    minHeight: 48,
+                    borderRadius: 18,
                     onPressed: () async {
                       final repo = ref.read(reminderRepositoryProvider);
                       await repo.snoozeReminder(
@@ -423,9 +474,9 @@ class _ClayPatientReminderCard extends ConsumerWidget {
                           SnackBar(
                             content: Text(
                               'Snoozed "${reminder.title}" for 15 minutes. ⏰',
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                              style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.w700),
                             ),
-                            backgroundColor: ElderColors.amberDeep,
+                            backgroundColor: const Color(0xFF8C6212),
                             duration: const Duration(seconds: 2),
                           ),
                         );
@@ -436,23 +487,19 @@ class _ClayPatientReminderCard extends ConsumerWidget {
               ],
             ),
           ] else ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: ElderColors.forestBg,
-                borderRadius: BorderRadius.circular(NirvanaRadii.pill),
-              ),
-              child: const Row(
+            ClayPill3D(
+              color: const Color(0xFFD3EFE3),
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check, size: 18, color: ElderColors.forestDeep),
-                  SizedBox(width: 6),
+                  const Icon(Icons.check, size: 16, color: Color(0xFF1B634B)),
+                  const SizedBox(width: 6),
                   Text(
                     'All completed for this schedule',
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: GoogleFonts.nunito(
+                      fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      color: ElderColors.forestDeep,
+                      color: const Color(0xFF1B634B),
                     ),
                   ),
                 ],
@@ -473,21 +520,3 @@ class _ClayPatientReminderCard extends ConsumerWidget {
     return '$displayHour:$minuteStr $period';
   }
 }
-
-// ==============================================================================
-// Empty State
-// ==============================================================================
-
-class _ClayEmptyRemindersCard extends StatelessWidget {
-  const _ClayEmptyRemindersCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return const EmptyState(
-      icon: Icons.spa_rounded,
-      title: 'No reminders for today',
-      message: 'You are all caught up. Have a peaceful, restful day! 🌸',
-    );
-  }
-}
-

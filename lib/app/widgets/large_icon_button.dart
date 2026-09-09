@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import '../theme/elder_theme.dart';
+import 'clay_3d/clay_3d_theme.dart';
 
 class LargeIconButton extends StatelessWidget {
   final IconData icon;
@@ -50,7 +51,9 @@ class LargeIconButton extends StatelessWidget {
           color: isEnabled ? effectiveBg : ElderColors.surfaceElevated,
           borderRadius: BorderRadius.circular(effectiveRadius),
           border: Border.all(color: ElderColors.borderLight, width: 1.5),
-          boxShadow: isEnabled ? ElderColors.clayShadow(color: effectiveBg) : null,
+            boxShadow: isEnabled
+              ? Clay3DTheme.cardShadow(blur: 12, offset: 5)
+              : null,
         ),
         child: Material(
           color: Colors.transparent,

@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import '../theme/elder_theme.dart';
+import 'clay_3d/clay_3d_theme.dart';
 
 class ElderCard extends StatelessWidget {
   final Widget child;
@@ -59,7 +60,7 @@ class ElderCard extends StatelessWidget {
           : null,
       boxShadow: isHighContrast
           ? null
-          : (customShadow ?? NirvanaShadows.card()),
+          : (customShadow ?? Clay3DTheme.cardShadow()),
     );
 
     final cardContent = Padding(

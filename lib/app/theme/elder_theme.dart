@@ -105,8 +105,8 @@ class ElderColors {
   // Backgrounds & Surfaces — warm peach family
   // ---------------------------------------------------------------------------
   /// Main scaffold background — warm peachy sand
-  static const Color background = Color(0xFFF5EDE0);
-  static const Color backgroundClay = Color(0xFFF5EDE0);
+  static const Color background = Color(0xFFF3ECE2);
+  static const Color backgroundClay = Color(0xFFF3ECE2);
   /// Slightly deeper alt background for sections
   static const Color backgroundAlt = Color(0xFFEDE3D4);
   /// Card / surface — near-white with warm undertone

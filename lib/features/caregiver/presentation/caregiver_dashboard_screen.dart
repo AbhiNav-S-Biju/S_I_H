@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/app/widgets/widgets.dart';
+import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 import 'widgets/activity_summary_cards.dart';
 import 'widgets/caregiver_notifications_panel.dart';
@@ -31,7 +32,8 @@ class CaregiverDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ElderColors.backgroundClay,
-      body: SafeArea(
+      body: ClayBackdrop3D(
+        child: SafeArea(
         child: Column(
           children: [
             // Top Bar
@@ -245,6 +247,7 @@ class CaregiverDashboardScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/app/widgets/widgets.dart';
+import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 
 class CaregiverLoginScreen extends ConsumerStatefulWidget {
@@ -150,7 +151,8 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
 
     return Scaffold(
       backgroundColor: ElderColors.backgroundClay,
-      body: SafeArea(
+      body: ClayBackdrop3D(
+        child: SafeArea(
         child: Column(
           children: [
             // Top Bar
@@ -422,6 +424,7 @@ class _CaregiverLoginScreenState extends ConsumerState<CaregiverLoginScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -12,6 +12,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../app/providers/accessibility_providers.dart';
 import '../../../app/theme/elder_theme.dart';
 import '../../../app/widgets/widgets.dart';
+import '../../../app/widgets/clay_3d/clay_3d.dart';
 
 class LanguageSelectorScreen extends ConsumerWidget {
   const LanguageSelectorScreen({super.key});
@@ -127,7 +128,8 @@ class LanguageSelectorScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ElderColors.backgroundClay,
-      body: SafeArea(
+      body: ClayBackdrop3D(
+        child: SafeArea(
         child: Column(
           children: [
             // Header
@@ -292,6 +294,7 @@ class LanguageSelectorScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

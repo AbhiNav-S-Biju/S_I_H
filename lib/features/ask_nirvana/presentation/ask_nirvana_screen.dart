@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers/accessibility_providers.dart';
 import '../../../app/theme/elder_theme.dart';
+import '../../../app/widgets/clay_3d/clay_3d.dart';
 import '../../../l10n/app_localizations.dart';
 import '../models/chat_message.dart';
 import '../providers/ask_nirvana_provider.dart';
@@ -282,7 +283,8 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
           ),
         ),
       ),
-      body: SafeArea(
+      body: ClayBackdrop3D(
+        child: SafeArea(
         child: Column(
           children: [
             // 1. Friendly Assistant Status Header Area
@@ -324,6 +326,7 @@ class _AskNirvanaScreenState extends ConsumerState<AskNirvanaScreen>
             ),
           ],
         ),
+      ),
       ),
     );
   }

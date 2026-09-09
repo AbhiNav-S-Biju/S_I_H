@@ -1,15 +1,15 @@
 // ==============================================================================
-// NIRVANA - Landing Screen / Portal Selection
-// Description: Accessible, claymorphic landing page allowing users to choose
-// between Patient Portal and Caregiver Portal with calm wellness aesthetics.
+// NIRVANA - Landing Screen / Portal Selection (3D Claymorphism)
+// Description: Tactile, soothing 3D claymorphic landing page allowing users to choose
+// between Patient Portal and Caregiver Portal with volumetric lighting & floating elements.
 // ==============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../app/theme/elder_theme.dart';
-import '../../../app/widgets/widgets.dart';
+import '../../../app/widgets/clay_3d/clay_3d.dart';
 import '../../../database/hive_database.dart';
 import '../../../features/caregiver/caregiver.dart';
 import '../../../l10n/app_localizations.dart';
@@ -20,152 +20,149 @@ class LandingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: ElderColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 16.0),
+    return ClayScaffold3D(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 12.0),
 
-              // Calming App Icon / Brand Emblem
-              Container(
-                width: 92,
-                height: 92,
-                decoration: BoxDecoration(
-                  color: ElderColors.primaryContainer,
-                  shape: BoxShape.circle,
-                  boxShadow: NirvanaShadows.float(tint: ElderColors.primary),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.spa_rounded,
-                    size: 48,
-                    color: ElderColors.primary,
+          // 3D Floating Spa Emblem
+          SizedBox(
+            width: 90,
+            height: 90,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 86,
+                  height: 86,
+                  decoration: BoxDecoration(
+                    color: Clay3DTheme.lavenderLight.withValues(alpha: 0.70),
+                    shape: BoxShape.circle,
+                    boxShadow: Clay3DTheme.deepShadow(blur: 16, offset: 6),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 20.0),
-
-              // App Name & Tagline
-              Text(
-                'NIRVANA',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2.0,
-                  color: ElderColors.primary,
+                const Icon(
+                  Icons.spa_rounded,
+                  size: 46,
+                  color: Color(0xFF6B58A0),
                 ),
-              ),
-
-              const SizedBox(height: 8.0),
-
-              // Welcome Title
-              Text(
-                l10n?.landingWelcomeTitle ?? 'Welcome to NIRVANA',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: ElderColors.textPrimary,
-                ),
-              ),
-
-              const SizedBox(height: 6.0),
-
-              // Subtitle
-              Text(
-                l10n?.landingSubtitle ??
-                    'Choose how you would like to continue today.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: ElderColors.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-
-              const SizedBox(height: 32.0),
-
-              // ──────────────────────────────────────────────────────────────
-              // Patient Portal Card (Pastel Lavender Theme)
-              // ──────────────────────────────────────────────────────────────
-              _ClayPortalCard(
-                tag: 'SENIOR FRIENDLY',
-                tagColor: ElderColors.primary,
-                tagBgColor: ElderColors.pastelLavender,
-                cardBgColor: Colors.white,
-                icon: Icons.favorite_rounded,
-                iconColor: ElderColors.primary,
-                iconBgColor: ElderColors.pastelLavender,
-                title: l10n?.patientPortalTitle ?? 'Patient Portal',
-                subtitle:
-                    l10n?.patientPortalSubtitle ?? 'For patients & loved ones',
-                description: l10n?.patientPortalDescription ??
-                    'Access your daily activities, reminders, games and family moments.',
-                buttonLabel:
-                    l10n?.patientPortalButton ?? 'Enter Patient Portal',
-                buttonVariant: LargeActionButtonVariant.primary,
-                onPressed: () {
-                  if (HiveDatabase.isDevicePaired) {
-                    context.go('/patient/home');
-                  } else {
-                    context.go('/patient/welcome');
-                  }
-                },
-              ),
-
-              const SizedBox(height: 24.0),
-
-              // ──────────────────────────────────────────────────────────────
-              // Caregiver Portal Card (Pastel Sage Theme)
-              // ──────────────────────────────────────────────────────────────
-              _ClayPortalCard(
-                tag: 'CAREGIVER HUB',
-                tagColor: ElderColors.forestDeep,
-                tagBgColor: ElderColors.pastelSage,
-                cardBgColor: Colors.white,
-                icon: Icons.admin_panel_settings_rounded,
-                iconColor: ElderColors.forestDeep,
-                iconBgColor: ElderColors.pastelSage,
-                title: l10n?.caregiverPortalTitle ?? 'Caregiver Portal',
-                subtitle:
-                    l10n?.caregiverPortalSubtitle ?? 'For family & care providers',
-                description: l10n?.caregiverPortalDescription ??
-                    'Manage routines, monitor activity, adjust settings, and pair devices.',
-                buttonLabel:
-                    l10n?.caregiverPortalButton ?? 'Enter Caregiver Portal',
-                buttonVariant: LargeActionButtonVariant.sage,
-                onPressed: () {
-                  final authState = ref.read(caregiverAuthProvider);
-                  if (authState.value != null) {
-                    context.go('/caregiver/dashboard');
-                  } else {
-                    context.go('/caregiver/login');
-                  }
-                },
-              ),
-
-              const SizedBox(height: 24.0),
-            ],
+              ],
+            ),
           ),
-        ),
+
+          const SizedBox(height: 16.0),
+
+          // App Name Pill / Title
+          ClaySlab3D(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            borderRadius: 20,
+            child: Text(
+              'NIRVANA',
+              style: GoogleFonts.nunito(
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 3.0,
+                color: Clay3DTheme.lavenderDeep,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12.0),
+
+          // Welcome Title
+          Text(
+            l10n?.landingWelcomeTitle ?? 'Welcome to NIRVANA',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: Clay3DTheme.textDark,
+              letterSpacing: -0.3,
+            ),
+          ),
+
+          const SizedBox(height: 6.0),
+
+          // Subtitle
+          Text(
+            l10n?.landingSubtitle ??
+                'Choose how you would like to continue today.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(
+              fontSize: 15,
+              color: Clay3DTheme.textMuted,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 28.0),
+
+          // ──────────────────────────────────────────────────────────────
+          // 1. Patient Portal 3D Card
+          // ──────────────────────────────────────────────────────────────
+          _ClayPortalCard3D(
+            tag: 'SENIOR FRIENDLY',
+            tagBgColor: Clay3DTheme.lavender,
+            icon: Icons.favorite_rounded,
+            iconColor: const Color(0xFF635198),
+            iconBgColor: Clay3DTheme.lavenderLight,
+            title: l10n?.patientPortalTitle ?? 'Patient Portal',
+            subtitle: l10n?.patientPortalSubtitle ?? 'For patients & loved ones',
+            description: l10n?.patientPortalDescription ??
+                'Access your daily activities, reminders, games and family moments.',
+            buttonLabel: l10n?.patientPortalButton ?? 'Enter Patient Portal',
+            buttonColor: Clay3DTheme.lavender,
+            onPressed: () {
+              if (HiveDatabase.isDevicePaired) {
+                context.go('/patient/home');
+              } else {
+                context.go('/patient/welcome');
+              }
+            },
+          ),
+
+          const SizedBox(height: 22.0),
+
+          // ──────────────────────────────────────────────────────────────
+          // 2. Caregiver Portal 3D Card
+          // ──────────────────────────────────────────────────────────────
+          _ClayPortalCard3D(
+            tag: 'CAREGIVER HUB',
+            tagBgColor: Clay3DTheme.teal,
+            icon: Icons.admin_panel_settings_rounded,
+            iconColor: const Color(0xFF286D6D),
+            iconBgColor: Clay3DTheme.tealLight,
+            title: l10n?.caregiverPortalTitle ?? 'Caregiver Portal',
+            subtitle: l10n?.caregiverPortalSubtitle ?? 'For family & care providers',
+            description: l10n?.caregiverPortalDescription ??
+                'Manage routines, monitor activity, adjust settings, and pair devices.',
+            buttonLabel: l10n?.caregiverPortalButton ?? 'Enter Caregiver Portal',
+            buttonColor: Clay3DTheme.teal,
+            onPressed: () {
+              final authState = ref.read(caregiverAuthProvider);
+              if (authState.value != null) {
+                context.go('/caregiver/dashboard');
+              } else {
+                context.go('/caregiver/login');
+              }
+            },
+          ),
+
+          const SizedBox(height: 32.0),
+        ],
       ),
     );
   }
 }
 
 // ==============================================================================
-// Claymorphic Portal Selection Card
+// 3D Claymorphic Portal Selection Card
 // ==============================================================================
-
-class _ClayPortalCard extends StatelessWidget {
+class _ClayPortalCard3D extends StatelessWidget {
   final String tag;
-  final Color tagColor;
   final Color tagBgColor;
-  final Color cardBgColor;
   final IconData icon;
   final Color iconColor;
   final Color iconBgColor;
@@ -173,14 +170,12 @@ class _ClayPortalCard extends StatelessWidget {
   final String subtitle;
   final String description;
   final String buttonLabel;
-  final LargeActionButtonVariant buttonVariant;
+  final Color buttonColor;
   final VoidCallback onPressed;
 
-  const _ClayPortalCard({
+  const _ClayPortalCard3D({
     required this.tag,
-    required this.tagColor,
     required this.tagBgColor,
-    required this.cardBgColor,
     required this.icon,
     required this.iconColor,
     required this.iconBgColor,
@@ -188,107 +183,91 @@ class _ClayPortalCard extends StatelessWidget {
     required this.subtitle,
     required this.description,
     required this.buttonLabel,
-    required this.buttonVariant,
+    required this.buttonColor,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return ElderCard(
-      padding: EdgeInsets.zero,
-      backgroundColor: cardBgColor,
-      semanticLabel: '$title — $subtitle',
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return ClayCard3D(
+      padding: const EdgeInsets.all(22.0),
+      borderRadius: 26.0,
+      customShadows: Clay3DTheme.deepShadow(blur: 18, offset: 8),
+      onTap: onPressed,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Badge & Icon Row
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: iconBgColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2.0),
-                      boxShadow: ElderColors.clayShadow(color: iconBgColor),
-                    ),
-                    child: Icon(icon, size: 30, color: iconColor),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                            vertical: 3.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: tagBgColor,
-                            borderRadius: BorderRadius.circular(NirvanaRadii.pill),
-                          ),
-                          child: Text(
-                            tag,
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.8,
-                              color: tagColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          title,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: ElderColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14.0),
-
-              // Description
-              Text(
-                description,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: ElderColors.textSecondary,
-                  height: 1.4,
+              // 3D Circular Icon Token
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  shape: BoxShape.circle,
+                  boxShadow: Clay3DTheme.cardShadow(blur: 10, offset: 4),
+                ),
+                child: Center(
+                  child: Icon(icon, size: 28, color: iconColor),
                 ),
               ),
-
-              const SizedBox(height: 20.0),
-
-              // CTA Button
-              SizedBox(
-                width: double.infinity,
-                child: LargeActionButton(
-                  label: buttonLabel,
-                  variant: buttonVariant,
-                  icon: Icons.arrow_forward_rounded,
-                  onPressed: onPressed,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClayPill3D(
+                      color: tagBgColor.withValues(alpha: 0.85),
+                      child: Text(
+                        tag,
+                        style: GoogleFonts.nunito(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
+                          color: Clay3DTheme.textDark,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      title,
+                      style: GoogleFonts.nunito(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w900,
+                        color: Clay3DTheme.textDark,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
+
+          const SizedBox(height: 12.0),
+
+          Text(
+            description,
+            style: GoogleFonts.nunito(
+              fontSize: 14.5,
+              color: Clay3DTheme.textMuted,
+              height: 1.35,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 18.0),
+
+          ClayButton3D(
+            label: buttonLabel,
+            icon: Icons.arrow_forward_rounded,
+            color: buttonColor,
+            minHeight: 52,
+            onPressed: onPressed,
+          ),
+        ],
       ),
     );
   }
 }
-

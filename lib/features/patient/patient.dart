@@ -9,4 +9,5 @@ export 'presentation/patient_welcome_screen.dart';
 export 'presentation/patient_pairing_screen.dart';
 export 'presentation/patient_pairing_success_screen.dart';
 export 'presentation/patient_home_screen.dart';
+export 'presentation/patient_dashboard.dart';
 export 'presentation/patient_reminders_screen.dart';
