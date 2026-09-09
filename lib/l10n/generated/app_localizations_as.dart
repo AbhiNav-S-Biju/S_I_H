@@ -303,4 +303,36 @@ class AppLocalizationsAs extends AppLocalizations {
 
   @override
   String get findItemsOnShelf => 'তালিকাত থকা বস্তুবোৰ বাকচত থ\'বলৈ বাছক:';
+
+  @override
+  String get landingWelcomeTitle => 'নিৰ্বাণলৈ স্বাগতম';
+
+  @override
+  String get landingSubtitle => 'আপুনি কেনেকৈ আগবাঢ়িব বিচাৰে বাছক।';
+
+  @override
+  String get patientPortalTitle => 'ৰোগী পৰ্টেল';
+
+  @override
+  String get patientPortalSubtitle => 'ৰোগী আৰু পৰিয়ালৰ বাবে';
+
+  @override
+  String get patientPortalDescription =>
+      'আপোনাৰ দৈনিক কাৰ্যকলাপ, সোঁৱৰণী আৰু পৰিয়ালৰ সংযোগ।';
+
+  @override
+  String get patientPortalButton => 'ৰোগী পৰ্টেলত প্ৰৱেশ কৰক';
+
+  @override
+  String get caregiverPortalTitle => 'যত্নকাৰী পৰ্টেল';
+
+  @override
+  String get caregiverPortalSubtitle => 'যত্নকাৰীসকলৰ বাবে';
+
+  @override
+  String get caregiverPortalDescription =>
+      'ৰোগী, দিনচৰ্যা, সোঁৱৰণী আৰু কাৰ্যকলাপ পৰিচালনা কৰক।';
+
+  @override
+  String get caregiverPortalButton => 'যত্নকাৰী পৰ্টেলত প্ৰৱেশ কৰক';
 }

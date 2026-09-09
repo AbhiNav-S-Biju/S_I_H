@@ -138,6 +138,17 @@ class LanguageSelectorScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back',
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/settings');
+            }
+          },
+        ),
         title: Text(
           l10n?.selectLanguageTitle ?? 'Choose Your Language',
           style: theme.textTheme.headlineMedium?.copyWith(

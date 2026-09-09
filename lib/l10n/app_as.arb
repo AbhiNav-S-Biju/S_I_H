@@ -90,5 +90,15 @@
   "shoppingListTitle": "আপোনাৰ বজাৰৰ তালিকা",
   "shoppingListSubtitle": "বস্তুবোৰ চাওক, সাজু হ'লে 'বজাৰ আৰম্ভ কৰক' টিপক।",
   "startShoppingButton": "বজাৰ আৰম্ভ কৰক ➔",
-  "findItemsOnShelf": "তালিকাত থকা বস্তুবোৰ বাকচত থ'বলৈ বাছক:"
+  "findItemsOnShelf": "তালিকাত থকা বস্তুবোৰ বাকচত থ'বলৈ বাছক:",
+  "landingWelcomeTitle": "নিৰ্বাণলৈ স্বাগতম",
+  "landingSubtitle": "আপুনি কেনেকৈ আগবাঢ়িব বিচাৰে বাছক।",
+  "patientPortalTitle": "ৰোগী পৰ্টেল",
+  "patientPortalSubtitle": "ৰোগী আৰু পৰিয়ালৰ বাবে",
+  "patientPortalDescription": "আপোনাৰ দৈনিক কাৰ্যকলাপ, সোঁৱৰণী আৰু পৰিয়ালৰ সংযোগ।",
+  "patientPortalButton": "ৰোগী পৰ্টেলত প্ৰৱেশ কৰক",
+  "caregiverPortalTitle": "যত্নকাৰী পৰ্টেল",
+  "caregiverPortalSubtitle": "যত্নকাৰীসকলৰ বাবে",
+  "caregiverPortalDescription": "ৰোগী, দিনচৰ্যা, সোঁৱৰণী আৰু কাৰ্যকলাপ পৰিচালনা কৰক।",
+  "caregiverPortalButton": "যত্নকাৰী পৰ্টেলত প্ৰৱেশ কৰক"
 }

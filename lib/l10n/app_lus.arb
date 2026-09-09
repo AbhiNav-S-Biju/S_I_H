@@ -59,5 +59,15 @@
   "tryAgainButton": "Ti nawn leh rawh",
   "goHomeButton": "Inpuiah kir leh rawh",
   "aboutAppTitle": "Nirvana chungchang",
-  "aboutAppVersion": "Version 1.0.0 • Hmangaihna nena Enkawlna"
+  "aboutAppVersion": "Version 1.0.0 • Hmangaihna nena Enkawlna",
+  "landingWelcomeTitle": "Nirvana-ah kan lo lawm che",
+  "landingSubtitle": "Engtin nge i kal zui duh tih thlang rawh.",
+  "patientPortalTitle": "Damlo Portal",
+  "patientPortalSubtitle": "Damlo leh hmangaih takte tan",
+  "patientPortalDescription": "Ni tin kan thil tih tur, soidawntute leh chhungkaw inzawmna.",
+  "patientPortalButton": "Damlo Portal-ah lut rawh",
+  "caregiverPortalTitle": "Enkawltu Portal",
+  "caregiverPortalSubtitle": "Enkawltute tan",
+  "caregiverPortalDescription": "Damlo, nikhua, soidawntu leh thil tih tur enkawl rawh.",
+  "caregiverPortalButton": "Enkawltu Portal-ah lut rawh"
 }

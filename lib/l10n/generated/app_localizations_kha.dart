@@ -307,4 +307,37 @@ class AppLocalizationsKha extends AppLocalizations {
   @override
   String get findItemsOnShelf =>
       'Tap items from your list to put them in your cart:';
+
+  @override
+  String get landingWelcomeTitle => 'Jingialang sha Nirvana';
+
+  @override
+  String get landingSubtitle => 'Jied kumno phi kwah ban phai sha.';
+
+  @override
+  String get patientPortalTitle => 'Portal jong u Nongwai';
+
+  @override
+  String get patientPortalSubtitle =>
+      'Na ka bynta jong ki nongwai bad ki bynriew ba ieit';
+
+  @override
+  String get patientPortalDescription =>
+      'Pyndonkam ia ki kam ba hin-hin-sngi, ki jingsoidne bad jingialang ha pamiliar.';
+
+  @override
+  String get patientPortalButton => 'Leit sha Portal jong u Nongwai';
+
+  @override
+  String get caregiverPortalTitle => 'Portal jong u Nongiarap';
+
+  @override
+  String get caregiverPortalSubtitle => 'Na ka bynta jong ki nongiarap';
+
+  @override
+  String get caregiverPortalDescription =>
+      'Pynshai ia ki nongwai, ki jingsoidne bad ki kam ba hin-hin-sngi.';
+
+  @override
+  String get caregiverPortalButton => 'Leit sha Portal jong u Nongiarap';
 }

@@ -92,5 +92,15 @@
   "shoppingListTitle": "आपकी खरीदारी सूची",
   "shoppingListSubtitle": "सामानों को देखें, तैयार होने पर 'खरीदारी शुरू करें' दबाएं।",
   "startShoppingButton": "खरीदारी शुरू करें ➔",
-  "findItemsOnShelf": "सूची की वस्तुओं को अपनी टोकरी में रखने के लिए चुनें:"
+  "findItemsOnShelf": "सूची की वस्तुओं को अपनी टोकरी में रखने के लिए चुनें:",
+  "landingWelcomeTitle": "निर्वाण में आपका स्वागत है",
+  "landingSubtitle": "कृपया चुनें कि आप कैसे आगे बढ़ना चाहते हैं।",
+  "patientPortalTitle": "रोगी पोर्टल",
+  "patientPortalSubtitle": "मरीजों और परिजनों के लिए",
+  "patientPortalDescription": "अपनी दैनिक गतिविधियों, अनुस्मारकों और परिवार से जुड़ें।",
+  "patientPortalButton": "रोगी पोर्टल में प्रवेश करें",
+  "caregiverPortalTitle": "देखभालकर्ता पोर्टल",
+  "caregiverPortalSubtitle": "देखभालकर्ताओं के लिए",
+  "caregiverPortalDescription": "मरीजों, दिनचर्या, अनुस्मारक और गतिविधियों का प्रबंधन करें।",
+  "caregiverPortalButton": "देखभालकर्ता पोर्टल में प्रवेश करें"
 }

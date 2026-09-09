@@ -307,4 +307,36 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get findItemsOnShelf => 'তালিকার জিনিসগুলো ঝুড়িতে রাখতে ট্যাপ করুন:';
+
+  @override
+  String get landingWelcomeTitle => 'নির্বাণে স্বাগতম';
+
+  @override
+  String get landingSubtitle => 'আপনি কীভাবে এগিয়ে যেতে চান তা বেছে নিন।';
+
+  @override
+  String get patientPortalTitle => 'রোগী পোর্টাল';
+
+  @override
+  String get patientPortalSubtitle => 'রোগী ও প্রিয়জনদের জন্য';
+
+  @override
+  String get patientPortalDescription =>
+      'আপনার দৈনিক কার্যক্রম, রিমাইন্ডার ও পরিবারের সাথে সংযোগ।';
+
+  @override
+  String get patientPortalButton => 'রোগী পোর্টালে প্রবেশ করুন';
+
+  @override
+  String get caregiverPortalTitle => 'পরিচর্যাকারী পোর্টাল';
+
+  @override
+  String get caregiverPortalSubtitle => 'পরিচর্যাকারীদের জন্য';
+
+  @override
+  String get caregiverPortalDescription =>
+      'রোগী, দিনচর্যা, রিমাইন্ডার ও কার্যক্রম পরিচালনা করুন।';
+
+  @override
+  String get caregiverPortalButton => 'পরিচর্যাকারী পোর্টালে প্রবেশ করুন';
 }

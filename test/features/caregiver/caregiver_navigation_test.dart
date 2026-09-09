@@ -185,45 +185,37 @@ void main() {
   }
 
   group('Caregiver GoRouter Navigation Tests', () {
-    testWidgets('Test 1: First launch -> Onboarding -> Home', (
+    testWidgets('Test 1: First launch -> Landing -> Patient Portal -> Welcome Screen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(createTestApp(onboardingCompleted: false));
       await tester.pumpAndSettle();
 
-      // Starts at onboarding step 1
-      expect(find.text('1 / 3'), findsOneWidget);
-      expect(find.text('A Gentle Companion'), findsOneWidget);
-      expect(find.text('Continue'), findsOneWidget);
+      // Starts at Landing Screen
+      expect(find.text('Welcome to NIRVANA'), findsOneWidget);
+      expect(find.text('Enter Patient Portal'), findsOneWidget);
+      expect(find.text('Enter Caregiver Portal'), findsOneWidget);
 
-      // Step 1 -> Step 2
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
-      expect(find.text('2 / 3'), findsOneWidget);
-
-      // Step 2 -> Step 3
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
-      expect(find.text('3 / 3'), findsOneWidget);
-
-      // Step 3 -> Finish -> Home
-      await tester.tap(find.text('Enter Nirvana'));
+      // Tap Enter Patient Portal -> Goes to Patient Welcome (device not paired)
+      final patientBtn = find.text('Enter Patient Portal');
+      await tester.ensureVisible(patientBtn);
+      await tester.tap(patientBtn);
       await tester.pumpAndSettle();
 
-      // Home Screen verified
-      expect(find.text("Today's Activities"), findsOneWidget);
-      expect(find.text('Caregiver Portal'), findsOneWidget);
+      // Verified Patient Welcome Screen
+      expect(find.text("Let's connect this device"), findsOneWidget);
+      expect(find.text('NIRVANA'), findsOneWidget);
     });
 
-    testWidgets('Test 2: Home -> Caregiver Portal -> Caregiver Login', (
+    testWidgets('Test 2: Landing -> Caregiver Portal -> Caregiver Login', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(createTestApp(onboardingCompleted: true));
       await tester.pumpAndSettle();
 
-      // On Home Screen
-      expect(find.text("Today's Activities"), findsOneWidget);
-      final caregiverButton = find.text('Caregiver Portal');
+      // On Landing Screen
+      expect(find.text('Welcome to NIRVANA'), findsOneWidget);
+      final caregiverButton = find.text('Enter Caregiver Portal');
       expect(caregiverButton, findsOneWidget);
 
       // Tap Caregiver Portal
@@ -243,9 +235,10 @@ void main() {
       await tester.pumpWidget(createTestApp(onboardingCompleted: true));
       await tester.pumpAndSettle();
 
-      // Navigate to Caregiver Login
-      await tester.ensureVisible(find.text('Caregiver Portal'));
-      await tester.tap(find.text('Caregiver Portal'));
+      // Navigate to Caregiver Login from Landing
+      final caregiverBtn = find.text('Enter Caregiver Portal');
+      await tester.ensureVisible(caregiverBtn);
+      await tester.tap(caregiverBtn);
       await tester.pumpAndSettle();
 
       // Tap Sign In to Dashboard
@@ -260,15 +253,16 @@ void main() {
       expect(find.textContaining('Elena Rostova'), findsOneWidget);
     });
 
-    testWidgets('Test 4: Logout -> Caregiver Login', (
+    testWidgets('Test 4: Logout -> Landing Screen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(createTestApp(onboardingCompleted: true));
       await tester.pumpAndSettle();
 
       // Go to Login and Sign in
-      await tester.ensureVisible(find.text('Caregiver Portal'));
-      await tester.tap(find.text('Caregiver Portal'));
+      final caregiverBtn = find.text('Enter Caregiver Portal');
+      await tester.ensureVisible(caregiverBtn);
+      await tester.tap(caregiverBtn);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Sign In to Dashboard'));
@@ -282,36 +276,37 @@ void main() {
       await tester.tap(logoutButton);
       await tester.pumpAndSettle();
 
-      // Navigates back to Caregiver Login
-      expect(find.text('Caregiver & Family Portal'), findsOneWidget);
-      expect(find.text('Sign In to Dashboard'), findsOneWidget);
+      // Navigates directly back to Landing Screen
+      expect(find.text('Welcome to NIRVANA'), findsOneWidget);
+      expect(find.text('Enter Caregiver Portal'), findsOneWidget);
     });
 
     testWidgets(
-      'Test 5: Back navigation from Caregiver Login returns to Home',
+      'Test 5: Back navigation from Caregiver Login returns to Landing Screen',
       (WidgetTester tester) async {
         await tester.pumpWidget(createTestApp(onboardingCompleted: true));
         await tester.pumpAndSettle();
 
-        // Home Screen
-        expect(find.text("Today's Activities"), findsOneWidget);
+        // Landing Screen
+        expect(find.text('Welcome to NIRVANA'), findsOneWidget);
 
         // Go to Caregiver Login
-        await tester.ensureVisible(find.text('Caregiver Portal'));
-        await tester.tap(find.text('Caregiver Portal'));
+        final caregiverBtn = find.text('Enter Caregiver Portal');
+        await tester.ensureVisible(caregiverBtn);
+        await tester.tap(caregiverBtn);
         await tester.pumpAndSettle();
 
         expect(find.text('Caregiver & Family Portal'), findsOneWidget);
 
         // Tap back button
-        final backButton = find.byTooltip('Back to Home');
+        final backButton = find.byTooltip('Back to Landing');
         expect(backButton, findsOneWidget);
         await tester.tap(backButton);
         await tester.pumpAndSettle();
 
-        // Returned safely to Home Screen
-        expect(find.text("Today's Activities"), findsOneWidget);
-        expect(find.text('Caregiver Portal'), findsOneWidget);
+        // Returned safely to Landing Screen
+        expect(find.text('Welcome to NIRVANA'), findsOneWidget);
+        expect(find.text('Enter Patient Portal'), findsOneWidget);
       },
     );
   });

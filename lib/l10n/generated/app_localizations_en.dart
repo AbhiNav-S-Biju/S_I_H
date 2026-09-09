@@ -307,4 +307,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get findItemsOnShelf =>
       'Tap items from your list to put them in your cart:';
+
+  @override
+  String get landingWelcomeTitle => 'Welcome to NIRVANA';
+
+  @override
+  String get landingSubtitle => 'Choose how you would like to continue.';
+
+  @override
+  String get patientPortalTitle => 'Patient Portal';
+
+  @override
+  String get patientPortalSubtitle => 'For patients and loved ones';
+
+  @override
+  String get patientPortalDescription =>
+      'Access your daily activities, reminders and family connections.';
+
+  @override
+  String get patientPortalButton => 'Enter Patient Portal';
+
+  @override
+  String get caregiverPortalTitle => 'Caregiver Portal';
+
+  @override
+  String get caregiverPortalSubtitle => 'For caregivers';
+
+  @override
+  String get caregiverPortalDescription =>
+      'Manage patients, reminders, activities and caregiver information.';
+
+  @override
+  String get caregiverPortalButton => 'Enter Caregiver Portal';
 }

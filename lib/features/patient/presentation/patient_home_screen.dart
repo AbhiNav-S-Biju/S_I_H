@@ -236,7 +236,7 @@ class _QuickAccessGrid extends StatelessWidget {
         label: 'Memory\nGames',
         color: const Color(0xFF7C3AED),
         bgColor: const Color(0xFFEDE9FE),
-        onTap: () => context.go('/games'),
+        onTap: () => context.push('/patient/games'),
       ),
       _QuickTile(
         icon: Icons.alarm_rounded,
@@ -257,7 +257,7 @@ class _QuickAccessGrid extends StatelessWidget {
         label: 'Settings',
         color: ElderColors.textSecondary,
         bgColor: ElderColors.surfaceElevated,
-        onTap: () => context.go('/settings'),
+        onTap: () => context.push('/patient/settings'),
       ),
     ];
 

@@ -59,5 +59,15 @@
   "tryAgainButton": "অমুক হন্না হোৎনসি",
   "goHomeButton": "য়ুম্বুদা হঞ্জিল্লকউ",
   "aboutAppTitle": "নির্বাণগী মরমদা",
-  "aboutAppVersion": "ভার্সন ১.০.০ • নুংশি-চানবা য়েংশিনবা"
+  "aboutAppVersion": "ভার্সন ১.০.০ • নুংশি-চানবা য়েংশিনবা",
+  "landingWelcomeTitle": "নির্বাণদা ওকচরি",
+  "landingSubtitle": "অদোম কমদৌনা মখা চৎনবা পাম্বগে হন্নবীয়ু।",
+  "patientPortalTitle": "লায়না নাবগী পোর্টেল",
+  "patientPortalSubtitle": "লায়না নাবা অমসুং নুংশিবা মীওই পুম্নমক্কী ওইনা",
+  "patientPortalDescription": "নুমিৎ খুদিংগী থবক, সোইদোননা অমসুং ইমুং মনুংগা শম্নহনবা।",
+  "patientPortalButton": "লায়না নাবগী পোর্টেলদা চংসি",
+  "caregiverPortalTitle": "য়েংশিনবগী পোর্টেল",
+  "caregiverPortalSubtitle": "য়েংশিনবশিংগী ওইনা",
+  "caregiverPortalDescription": "লায়না নাবা, দিনচর্যা, সোইদোননা অমসুং থবকশিং শেমগৎসি।",
+  "caregiverPortalButton": "য়েংশিনবগী পোর্টেলদা চংসি"
 }

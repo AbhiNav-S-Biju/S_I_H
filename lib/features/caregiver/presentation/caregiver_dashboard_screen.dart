@@ -32,12 +32,12 @@ class CaregiverDashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back to Home',
+          tooltip: 'Back to Landing',
           onPressed: () {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/home');
+              context.go('/');
             }
           },
         ),
@@ -91,7 +91,7 @@ class CaregiverDashboardScreen extends ConsumerWidget {
             onPressed: () async {
               await ref.read(caregiverAuthProvider.notifier).logout();
               if (context.mounted) {
-                context.go('/caregiver/login');
+                context.go('/');
               }
             },
           ),

@@ -306,4 +306,37 @@ class AppLocalizationsMni extends AppLocalizations {
   @override
   String get findItemsOnShelf =>
       'Tap items from your list to put them in your cart:';
+
+  @override
+  String get landingWelcomeTitle => 'নির্বাণদা ওকচরি';
+
+  @override
+  String get landingSubtitle => 'অদোম কমদৌনা মখা চৎনবা পাম্বগে হন্নবীয়ু।';
+
+  @override
+  String get patientPortalTitle => 'লায়না নাবগী পোর্টেল';
+
+  @override
+  String get patientPortalSubtitle =>
+      'লায়না নাবা অমসুং নুংশিবা মীওই পুম্নমক্কী ওইনা';
+
+  @override
+  String get patientPortalDescription =>
+      'নুমিৎ খুদিংগী থবক, সোইদোননা অমসুং ইমুং মনুংগা শম্নহনবা।';
+
+  @override
+  String get patientPortalButton => 'লায়না নাবগী পোর্টেলদা চংসি';
+
+  @override
+  String get caregiverPortalTitle => 'য়েংশিনবগী পোর্টেল';
+
+  @override
+  String get caregiverPortalSubtitle => 'য়েংশিনবশিংগী ওইনা';
+
+  @override
+  String get caregiverPortalDescription =>
+      'লায়না নাবা, দিনচর্যা, সোইদোননা অমসুং থবকশিং শেমগৎসি।';
+
+  @override
+  String get caregiverPortalButton => 'য়েংশিনবগী পোর্টেলদা চংসি';
 }

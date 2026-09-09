@@ -308,4 +308,36 @@ class AppLocalizationsNe extends AppLocalizations {
   @override
   String get findItemsOnShelf =>
       'आफ्नो सूचीका वस्तुहरू टोकरीमा राख्न थिच्नुहोस्:';
+
+  @override
+  String get landingWelcomeTitle => 'निर्वाणमा स्वागत छ';
+
+  @override
+  String get landingSubtitle => 'तपाईं कसरी अगाडि बढ्न चाहनुहुन्छ छान्नुहोस्।';
+
+  @override
+  String get patientPortalTitle => 'बिरामी पोर्टल';
+
+  @override
+  String get patientPortalSubtitle => 'बिरामी र प्रियजनहरूका लागि';
+
+  @override
+  String get patientPortalDescription =>
+      'तपाईंका दैनिक गतिविधि, रिमाइन्डर र परिवारसँगको सम्पर्क।';
+
+  @override
+  String get patientPortalButton => 'बिरामी पोर्टलमा प्रवेश गर्नुहोस्';
+
+  @override
+  String get caregiverPortalTitle => 'हेरचाहकर्ता पोर्टल';
+
+  @override
+  String get caregiverPortalSubtitle => 'हेरचाहकर्ताहरूका लागि';
+
+  @override
+  String get caregiverPortalDescription =>
+      'बिरामी, दिनचर्या, रिमाइन्डर र गतिविधिहरू व्यवस्थापन गर्नुहोस्।';
+
+  @override
+  String get caregiverPortalButton => 'हेरचाहकर्ता पोर्टलमा प्रवेश गर्नुहोस्';
 }

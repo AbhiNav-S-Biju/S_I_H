@@ -29,7 +29,8 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: NirvanaApp()));
     await tester.pumpAndSettle();
 
-    expect(find.text('NIRVANA'), findsOneWidget);
-    expect(find.text('A Gentle Companion'), findsOneWidget);
+    expect(find.text('Welcome to NIRVANA'), findsOneWidget);
+    expect(find.text('Patient Portal'), findsOneWidget);
+    expect(find.text('Caregiver Portal'), findsOneWidget);
   });
 }

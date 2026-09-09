@@ -90,5 +90,15 @@
   "shoppingListTitle": "तपाईंको किनमेल सूची",
   "shoppingListSubtitle": "यी वस्तुहरू हेर्नुहोस्, तयार भएपछि 'किनमेल सुरु गर्नुहोस्' थिच्नुहोस्।",
   "startShoppingButton": "किनमेल सुरु गर्नुहोस् ➔",
-  "findItemsOnShelf": "आफ्नो सूचीका वस्तुहरू टोकरीमा राख्न थिच्नुहोस्:"
+  "findItemsOnShelf": "आफ्नो सूचीका वस्तुहरू टोकरीमा राख्न थिच्नुहोस्:",
+  "landingWelcomeTitle": "निर्वाणमा स्वागत छ",
+  "landingSubtitle": "तपाईं कसरी अगाडि बढ्न चाहनुहुन्छ छान्नुहोस्।",
+  "patientPortalTitle": "बिरामी पोर्टल",
+  "patientPortalSubtitle": "बिरामी र प्रियजनहरूका लागि",
+  "patientPortalDescription": "तपाईंका दैनिक गतिविधि, रिमाइन्डर र परिवारसँगको सम्पर्क।",
+  "patientPortalButton": "बिरामी पोर्टलमा प्रवेश गर्नुहोस्",
+  "caregiverPortalTitle": "हेरचाहकर्ता पोर्टल",
+  "caregiverPortalSubtitle": "हेरचाहकर्ताहरूका लागि",
+  "caregiverPortalDescription": "बिरामी, दिनचर्या, रिमाइन्डर र गतिविधिहरू व्यवस्थापन गर्नुहोस्।",
+  "caregiverPortalButton": "हेरचाहकर्ता पोर्टलमा प्रवेश गर्नुहोस्"
 }
