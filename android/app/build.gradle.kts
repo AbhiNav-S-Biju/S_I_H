@@ -5,6 +5,11 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Automatically apply Google Services plugin when google-services.json is provided
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.nirvana.app.nirvana"
     compileSdk = flutter.compileSdkVersion

@@ -10,6 +10,7 @@ export 'repositories/pairing_repository.dart';
 export 'repositories/caregiver_notification_repository.dart';
 export 'repositories/supabase_caregiver_notification_repository.dart';
 export 'services/caregiver_event_notification_service.dart';
+export 'services/caregiver_push_notification_service.dart';
 export 'presentation/caregiver_login_screen.dart';
 export 'presentation/caregiver_register_screen.dart';
 export 'presentation/caregiver_patient_onboarding_screen.dart';

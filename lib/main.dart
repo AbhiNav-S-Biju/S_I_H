@@ -8,6 +8,7 @@ import 'app/theme/elder_theme.dart';
 import 'core/config/supabase_config.dart';
 import 'core/network/audio_service.dart';
 import 'database/hive_database.dart';
+import 'features/caregiver/caregiver.dart';
 import 'features/reminders/services/notification_service.dart';
 import 'l10n/app_localizations.dart';
 
@@ -35,6 +36,14 @@ Future<void> main() async {
     await audioService.initialize();
   } catch (e) {
     debugPrint('⚠️ AudioService initialization error: $e');
+  }
+
+  // 4. Safely initialize Caregiver Push Notification Service
+  try {
+    final pushService = CaregiverPushNotificationService();
+    await pushService.initialize().timeout(const Duration(seconds: 4));
+  } catch (e) {
+    debugPrint('⚠️ CaregiverPushNotificationService initialization warning: $e');
   }
 
   // Initialize Supabase if credentials are provided in SupabaseConfig

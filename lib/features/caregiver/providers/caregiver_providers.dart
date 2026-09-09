@@ -15,6 +15,20 @@ import '../repositories/supabase_caregiver_notification_repository.dart';
 import '../repositories/supabase_caregiver_repository.dart';
 import '../repositories/supabase_pairing_repository.dart';
 import '../services/caregiver_event_notification_service.dart';
+import '../services/caregiver_push_notification_service.dart';
+
+/// Caregiver Push Notification Service provider
+final caregiverPushNotificationServiceProvider =
+    Provider<CaregiverPushNotificationService>((ref) {
+  return CaregiverPushNotificationService();
+});
+
+/// Stream provider for notification tap payloads (deep linking)
+final caregiverPushNotificationTappedProvider =
+    StreamProvider.autoDispose<CaregiverNotificationPayload>((ref) {
+  final service = ref.watch(caregiverPushNotificationServiceProvider);
+  return service.onNotificationTapped;
+});
 
 /// Caregiver repository provider
 final caregiverRepositoryProvider = Provider<ICaregiverRepository>((ref) {
@@ -40,8 +54,13 @@ final caregiverEventNotificationServiceProvider =
 class CaregiverAuthNotifier
     extends StateNotifier<AsyncValue<CaregiverProfile?>> {
   final ICaregiverRepository _repository;
+  final CaregiverPushNotificationService _pushService;
 
-  CaregiverAuthNotifier(this._repository) : super(const AsyncValue.data(null)) {
+  CaregiverAuthNotifier(
+    this._repository, [
+    CaregiverPushNotificationService? pushService,
+  ])  : _pushService = pushService ?? CaregiverPushNotificationService(),
+        super(const AsyncValue.data(null)) {
     _init();
   }
 
@@ -49,6 +68,17 @@ class CaregiverAuthNotifier
     final current = await _repository.getCurrentCaregiver();
     if (current != null) {
       state = AsyncValue.data(current);
+      // Synchronize push token for active session
+      _syncPushToken(current.id);
+    }
+  }
+
+  Future<void> _syncPushToken(String caregiverId) async {
+    try {
+      await _pushService.requestNotificationPermissions();
+      await _pushService.registerDeviceTokenForCaregiver(caregiverId);
+    } catch (e) {
+      debugPrint('ℹ️ Push notification token sync skipped/failed: $e');
     }
   }
 
@@ -57,6 +87,7 @@ class CaregiverAuthNotifier
     try {
       final profile = await _repository.login(email: email, password: password);
       state = AsyncValue.data(profile);
+      _syncPushToken(profile.id);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -77,6 +108,7 @@ class CaregiverAuthNotifier
         phone: phone,
       );
       state = AsyncValue.data(profile);
+      _syncPushToken(profile.id);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -84,6 +116,11 @@ class CaregiverAuthNotifier
 
   Future<void> logout() async {
     state = const AsyncValue.loading();
+    try {
+      await _pushService.unregisterDeviceToken();
+    } catch (e) {
+      debugPrint('⚠️ Error unregistering push token on logout: $e');
+    }
     await _repository.logout();
     state = const AsyncValue.data(null);
   }
@@ -93,7 +130,8 @@ final caregiverAuthProvider =
     StateNotifierProvider<CaregiverAuthNotifier, AsyncValue<CaregiverProfile?>>(
       (ref) {
         final repo = ref.watch(caregiverRepositoryProvider);
-        return CaregiverAuthNotifier(repo);
+        final pushService = ref.watch(caregiverPushNotificationServiceProvider);
+        return CaregiverAuthNotifier(repo, pushService);
       },
     );
 
