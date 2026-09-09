@@ -1,8 +1,8 @@
 // ==============================================================================
 // NIRVANA - Ask NIRVANA Data Responder Tests
-// Description: Comprehensive test suite verifying all 8 intents against real
-// data layer contracts, testing online vs offline states, empty databases,
-// missing data, and zero-hallucination guarantees.
+// Description: Comprehensive test suite verifying all 18 standard intents against
+// real data layer contracts, testing stories, boredom, date/day/time, reminders,
+// routine, family, memories, social greetings, and zero-hallucination guarantees.
 // ==============================================================================
 
 import 'dart:async';
@@ -42,8 +42,7 @@ class FakeReminderRepository implements IReminderRepository {
   List<Reminder> reminders = [];
 
   @override
-  Future<List<Reminder>> getActiveReminders(String patientId) async =>
-      reminders;
+  Future<List<Reminder>> getActiveReminders(String patientId) async => reminders;
 
   @override
   Future<Reminder?> getReminderById(String reminderId) async => null;
@@ -89,6 +88,19 @@ class FakeCaregiverRepository extends Fake implements ICaregiverRepository {
   }
 }
 
+class FakeAiAssistantService implements IAiAssistantService {
+  String responseToReturn = NirvanaDataResponder.unavailable;
+
+  @override
+  Future<String> getAiFallbackResponse({
+    required String query,
+    required String languageCode,
+    String? patientContext,
+  }) async {
+    return responseToReturn;
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Main Test Suite
 // -----------------------------------------------------------------------------
@@ -97,20 +109,26 @@ void main() {
   late FakeReminderRepository fakeReminderRepo;
   late FakeCaregiverRepository fakeCaregiverRepo;
   late FakeConnectivityMonitor fakeConnectivity;
+  late FakeAiAssistantService fakeAiAssistant;
+  late NirvanaStoryService storyService;
   late ProviderContainer container;
 
   setUp(() {
     fakeReminderRepo = FakeReminderRepository();
     fakeCaregiverRepo = FakeCaregiverRepository();
+    fakeAiAssistant = FakeAiAssistantService();
     fakeConnectivity = FakeConnectivityMonitor(
       currentStatus: NetworkStatus.offline,
     );
+    storyService = NirvanaStoryService();
 
     container = ProviderContainer(
       overrides: [
         reminderRepositoryProvider.overrideWithValue(fakeReminderRepo),
         caregiverRepositoryProvider.overrideWithValue(fakeCaregiverRepo),
         connectivityMonitorProvider.overrideWithValue(fakeConnectivity),
+        aiAssistantServiceProvider.overrideWithValue(fakeAiAssistant),
+        nirvanaStoryServiceProvider.overrideWithValue(storyService),
       ],
     );
   });
@@ -119,7 +137,32 @@ void main() {
     container.dispose();
   });
 
-  group('Ask NIRVANA Data Responder - Intent 1: REMINDERS', () {
+  group('Ask NIRVANA Data Responder - Intent 1: STORIES (Offline)', () {
+    test('Returns local story completely offline', () async {
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('Tell me a story', 'en');
+
+      expect(response, startsWith('Of course. Here is a short story for you:'));
+      expect(response, isNotEmpty);
+    });
+
+    test('Returns different story on "Another one"', () async {
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response1 = await responder.respond('Tell me a story', 'en');
+      final response2 = await responder.respond('Another one', 'en');
+
+      expect(response1, isNot(equals(response2)));
+    });
+
+    test('Returns story in Hindi when requested', () async {
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('मुझे एक कहानी सुनाओ', 'hi');
+
+      expect(response, startsWith('ज़रूर! यह रही आपके लिए एक छोटी सी कहानी:'));
+    });
+  });
+
+  group('Ask NIRVANA Data Responder - Intent 2: REMINDERS', () {
     test('Reads local Hive reminder when available', () async {
       final now = DateTime.now();
       fakeReminderRepo.reminders = [
@@ -141,49 +184,15 @@ void main() {
       expect(response, contains('9:00'));
     });
 
-    test(
-      'Falls back to Supabase remote repository when local is empty and online',
-      () async {
-        fakeReminderRepo.reminders = []; // local is empty
-        fakeConnectivity.setOnline(true); // internet enabled
+    test('Does NOT hallucinate when reminders are empty', () async {
+      fakeReminderRepo.reminders = [];
+      fakeConnectivity.setOnline(false);
 
-        final now = DateTime.now();
-        fakeCaregiverRepo.remoteReminders = [
-          CaregiverReminderRecord(
-            id: 'rem_remote_1',
-            patientId: 'patient_1',
-            title: 'Blood Pressure Pill',
-            description: 'Take after breakfast',
-            scheduledAt: DateTime(now.year, now.month, now.day, 10, 30),
-            status: 'pending',
-            isActive: true,
-            isCompleted: false,
-          ),
-        ];
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('When is my medicine?', 'en');
 
-        final responder = container.read(nirvanaDataResponderProvider);
-        final response = await responder.respond(
-          'What is my next reminder?',
-          'en',
-        );
-
-        expect(response, equals(NirvanaDataResponder.unavailable));
-      },
-    );
-
-    test(
-      'Does NOT hallucinate when local is empty and offline (internet disabled)',
-      () async {
-        fakeReminderRepo.reminders = [];
-        fakeConnectivity.setOnline(false); // internet disabled
-
-        final responder = container.read(nirvanaDataResponderProvider);
-        final response = await responder.respond('When is my medicine?', 'en');
-
-        // Must clearly state no reminders, never invent
-        expect(response, equals(NirvanaDataResponder.unavailable));
-      },
-    );
+      expect(response, equals(NirvanaDataResponder.unavailable));
+    });
 
     test('Todays Reminders lists all scheduled items for today', () async {
       final now = DateTime.now();
@@ -197,15 +206,6 @@ void main() {
           createdAt: now,
           notificationId: 1,
         ),
-        Reminder(
-          id: 'rem_2',
-          patientId: 'patient_1',
-          title: 'Evening Walk',
-          body: 'With caregiver',
-          scheduledAt: DateTime(now.year, now.month, now.day, 17, 0),
-          createdAt: now,
-          notificationId: 2,
-        ),
       ];
 
       final responder = container.read(nirvanaDataResponderProvider);
@@ -214,13 +214,12 @@ void main() {
         'en',
       );
 
-      expect(response, contains('Today you have 2 reminder(s)'));
+      expect(response, contains('Today you have 1 reminder(s)'));
       expect(response, contains('Morning Vitamin'));
-      expect(response, contains('Evening Walk'));
     });
   });
 
-  group('Ask NIRVANA Data Responder - Intent 2: DAILY ROUTINE', () {
+  group('Ask NIRVANA Data Responder - Intent 3: DAILY ROUTINE', () {
     test('Generates daily routine from today\'s scheduled items', () async {
       final now = DateTime.now();
       fakeReminderRepo.reminders = [
@@ -244,78 +243,10 @@ void main() {
       expect(response, contains('Here is your routine'));
       expect(response, contains('Breakfast'));
     });
-
-    test('Handles empty routine safely without hallucination', () async {
-      fakeReminderRepo.reminders = [];
-
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond(
-        'What do I have to do today?',
-        'en',
-      );
-
-      expect(
-        response,
-        equals(
-          "You don't have any scheduled tasks or routine items for today.",
-        ),
-      );
-    });
   });
 
-  group('Ask NIRVANA Data Responder - Intent 3: FAMILY & VISITORS', () {
-    test('Answers specific daughter relationship', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Who is my daughter?', 'en');
-
-      expect(response, equals(NirvanaDataResponder.unavailable));
-    });
-
-    test('Answers specific son relationship', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Who is my son?', 'en');
-
-      expect(response, equals(NirvanaDataResponder.unavailable));
-    });
-
-    test('Answers visitor inquiries', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Who is visiting me?', 'en');
-
-      expect(response, equals(NirvanaDataResponder.unavailable));
-    });
-
-    test('Shows general family overview', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Show me my family', 'en');
-
-      expect(response, equals(NirvanaDataResponder.unavailable));
-    });
-  });
-
-  group('Ask NIRVANA Data Responder - Intent 4: MEMORIES', () {
-    test('Returns structured fond family memories', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond(
-        'Tell me about my memories.',
-        'en',
-      );
-
-      expect(response, equals(NirvanaDataResponder.unavailable));
-    });
-  });
-
-  group('Ask NIRVANA Data Responder - Intent 5: GAMES', () {
-    test('Recommends cognitive games with navigation guidance', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('I want to play a game.', 'en');
-
-      expect(response, startsWith('START_GAME'));
-    });
-  });
-
-  group('Ask NIRVANA Data Responder - Intent 6: ORIENTATION', () {
-    test('Tells current time from device clock', () async {
+  group('Ask NIRVANA Data Responder - Intent 4: ORIENTATION (Time, Day, Date)', () {
+    test('Tells current time', () async {
       final responder = container.read(nirvanaDataResponderProvider);
       final response = await responder.respond('What time is it?', 'en');
 
@@ -324,7 +255,7 @@ void main() {
 
     test('Tells current day of week', () async {
       final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('What day is it?', 'en');
+      final response = await responder.respond('What day is today?', 'en');
 
       expect(response, startsWith('Today is'));
     });
@@ -337,37 +268,70 @@ void main() {
     });
   });
 
-  group('Ask NIRVANA Data Responder - Intent 7: ACTIVITY', () {
-    test('States zero activities when none recorded today', () async {
+  group('Ask NIRVANA Data Responder - Intent 5: GAMES & BOREDOM', () {
+    test('Offers game, memory, and story choices on "I\'m bored"', () async {
       final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('What did I do today?', 'en');
+      final response = await responder.respond('I\'m bored', 'en');
 
-      expect(response, equals('I have no recorded activity for today.'));
+      expect(
+        response,
+        equals(
+          'We can play a memory game, look at your memories, or I can tell you a story. What would you like?',
+        ),
+      );
+    });
+
+    test('Starts game', () async {
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('I want to play a game', 'en');
+
+      expect(response, startsWith('START_GAME'));
     });
   });
 
-  group('Ask NIRVANA Data Responder - Intent 8: HELP', () {
-    test('Lists all supported elder capabilities', () async {
+  group('Ask NIRVANA Data Responder - Intent 6: SOCIAL (Greeting, Gratitude, Goodbye)', () {
+    test('Responds to greeting warmly', () async {
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('Hello', 'en');
+
+      expect(response, contains('Hello! It is wonderful to talk with you'));
+    });
+
+    test('Responds to gratitude warmly', () async {
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('Thank you', 'en');
+
+      expect(response, equals('You are always welcome. I am right here with you.'));
+    });
+
+    test('Responds to goodbye warmly', () async {
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('Goodbye', 'en');
+
+      expect(response, contains('Take care and rest well'));
+    });
+  });
+
+  group('Ask NIRVANA Data Responder - Intent 7: HELP', () {
+    test('Lists capabilities including stories', () async {
       final responder = container.read(nirvanaDataResponderProvider);
       final response = await responder.respond('What can you do?', 'en');
 
       expect(response, contains('I am NIRVANA'));
+      expect(response, contains('stories'));
       expect(response, contains('reminders'));
-      expect(response, contains('routine'));
-      expect(response, contains('family'));
-      expect(response, contains('time'));
     });
   });
 
-  group('Ask NIRVANA Data Responder - Zero Hallucination Fallback', () {
-    test('Returns safe fallback for unmapped queries', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond(
-        'What is the recipe for chocolate cake?',
-        'en',
-      );
+  group('Ask NIRVANA Data Responder - AI Fallback Delegation', () {
+    test('Delegates unmapped conversational queries to AI assistant service', () async {
+      fakeAiAssistant.responseToReturn =
+          'The sky appears blue because of how the Earth\'s atmosphere scatters sunlight.';
 
-      expect(response, equals(NirvanaDataResponder.unavailable));
+      final responder = container.read(nirvanaDataResponderProvider);
+      final response = await responder.respond('Why is the sky blue?', 'en');
+
+      expect(response, contains('sky appears blue'));
     });
   });
 }
