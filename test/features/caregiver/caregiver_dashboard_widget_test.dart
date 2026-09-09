@@ -101,6 +101,50 @@ class StubCaregiverRepository implements ICaregiverRepository {
   ];
 
   @override
+  Future<CaregiverReminderRecord> createReminder(
+    CreateOrUpdateReminderInput input,
+  ) async {
+    return CaregiverReminderRecord(
+      id: 'r-new',
+      patientId: input.patientId,
+      title: input.title,
+      description: input.description,
+      reminderType: input.reminderType,
+      scheduleTime: input.scheduleTime,
+      scheduledAt: DateTime.now(),
+      recurrenceDays: input.recurrenceDays,
+      isActive: input.isActive,
+      isCompleted: false,
+    );
+  }
+
+  @override
+  Future<CaregiverReminderRecord> updateReminder(
+    String reminderId,
+    CreateOrUpdateReminderInput input,
+  ) async {
+    return CaregiverReminderRecord(
+      id: reminderId,
+      patientId: input.patientId,
+      title: input.title,
+      description: input.description,
+      reminderType: input.reminderType,
+      scheduleTime: input.scheduleTime,
+      scheduledAt: DateTime.now(),
+      recurrenceDays: input.recurrenceDays,
+      isActive: input.isActive,
+      isCompleted: false,
+    );
+  }
+
+  @override
+  Future<void> toggleReminderActive(String reminderId, bool isActive) async {}
+
+  @override
+  Future<void> deleteReminder(String reminderId) async {}
+
+
+  @override
   Future<List<DailyActivitySummary>> getSevenDayActivity(
     String patientId,
   ) async => [

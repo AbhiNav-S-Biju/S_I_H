@@ -243,7 +243,115 @@ class SettingsScreen extends ConsumerWidget {
 
               const SizedBox(height: 16.0),
 
-              // 3. About Section
+              // 3. Portals & Device Pairing Section
+              SectionHeader(
+                title: 'Device & Caregiver Portals',
+                icon: Icons.devices_other_rounded,
+              ),
+
+              // Pair Patient Device Card
+              ElderCard(
+                padding: const EdgeInsets.all(18.0),
+                onTap: () => context.push('/patient/welcome'),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: const BoxDecoration(
+                        color: ElderColors.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.pin_rounded,
+                        size: 30.0,
+                        color: ElderColors.onPrimaryContainer,
+                      ),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Pair This Device (Enter 6-Digit Code)',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: ElderColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4.0),
+                          Text(
+                            'Connect this phone/tablet as a patient device.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: ElderColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 24.0,
+                      color: ElderColors.textMuted,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12.0),
+
+              // Caregiver Portal Card
+              ElderCard(
+                padding: const EdgeInsets.all(18.0),
+                onTap: () => context.push('/caregiver/dashboard'),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: const BoxDecoration(
+                        color: ElderColors.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.admin_panel_settings_outlined,
+                        size: 30.0,
+                        color: ElderColors.onPrimaryContainer,
+                      ),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Caregiver Dashboard',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: ElderColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4.0),
+                          Text(
+                            'Manage loved ones, routines, and pairing codes.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: ElderColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 24.0,
+                      color: ElderColors.textMuted,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16.0),
+
+              // 4. About Section
               ElderCard(
                 padding: const EdgeInsets.all(20.0),
                 backgroundColor: ElderColors.surfaceElevated,

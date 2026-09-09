@@ -41,6 +41,23 @@ abstract class ICaregiverRepository {
   /// Retrieves active/recent reminders and completion status for the patient
   Future<List<CaregiverReminderRecord>> getReminderStatus(String patientId);
 
+  /// Creates a new reminder for the patient
+  Future<CaregiverReminderRecord> createReminder(
+    CreateOrUpdateReminderInput input,
+  );
+
+  /// Updates an existing reminder (e.g. time, recurrence, title)
+  Future<CaregiverReminderRecord> updateReminder(
+    String reminderId,
+    CreateOrUpdateReminderInput input,
+  );
+
+  /// Enables or disables a reminder
+  Future<void> toggleReminderActive(String reminderId, bool isActive);
+
+  /// Soft-deletes a reminder
+  Future<void> deleteReminder(String reminderId);
+
   /// Calculates a non-clinical 7-day activity completion summary
   Future<List<DailyActivitySummary>> getSevenDayActivity(String patientId);
 

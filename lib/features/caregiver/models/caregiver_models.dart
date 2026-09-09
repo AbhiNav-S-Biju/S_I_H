@@ -364,33 +364,83 @@ class CaregiverGameRecord {
 
 class CaregiverReminderRecord {
   final String id;
+  final String patientId;
   final String title;
+  final String? description;
+  final String reminderType; // 'medication', 'hydration', 'meal', 'activity', 'social', 'general'
+  final String scheduleTime; // '08:30:00' or '08:30'
   final DateTime scheduledAt;
+  final List<String> recurrenceDays; // ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+  final bool isActive;
   final bool isCompleted;
+  final String status; // 'pending', 'acknowledged', 'missed', 'snoozed'
   final DateTime? completedAt;
+  final DateTime? acknowledgedAt;
   final DateTime? snoozedUntil;
   final String? lastAction; // 'done', 'snoozed', 'later_today', null
 
   const CaregiverReminderRecord({
     required this.id,
+    this.patientId = '',
     required this.title,
+    this.description,
+    this.reminderType = 'general',
+    this.scheduleTime = '08:30',
     required this.scheduledAt,
+    this.recurrenceDays = const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+    this.isActive = true,
     required this.isCompleted,
+    this.status = 'pending',
     this.completedAt,
+    this.acknowledgedAt,
     this.snoozedUntil,
     this.lastAction,
   });
 
   factory CaregiverReminderRecord.fromMap(Map<String, dynamic> map) {
+    final now = DateTime.now();
+    DateTime parsedScheduled = now;
+
+    if (map['scheduled_at'] != null) {
+      parsedScheduled = DateTime.tryParse(map['scheduled_at'] as String) ?? now;
+    } else if (map['schedule_time'] != null) {
+      final timeStr = map['schedule_time'] as String;
+      final parts = timeStr.split(':');
+      if (parts.isNotEmpty) {
+        final hour = int.tryParse(parts[0]) ?? 8;
+        final minute = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
+        parsedScheduled = DateTime(now.year, now.month, now.day, hour, minute);
+      }
+    }
+
+    List<String> recurrence = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    if (map['recurrence_days'] is List) {
+      recurrence = (map['recurrence_days'] as List).map((e) => e.toString()).toList();
+    }
+
+    final isDone = map['is_completed'] as bool? ??
+        (map['status'] == 'acknowledged' || map['last_action'] == 'done');
+
     return CaregiverReminderRecord(
       id: map['id'] as String? ?? '',
-      title: map['title'] as String? ?? 'Daily Reminder',
-      scheduledAt: map['scheduled_at'] != null
-          ? DateTime.parse(map['scheduled_at'] as String)
-          : DateTime.now(),
-      isCompleted: map['is_completed'] as bool? ?? false,
+      patientId: map['patient_id'] as String? ?? '',
+      title: map['title'] as String? ?? 'Daily Routine',
+      description: map['description'] as String?,
+      reminderType: map['reminder_type'] as String? ?? 'general',
+      scheduleTime: map['schedule_time'] as String? ??
+          '${parsedScheduled.hour.toString().padLeft(2, '0')}:${parsedScheduled.minute.toString().padLeft(2, '0')}',
+      scheduledAt: parsedScheduled,
+      recurrenceDays: recurrence,
+      isActive: map['is_active'] as bool? ?? true,
+      isCompleted: isDone,
+      status: map['status'] as String? ?? (isDone ? 'acknowledged' : 'pending'),
       completedAt: map['completed_at'] != null
           ? DateTime.tryParse(map['completed_at'] as String)
+          : (map['acknowledged_at'] != null
+              ? DateTime.tryParse(map['acknowledged_at'] as String)
+              : null),
+      acknowledgedAt: map['acknowledged_at'] != null
+          ? DateTime.tryParse(map['acknowledged_at'] as String)
           : null,
       snoozedUntil: map['snoozed_until'] != null
           ? DateTime.tryParse(map['snoozed_until'] as String)
@@ -398,6 +448,77 @@ class CaregiverReminderRecord {
       lastAction: map['last_action'] as String?,
     );
   }
+
+  CaregiverReminderRecord copyWith({
+    String? id,
+    String? patientId,
+    String? title,
+    String? description,
+    String? reminderType,
+    String? scheduleTime,
+    DateTime? scheduledAt,
+    List<String>? recurrenceDays,
+    bool? isActive,
+    bool? isCompleted,
+    String? status,
+    DateTime? completedAt,
+    DateTime? acknowledgedAt,
+    DateTime? snoozedUntil,
+    String? lastAction,
+  }) {
+    return CaregiverReminderRecord(
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      reminderType: reminderType ?? this.reminderType,
+      scheduleTime: scheduleTime ?? this.scheduleTime,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      recurrenceDays: recurrenceDays ?? this.recurrenceDays,
+      isActive: isActive ?? this.isActive,
+      isCompleted: isCompleted ?? this.isCompleted,
+      status: status ?? this.status,
+      completedAt: completedAt ?? this.completedAt,
+      acknowledgedAt: acknowledgedAt ?? this.acknowledgedAt,
+      snoozedUntil: snoozedUntil ?? this.snoozedUntil,
+      lastAction: lastAction ?? this.lastAction,
+    );
+  }
+}
+
+/// DTO for creating or updating a reminder from the caregiver portal
+class CreateOrUpdateReminderInput {
+  final String? id;
+  final String patientId;
+  final String title;
+  final String? description;
+  final String reminderType;
+  final String scheduleTime; // HH:mm format, e.g. "08:30"
+  final List<String> recurrenceDays;
+  final bool isActive;
+
+  const CreateOrUpdateReminderInput({
+    this.id,
+    required this.patientId,
+    required this.title,
+    this.description,
+    this.reminderType = 'general',
+    required this.scheduleTime,
+    this.recurrenceDays = const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+    this.isActive = true,
+  });
+
+  Map<String, dynamic> toMap() => {
+    if (id != null) 'id': id,
+    'patient_id': patientId,
+    'title': title.trim(),
+    if (description != null) 'description': description!.trim(),
+    'reminder_type': reminderType,
+    'schedule_time': scheduleTime.length == 5 ? '$scheduleTime:00' : scheduleTime,
+    'recurrence_days': recurrenceDays,
+    'is_active': isActive,
+    'is_deleted': false,
+  };
 }
 
 class DailyActivitySummary {
@@ -429,3 +550,101 @@ class CaregiverSyncInfo {
     required this.statusLabel,
   });
 }
+
+/// Pairing code generated for one-time device pairing
+class PairingCodeInfo {
+  final String code;
+  final DateTime expiresAt;
+  final String patientId;
+
+  const PairingCodeInfo({
+    required this.code,
+    required this.expiresAt,
+    required this.patientId,
+  });
+
+  bool get isExpired => DateTime.now().isAfter(expiresAt);
+
+  int get remainingMinutes {
+    final diff = expiresAt.difference(DateTime.now()).inMinutes;
+    return diff > 0 ? diff : 0;
+  }
+}
+
+/// Information about a patient device linked to a patient
+class PatientDeviceSummary {
+  final String id;
+  final String patientId;
+  final String deviceId;
+  final String deviceName;
+  final bool isActive;
+  final DateTime pairedAt;
+  final DateTime? lastSeenAt;
+
+  const PatientDeviceSummary({
+    required this.id,
+    required this.patientId,
+    required this.deviceId,
+    required this.deviceName,
+    required this.isActive,
+    required this.pairedAt,
+    this.lastSeenAt,
+  });
+
+  factory PatientDeviceSummary.fromMap(Map<String, dynamic> map) {
+    return PatientDeviceSummary(
+      id: map['id'] as String? ?? '',
+      patientId: map['patient_id'] as String? ?? '',
+      deviceId: map['device_id'] as String? ?? '',
+      deviceName: map['device_name'] as String? ?? 'Elder Device',
+      isActive: map['is_active'] as bool? ?? true,
+      pairedAt: map['paired_at'] != null
+          ? DateTime.parse(map['paired_at'] as String)
+          : DateTime.now(),
+      lastSeenAt: map['last_seen_at'] != null
+          ? DateTime.tryParse(map['last_seen_at'] as String)
+          : null,
+    );
+  }
+}
+
+/// Result of a patient device pairing attempt
+class PairDeviceResult {
+  final bool success;
+  final String? patientId;
+  final String? displayName;
+  final String? preferredName;
+  final String? deviceId;
+  final String? errorMessage;
+  final String? errorCode;
+
+  const PairDeviceResult({
+    required this.success,
+    this.patientId,
+    this.displayName,
+    this.preferredName,
+    this.deviceId,
+    this.errorMessage,
+    this.errorCode,
+  });
+
+  factory PairDeviceResult.fromRpcResponse(Map<String, dynamic> map) {
+    final success = map['success'] as bool? ?? false;
+    if (success) {
+      return PairDeviceResult(
+        success: true,
+        patientId: map['patient_id'] as String?,
+        displayName: map['display_name'] as String?,
+        preferredName: map['preferred_name'] as String?,
+        deviceId: map['device_id'] as String?,
+      );
+    }
+    return PairDeviceResult(
+      success: false,
+      errorCode: map['error'] as String?,
+      errorMessage: map['message'] as String? ??
+          'Pairing failed. Please check the code and try again.',
+    );
+  }
+}
+

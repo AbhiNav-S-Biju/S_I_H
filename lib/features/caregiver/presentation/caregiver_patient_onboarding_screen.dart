@@ -870,7 +870,7 @@ class _CaregiverPatientOnboardingScreenState
               ),
               const SizedBox(height: 8),
               Text(
-                'Your patient profile and preferences are configured. In the next phase, you will be able to generate a pairing code or QR code on the patient\'s tablet.',
+                'Your patient profile and preferences are configured. You can generate a 6-digit one-time pairing code anytime from your Caregiver Dashboard to connect your patient\'s device.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade700, height: 1.4),
               ),
@@ -878,18 +878,18 @@ class _CaregiverPatientOnboardingScreenState
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: Colors.green.shade50,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.amber.shade200),
+                  border: Border.all(color: Colors.green.shade200),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.info_outline, color: Colors.amber.shade800, size: 18),
+                    Icon(Icons.check_circle_outline, color: Colors.green.shade800, size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      'Direct device pairing scheduled for Phase 4',
-                      style: TextStyle(fontSize: 12, color: Colors.amber.shade900, fontWeight: FontWeight.w600),
+                      'Ready to Pair via Caregiver Dashboard',
+                      style: TextStyle(fontSize: 12, color: Colors.green.shade900, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -949,17 +949,22 @@ class _CaregiverPatientOnboardingScreenState
       child: Row(
         children: [
           if (_currentStep > 0) ...[
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            Expanded(
+              flex: 1,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 48),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                ),
+                onPressed: isLoading ? null : () => setState(() => _currentStep--),
+                child: const Text('Back'),
               ),
-              onPressed: isLoading ? null : () => setState(() => _currentStep--),
-              child: const Text('Back'),
             ),
             const SizedBox(width: 12),
           ],
           Expanded(
+            flex: _currentStep > 0 ? 2 : 1,
             child: ElevatedButton(
               key: const Key('patient_onboarding_next_button'),
               style: ElevatedButton.styleFrom(

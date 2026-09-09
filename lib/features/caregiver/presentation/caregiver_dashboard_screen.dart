@@ -11,6 +11,7 @@ import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 import 'widgets/activity_summary_cards.dart';
 import 'widgets/game_history_list.dart';
+import 'widgets/patient_device_panel.dart';
 import 'widgets/patient_selector_widget.dart';
 import 'widgets/reminder_status_list.dart';
 import 'widgets/seven_day_activity_chart.dart';
@@ -110,9 +111,13 @@ class CaregiverDashboardScreen extends ConsumerWidget {
 
               // 2. Sync Status Card
               SyncStatusCard(),
+              SizedBox(height: 14),
+
+              // 3. Patient Device Status & Pairing
+              PatientDevicePanel(),
               SizedBox(height: 18),
 
-              // 3. Activity Summary Metrics
+              // 4. Activity Summary Metrics
               ActivitySummaryCards(),
               SizedBox(height: 18),
 

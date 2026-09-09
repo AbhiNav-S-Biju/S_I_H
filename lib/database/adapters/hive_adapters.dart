@@ -6,6 +6,7 @@
 
 import 'package:hive/hive.dart';
 import '../hive_boxes.dart';
+import '../models/hive_patient_session.dart';
 import '../models/hive_reminder.dart';
 import '../models/hive_reminder_log.dart';
 import '../models/hive_sync_event.dart';
@@ -160,5 +161,60 @@ class HiveReminderLogAdapter extends TypeAdapter<HiveReminderLog> {
       ..write(obj.createdAt.toIso8601String())
       ..writeByte(6)
       ..write(obj.metadata);
+  }
+}
+
+class HivePatientDeviceSessionAdapter
+    extends TypeAdapter<HivePatientDeviceSession> {
+  @override
+  final int typeId = HiveTypeIds.hivePatientDeviceSession;
+
+  @override
+  HivePatientDeviceSession read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return HivePatientDeviceSession(
+      isPaired: fields[0] as bool? ?? false,
+      patientId: fields[1] as String? ?? '',
+      deviceId: fields[2] as String? ?? '',
+      displayName: fields[3] as String? ?? 'Loved One',
+      preferredName: fields[4] as String? ?? 'Loved One',
+      pairedAt: fields[5] != null
+          ? DateTime.parse(fields[5] as String)
+          : DateTime.now(),
+      lastSyncAt: fields[6] != null
+          ? DateTime.parse(fields[6] as String)
+          : null,
+      isActive: fields[7] as bool? ?? true,
+      accessibilitySettings: fields[8] != null
+          ? (fields[8] as Map).cast<String, dynamic>()
+          : const {},
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, HivePatientDeviceSession obj) {
+    writer
+      ..writeByte(9)
+      ..writeByte(0)
+      ..write(obj.isPaired)
+      ..writeByte(1)
+      ..write(obj.patientId)
+      ..writeByte(2)
+      ..write(obj.deviceId)
+      ..writeByte(3)
+      ..write(obj.displayName)
+      ..writeByte(4)
+      ..write(obj.preferredName)
+      ..writeByte(5)
+      ..write(obj.pairedAt.toIso8601String())
+      ..writeByte(6)
+      ..write(obj.lastSyncAt?.toIso8601String())
+      ..writeByte(7)
+      ..write(obj.isActive)
+      ..writeByte(8)
+      ..write(obj.accessibilitySettings);
   }
 }

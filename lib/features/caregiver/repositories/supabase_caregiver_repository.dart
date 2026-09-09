@@ -4,6 +4,7 @@
 // patient-scoped security, patient onboarding, and adherence tracking.
 // ==============================================================================
 
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/network/connectivity_monitor.dart';
@@ -16,8 +17,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   final SupabaseClient? _client;
   final IConnectivityMonitor _connectivityMonitor;
 
-  CaregiverProfile? _cachedProfile;
-  final List<PatientSummary> _offlinePatients = [];
+  static CaregiverProfile? _cachedProfile;
+  static final List<PatientSummary> _offlinePatients = [];
 
   SupabaseCaregiverRepository({
     SupabaseClient? client,
@@ -122,20 +123,24 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
           _cachedProfile = CaregiverProfile(
             id: user.id,
             email: user.email ?? email,
-            fullName: profileData?['full_name'] as String? ?? 'Caregiver',
+            fullName: profileData?['full_name'] as String? ??
+                user.userMetadata?['full_name'] as String? ??
+                'Caregiver',
             phone: profileData?['phone'] as String?,
             role: profileData?['role'] as String? ?? 'primary_caregiver',
           );
           return _cachedProfile!;
         }
       } catch (e) {
-        debugPrint(
-          '⚠️ Supabase login exception: $e. Falling back to offline session mode.',
-        );
+        debugPrint('⚠️ Supabase login exception: $e');
+        final status = await _connectivityMonitor.checkStatus();
+        if (status == NetworkStatus.online) {
+          rethrow;
+        }
       }
     }
 
-    // Offline / Demo Caregiver Mode
+    // Offline / Demo Caregiver Mode (strictly when offline)
     _cachedProfile = CaregiverProfile(
       id: 'caregiver-local-001',
       email: email.isEmpty ? 'caregiver@nirvana.care' : email,
@@ -162,13 +167,41 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final activeClient = client;
     final user = activeClient?.auth.currentUser;
     if (user != null) {
-      return CaregiverProfile(
-        id: user.id,
-        email: user.email ?? '',
-        fullName: 'Caregiver',
-      );
+      try {
+        final profileData = await activeClient
+            ?.from('profiles')
+            .select()
+            .eq('id', user.id)
+            .maybeSingle();
+
+        _cachedProfile = CaregiverProfile(
+          id: user.id,
+          email: user.email ?? '',
+          fullName: profileData?['full_name'] as String? ??
+              user.userMetadata?['full_name'] as String? ??
+              'Caregiver',
+          phone: profileData?['phone'] as String?,
+          role: profileData?['role'] as String? ?? 'primary_caregiver',
+        );
+        return _cachedProfile;
+      } catch (_) {
+        return CaregiverProfile(
+          id: user.id,
+          email: user.email ?? '',
+          fullName: user.userMetadata?['full_name'] as String? ?? 'Caregiver',
+        );
+      }
     }
     return null;
+  }
+
+  static String _generateUuid() {
+    final rand = Random.secure();
+    final bytes = List<int>.generate(16, (_) => rand.nextInt(256));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // Version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // Variant RFC 4122
+    final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20, 32)}';
   }
 
   @override
@@ -177,24 +210,101 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     String? caregiverId,
   }) async {
     final activeClient = client;
-    final effectiveCaregiverId = caregiverId ??
-        activeClient?.auth.currentUser?.id ??
-        _cachedProfile?.id ??
-        'caregiver-local-001';
-
+    final currentUser = activeClient?.auth.currentUser;
     final status = await _connectivityMonitor.checkStatus();
 
     if (activeClient != null && status == NetworkStatus.online) {
+      if (currentUser == null) {
+        throw Exception(
+          'Authentication required: Please sign in with a valid caregiver account before creating a patient.',
+        );
+      }
+
       try {
+        // 1. Try atomic RPC create_patient_with_caregiver
+        try {
+          final rpcResult = await activeClient.rpc(
+            'create_patient_with_caregiver',
+            params: {
+              'p_display_name': input.fullName.trim(),
+              'p_preferred_name': input.preferredName.trim().isNotEmpty
+                  ? input.preferredName.trim()
+                  : input.fullName.trim(),
+              'p_relationship_label': input.relationship.trim(),
+              if (input.dateOfBirth != null)
+                'p_date_of_birth':
+                    input.dateOfBirth!.toIso8601String().split('T').first,
+              if (input.emergencyContactPhone != null &&
+                  input.emergencyContactPhone!.trim().isNotEmpty)
+                'p_emergency_contact_phone': input.emergencyContactPhone!.trim(),
+              'p_accessibility_settings': input.toAccessibilitySettings(),
+              'p_initial_reminders': input.initialReminders
+                  .where((r) => r.isEnabled)
+                  .map((r) => r.toMap('00000000-0000-0000-0000-000000000000'))
+                  .toList(),
+            },
+          );
+
+          if (rpcResult != null) {
+            final data = Map<String, dynamic>.from(rpcResult as Map);
+            final createdSummary = PatientSummary(
+              id: data['id'] as String,
+              fullName: data['display_name'] as String? ?? input.fullName.trim(),
+              preferredName: data['preferred_name'] as String? ??
+                  input.preferredName.trim(),
+              relationship: data['relationship_label'] as String? ??
+                  input.relationship.trim(),
+              primaryCaregiverId: currentUser.id,
+              emergencyContactPhone: data['emergency_contact_phone'] as String? ??
+                  input.emergencyContactPhone?.trim(),
+              lastActiveAt: DateTime.now(),
+            );
+
+            _offlinePatients.insert(0, createdSummary);
+            return createdSummary;
+          }
+        } on PostgrestException catch (rpcError) {
+          // PostgREST returns 'PGRST202' when the function is not found in the
+          // schema cache (i.e. migration hasn't been applied yet).
+          // Raw PostgreSQL would return '42883'. Handle both so the direct-insert
+          // fallback triggers correctly in either case.
+          final isFunctionNotFound =
+              rpcError.code == 'PGRST202' || rpcError.code == '42883';
+          if (!isFunctionNotFound) {
+            rethrow;
+          }
+          debugPrint(
+            'ℹ️ RPC create_patient_with_caregiver not found (${rpcError.code}), '
+            'falling back to direct table inserts.',
+          );
+        }
+
+        // Direct table inserts fallback under RLS
+        // Ensure profile exists in profiles table
+        try {
+          await activeClient.from('profiles').upsert({
+            'id': currentUser.id,
+            'email': currentUser.email ?? '',
+            'full_name': currentUser.userMetadata?['full_name'] as String? ??
+                _cachedProfile?.fullName ??
+                'Caregiver',
+            'role': 'caregiver',
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          });
+        } catch (profileErr) {
+          debugPrint('⚠️ Warning during profile sync: $profileErr');
+        }
+
         // 1. Create patients record in Supabase
         final patientInsertData = {
-          'primary_caregiver_id': effectiveCaregiverId,
+          'primary_caregiver_id': currentUser.id,
           'display_name': input.fullName.trim(),
           'preferred_name': input.preferredName.trim().isNotEmpty
               ? input.preferredName.trim()
               : input.fullName.trim(),
           if (input.dateOfBirth != null)
-            'date_of_birth': input.dateOfBirth!.toIso8601String().split('T').first,
+            'date_of_birth':
+                input.dateOfBirth!.toIso8601String().split('T').first,
           if (input.emergencyContactPhone != null &&
               input.emergencyContactPhone!.trim().isNotEmpty)
             'emergency_contact_phone': input.emergencyContactPhone!.trim(),
@@ -212,8 +322,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
         final patientId = patientResponse['id'] as String;
 
         // 2. Create caregiver_patient_links record
-        await activeClient.from('caregiver_patient_links').insert({
-          'caregiver_id': effectiveCaregiverId,
+        await activeClient.from('caregiver_patient_links').upsert({
+          'caregiver_id': currentUser.id,
           'patient_id': patientId,
           'relationship_label': input.relationship.trim(),
           'access_role': 'primary',
@@ -243,7 +353,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
               ? input.preferredName.trim()
               : input.fullName.trim(),
           relationship: input.relationship.trim(),
-          primaryCaregiverId: effectiveCaregiverId,
+          primaryCaregiverId: currentUser.id,
           emergencyContactPhone: input.emergencyContactPhone?.trim(),
           lastActiveAt: DateTime.now(),
         );
@@ -252,22 +362,22 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
         return createdSummary;
       } catch (e) {
         debugPrint('⚠️ Remote patient creation error: $e');
-        if (e is AuthException || e is PostgrestException) {
-          rethrow;
-        }
+        rethrow;
       }
     }
 
-    // Offline fallback patient creation
-    final newId = 'patient-local-${DateTime.now().millisecondsSinceEpoch}';
+    // Offline / Demo fallback patient creation with standard UUID format (strictly offline)
+    final fallbackId = _generateUuid();
     final fallbackSummary = PatientSummary(
-      id: newId,
+      id: fallbackId,
       fullName: input.fullName.trim(),
       preferredName: input.preferredName.trim().isNotEmpty
           ? input.preferredName.trim()
           : input.fullName.trim(),
       relationship: input.relationship.trim(),
-      primaryCaregiverId: effectiveCaregiverId,
+      primaryCaregiverId: caregiverId ??
+          _cachedProfile?.id ??
+          '00000000-0000-0000-0000-000000000000',
       emergencyContactPhone: input.emergencyContactPhone?.trim(),
       lastActiveAt: DateTime.now(),
     );
@@ -280,19 +390,26 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
   Future<List<PatientSummary>> getAssignedPatients(String caregiverId) async {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
+    final currentUser = activeClient?.auth.currentUser;
 
-    if (activeClient != null && status == NetworkStatus.online) {
+    if (activeClient != null && status == NetworkStatus.online && currentUser != null) {
       try {
         // Query assigned patients via links
         final response = await activeClient
             .from('patients')
             .select('*, caregiver_patient_links(relationship_label, access_role, caregiver_id)');
 
-        final list = (response as List)
+        final remoteList = (response as List)
             .map((item) => PatientSummary.fromMap(item as Map<String, dynamic>))
             .toList();
 
-        if (list.isNotEmpty) return list;
+        // Merge any locally created patients that might not be in remote yet
+        final combined = <PatientSummary>[
+          ..._offlinePatients.where((op) => !remoteList.any((rp) => rp.id == op.id)),
+          ...remoteList,
+        ];
+
+        if (combined.isNotEmpty) return combined;
 
         // Fallback to direct query by primary_caregiver_id
         final directResponse = await activeClient
@@ -304,36 +421,37 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             .map((item) => PatientSummary.fromMap(item as Map<String, dynamic>))
             .toList();
 
-        if (directList.isNotEmpty) return directList;
+        final combinedDirect = <PatientSummary>[
+          ..._offlinePatients.where((op) => !directList.any((rp) => rp.id == op.id)),
+          ...directList,
+        ];
+
+        if (combinedDirect.isNotEmpty) return combinedDirect;
       } catch (e) {
         debugPrint('⚠️ Failed to fetch remote patients: $e');
       }
     }
 
     if (_offlinePatients.isNotEmpty) {
-      return [
-        ..._offlinePatients.where(
-          (p) => p.primaryCaregiverId == caregiverId || caregiverId.isEmpty,
-        ),
-      ];
+      return List.unmodifiable(_offlinePatients);
     }
 
-    // Offline / Default Assigned Patients
+    // Offline / Default Assigned Patients with valid UUIDs
     return [
       PatientSummary(
-        id: 'patient-elena-01',
+        id: '11111111-1111-4111-8111-111111111111',
         fullName: 'Elena Rostova',
         preferredName: 'Elena',
         relationship: 'Mother',
-        primaryCaregiverId: caregiverId,
+        primaryCaregiverId: caregiverId.isNotEmpty ? caregiverId : '00000000-0000-0000-0000-000000000000',
         lastActiveAt: DateTime.now().subtract(const Duration(minutes: 25)),
       ),
       PatientSummary(
-        id: 'patient-arthur-02',
+        id: '22222222-2222-4222-8222-222222222222',
         fullName: 'Arthur Pendelton',
         preferredName: 'Arthur',
         relationship: 'Father',
-        primaryCaregiverId: caregiverId,
+        primaryCaregiverId: caregiverId.isNotEmpty ? caregiverId : '00000000-0000-0000-0000-000000000000',
         lastActiveAt: DateTime.now().subtract(const Duration(hours: 3)),
       ),
     ];
@@ -414,11 +532,70 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     ];
   }
 
+  static final List<CaregiverReminderRecord> _offlineReminders = [];
+
   @override
   Future<List<CaregiverReminderRecord>> getReminderStatus(
     String patientId,
   ) async {
-    // Check local Hive database first for instant offline readiness
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (activeClient != null && status == NetworkStatus.online && patientId.isNotEmpty) {
+      try {
+        // Query reminders for this patient with latest log status
+        final response = await activeClient
+            .from('reminders')
+            .select('*, reminder_logs(status, acknowledged_at, snoozed_until)')
+            .eq('patient_id', patientId)
+            .eq('is_deleted', false)
+            .order('schedule_time', ascending: true);
+
+        final remoteList = (response as List).map((item) {
+          final map = item as Map<String, dynamic>;
+
+          // Extract latest log status if available
+          String logStatus = 'pending';
+          DateTime? acknowledgedAt;
+          DateTime? snoozedUntil;
+          if (map['reminder_logs'] is List && (map['reminder_logs'] as List).isNotEmpty) {
+            final latestLog = (map['reminder_logs'] as List).last as Map<String, dynamic>;
+            logStatus = latestLog['status'] as String? ?? 'pending';
+            acknowledgedAt = latestLog['acknowledged_at'] != null
+                ? DateTime.tryParse(latestLog['acknowledged_at'] as String)
+                : null;
+            snoozedUntil = latestLog['snoozed_until'] != null
+                ? DateTime.tryParse(latestLog['snoozed_until'] as String)
+                : null;
+          }
+
+          return CaregiverReminderRecord.fromMap({
+            ...map,
+            'status': logStatus,
+            'acknowledged_at': acknowledgedAt?.toIso8601String(),
+            'snoozed_until': snoozedUntil?.toIso8601String(),
+            'is_completed': logStatus == 'acknowledged',
+            'last_action': logStatus == 'acknowledged'
+                ? 'done'
+                : (logStatus == 'snoozed' ? 'snoozed' : null),
+          });
+        }).toList();
+
+        // Merge any locally created reminders not yet synced
+        final combined = <CaregiverReminderRecord>[
+          ..._offlineReminders.where(
+            (or) => or.patientId == patientId && !remoteList.any((rr) => rr.id == or.id),
+          ),
+          ...remoteList,
+        ];
+
+        return combined;
+      } catch (e) {
+        debugPrint('⚠️ Remote reminder fetch error: $e');
+      }
+    }
+
+    // Hive fallback
     try {
       final localReminders = HiveDatabase.remindersBox.values.where((r) {
         return (patientId.isEmpty || r.patientId == patientId) && r.isActive;
@@ -428,6 +605,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
         return localReminders.map((r) {
           return CaregiverReminderRecord(
             id: r.id,
+            patientId: r.patientId,
             title: r.title,
             scheduledAt: r.scheduledAt,
             isCompleted: r.isCompleted,
@@ -441,33 +619,241 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
       }
     } catch (_) {}
 
+    // Offline-created reminders for this patient
+    final patientOffline = _offlineReminders
+        .where((r) => r.patientId == patientId)
+        .toList();
+    if (patientOffline.isNotEmpty) return patientOffline;
+
+    // Offline / Demo fallback reminders (for offline mode/unit testing)
     final now = DateTime.now();
     return [
       CaregiverReminderRecord(
         id: 'r-1',
+        patientId: patientId,
         title: 'Morning Blood Pressure Medication',
+        description: 'Take 1 blue pill with a full glass of water',
+        reminderType: 'medication',
+        scheduleTime: '08:30:00',
         scheduledAt: DateTime(now.year, now.month, now.day, 8, 30),
+        recurrenceDays: const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        isActive: true,
         isCompleted: true,
         completedAt: DateTime(now.year, now.month, now.day, 8, 35),
         lastAction: 'done',
       ),
       CaregiverReminderRecord(
         id: 'r-2',
-        title: 'Afternoon Hydration & Water Glass',
-        scheduledAt: DateTime(now.year, now.month, now.day, 13, 0),
-        isCompleted: true,
-        completedAt: DateTime(now.year, now.month, now.day, 13, 10),
-        lastAction: 'done',
+        patientId: patientId,
+        title: 'Midday Hydration & Glass of Water',
+        description: 'Drink a large glass of water',
+        reminderType: 'hydration',
+        scheduleTime: '12:30:00',
+        scheduledAt: DateTime(now.year, now.month, now.day, 12, 30),
+        recurrenceDays: const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        isActive: true,
+        isCompleted: false,
       ),
       CaregiverReminderRecord(
         id: 'r-3',
-        title: 'Evening Walk in Garden',
-        scheduledAt: DateTime(now.year, now.month, now.day, 17, 30),
+        patientId: patientId,
+        title: 'Evening Walk & Light Stretch',
+        description: '15 minute evening stroll in the garden',
+        reminderType: 'activity',
+        scheduleTime: '17:00:00',
+        scheduledAt: DateTime(now.year, now.month, now.day, 17, 0),
+        recurrenceDays: const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        isActive: true,
         isCompleted: false,
-        snoozedUntil: DateTime(now.year, now.month, now.day, 17, 45),
-        lastAction: 'snoozed',
       ),
     ];
+  }
+
+  @override
+  Future<CaregiverReminderRecord> createReminder(
+    CreateOrUpdateReminderInput input,
+  ) async {
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (activeClient != null && status == NetworkStatus.online) {
+      try {
+        final insertData = input.toMap();
+        insertData['created_at'] = DateTime.now().toUtc().toIso8601String();
+        insertData['updated_at'] = DateTime.now().toUtc().toIso8601String();
+
+        final response = await activeClient
+            .from('reminders')
+            .insert(insertData)
+            .select()
+            .single();
+
+        final record = CaregiverReminderRecord.fromMap(response);
+        _offlineReminders.add(record);
+        return record;
+      } catch (e) {
+        debugPrint('⚠️ Remote reminder creation error: $e');
+      }
+    }
+
+    // Offline fallback
+    final fallbackId = _generateUuid();
+    final now = DateTime.now();
+    final parts = input.scheduleTime.split(':');
+    final hour = int.tryParse(parts[0]) ?? 8;
+    final minute = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
+
+    final record = CaregiverReminderRecord(
+      id: fallbackId,
+      patientId: input.patientId,
+      title: input.title,
+      description: input.description,
+      reminderType: input.reminderType,
+      scheduleTime: input.scheduleTime,
+      scheduledAt: DateTime(now.year, now.month, now.day, hour, minute),
+      recurrenceDays: input.recurrenceDays,
+      isActive: input.isActive,
+      isCompleted: false,
+      status: 'pending',
+    );
+    _offlineReminders.add(record);
+
+    // Queue sync event
+    try {
+      final syncEvent = HiveSyncEvent(
+        eventId: _generateUuid(),
+        entityType: 'reminder',
+        entityId: fallbackId,
+        operation: 'create',
+        payload: input.toMap(),
+        createdAt: now,
+        patientId: input.patientId,
+      );
+      HiveDatabase.syncQueueBox.put(syncEvent.eventId, syncEvent);
+    } catch (_) {}
+
+    return record;
+  }
+
+  @override
+  Future<CaregiverReminderRecord> updateReminder(
+    String reminderId,
+    CreateOrUpdateReminderInput input,
+  ) async {
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (activeClient != null && status == NetworkStatus.online) {
+      try {
+        final updateData = <String, dynamic>{
+          'title': input.title.trim(),
+          'reminder_type': input.reminderType,
+          'schedule_time': input.scheduleTime.length == 5
+              ? '${input.scheduleTime}:00'
+              : input.scheduleTime,
+          'recurrence_days': input.recurrenceDays,
+          'is_active': input.isActive,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        };
+        if (input.description != null) {
+          updateData['description'] = input.description!.trim();
+        }
+
+        final response = await activeClient
+            .from('reminders')
+            .update(updateData)
+            .eq('id', reminderId)
+            .select()
+            .single();
+
+        final record = CaregiverReminderRecord.fromMap(response);
+
+        // Update offline cache
+        _offlineReminders.removeWhere((r) => r.id == reminderId);
+        _offlineReminders.add(record);
+        return record;
+      } catch (e) {
+        debugPrint('⚠️ Remote reminder update error: $e');
+      }
+    }
+
+    // Offline fallback: update in-memory
+    final idx = _offlineReminders.indexWhere((r) => r.id == reminderId);
+    final now = DateTime.now();
+    final parts = input.scheduleTime.split(':');
+    final hour = int.tryParse(parts[0]) ?? 8;
+    final minute = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
+
+    final record = CaregiverReminderRecord(
+      id: reminderId,
+      patientId: input.patientId,
+      title: input.title,
+      description: input.description,
+      reminderType: input.reminderType,
+      scheduleTime: input.scheduleTime,
+      scheduledAt: DateTime(now.year, now.month, now.day, hour, minute),
+      recurrenceDays: input.recurrenceDays,
+      isActive: input.isActive,
+      isCompleted: idx >= 0 ? _offlineReminders[idx].isCompleted : false,
+      status: idx >= 0 ? _offlineReminders[idx].status : 'pending',
+    );
+
+    if (idx >= 0) {
+      _offlineReminders[idx] = record;
+    } else {
+      _offlineReminders.add(record);
+    }
+
+    return record;
+  }
+
+  @override
+  Future<void> toggleReminderActive(String reminderId, bool isActive) async {
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (activeClient != null && status == NetworkStatus.online) {
+      try {
+        await activeClient
+            .from('reminders')
+            .update({
+              'is_active': isActive,
+              'updated_at': DateTime.now().toUtc().toIso8601String(),
+            })
+            .eq('id', reminderId);
+      } catch (e) {
+        debugPrint('⚠️ Remote toggle error: $e');
+      }
+    }
+
+    // Update offline cache
+    final idx = _offlineReminders.indexWhere((r) => r.id == reminderId);
+    if (idx >= 0) {
+      _offlineReminders[idx] = _offlineReminders[idx].copyWith(isActive: isActive);
+    }
+  }
+
+  @override
+  Future<void> deleteReminder(String reminderId) async {
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (activeClient != null && status == NetworkStatus.online) {
+      try {
+        await activeClient
+            .from('reminders')
+            .update({
+              'is_deleted': true,
+              'is_active': false,
+              'updated_at': DateTime.now().toUtc().toIso8601String(),
+            })
+            .eq('id', reminderId);
+      } catch (e) {
+        debugPrint('⚠️ Remote delete error: $e');
+      }
+    }
+
+    _offlineReminders.removeWhere((r) => r.id == reminderId);
   }
 
   @override

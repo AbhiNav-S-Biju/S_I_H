@@ -88,7 +88,7 @@ class PatientSelectorWidget extends ConsumerWidget {
 
         final effectiveSelected = (selectedPatient != null &&
                 patients.any((p) => p.id == selectedPatient.id))
-            ? selectedPatient
+            ? patients.firstWhere((p) => p.id == selectedPatient.id)
             : patients.first;
 
         return Container(

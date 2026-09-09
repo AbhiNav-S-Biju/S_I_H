@@ -1,12 +1,15 @@
 // ==============================================================================
 // NIRVANA - HiveDatabase Initializer
 // Description: Manages Hive initialization, adapter registration, and box opening.
+// Supports offline patient session persistence and device pairing.
 // ==============================================================================
 
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'adapters/hive_adapters.dart';
 import 'hive_boxes.dart';
+import 'models/hive_patient_session.dart';
 import 'models/hive_reminder.dart';
 import 'models/hive_reminder_log.dart';
 import 'models/hive_sync_event.dart';
@@ -15,6 +18,7 @@ class HiveDatabase {
   HiveDatabase._();
 
   static bool _isInitialized = false;
+  static const String _sessionKey = 'current_patient_session';
 
   /// Initializes Hive, registers TypeAdapters, and opens standard boxes.
   static Future<void> init({String? subDir}) async {
@@ -27,7 +31,8 @@ class HiveDatabase {
     _isInitialized = true;
     debugPrint(
       '✅ HiveDatabase initialized successfully with boxes: '
-      '${HiveBoxes.reminders}, ${HiveBoxes.reminderLogs}, ${HiveBoxes.syncQueue}',
+      '${HiveBoxes.reminders}, ${HiveBoxes.reminderLogs}, '
+      '${HiveBoxes.syncQueue}, ${HiveBoxes.patientSession}',
     );
   }
 
@@ -42,6 +47,9 @@ class HiveDatabase {
     if (!Hive.isAdapterRegistered(HiveTypeIds.hiveReminderLog)) {
       Hive.registerAdapter(HiveReminderLogAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTypeIds.hivePatientDeviceSession)) {
+      Hive.registerAdapter(HivePatientDeviceSessionAdapter());
+    }
   }
 
   /// Opens the core Hive boxes required for offline-first operation.
@@ -50,6 +58,7 @@ class HiveDatabase {
       Hive.openBox<HiveReminder>(HiveBoxes.reminders),
       Hive.openBox<HiveReminderLog>(HiveBoxes.reminderLogs),
       Hive.openBox<HiveSyncEvent>(HiveBoxes.syncQueue),
+      Hive.openBox<HivePatientDeviceSession>(HiveBoxes.patientSession),
     ]);
   }
 
@@ -62,6 +71,55 @@ class HiveDatabase {
 
   static Box<HiveSyncEvent> get syncQueueBox =>
       Hive.box<HiveSyncEvent>(HiveBoxes.syncQueue);
+
+  static Box<HivePatientDeviceSession> get patientSessionBox =>
+      Hive.box<HivePatientDeviceSession>(HiveBoxes.patientSession);
+
+  /// Returns the current locally stored patient session, if any
+  static HivePatientDeviceSession? get currentPatientSession {
+    try {
+      if (!Hive.isBoxOpen(HiveBoxes.patientSession)) return null;
+      return patientSessionBox.get(_sessionKey);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Returns true if the device has a valid, active paired session
+  static bool get isDevicePaired {
+    final session = currentPatientSession;
+    return session != null && session.isPaired && session.isActive;
+  }
+
+  /// Returns the paired patient ID if an active paired session exists
+  static String? get pairedPatientId => currentPatientSession?.patientId;
+
+  /// Saves or updates the patient session locally
+  static Future<void> savePatientSession(
+    HivePatientDeviceSession session,
+  ) async {
+    await patientSessionBox.put(_sessionKey, session);
+  }
+
+  /// Clears or unpairs the local patient session
+  static Future<void> clearPatientSession() async {
+    await patientSessionBox.delete(_sessionKey);
+  }
+
+  /// Gets or generates a stable unique device ID
+  static String getOrCreateDeviceId() {
+    final existingSession = currentPatientSession;
+    if (existingSession != null && existingSession.deviceId.isNotEmpty) {
+      return existingSession.deviceId;
+    }
+
+    final rand = Random.secure();
+    final randomHex = List.generate(
+      16,
+      (_) => rand.nextInt(256).toRadixString(16).padLeft(2, '0'),
+    ).join();
+    return 'device-$randomHex';
+  }
 
   /// Close boxes (e.g. for testing cleanup)
   static Future<void> close() async {

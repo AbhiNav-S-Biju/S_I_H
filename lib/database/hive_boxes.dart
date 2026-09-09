@@ -11,6 +11,7 @@ class HiveBoxes {
   static const String reminders = 'nirvana_reminders';
   static const String reminderLogs = 'nirvana_reminder_logs';
   static const String syncQueue = 'nirvana_sync_queue';
+  static const String patientSession = 'nirvana_patient_session';
 }
 
 class HiveTypeIds {
@@ -19,4 +20,5 @@ class HiveTypeIds {
   static const int hiveSyncEvent = 1;
   static const int hiveReminder = 2;
   static const int hiveReminderLog = 3;
+  static const int hivePatientDeviceSession = 4;
 }
