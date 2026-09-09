@@ -453,28 +453,14 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     }
 
     if (_offlinePatients.isNotEmpty) {
-      return List.unmodifiable(_offlinePatients);
+      final matching = _offlinePatients
+          .where((p) => caregiverId.isEmpty || p.primaryCaregiverId == caregiverId)
+          .toList();
+      return List.unmodifiable(matching);
     }
 
-    // Offline / Default Assigned Patients with valid UUIDs
-    return [
-      PatientSummary(
-        id: '11111111-1111-4111-8111-111111111111',
-        fullName: 'Elena Rostova',
-        preferredName: 'Elena',
-        relationship: 'Mother',
-        primaryCaregiverId: caregiverId.isNotEmpty ? caregiverId : '00000000-0000-0000-0000-000000000000',
-        lastActiveAt: DateTime.now().subtract(const Duration(minutes: 25)),
-      ),
-      PatientSummary(
-        id: '22222222-2222-4222-8222-222222222222',
-        fullName: 'Arthur Pendelton',
-        preferredName: 'Arthur',
-        relationship: 'Father',
-        primaryCaregiverId: caregiverId.isNotEmpty ? caregiverId : '00000000-0000-0000-0000-000000000000',
-        lastActiveAt: DateTime.now().subtract(const Duration(hours: 3)),
-      ),
-    ];
+    // No remote data and no offline patients
+    return [];
   }
 
   @override
@@ -482,28 +468,33 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
 
-    if (activeClient != null && status == NetworkStatus.online) {
+    if (activeClient != null && status == NetworkStatus.online && patientId.isNotEmpty) {
       try {
+        // DB columns: successful_trials, total_trials, difficulty_level (int), completed_at
         final response = await activeClient
             .from('game_sessions')
-            .select()
+            .select(
+              'id, game_type, difficulty_level, total_trials, successful_trials, duration_seconds, completed_at, created_at',
+            )
             .eq('patient_id', patientId)
-            .order('created_at', ascending: false)
+            .order('completed_at', ascending: false)
             .limit(20);
 
         return (response as List).map((item) {
           final map = item as Map<String, dynamic>;
           final type = map['game_type'] as String? ?? 'remember_objects';
+          final diffLevel = (map['difficulty_level'] as num?)?.toInt() ?? 1;
           return CaregiverGameRecord(
             id: map['id'] as String? ?? '',
             gameTitle: _formatGameTitle(type),
             gameType: type,
-            difficulty: map['difficulty'] as String? ?? 'easy',
-            score: map['score'] as int? ?? 0,
-            durationSeconds: map['duration_seconds'] as int? ?? 0,
-            correctCount: map['correct_count'] as int? ?? 0,
-            totalCount: map['total_count'] as int? ?? 0,
+            difficulty: _difficultyLevelToString(diffLevel),
+            score: 0, // No score column in schema; computed client-side if needed
+            durationSeconds: (map['duration_seconds'] as num?)?.toInt() ?? 0,
+            correctCount: (map['successful_trials'] as num?)?.toInt() ?? 0,
+            totalCount: (map['total_trials'] as num?)?.toInt() ?? 0,
             playedAt:
+                DateTime.tryParse(map['completed_at'] as String? ?? '') ??
                 DateTime.tryParse(map['created_at'] as String? ?? '') ??
                 DateTime.now(),
           );
@@ -513,43 +504,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
       }
     }
 
-    // Offline / local demonstration history
-    final now = DateTime.now();
-    return [
-      CaregiverGameRecord(
-        id: 'g-1',
-        gameTitle: 'Remember Objects',
-        gameType: 'remember_objects',
-        difficulty: 'easy',
-        score: 350,
-        durationSeconds: 18,
-        correctCount: 3,
-        totalCount: 3,
-        playedAt: now.subtract(const Duration(hours: 2)),
-      ),
-      CaregiverGameRecord(
-        id: 'g-2',
-        gameTitle: 'Who Is This?',
-        gameType: 'who_is_this',
-        difficulty: 'easy',
-        score: 290,
-        durationSeconds: 22,
-        correctCount: 2,
-        totalCount: 2,
-        playedAt: now.subtract(const Duration(hours: 5)),
-      ),
-      CaregiverGameRecord(
-        id: 'g-3',
-        gameTitle: 'Grocery Memory',
-        gameType: 'grocery_memory',
-        difficulty: 'medium',
-        score: 400,
-        durationSeconds: 30,
-        correctCount: 4,
-        totalCount: 4,
-        playedAt: now.subtract(const Duration(days: 1, hours: 3)),
-      ),
-    ];
+    // Hive fallback: reminder logs only (no Hive box for game sessions)
+    // Return empty list — the widget shows a clean empty state
+    return [];
   }
 
   static final List<CaregiverReminderRecord> _offlineReminders = [];
@@ -645,48 +602,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
         .toList();
     if (patientOffline.isNotEmpty) return patientOffline;
 
-    // Offline / Demo fallback reminders (for offline mode/unit testing)
-    final now = DateTime.now();
-    return [
-      CaregiverReminderRecord(
-        id: 'r-1',
-        patientId: patientId,
-        title: 'Morning Blood Pressure Medication',
-        description: 'Take 1 blue pill with a full glass of water',
-        reminderType: 'medication',
-        scheduleTime: '08:30:00',
-        scheduledAt: DateTime(now.year, now.month, now.day, 8, 30),
-        recurrenceDays: const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-        isActive: true,
-        isCompleted: true,
-        completedAt: DateTime(now.year, now.month, now.day, 8, 35),
-        lastAction: 'done',
-      ),
-      CaregiverReminderRecord(
-        id: 'r-2',
-        patientId: patientId,
-        title: 'Midday Hydration & Glass of Water',
-        description: 'Drink a large glass of water',
-        reminderType: 'hydration',
-        scheduleTime: '12:30:00',
-        scheduledAt: DateTime(now.year, now.month, now.day, 12, 30),
-        recurrenceDays: const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-        isActive: true,
-        isCompleted: false,
-      ),
-      CaregiverReminderRecord(
-        id: 'r-3',
-        patientId: patientId,
-        title: 'Evening Walk & Light Stretch',
-        description: '15 minute evening stroll in the garden',
-        reminderType: 'activity',
-        scheduleTime: '17:00:00',
-        scheduledAt: DateTime(now.year, now.month, now.day, 17, 0),
-        recurrenceDays: const ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-        isActive: true,
-        isCompleted: false,
-      ),
-    ];
+    // No remote data and no Hive data — return empty list.
+    // The widget renders a clean empty state with an "Add Reminder" prompt.
+    return [];
   }
 
   @override
@@ -881,22 +799,103 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     String patientId,
   ) async {
     final now = DateTime.now();
-    final List<DailyActivitySummary> summaries = [];
-
+    final today = DateTime(now.year, now.month, now.day);
+    // Range: start of 6 days ago → end of today (UTC-aligned)
+    final rangeStart = today.subtract(const Duration(days: 6)).toUtc();
+    final rangeEnd = today.add(const Duration(days: 1)).toUtc();
     final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+    // Per-day counters keyed by "YYYY-MM-DD" in local time
+    final Map<String, int> gamesPerDay = {};
+    final Map<String, int> remindersPerDay = {};
+
+    // Pre-fill 7 days with zeros
     for (int i = 6; i >= 0; i--) {
-      final date = now.subtract(Duration(days: i));
-      final dayLabel = dayNames[date.weekday - 1];
+      final d = today.subtract(Duration(days: i));
+      final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+      gamesPerDay[key] = 0;
+      remindersPerDay[key] = 0;
+    }
 
-      // Realistic non-clinical activity numbers (games + reminders)
-      final games = (i == 0) ? 2 : (i % 2 == 0 ? 3 : 1);
-      final reminders = (i == 0) ? 2 : 3;
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
 
+    if (activeClient != null && status == NetworkStatus.online && patientId.isNotEmpty) {
+      try {
+        // 1. Count game sessions per day using completed_at
+        final gamesResponse = await activeClient
+            .from('game_sessions')
+            .select('completed_at')
+            .eq('patient_id', patientId)
+            .gte('completed_at', rangeStart.toIso8601String())
+            .lt('completed_at', rangeEnd.toIso8601String());
+
+        for (final item in (gamesResponse as List)) {
+          final map = item as Map<String, dynamic>;
+          final completedAt = DateTime.tryParse(map['completed_at'] as String? ?? '');
+          if (completedAt != null) {
+            final local = completedAt.toLocal();
+            final key = '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
+            if (gamesPerDay.containsKey(key)) {
+              gamesPerDay[key] = (gamesPerDay[key] ?? 0) + 1;
+            }
+          }
+        }
+
+        // 2. Count acknowledged reminder logs per day using scheduled_for
+        final logsResponse = await activeClient
+            .from('reminder_logs')
+            .select('scheduled_for, status')
+            .eq('patient_id', patientId)
+            .eq('status', 'acknowledged')
+            .gte('scheduled_for', rangeStart.toIso8601String())
+            .lt('scheduled_for', rangeEnd.toIso8601String());
+
+        for (final item in (logsResponse as List)) {
+          final map = item as Map<String, dynamic>;
+          final scheduledFor = DateTime.tryParse(map['scheduled_for'] as String? ?? '');
+          if (scheduledFor != null) {
+            final local = scheduledFor.toLocal();
+            final key = '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
+            if (remindersPerDay.containsKey(key)) {
+              remindersPerDay[key] = (remindersPerDay[key] ?? 0) + 1;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Remote 7-day activity fetch error: $e');
+        // Fall through — zeros are already populated, chart shows real zeros
+      }
+    } else {
+      // Offline: also try Hive reminder logs for acknowledged reminders
+      try {
+        final localLogs = HiveDatabase.reminderLogsBox.values.where((log) {
+          return log.patientId == patientId &&
+              log.action == 'done' &&
+              log.actionTimestamp.isAfter(rangeStart) &&
+              log.actionTimestamp.isBefore(rangeEnd);
+        });
+        for (final log in localLogs) {
+          final local = log.actionTimestamp.toLocal();
+          final key = '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
+          if (remindersPerDay.containsKey(key)) {
+            remindersPerDay[key] = (remindersPerDay[key] ?? 0) + 1;
+          }
+        }
+      } catch (_) {}
+    }
+
+    // Build ordered list from 6 days ago → today
+    final List<DailyActivitySummary> summaries = [];
+    for (int i = 6; i >= 0; i--) {
+      final date = today.subtract(Duration(days: i));
+      final key = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final games = gamesPerDay[key] ?? 0;
+      final reminders = remindersPerDay[key] ?? 0;
       summaries.add(
         DailyActivitySummary(
           date: date,
-          dayLabel: dayLabel,
+          dayLabel: dayNames[date.weekday - 1],
           gamesCompleted: games,
           remindersCompleted: reminders,
           totalActivities: games + reminders,
@@ -913,18 +912,29 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final isOnline = networkStatus == NetworkStatus.online;
 
     int pendingCount = 0;
+    DateTime? lastSyncedAt;
+
     try {
-      pendingCount = HiveDatabase.syncQueueBox.values
-          .where((e) => e.syncStatus == SyncStatus.pending)
-          .length;
+      final events = HiveDatabase.syncQueueBox.values;
+      pendingCount = events.where((e) => e.syncStatus == SyncStatus.pending).length;
+
+      // Derive last sync time from the most recently processed (non-pending) event
+      final processedEvents = events
+          .where((e) => e.syncStatus != SyncStatus.pending)
+          .toList();
+      if (processedEvents.isNotEmpty) {
+        processedEvents.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        lastSyncedAt = processedEvents.first.createdAt;
+      } else if (isOnline && pendingCount == 0) {
+        // Online with no pending events — consider freshly synced at session start
+        lastSyncedAt = null;
+      }
     } catch (_) {}
 
     return CaregiverSyncInfo(
       pendingEventsCount: pendingCount,
       isOnline: isOnline,
-      lastSyncedAt: isOnline
-          ? DateTime.now().subtract(const Duration(minutes: 4))
-          : null,
+      lastSyncedAt: lastSyncedAt,
       statusLabel: isOnline
           ? (pendingCount == 0
                 ? 'All activities synchronized'
@@ -942,7 +952,23 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
       case 'grocery_memory':
         return 'Grocery Memory';
       default:
-        return 'Activity Game';
+        return type
+            .split('_')
+            .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}')
+            .join(' ');
+    }
+  }
+
+  /// Converts an integer difficulty_level (1–5) to a display string.
+  /// Level 1 → easy, 2 → medium, 3+ → hard.
+  static String _difficultyLevelToString(int level) {
+    switch (level) {
+      case 1:
+        return 'easy';
+      case 2:
+        return 'medium';
+      default:
+        return 'hard';
     }
   }
 }

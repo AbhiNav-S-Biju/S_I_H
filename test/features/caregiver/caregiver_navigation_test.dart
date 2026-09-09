@@ -136,6 +136,26 @@ class MockCaregiverRepository implements ICaregiverRepository {
       );
 }
 
+class MockPairingRepository implements IPairingRepository {
+  @override
+  Future<PairingCodeInfo> generatePairingCode(
+    String patientId, {
+    int validityMinutes = 15,
+  }) async {
+    return PairingCodeInfo(
+      code: '123456',
+      expiresAt: DateTime.now().add(Duration(minutes: validityMinutes)),
+      patientId: patientId,
+    );
+  }
+
+  @override
+  Future<PatientDeviceSummary?> getLinkedDevice(String patientId) async => null;
+
+  @override
+  Future<void> revokeDevice(String deviceId) async {}
+}
+
 void main() {
   Widget createTestApp({required bool onboardingCompleted}) {
     return ProviderScope(
@@ -145,6 +165,9 @@ void main() {
         ),
         caregiverRepositoryProvider.overrideWithValue(
           MockCaregiverRepository(),
+        ),
+        pairingRepositoryProvider.overrideWithValue(
+          MockPairingRepository(),
         ),
       ],
       child: Consumer(

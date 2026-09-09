@@ -173,6 +173,26 @@ class StubCaregiverRepository implements ICaregiverRepository {
       );
 }
 
+class StubPairingRepository implements IPairingRepository {
+  @override
+  Future<PairingCodeInfo> generatePairingCode(
+    String patientId, {
+    int validityMinutes = 15,
+  }) async {
+    return PairingCodeInfo(
+      code: '123456',
+      expiresAt: DateTime.now().add(Duration(minutes: validityMinutes)),
+      patientId: patientId,
+    );
+  }
+
+  @override
+  Future<PatientDeviceSummary?> getLinkedDevice(String patientId) async => null;
+
+  @override
+  Future<void> revokeDevice(String deviceId) async {}
+}
+
 void main() {
   // Minimal GoRouter so context.go() / context.pop() work in widget tests.
   GoRouter buildRouter(Widget screen) {
@@ -197,7 +217,10 @@ void main() {
     List<Override> overrides = const [],
   }) {
     return ProviderScope(
-      overrides: overrides,
+      overrides: [
+        pairingRepositoryProvider.overrideWithValue(StubPairingRepository()),
+        ...overrides,
+      ],
       child: Consumer(
         builder: (context, ref, _) =>
             MaterialApp.router(routerConfig: buildRouter(screen)),
@@ -210,7 +233,10 @@ void main() {
     List<Override> overrides = const [],
   }) {
     return ProviderScope(
-      overrides: overrides,
+      overrides: [
+        pairingRepositoryProvider.overrideWithValue(StubPairingRepository()),
+        ...overrides,
+      ],
       child: MaterialApp(home: child),
     );
   }

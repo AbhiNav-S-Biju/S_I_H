@@ -97,45 +97,33 @@ void main() {
     });
 
     test(
-      'getAssignedPatients returns only patients assigned to caregiver',
+      'getAssignedPatients returns empty list when no patients are assigned/created',
       () async {
         final patients = await repository.getAssignedPatients(
-          'caregiver-local-001',
+          'caregiver-local-002',
         );
 
-        expect(patients, isNotEmpty);
-        for (final patient in patients) {
-          expect(patient.primaryCaregiverId, equals('caregiver-local-001'));
-          expect(patient.fullName, isNotEmpty);
-          expect(patient.relationship, isNotEmpty);
-        }
+        expect(patients, isEmpty);
       },
     );
 
     test(
-      'getGameHistory returns recent game activity without clinical progression labels',
+      'getGameHistory returns empty list when no game sessions exist',
       () async {
         final history = await repository.getGameHistory('patient-elena-01');
 
-        expect(history, isNotEmpty);
-        for (final game in history) {
-          expect(game.gameTitle, isNotEmpty);
-          expect(game.score, isNonNegative);
-          expect(game.correctCount, isNonNegative);
-          expect(game.totalCount, isPositive);
-        }
+        expect(history, isEmpty);
       },
     );
 
     test(
-      'getReminderStatus returns reminder records with completion status',
+      'getReminderStatus returns empty list when no reminders exist',
       () async {
         final reminders = await repository.getReminderStatus(
           'patient-elena-01',
         );
 
-        expect(reminders, isNotEmpty);
-        expect(reminders.any((r) => r.isCompleted), isTrue);
+        expect(reminders, isEmpty);
       },
     );
 
