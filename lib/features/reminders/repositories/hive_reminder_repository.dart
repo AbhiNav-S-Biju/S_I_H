@@ -10,6 +10,7 @@ import '../../../core/network/sync_engine.dart';
 import '../../../database/models/hive_reminder.dart';
 import '../../../database/models/hive_reminder_log.dart';
 import '../../../database/models/hive_sync_event.dart';
+import '../../caregiver/services/caregiver_event_notification_service.dart';
 import '../models/reminder.dart';
 import '../models/reminder_action.dart';
 import '../models/reminder_log.dart';
@@ -19,16 +20,19 @@ class HiveReminderRepository implements IReminderRepository {
   final Box<HiveReminder> _remindersBox;
   final Box<HiveReminderLog> _reminderLogsBox;
   final SyncEngine _syncEngine;
+  final CaregiverEventNotificationService? _eventNotificationService;
   final Uuid _uuid;
 
   HiveReminderRepository({
     required Box<HiveReminder> remindersBox,
     required Box<HiveReminderLog> reminderLogsBox,
     required SyncEngine syncEngine,
+    CaregiverEventNotificationService? eventNotificationService,
     Uuid? uuid,
   }) : _remindersBox = remindersBox,
        _reminderLogsBox = reminderLogsBox,
        _syncEngine = syncEngine,
+       _eventNotificationService = eventNotificationService,
        _uuid = uuid ?? const Uuid();
 
   @override
@@ -135,6 +139,13 @@ class HiveReminderRepository implements IReminderRepository {
       patientId: pId,
     );
     await _syncEngine.enqueueEvent(logSyncEvent);
+
+    // 3. Dispatch caregiver event notification
+    _eventNotificationService?.notifyReminderCompleted(
+      patientId: pId,
+      reminderTitle: hive.title,
+      reminderId: reminderId,
+    );
   }
 
   @override
@@ -187,6 +198,14 @@ class HiveReminderRepository implements IReminderRepository {
       patientId: pId,
     );
     await _syncEngine.enqueueEvent(logSyncEvent);
+
+    // 3. Dispatch caregiver event notification
+    _eventNotificationService?.notifyReminderSnoozed(
+      patientId: pId,
+      reminderTitle: hive.title,
+      snoozedUntil: hive.snoozedUntil ?? now.add(delay),
+      reminderId: reminderId,
+    );
   }
 
   @override
@@ -240,6 +259,14 @@ class HiveReminderRepository implements IReminderRepository {
       patientId: pId,
     );
     await _syncEngine.enqueueEvent(logSyncEvent);
+
+    // 3. Dispatch caregiver event notification
+    _eventNotificationService?.notifyReminderSnoozed(
+      patientId: pId,
+      reminderTitle: hive.title,
+      snoozedUntil: later,
+      reminderId: reminderId,
+    );
   }
 
   @override

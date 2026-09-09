@@ -196,6 +196,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                             patientId: effectivePatientId,
                           );
 
+                      // Dispatch caregiver event notification
+                      await ref
+                          .read(caregiverEventNotificationServiceProvider)
+                          .notifyGameCompleted(
+                            patientId: effectivePatientId,
+                            gameTitle: session.gameType.displayName,
+                            score: session.score,
+                            correctAnswers: session.correctAnswers,
+                            totalQuestions: session.totalQuestions,
+                            gameSessionId: session.id,
+                          );
+
                       // Invalidate caregiver dashboard telemetry providers
                       ref.invalidate(selectedPatientGameHistoryProvider);
                       ref.invalidate(selectedPatientSevenDayActivityProvider);

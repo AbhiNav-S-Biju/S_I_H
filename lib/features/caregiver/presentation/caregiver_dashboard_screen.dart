@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 import 'widgets/activity_summary_cards.dart';
+import 'widgets/caregiver_notifications_panel.dart';
 import 'widgets/game_history_list.dart';
 import 'widgets/patient_device_panel.dart';
 import 'widgets/patient_selector_widget.dart';
@@ -24,6 +25,7 @@ class CaregiverDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(caregiverAuthProvider);
     final caregiver = authState.value;
+    final unreadCount = ref.watch(unreadCaregiverNotificationsCountProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAF9),
@@ -68,10 +70,15 @@ class CaregiverDashboardScreen extends ConsumerWidget {
             onPressed: () => context.push('/caregiver/onboarding'),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Badge(
+              isLabelVisible: unreadCount > 0,
+              label: Text('$unreadCount'),
+              child: const Icon(Icons.refresh),
+            ),
             tooltip: 'Refresh Data',
             onPressed: () {
               ref.invalidate(assignedPatientsProvider);
+              ref.invalidate(caregiverNotificationsProvider);
               ref.invalidate(selectedPatientGameHistoryProvider);
               ref.invalidate(selectedPatientRemindersProvider);
               ref.invalidate(selectedPatientSevenDayActivityProvider);
@@ -94,6 +101,7 @@ class CaregiverDashboardScreen extends ConsumerWidget {
         child: RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(assignedPatientsProvider);
+            ref.invalidate(caregiverNotificationsProvider);
             ref.invalidate(selectedPatientGameHistoryProvider);
             ref.invalidate(selectedPatientRemindersProvider);
             ref.invalidate(selectedPatientSevenDayActivityProvider);
@@ -117,15 +125,19 @@ class CaregiverDashboardScreen extends ConsumerWidget {
               PatientDevicePanel(),
               SizedBox(height: 18),
 
-              // 4. Activity Summary Metrics
+              // 4. Live Event Alerts Feed
+              CaregiverNotificationsPanel(),
+              SizedBox(height: 18),
+
+              // 5. Activity Summary Metrics
               ActivitySummaryCards(),
               SizedBox(height: 18),
 
-              // 4. 7-Day Activity View
+              // 6. 7-Day Activity View
               SevenDayActivityChart(),
               SizedBox(height: 20),
 
-              // 5. Reminder Status Section
+              // 7. Reminder Status Section
               Text(
                 'Reminder Status',
                 style: TextStyle(
@@ -138,7 +150,7 @@ class CaregiverDashboardScreen extends ConsumerWidget {
               ReminderStatusList(),
               SizedBox(height: 20),
 
-              // 6. Recent Activity / Game History Section
+              // 8. Recent Activity / Game History Section
               Text(
                 'Recent Activity',
                 style: TextStyle(

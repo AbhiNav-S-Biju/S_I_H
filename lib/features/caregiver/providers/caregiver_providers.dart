@@ -8,15 +8,32 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/connectivity_monitor.dart';
 import '../models/caregiver_models.dart';
+import '../repositories/caregiver_notification_repository.dart';
 import '../repositories/caregiver_repository.dart';
 import '../repositories/pairing_repository.dart';
+import '../repositories/supabase_caregiver_notification_repository.dart';
 import '../repositories/supabase_caregiver_repository.dart';
 import '../repositories/supabase_pairing_repository.dart';
+import '../services/caregiver_event_notification_service.dart';
 
 /// Caregiver repository provider
 final caregiverRepositoryProvider = Provider<ICaregiverRepository>((ref) {
   final monitor = ref.watch(connectivityMonitorProvider);
   return SupabaseCaregiverRepository(connectivityMonitor: monitor);
+});
+
+/// Caregiver notification repository provider
+final caregiverNotificationRepositoryProvider =
+    Provider<ICaregiverNotificationRepository>((ref) {
+  final monitor = ref.watch(connectivityMonitorProvider);
+  return SupabaseCaregiverNotificationRepository(connectivityMonitor: monitor);
+});
+
+/// Centralized event dispatcher creating telemetry alerts for caregivers
+final caregiverEventNotificationServiceProvider =
+    Provider<CaregiverEventNotificationService>((ref) {
+  final repo = ref.watch(caregiverNotificationRepositoryProvider);
+  return CaregiverEventNotificationService(repository: repo);
 });
 
 /// Caregiver Authentication StateNotifier
@@ -378,3 +395,85 @@ final patientLinkedDeviceProvider =
   final repo = ref.watch(pairingRepositoryProvider);
   return repo.getLinkedDevice(selected.id);
 });
+
+// ==============================================================================
+// CAREGIVER NOTIFICATION PROVIDERS
+// ==============================================================================
+
+/// Realtime notification stream provider for the active caregiver
+final caregiverNotificationsStreamProvider =
+    StreamProvider.autoDispose<List<CaregiverNotification>>((ref) {
+  final authState = ref.watch(caregiverAuthProvider);
+  final caregiver = authState.value;
+  if (caregiver == null) return const Stream.empty();
+
+  final selectedPatient = ref.watch(selectedPatientProvider);
+  final repo = ref.watch(caregiverNotificationRepositoryProvider);
+
+  return repo.getNotificationsStream(
+    caregiver.id,
+    patientId: selectedPatient?.id,
+  );
+});
+
+/// Future provider for caregiver notifications (used for initial load / refresh)
+final caregiverNotificationsProvider =
+    FutureProvider.autoDispose<List<CaregiverNotification>>((ref) async {
+  final authState = ref.watch(caregiverAuthProvider);
+  final caregiver = authState.value;
+  if (caregiver == null) return [];
+
+  final selectedPatient = ref.watch(selectedPatientProvider);
+  final repo = ref.watch(caregiverNotificationRepositoryProvider);
+
+  return repo.getNotifications(
+    caregiver.id,
+    patientId: selectedPatient?.id,
+  );
+});
+
+/// Realtime unread notifications count
+final unreadCaregiverNotificationsCountProvider =
+    Provider.autoDispose<int>((ref) {
+  final streamAsync = ref.watch(caregiverNotificationsStreamProvider);
+  return streamAsync.when(
+    data: (list) => list.where((n) => !n.isRead).length,
+    loading: () => 0,
+    error: (_, __) => 0,
+  );
+});
+
+/// Notifier for marking notifications as read
+class CaregiverNotificationsNotifier extends StateNotifier<AsyncValue<void>> {
+  final ICaregiverNotificationRepository _repository;
+  final Ref _ref;
+
+  CaregiverNotificationsNotifier(this._repository, this._ref)
+      : super(const AsyncValue.data(null));
+
+  Future<void> markAsRead(String notificationId) async {
+    try {
+      await _repository.markAsRead(notificationId);
+      _ref.invalidate(caregiverNotificationsProvider);
+    } catch (e) {
+      debugPrint('⚠️ Error marking notification as read: $e');
+    }
+  }
+
+  Future<void> markAllAsRead(String caregiverId) async {
+    try {
+      await _repository.markAllAsRead(caregiverId);
+      _ref.invalidate(caregiverNotificationsProvider);
+    } catch (e) {
+      debugPrint('⚠️ Error marking all notifications as read: $e');
+    }
+  }
+}
+
+final caregiverNotificationsNotifierProvider =
+    StateNotifierProvider<CaregiverNotificationsNotifier, AsyncValue<void>>(
+  (ref) {
+    final repo = ref.watch(caregiverNotificationRepositoryProvider);
+    return CaregiverNotificationsNotifier(repo, ref);
+  },
+);

@@ -9,6 +9,7 @@ import '../../../core/network/connectivity_monitor.dart';
 import '../../../database/hive_database.dart';
 import '../../../database/models/hive_patient_session.dart';
 import '../../caregiver/models/caregiver_models.dart';
+import '../../caregiver/providers/caregiver_providers.dart';
 import '../repositories/patient_pairing_repository.dart';
 import '../repositories/supabase_patient_pairing_repository.dart';
 
@@ -59,8 +60,9 @@ class PatientPairingState {
 
 class PatientPairingNotifier extends StateNotifier<PatientPairingState> {
   final IPatientPairingRepository _repository;
+  final Ref _ref;
 
-  PatientPairingNotifier(this._repository)
+  PatientPairingNotifier(this._repository, this._ref)
       : super(const PatientPairingState());
 
   /// Validates the 6-digit [code] and pairs this device with the patient.
@@ -76,6 +78,18 @@ class PatientPairingNotifier extends StateNotifier<PatientPairingState> {
     );
 
     if (result.success) {
+      if (result.patientId != null) {
+        try {
+          await _ref
+              .read(caregiverEventNotificationServiceProvider)
+              .notifyDevicePaired(
+                patientId: result.patientId!,
+                deviceName: 'Elder Mobile Device',
+                patientName: result.preferredName ?? result.displayName,
+              );
+        } catch (_) {}
+      }
+
       state = state.copyWith(
         status: PatientPairingStatus.success,
         result: result,
@@ -96,7 +110,7 @@ class PatientPairingNotifier extends StateNotifier<PatientPairingState> {
 final patientPairingProvider =
     StateNotifierProvider<PatientPairingNotifier, PatientPairingState>((ref) {
   final repo = ref.watch(patientPairingRepositoryProvider);
-  return PatientPairingNotifier(repo);
+  return PatientPairingNotifier(repo, ref);
 });
 
 // ==============================================================================

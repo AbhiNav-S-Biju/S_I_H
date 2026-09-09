@@ -718,18 +718,17 @@ class _AddOrEditReminderSheetState
   Widget build(BuildContext context) {
     final isEditing = widget.reminder != null;
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        top: 20,
-        left: 20,
-        right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Form(
+    return Material(
+      color: Colors.white,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      child: Container(
+        padding: EdgeInsets.only(
+          top: 20,
+          left: 20,
+          right: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
@@ -1058,6 +1057,7 @@ class _AddOrEditReminderSheetState
             ],
           ),
         ),
+      ),
       ),
     );
   }

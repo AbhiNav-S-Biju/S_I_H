@@ -39,6 +39,8 @@ class SyncEngine {
   final ISupabaseSyncRepository _syncRepository;
   final IConnectivityMonitor _connectivityMonitor;
   final int maxRetries;
+  final void Function(int syncedCount, String? patientId)? onSyncRestored;
+  final void Function(String error, String? patientId)? onSyncError;
 
   StreamSubscription<NetworkStatus>? _connectivitySub;
   bool _isProcessing = false;
@@ -47,6 +49,8 @@ class SyncEngine {
     required Box<HiveSyncEvent> syncQueueBox,
     required ISupabaseSyncRepository syncRepository,
     required IConnectivityMonitor connectivityMonitor,
+    this.onSyncRestored,
+    this.onSyncError,
     this.maxRetries = 8,
   }) : _syncQueueBox = syncQueueBox,
        _syncRepository = syncRepository,
@@ -182,6 +186,14 @@ class SyncEngine {
           }
           await event.save();
         }
+      }
+
+      final pId = pendingEvents.isNotEmpty ? pendingEvents.first.patientId : null;
+      if (succeeded > 0) {
+        onSyncRestored?.call(succeeded, pId);
+      }
+      if (deadLettered > 0) {
+        onSyncError?.call('$deadLettered item(s) exceeded max retry limit.', pId);
       }
 
       return SyncResult(

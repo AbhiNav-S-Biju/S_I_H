@@ -486,3 +486,22 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- ------------------------------------------------------------------------------
+-- 9. Enable Supabase Realtime for Notification Tables
+-- Required for .stream() subscriptions in the Flutter client
+-- ------------------------------------------------------------------------------
+
+-- Add caregiver_notifications to the supabase_realtime publication
+-- so that StreamProvider subscriptions receive live INSERT/UPDATE/DELETE events.
+DO $$
+BEGIN
+    -- Check if publication exists before altering
+    IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.caregiver_notifications;
+    END IF;
+EXCEPTION
+    WHEN duplicate_object THEN
+        -- Table already in publication, ignore
+        NULL;
+END $$;

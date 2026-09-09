@@ -107,25 +107,55 @@ class SupabaseCaregiverNotificationRepository
   Stream<List<CaregiverNotification>> getNotificationsStream(
     String caregiverId, {
     String? patientId,
-  }) {
+  }) async* {
+    List<CaregiverNotification> filter(List<CaregiverNotification> list) {
+      final filtered = list.where((n) {
+        final matchesCaregiver =
+            caregiverId.isEmpty || n.caregiverId == caregiverId;
+        final matchesPatient =
+            patientId == null || patientId.isEmpty || n.patientId == patientId;
+        return matchesCaregiver && matchesPatient;
+      }).toList();
+      filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return List.unmodifiable(filtered);
+    }
+
+    // Immediately yield initial cache so StreamProvider has data on first frame
+    yield filter(_localNotifications);
+
+    // Try to fetch current data from Supabase (non-realtime) and merge
+    try {
+      final freshData = await getNotifications(caregiverId, patientId: patientId);
+      if (freshData.isNotEmpty) {
+        yield filter(_localNotifications);
+      }
+    } catch (e) {
+      debugPrint('⚠️ Initial notification fetch failed: $e');
+    }
+
     final client = _activeClient;
     if (client != null && caregiverId.isNotEmpty) {
+      // Attempt Supabase Realtime — but handle async errors gracefully
+      // by catching them within the stream rather than letting them propagate
+      var realtimeSucceeded = false;
       try {
-        // Use Supabase Realtime Stream
-        return client
+        final realtimeStream = client
             .from('caregiver_notifications')
             .stream(primaryKey: ['id'])
             .eq('caregiver_id', caregiverId)
             .order('created_at', ascending: false)
             .map((rows) {
-              final list = rows.map((r) => CaregiverNotification.fromMap(r)).where((n) {
-                if (patientId == null || patientId.isEmpty) return true;
-                return n.patientId == patientId;
-              }).toList();
+              final list = rows
+                  .map((r) => CaregiverNotification.fromMap(r))
+                  .where((n) {
+                    if (patientId == null || patientId.isEmpty) return true;
+                    return n.patientId == patientId;
+                  })
+                  .toList();
 
-              // Merge into local cache
               for (final item in list) {
-                final idx = _localNotifications.indexWhere((n) => n.id == item.id);
+                final idx =
+                    _localNotifications.indexWhere((n) => n.id == item.id);
                 if (idx >= 0) {
                   _localNotifications[idx] = item;
                 } else {
@@ -134,21 +164,25 @@ class SupabaseCaregiverNotificationRepository
               }
 
               return list;
+            })
+            .handleError((Object error) {
+              debugPrint(
+                '⚠️ Supabase Realtime stream error (falling back to polling): $error',
+              );
             });
+
+        await for (final data in realtimeStream) {
+          realtimeSucceeded = true;
+          yield data;
+        }
+        if (realtimeSucceeded) return;
       } catch (e) {
         debugPrint('⚠️ Supabase Realtime stream subscription error: $e');
       }
     }
 
-    // Fallback offline stream
-    return _localStreamController.stream.map((list) {
-      return list.where((n) {
-        final matchesCaregiver = caregiverId.isEmpty || n.caregiverId == caregiverId;
-        final matchesPatient =
-            patientId == null || patientId.isEmpty || n.patientId == patientId;
-        return matchesCaregiver && matchesPatient;
-      }).toList();
-    });
+    // Fallback: local stream controller for offline / Realtime-disabled setups
+    yield* _localStreamController.stream.map(filter);
   }
 
   @override

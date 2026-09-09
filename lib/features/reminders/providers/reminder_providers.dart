@@ -7,6 +7,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/sync_engine.dart';
 import '../../../database/hive_database.dart';
+import '../../caregiver/providers/caregiver_providers.dart';
 import '../models/reminder.dart';
 import '../models/reminder_log.dart';
 import '../repositories/hive_reminder_repository.dart';
@@ -16,10 +17,12 @@ import '../services/notification_service.dart';
 /// Reminder repository provider (offline-first)
 final reminderRepositoryProvider = Provider<IReminderRepository>((ref) {
   final syncEngine = ref.watch(syncEngineProvider);
+  final eventService = ref.watch(caregiverEventNotificationServiceProvider);
   return HiveReminderRepository(
     remindersBox: HiveDatabase.remindersBox,
     reminderLogsBox: HiveDatabase.reminderLogsBox,
     syncEngine: syncEngine,
+    eventNotificationService: eventService,
   );
 });
 

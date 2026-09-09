@@ -92,7 +92,14 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
 
     if (confirmed == true) {
       try {
+        final selected = ref.read(selectedPatientProvider);
         await ref.read(pairingRepositoryProvider).revokeDevice(deviceId);
+        if (selected != null) {
+          await ref.read(caregiverEventNotificationServiceProvider).notifyDeviceRevoked(
+            patientId: selected.id,
+            patientName: selected.preferredName ?? selected.fullName,
+          );
+        }
         ref.invalidate(patientLinkedDeviceProvider);
       } catch (e) {
         if (mounted) {

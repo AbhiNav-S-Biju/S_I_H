@@ -6,10 +6,15 @@
 
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/network/connectivity_monitor.dart';
+import '../../../database/hive_boxes.dart';
 import '../../../database/hive_database.dart';
+import '../../../database/models/hive_reminder.dart';
 import '../../../database/models/hive_sync_event.dart';
+import '../../reminders/models/reminder.dart';
+import '../../reminders/services/notification_service.dart';
 import '../models/caregiver_models.dart';
 import 'caregiver_repository.dart';
 
@@ -587,12 +592,78 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     return [];
   }
 
+  void _syncToHiveAndNotifications({
+    required String reminderId,
+    required String patientId,
+    required String title,
+    String? description,
+    required String scheduleTime,
+    required List<String> recurrenceDays,
+    required bool isActive,
+    bool isDeleted = false,
+  }) {
+    try {
+      if (!Hive.isBoxOpen(HiveBoxes.reminders)) return;
+      final box = HiveDatabase.remindersBox;
+
+      final parts = scheduleTime.split(':');
+      final hour = int.tryParse(parts[0]) ?? 8;
+      final minute = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
+      final now = DateTime.now();
+      final scheduledAt = DateTime(now.year, now.month, now.day, hour, minute);
+
+      final notifService = NotificationService();
+
+      if (isDeleted) {
+        final existing = box.get(reminderId);
+        if (existing != null) {
+          notifService.cancelReminder(existing.notificationId);
+          box.delete(reminderId);
+        }
+        return;
+      }
+
+      final existing = box.get(reminderId);
+      final notificationId =
+          existing?.notificationId ?? (reminderId.hashCode.abs() % 100000);
+
+      // Cancel old notification before updating
+      notifService.cancelReminder(notificationId);
+
+      final hiveReminder = HiveReminder(
+        id: reminderId,
+        patientId: patientId,
+        title: title,
+        body: description ?? '',
+        scheduledAt: scheduledAt,
+        isActive: isActive,
+        isCompleted: existing?.isCompleted ?? false,
+        createdAt: existing?.createdAt ?? now,
+        completedAt: existing?.completedAt,
+        snoozedUntil: existing?.snoozedUntil,
+        notificationId: notificationId,
+        recurrenceRule: recurrenceDays.join(','),
+      );
+
+      box.put(reminderId, hiveReminder);
+
+      // Reschedule new notification if active and not already completed
+      if (isActive && !(existing?.isCompleted ?? false)) {
+        notifService.scheduleReminder(Reminder.fromHive(hiveReminder));
+      }
+    } catch (e) {
+      debugPrint('⚠️ Local Hive/Notification sync exception: $e');
+    }
+  }
+
   @override
   Future<CaregiverReminderRecord> createReminder(
     CreateOrUpdateReminderInput input,
   ) async {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
+
+    CaregiverReminderRecord record;
 
     if (activeClient != null && status == NetworkStatus.online) {
       try {
@@ -606,8 +677,20 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             .select()
             .single();
 
-        final record = CaregiverReminderRecord.fromMap(response);
+        record = CaregiverReminderRecord.fromMap(response);
         _offlineReminders.add(record);
+
+        // Sync to local Hive and schedule notification
+        _syncToHiveAndNotifications(
+          reminderId: record.id,
+          patientId: record.patientId,
+          title: record.title,
+          description: record.description,
+          scheduleTime: record.scheduleTime,
+          recurrenceDays: record.recurrenceDays,
+          isActive: record.isActive,
+        );
+
         return record;
       } catch (e) {
         debugPrint('⚠️ Remote reminder creation error: $e');
@@ -621,7 +704,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final hour = int.tryParse(parts[0]) ?? 8;
     final minute = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
 
-    final record = CaregiverReminderRecord(
+    record = CaregiverReminderRecord(
       id: fallbackId,
       patientId: input.patientId,
       title: input.title,
@@ -635,6 +718,17 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
       status: 'pending',
     );
     _offlineReminders.add(record);
+
+    // Sync to local Hive and schedule notification
+    _syncToHiveAndNotifications(
+      reminderId: record.id,
+      patientId: record.patientId,
+      title: record.title,
+      description: record.description,
+      scheduleTime: record.scheduleTime,
+      recurrenceDays: record.recurrenceDays,
+      isActive: record.isActive,
+    );
 
     // Queue sync event
     try {
@@ -661,6 +755,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
 
+    CaregiverReminderRecord record;
+
     if (activeClient != null && status == NetworkStatus.online) {
       try {
         final updateData = <String, dynamic>{
@@ -684,11 +780,23 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             .select()
             .single();
 
-        final record = CaregiverReminderRecord.fromMap(response);
+        record = CaregiverReminderRecord.fromMap(response);
 
         // Update offline cache
         _offlineReminders.removeWhere((r) => r.id == reminderId);
         _offlineReminders.add(record);
+
+        // Sync to Hive and reschedule local notification
+        _syncToHiveAndNotifications(
+          reminderId: record.id,
+          patientId: record.patientId,
+          title: record.title,
+          description: record.description,
+          scheduleTime: record.scheduleTime,
+          recurrenceDays: record.recurrenceDays,
+          isActive: record.isActive,
+        );
+
         return record;
       } catch (e) {
         debugPrint('⚠️ Remote reminder update error: $e');
@@ -702,7 +810,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final hour = int.tryParse(parts[0]) ?? 8;
     final minute = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
 
-    final record = CaregiverReminderRecord(
+    record = CaregiverReminderRecord(
       id: reminderId,
       patientId: input.patientId,
       title: input.title,
@@ -721,6 +829,31 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     } else {
       _offlineReminders.add(record);
     }
+
+    // Sync to Hive and reschedule local notification
+    _syncToHiveAndNotifications(
+      reminderId: record.id,
+      patientId: record.patientId,
+      title: record.title,
+      description: record.description,
+      scheduleTime: record.scheduleTime,
+      recurrenceDays: record.recurrenceDays,
+      isActive: record.isActive,
+    );
+
+    // Queue sync event
+    try {
+      final syncEvent = HiveSyncEvent(
+        eventId: _generateUuid(),
+        entityType: 'reminder',
+        entityId: reminderId,
+        operation: 'update',
+        payload: input.toMap(),
+        createdAt: now,
+        patientId: input.patientId,
+      );
+      HiveDatabase.syncQueueBox.put(syncEvent.eventId, syncEvent);
+    } catch (_) {}
 
     return record;
   }
@@ -748,6 +881,27 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final idx = _offlineReminders.indexWhere((r) => r.id == reminderId);
     if (idx >= 0) {
       _offlineReminders[idx] = _offlineReminders[idx].copyWith(isActive: isActive);
+      final r = _offlineReminders[idx];
+      _syncToHiveAndNotifications(
+        reminderId: r.id,
+        patientId: r.patientId,
+        title: r.title,
+        description: r.description,
+        scheduleTime: r.scheduleTime,
+        recurrenceDays: r.recurrenceDays,
+        isActive: isActive,
+      );
+    } else if (Hive.isBoxOpen(HiveBoxes.reminders)) {
+      final existing = HiveDatabase.remindersBox.get(reminderId);
+      if (existing != null) {
+        existing.isActive = isActive;
+        existing.save();
+        if (!isActive) {
+          NotificationService().cancelReminder(existing.notificationId);
+        } else if (!existing.isCompleted) {
+          NotificationService().scheduleReminder(Reminder.fromHive(existing));
+        }
+      }
     }
   }
 
@@ -772,6 +926,17 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     }
 
     _offlineReminders.removeWhere((r) => r.id == reminderId);
+
+    // Cancel notification and remove from Hive
+    _syncToHiveAndNotifications(
+      reminderId: reminderId,
+      patientId: '',
+      title: '',
+      scheduleTime: '08:00',
+      recurrenceDays: [],
+      isActive: false,
+      isDeleted: true,
+    );
   }
 
   @override
