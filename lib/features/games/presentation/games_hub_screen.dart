@@ -32,15 +32,10 @@ class GamesHubScreen extends ConsumerStatefulWidget {
 class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
   GameDifficulty _selectedDifficulty = GameDifficulty.easy;
 
-  void _launchGame(Widget screen) async {
-    final session = await Navigator.of(
-      context,
-    ).push<GameSession>(MaterialPageRoute(builder: (_) => screen));
-
-    if (session != null && widget.onSessionCompleted != null) {
-      widget.onSessionCompleted!(session);
-    }
-  
+  void _openGameMap(GameType gameType) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => GameLevelMapScreen(gameType: gameType)),
+    );
   }
 
   @override
@@ -99,14 +94,23 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
               ),
               child: Row(
                 children: [
+<<<<<<< HEAD
                   const Icon(Icons.spa_rounded, color: ElderColors.forestDeep, size: 36.0),
+=======
+                  const Icon(
+                    Icons.spa_rounded,
+                    color: Color(0xFF16A34A),
+                    size: 36.0,
+                  ),
+>>>>>>> 0ad1531 (Fix post-rebase formatting and game navigation)
                   const SizedBox(width: 14.0),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          l10n?.activitiesBannerTitle ?? 'Welcome to Today\'s Fun!',
+                          l10n?.activitiesBannerTitle ??
+                              'Welcome to Today\'s Fun!',
                           style: const TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.w800,
@@ -118,11 +122,19 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                           langCode == 'as'
                               ? 'প্ৰতিটো খেলৰ ৮ টা স্তৰৰ সুন্দৰ যাত্ৰা আৰম্ভ কৰক। আপোনাৰ নিজৰ গতিত তৰা সংগ্ৰহ কৰক।'
                               : langCode == 'hi'
+<<<<<<< HEAD
                                   ? 'प्रत्येक खेल के 8 स्तरों की सुंदर यात्रा शुरू करें। अपनी गति से सितारे अर्जित करें।'
                                   : langCode == 'bn'
                                       ? 'প্রতিটি খেলার ৮টি স্তরের সুন্দর ভ্রমণ উপভোগ করুন। নিজের ছন্দে তারা সংগ্রহ করুন।'
                                       : 'Embark on an 8-level journey for each activity. Earn stars at your own calm pace.',
                           style: TextStyle(
+=======
+                              ? 'प्रत्येक खेल के 8 स्तरों की सुंदर यात्रा शुरू करें। अपनी गति से सितारे अर्जित करें।'
+                              : langCode == 'bn'
+                              ? 'প্রতিটি খেলার ৮টি স্তরের সুন্দর ভ্রমণ উপভোগ করুন। নিজের ছন্দে তারা সংগ্রহ করুন।'
+                              : 'Embark on an 8-level journey for each activity. Earn stars at your own calm pace.',
+                          style: const TextStyle(
+>>>>>>> 0ad1531 (Fix post-rebase formatting and game navigation)
                             fontSize: 15.0,
                             fontWeight: FontWeight.w500,
                             color: ElderColors.forestDeep.withValues(alpha: 0.85),
@@ -137,6 +149,7 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
             const SizedBox(height: 20.0),
 
             // Section Header
+<<<<<<< HEAD
             Row(children: [
   const Icon(
     Icons.map_rounded,
@@ -233,18 +246,91 @@ Row(
                   ),
                 ),
               ),
+=======
+            Row(
+              children: [
+                const Icon(
+                  Icons.map_rounded,
+                  color: Color(0xFF0F766E),
+                  size: 24.0,
+                ),
+                const SizedBox(width: 8.0),
+                Text(
+                  langCode == 'as'
+                      ? 'খেলৰ স্তৰ আৰু যাত্ৰা মানচিত্ৰ'
+                      : langCode == 'hi'
+                      ? 'खेल के स्तर और यात्रा मानचित्र'
+                      : langCode == 'bn'
+                      ? 'খেলার স্তর ও পরিক্রমা মানচিত্র'
+                      : 'Activity Level Journeys',
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF334155),
+                  ),
+                ),
+              ],
             ),
-            if (isSuggested) ...[
-              const SizedBox(height: 6.0),
-              const _SuggestedBadge(),
-            ] else
-              const SizedBox(height: 6.0 + _SuggestedBadge.height),
-          ],
-        ),
-      ),
-    );
-  }).toList(),
-),
+
+            const SizedBox(height: 10.0),
+
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: GameDifficulty.values.map((diff) {
+                final isSelected = _selectedDifficulty == diff;
+                final isSuggested = diff == recommendedDifficulty;
+
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Column(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectedDifficulty = diff;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(14.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFF0F766E)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(14.0),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFF0F766E)
+                                    : const Color(0xFFCBD5E1),
+                                width: 2.0,
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              diff.localizedLabel(l10n),
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w700,
+                                color: isSelected
+                                    ? Colors.white
+                                    : const Color(0xFF334155),
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (isSuggested) ...[
+                          const SizedBox(height: 6.0),
+                          const _SuggestedBadge(),
+                        ] else
+                          const SizedBox(height: 6.0 + _SuggestedBadge.height),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+>>>>>>> 0ad1531 (Fix post-rebase formatting and game navigation)
+            ),
             const SizedBox(height: 14.0),
 
             // 1. Familiar Jigsaw Card (Pastel Peach)
@@ -315,8 +401,12 @@ Row(
     required VoidCallback onOpenMap,
   }) {
     final progress = GameProgressService.instance.getProgressForGame(gameType);
-    final totalStars = GameProgressService.instance.getTotalStarsEarned(gameType);
-    final highestLevel = GameProgressService.instance.getHighestUnlockedLevel(gameType);
+    final totalStars = GameProgressService.instance.getTotalStarsEarned(
+      gameType,
+    );
+    final highestLevel = GameProgressService.instance.getHighestUnlockedLevel(
+      gameType,
+    );
     final completedCount = progress.values.where((p) => p.isCompleted).length;
     final journeyTitle = GameLevel.getJourneyTitle(gameType, langCode);
 
@@ -325,26 +415,26 @@ Row(
       buttonLabel = langCode == 'as'
           ? 'যাত্ৰা আৰম্ভ কৰক ➔'
           : langCode == 'hi'
-              ? 'यात्रा शुरू करें ➔'
-              : langCode == 'bn'
-                  ? 'যাত্রা শুরু করুন ➔'
-                  : 'Start Level Journey ➔';
+          ? 'यात्रा शुरू करें ➔'
+          : langCode == 'bn'
+          ? 'যাত্রা শুরু করুন ➔'
+          : 'Start Level Journey ➔';
     } else if (completedCount >= 8) {
       buttonLabel = langCode == 'as'
           ? 'মানচিত্ৰ চাওক (সম্পূৰ্ণ) 🏆'
           : langCode == 'hi'
-              ? 'मानचित्र देखें (पूर्ण) 🏆'
-              : langCode == 'bn'
-                  ? 'মানচিত্র দেখুন (সম্পূর্ণ) 🏆'
-                  : 'View Map (Completed) 🏆';
+          ? 'मानचित्र देखें (पूर्ण) 🏆'
+          : langCode == 'bn'
+          ? 'মানচিত্র দেখুন (সম্পূর্ণ) 🏆'
+          : 'View Map (Completed) 🏆';
     } else {
       buttonLabel = langCode == 'as'
           ? 'স্তৰ $highestLevel লৈ আগবাঢ়ক ➔'
           : langCode == 'hi'
-              ? 'स्तर $highestLevel जारी रखें ➔'
-              : langCode == 'bn'
-                  ? 'ধাপ $highestLevel এ চলুন ➔'
-                  : 'Continue Level $highestLevel ➔';
+          ? 'स्तर $highestLevel जारी रखें ➔'
+          : langCode == 'bn'
+          ? 'ধাপ $highestLevel এ চলুন ➔'
+          : 'Continue Level $highestLevel ➔';
     }
 
     return Container(
@@ -412,7 +502,10 @@ Row(
 
           // Level progress bar & stars status
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14.0,
+              vertical: 10.0,
+            ),
             decoration: BoxDecoration(
               color: ElderColors.surfaceElevated,
               borderRadius: BorderRadius.circular(NirvanaRadii.button),
@@ -435,10 +528,10 @@ Row(
                   langCode == 'as'
                       ? 'স্তৰ $completedCount / ৮ সম্পূৰ্ণ'
                       : langCode == 'hi'
-                          ? 'स्तर $completedCount / 8 पूरे'
-                          : langCode == 'bn'
-                              ? 'ধাপ $completedCount / ৮ সম্পূর্ণ'
-                              : 'Level $completedCount of 8 Done',
+                      ? 'स्तर $completedCount / 8 पूरे'
+                      : langCode == 'bn'
+                      ? 'ধাপ $completedCount / ৮ সম্পূর্ণ'
+                      : 'Level $completedCount of 8 Done',
                   style: const TextStyle(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w700,
@@ -448,11 +541,14 @@ Row(
                 const Spacer(),
                 // Stars pill
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    color: ElderColors.pastelButtercupBg,
-                    borderRadius: BorderRadius.circular(NirvanaRadii.pill),
-                  ),
+  padding: const EdgeInsets.symmetric(
+    horizontal: 8.0,
+    vertical: 3.0,
+  ),
+  decoration: BoxDecoration(
+    color: ElderColors.pastelButtercupBg,
+    borderRadius: BorderRadius.circular(NirvanaRadii.pill),
+  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

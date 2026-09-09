@@ -64,11 +64,8 @@ class HiveDatabase {
       Hive.openBox<HiveReminderLog>(HiveBoxes.reminderLogs),
       Hive.openBox<HiveSyncEvent>(HiveBoxes.syncQueue),
       Hive.openBox<HivePatientDeviceSession>(HiveBoxes.patientSession),
-<<<<<<< HEAD
       Hive.openBox<dynamic>(HiveBoxes.settings),
-=======
       Hive.openBox<HiveDifficultyStats>(HiveBoxes.difficultyStats),
->>>>>>> f367611 (Save current game intelligence changes)
     ]);
   }
 
