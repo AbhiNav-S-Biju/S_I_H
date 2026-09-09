@@ -57,87 +57,59 @@ class _CaregiverDashboardScreenState
       backgroundColor: ElderColors.backgroundClay,
       body: ClayBackdrop3D(
         child: SafeArea(
-        child: Column(
-          children: [
-            // Top Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 12.0,
-              ),
-              child: Row(
-                children: [
-                  LargeIconButton(
-                    icon: Icons.arrow_back_rounded,
-                    tooltip: 'Back to Landing',
-                    backgroundColor: Colors.white,
-                    iconColor: ElderColors.textPrimary,
-                    size: 52.0,
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.go('/');
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 14.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _titles[_selectedIndex],
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: ElderColors.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          caregiver != null
-                              ? 'Welcome, ${caregiver.fullName}'
-                              : 'NIRVANA Care',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: ElderColors.textSecondary,
-                          ),
-                        ),
-                      ],
+          child: Column(
+            children: [
+              // Top Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 12.0,
+                ),
+                child: Row(
+                  children: [
+                    LargeIconButton(
+                      icon: Icons.arrow_back_rounded,
+                      tooltip: 'Back to Landing',
+                      backgroundColor: Colors.white,
+                      iconColor: ElderColors.textPrimary,
+                      size: 52.0,
+                      onPressed: () {
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.go('/');
+                        }
+                      },
                     ),
-                  ),
-                  // Add Loved One Action
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x0A000000),
-                            blurRadius: 6,
-                            offset: Offset(0, 2),
+                    const SizedBox(width: 14.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _titles[_selectedIndex],
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: ElderColors.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            caregiver != null
+                                ? 'Welcome, ${caregiver.fullName}'
+                                : 'NIRVANA Care',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: ElderColors.textSecondary,
+                            ),
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.person_add_rounded,
-                        color: ElderColors.clayLavender,
-                        size: 22,
-                      ),
                     ),
-                    tooltip: 'Add Loved One',
-                    onPressed: () => context.push('/caregiver/onboarding'),
-                  ),
-                  // Refresh Action
-                  IconButton(
-                    icon: Badge(
-                      isLabelVisible: unreadCount > 0,
-                      label: Text('$unreadCount'),
-                      backgroundColor: ElderColors.clayPeach,
-                      child: Container(
+                    // Add Loved One Action
+                    IconButton(
+                      icon: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -151,56 +123,84 @@ class _CaregiverDashboardScreenState
                           ],
                         ),
                         child: const Icon(
-                          Icons.refresh_rounded,
-                          color: ElderColors.textPrimary,
+                          Icons.person_add_rounded,
+                          color: ElderColors.clayLavender,
                           size: 22,
                         ),
                       ),
+                      tooltip: 'Add Loved One',
+                      onPressed: () => context.push('/caregiver/onboarding'),
                     ),
-                    tooltip: 'Refresh Data',
-                    onPressed: _refreshData,
-                  ),
-                  // Sign Out Action
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x0A000000),
-                            blurRadius: 6,
-                            offset: Offset(0, 2),
+                    // Refresh Action
+                    IconButton(
+                      icon: Badge(
+                        isLabelVisible: unreadCount > 0,
+                        label: Text('$unreadCount'),
+                        backgroundColor: ElderColors.clayPeach,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x0A000000),
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
-                        ],
+                          child: const Icon(
+                            Icons.refresh_rounded,
+                            color: ElderColors.textPrimary,
+                            size: 22,
+                          ),
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.logout_rounded,
-                        color: Color(0xFFE11D48),
-                        size: 22,
-                      ),
+                      tooltip: 'Refresh Data',
+                      onPressed: _refreshData,
                     ),
-                    tooltip: 'Sign Out',
-                    onPressed: _logout,
-                  ),
-                ],
+                    // Sign Out Action
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x0A000000),
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.logout_rounded,
+                          color: Color(0xFFE11D48),
+                          size: 22,
+                        ),
+                      ),
+                      tooltip: 'Sign Out',
+                      onPressed: _logout,
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            Expanded(
-              child: IndexedStack(
-                index: _selectedIndex,
-                children: const [
-                  CaregiverHomePage(),
-                  CaregiverAlertsPage(),
-                  CaregiverRemindersPage(),
-                ],
+              Expanded(
+                child: IndexedStack(
+                  index: _selectedIndex,
+                  children: const [
+                    CaregiverHomePage(),
+                    CaregiverAlertsPage(),
+                    CaregiverRemindersPage(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
       bottomNavigationBar: CaregiverBottomNavigation(
         selectedIndex: _selectedIndex,
