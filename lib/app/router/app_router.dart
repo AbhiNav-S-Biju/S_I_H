@@ -21,22 +21,23 @@ import '../../features/settings/presentation/language_selector_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../shell/elder_app_shell.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'root',
-);
-final GlobalKey<NavigatorState> _homeNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'home',
-);
-final GlobalKey<NavigatorState> _gamesNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'games',
-);
-final GlobalKey<NavigatorState> _settingsNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'settings');
-
 final appRouterProvider = Provider<GoRouter>((ref) {
   // Check local pairing state synchronously — HiveDatabase is already open
   // before runApp() is called in main.dart.
   final isPatientDevicePaired = HiveDatabase.isDevicePaired;
+
+  final rootNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'root',
+  );
+  final homeNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'home',
+  );
+  final gamesNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'games',
+  );
+  final settingsNavigatorKey =
+      GlobalKey<NavigatorState>(debugLabel: 'settings');
+
   final isOnboardingCompleted = ref.read(onboardingCompletedProvider);
 
   // Priority: paired patient device > elder onboarding > onboarding
@@ -50,7 +51,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   }
 
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
     redirect: (context, state) {
       final authState = ref.read(caregiverAuthProvider);
@@ -93,54 +94,54 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 2. Caregiver Portal Routes (Full screen, outside elder shell)
       GoRoute(
         path: '/caregiver/login',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverLoginScreen(),
       ),
       GoRoute(
         path: '/caregiver/register',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverRegisterScreen(),
       ),
       GoRoute(
         path: '/caregiver/onboarding',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverPatientOnboardingScreen(),
       ),
       GoRoute(
         path: '/caregiver/add-patient',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverPatientOnboardingScreen(),
       ),
       GoRoute(
         path: '/caregiver/dashboard',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const CaregiverDashboardScreen(),
       ),
 
       // 3. Patient Device Flow (Full screen — no elder shell)
       GoRoute(
         path: '/patient/welcome',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientWelcomeScreen(),
       ),
       GoRoute(
         path: '/patient/pairing',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientPairingScreen(),
       ),
       GoRoute(
         path: '/patient/success',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientPairingSuccessScreen(),
       ),
       GoRoute(
         path: '/patient/home',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientHomeScreen(),
       ),
       GoRoute(
         path: '/patient/reminders',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientRemindersScreen(),
       ),
 
@@ -152,7 +153,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         branches: [
           // Branch 0: Home
           StatefulShellBranch(
-            navigatorKey: _homeNavigatorKey,
+            navigatorKey: homeNavigatorKey,
             routes: [
               GoRoute(
                 path: '/home',
@@ -163,7 +164,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
           // Branch 1: Games Hub
           StatefulShellBranch(
-            navigatorKey: _gamesNavigatorKey,
+            navigatorKey: gamesNavigatorKey,
             routes: [
               GoRoute(
                 path: '/games',
@@ -178,7 +179,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
           // Branch 2: Settings & Visual Comfort
           StatefulShellBranch(
-            navigatorKey: _settingsNavigatorKey,
+            navigatorKey: settingsNavigatorKey,
             routes: [
               GoRoute(
                 path: '/settings',
@@ -186,7 +187,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'language',
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     builder: (context, state) => const LanguageSelectorScreen(),
                   ),
                 ],

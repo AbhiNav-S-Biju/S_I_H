@@ -1,0 +1,202 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Nepali (`ne`).
+class AppLocalizationsNe extends AppLocalizations {
+  AppLocalizationsNe([String locale = 'ne']) : super(locale);
+
+  @override
+  String get appName => 'NIRVANA';
+
+  @override
+  String get welcomeTitle => 'निर्वाणमा स्वागत छ';
+
+  @override
+  String get welcomeSubtitle =>
+      'तपाईंको शान्ति, सहजता र स्मरणशक्तिको लागि बनाइएको एक सुन्दर स्थान।';
+
+  @override
+  String get getStarted => 'सुरु गर्नुहोस्';
+
+  @override
+  String get continueButton => 'अगाडि बढ्नुहोस्';
+
+  @override
+  String get backButton => 'पछाडि जानुहोस्';
+
+  @override
+  String get homeNavLabel => 'गृहपृष्ठ';
+
+  @override
+  String get activitiesNavLabel => 'गतिविधिहरू';
+
+  @override
+  String get settingsNavLabel => 'सेटिङहरू';
+
+  @override
+  String get todayGreetingMorning => 'शुभ प्रभात';
+
+  @override
+  String get todayGreetingAfternoon => 'शुभ दिउँसो';
+
+  @override
+  String get todayGreetingEvening => 'शुभ साँझ';
+
+  @override
+  String get dailyActivitiesCardTitle => 'आजका गतिविधिहरू';
+
+  @override
+  String get dailyActivitiesCardSubtitle =>
+      'तपाईंका लागि तयार गरिएका सरल र रमाइला स्मरण खेलहरू।';
+
+  @override
+  String get startActivitiesButton => 'गतिविधि सुरु गर्नुहोस्';
+
+  @override
+  String get dailySupportiveMessage =>
+      'आफ्नो समय लिनुहोस्। कुनै हतार छैन, तपाईं धेरै राम्रो गर्दै हुनुहुन्छ।';
+
+  @override
+  String get exploreMemoriesTitle => 'मेरा सम्झना र तस्बिरहरू';
+
+  @override
+  String get exploreMemoriesSubtitle =>
+      'आफ्ना प्रियजन र रमाइला पलहरू हेर्नुहोस्।';
+
+  @override
+  String get viewMemoriesButton => 'सम्झनाहरू हेर्नुहोस्';
+
+  @override
+  String get settingsTitle => 'एप सेटिङ र सहजता';
+
+  @override
+  String get settingsSubtitle => 'आफ्नो आँखाको सहजता अनुसार एप मिलाउनुहोस्।';
+
+  @override
+  String get accessibilitySectionTitle => 'दृश्य र चाल सहजता';
+
+  @override
+  String get reducedMotionTitle => 'कम चाल मोड (Reduced Motion)';
+
+  @override
+  String get reducedMotionSubtitle =>
+      'स्क्रिन स्थिर राख्न एनिमेसन बन्द गर्नुहोस्।';
+
+  @override
+  String get highContrastTitle => 'उच्च कन्ट्रास्ट मोड';
+
+  @override
+  String get highContrastSubtitle =>
+      'सजिलै पढ्नका लागि गाढा अक्षर र स्पष्ट किनारहरू।';
+
+  @override
+  String get textSizeTitle => 'अक्षरको आकार';
+
+  @override
+  String get textSizeSubtitle => 'शब्दहरू ठूला र स्पष्ट बनाउनुहोस्।';
+
+  @override
+  String get textSizeStandard => 'ठूलो (सामान्य)';
+
+  @override
+  String get textSizeExtraLarge => 'धेरै ठूलो';
+
+  @override
+  String get textSizeMaximum => 'अत्यन्त स्पष्ट';
+
+  @override
+  String get languageTitle => 'भाषा / Language / भाषा';
+
+  @override
+  String get languageSubtitle => 'आफ्नो मनपर्ने भाषा छान्नुहोस्।';
+
+  @override
+  String get selectLanguageTitle => 'आफ्नो भाषा छान्नुहोस्';
+
+  @override
+  String get selectLanguageSubtitle =>
+      'तपाईंलाई प्रयोग गर्न सजिलो लाग्ने भाषामा ट्याप गर्नुहोस्।';
+
+  @override
+  String get english => 'English (अंग्रेजी)';
+
+  @override
+  String get hindi => 'हिन्दी (हिन्दी)';
+
+  @override
+  String get assamese => 'অসমীয়া (असमिया)';
+
+  @override
+  String get bengali => 'বাংলা (बङ्गाली)';
+
+  @override
+  String get manipuri => 'মৈতৈলোন্ (मणिपुरी / मेइतेइ)';
+
+  @override
+  String get khasi => 'Ka Ktien Khasi (खासी)';
+
+  @override
+  String get mizo => 'Mizo ṭawng (मिजो)';
+
+  @override
+  String get nepali => 'नेपाली (Nepali)';
+
+  @override
+  String get saveAndApply => 'लागू गर्नुहोस्';
+
+  @override
+  String get onboardingStep1Title => 'तपाईंको असल साथी';
+
+  @override
+  String get onboardingStep1Body =>
+      'निर्वाणले तपाईंको मन सक्रिय र शान्त राख्न मद्दत गर्दछ।';
+
+  @override
+  String get onboardingStep2Title => 'सजिलै पढ्न सकिने';
+
+  @override
+  String get onboardingStep2Body =>
+      'सबै बटनहरू ठूला र स्पष्ट छन्, कुनै अन्योलपूर्ण मेनु छैन।';
+
+  @override
+  String get onboardingStep3Title => 'आफ्नै गतिमा खेल्नुहोस्';
+
+  @override
+  String get onboardingStep3Body =>
+      'आरामसँग समय लिनुहोस्। यहाँ कुनै समय सीमा वा दण्ड छैन।';
+
+  @override
+  String get onboardingFinishButton => 'निर्वाणमा प्रवेश गर्नुहोस्';
+
+  @override
+  String get loadingMessage => 'सबै कुरा तयार गरिँदैछ...';
+
+  @override
+  String get emptyStateTitle => 'यहाँ अहिले केही छैन';
+
+  @override
+  String get emptyStateMessage =>
+      'केही समयपछि पुन: हेर्नुहोस् वा अर्को गतिविधि प्रयास गर्नुहोस्।';
+
+  @override
+  String get errorStateTitle => 'केही बेर आराम गरौं';
+
+  @override
+  String get errorStateMessage =>
+      'चिन्ता लिनु पर्दैन। के तपाईं पुन: प्रयास गर्न चाहनुहुन्छ?';
+
+  @override
+  String get tryAgainButton => 'पुन: प्रयास गर्नुहोस्';
+
+  @override
+  String get goHomeButton => 'गृहपृष्ठमा फर्कनुहोस्';
+
+  @override
+  String get aboutAppTitle => 'निर्वाणको बारेमा';
+
+  @override
+  String get aboutAppVersion => 'संस्करण १.०.० • स्नेहपूर्ण र सरल हेरचाह';
+}

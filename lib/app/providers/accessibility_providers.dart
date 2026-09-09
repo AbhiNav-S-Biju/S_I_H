@@ -69,3 +69,17 @@ class LocaleNotifier extends StateNotifier<Locale> {
 final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
   return LocaleNotifier();
 });
+
+/// Notifier for Voice Feedback & Spoken Guidance
+class VoiceEnabledNotifier extends StateNotifier<bool> {
+  VoiceEnabledNotifier() : super(true);
+
+  void toggle() => state = !state;
+  void setVoiceEnabled(bool value) => state = value;
+}
+
+final voiceEnabledProvider =
+    StateNotifierProvider<VoiceEnabledNotifier, bool>((ref) {
+  return VoiceEnabledNotifier();
+});
+

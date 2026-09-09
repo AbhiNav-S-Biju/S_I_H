@@ -62,6 +62,7 @@ class ElderGameButton extends StatelessWidget {
               horizontal: 24.0,
               vertical: 16.0,
             ),
+            minimumSize: Size(140.0, minHeight),
           ),
           onPressed: onPressed,
           child: Row(

@@ -106,7 +106,7 @@ class ElderTheme {
           backgroundColor: ElderColors.primary,
           foregroundColor: ElderColors.onPrimary,
           elevation: 0.0,
-          minimumSize: const Size(double.infinity, buttonHeight),
+          minimumSize: const Size(64.0, buttonHeight),
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(buttonBorderRadius),
@@ -121,7 +121,7 @@ class ElderTheme {
           foregroundColor: ElderColors.textPrimary,
           backgroundColor: ElderColors.surface,
           elevation: 0.0,
-          minimumSize: const Size(double.infinity, buttonHeight),
+          minimumSize: const Size(64.0, buttonHeight),
           side: const BorderSide(color: ElderColors.border, width: 2.5),
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           shape: RoundedRectangleBorder(
@@ -195,7 +195,7 @@ class ElderTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: ElderColors.highContrastPrimary,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, buttonHeight),
+          minimumSize: const Size(64.0, buttonHeight),
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(buttonBorderRadius),
@@ -208,7 +208,7 @@ class ElderTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.black,
           backgroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, buttonHeight),
+          minimumSize: const Size(64.0, buttonHeight),
           side: const BorderSide(color: Colors.black, width: 3.0),
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           shape: RoundedRectangleBorder(
