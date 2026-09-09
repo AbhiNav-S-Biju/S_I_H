@@ -17,8 +17,8 @@ class SupabasePairingRepository implements IPairingRepository {
   SupabasePairingRepository({
     SupabaseClient? client,
     IConnectivityMonitor? connectivityMonitor,
-  })  : _client = client,
-        _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
+  }) : _client = client,
+       _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
 
   SupabaseClient? get _activeClient {
     if (_client != null) return _client;
@@ -103,9 +103,7 @@ class SupabasePairingRepository implements IPairingRepository {
         final list = response as List;
         if (list.isEmpty) return null;
 
-        return PatientDeviceSummary.fromMap(
-          list.first as Map<String, dynamic>,
-        );
+        return PatientDeviceSummary.fromMap(list.first as Map<String, dynamic>);
       } catch (e) {
         debugPrint('⚠️ getLinkedDevice error: $e');
       }

@@ -18,14 +18,15 @@ class SupabaseCaregiverNotificationRepository
 
   // In-memory cache for offline resilience & immediate reactive UI
   static final List<CaregiverNotification> _localNotifications = [];
-  static final StreamController<List<CaregiverNotification>> _localStreamController =
+  static final StreamController<List<CaregiverNotification>>
+  _localStreamController =
       StreamController<List<CaregiverNotification>>.broadcast();
 
   SupabaseCaregiverNotificationRepository({
     SupabaseClient? client,
     IConnectivityMonitor? connectivityMonitor,
-  })  : _client = client,
-        _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
+  }) : _client = client,
+       _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
 
   SupabaseClient? get _activeClient {
     if (_client != null) return _client;
@@ -45,7 +46,9 @@ class SupabaseCaregiverNotificationRepository
     final client = _activeClient;
     final status = await _connectivityMonitor.checkStatus();
 
-    if (client != null && status == NetworkStatus.online && caregiverId.isNotEmpty) {
+    if (client != null &&
+        status == NetworkStatus.online &&
+        caregiverId.isNotEmpty) {
       try {
         var query = client
             .from('caregiver_notifications')
@@ -65,7 +68,8 @@ class SupabaseCaregiverNotificationRepository
           String? patientName;
           if (map['patients'] is Map) {
             final pMap = map['patients'] as Map;
-            patientName = (pMap['preferred_name'] as String?) ??
+            patientName =
+                (pMap['preferred_name'] as String?) ??
                 (pMap['display_name'] as String?);
           }
           return CaregiverNotification.fromMap({
@@ -93,7 +97,8 @@ class SupabaseCaregiverNotificationRepository
 
     // Offline / fallback cache
     final filtered = _localNotifications.where((n) {
-      final matchesCaregiver = caregiverId.isEmpty || n.caregiverId == caregiverId;
+      final matchesCaregiver =
+          caregiverId.isEmpty || n.caregiverId == caregiverId;
       final matchesPatient =
           patientId == null || patientId.isEmpty || n.patientId == patientId;
       return matchesCaregiver && matchesPatient;
@@ -125,7 +130,10 @@ class SupabaseCaregiverNotificationRepository
 
     // Try to fetch current data from Supabase (non-realtime) and merge
     try {
-      final freshData = await getNotifications(caregiverId, patientId: patientId);
+      final freshData = await getNotifications(
+        caregiverId,
+        patientId: patientId,
+      );
       if (freshData.isNotEmpty) {
         yield filter(_localNotifications);
       }
@@ -154,8 +162,9 @@ class SupabaseCaregiverNotificationRepository
                   .toList();
 
               for (final item in list) {
-                final idx =
-                    _localNotifications.indexWhere((n) => n.id == item.id);
+                final idx = _localNotifications.indexWhere(
+                  (n) => n.id == item.id,
+                );
                 if (idx >= 0) {
                   _localNotifications[idx] = item;
                 } else {
@@ -202,8 +211,12 @@ class SupabaseCaregiverNotificationRepository
 
     if (client != null && status == NetworkStatus.online) {
       try {
-        await client.from('caregiver_notifications').upsert(notification.toMap());
-        debugPrint('🔔 Caregiver notification created in Supabase: ${notification.title}');
+        await client
+            .from('caregiver_notifications')
+            .upsert(notification.toMap());
+        debugPrint(
+          '🔔 Caregiver notification created in Supabase: ${notification.title}',
+        );
       } catch (e) {
         debugPrint('⚠️ Error persisting caregiver notification: $e');
       }
@@ -215,7 +228,9 @@ class SupabaseCaregiverNotificationRepository
     // Update local cache
     final idx = _localNotifications.indexWhere((n) => n.id == notificationId);
     if (idx >= 0) {
-      _localNotifications[idx] = _localNotifications[idx].copyWith(isRead: true);
+      _localNotifications[idx] = _localNotifications[idx].copyWith(
+        isRead: true,
+      );
       _notifyLocalStream();
     }
 
@@ -238,7 +253,8 @@ class SupabaseCaregiverNotificationRepository
   Future<void> markAllAsRead(String caregiverId) async {
     // Update local cache
     for (int i = 0; i < _localNotifications.length; i++) {
-      if (caregiverId.isEmpty || _localNotifications[i].caregiverId == caregiverId) {
+      if (caregiverId.isEmpty ||
+          _localNotifications[i].caregiverId == caregiverId) {
         _localNotifications[i] = _localNotifications[i].copyWith(isRead: true);
       }
     }
@@ -247,7 +263,9 @@ class SupabaseCaregiverNotificationRepository
     final client = _activeClient;
     final status = await _connectivityMonitor.checkStatus();
 
-    if (client != null && status == NetworkStatus.online && caregiverId.isNotEmpty) {
+    if (client != null &&
+        status == NetworkStatus.online &&
+        caregiverId.isNotEmpty) {
       try {
         await client
             .from('caregiver_notifications')

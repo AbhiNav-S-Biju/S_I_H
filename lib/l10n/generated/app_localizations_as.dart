@@ -335,4 +335,62 @@ class AppLocalizationsAs extends AppLocalizations {
 
   @override
   String get caregiverPortalButton => 'যত্নকাৰী পৰ্টেলত প্ৰৱেশ কৰক';
+
+  @override
+  String get askNirvanaTitle => 'NIRVANA-ক সোধক';
+
+  @override
+  String get askNirvanaCompanionLabel => 'NIRVANA সংগী';
+
+  @override
+  String get askNirvanaListening => 'মই শুনি আছোঁ...';
+
+  @override
+  String get askNirvanaThinking => 'ভাবি আছোঁ...';
+
+  @override
+  String get askNirvanaSpeaking => 'কোৱা আছোঁ...';
+
+  @override
+  String get askNirvanaTapToSpeak => 'কোৱাৱ বাবে টেপ কৰক';
+
+  @override
+  String get askNirvanaListeningPrompt => 'মই শুনি আছোঁ... (শেষ কৰাৱ টেপ কৰক)';
+
+  @override
+  String get askNirvanaSpeakingPrompt => 'কোৱা আছোঁ... (থকাৱবলে টেপ কৰক)';
+
+  @override
+  String get askNirvanaThinkingPrompt => 'ভাবি আছোঁ...';
+
+  @override
+  String get askNirvanaErrorPrompt =>
+      'মই বুজিব পৰা নাইলোং। অনুগ্ৰহ পুনৰায় চেষ্টা কৰক।';
+
+  @override
+  String get askNirvanaClearButton => 'মাছক';
+
+  @override
+  String get askNirvanaClearTitle => 'বাৰ্তালাপ মাছিব নে?';
+
+  @override
+  String get askNirvanaClearMessage =>
+      'এয়া এটা নতুন সংভাষণ আৰম্ভ কৰিব। আপুনি নিশ্চিত নে?';
+
+  @override
+  String get askNirvanaReadAloud => 'ধ্বনিসহ পাঠ কৰক';
+
+  @override
+  String get askNirvanaTypeHere => 'বা এইঠাত লিখক...';
+
+  @override
+  String get askNirvanaGreeting =>
+      'নমস্কাৰ! মই নিৰ্বাণ, আপোনাৰ সংগী। কথা পাতিবলৈ তলেৰ মাইকত টেপ কৰক, নোৱহেলে আপোনাৰ প্ৰশ্ন লিখক।';
+
+  @override
+  String get askNirvanaNoSpeech => 'মই ধান্য শুনিলোং। পুনৰায় কোৱাৱ টেপ কৰক।';
+
+  @override
+  String get askNirvanaMicUnavailable =>
+      'মাইক্ৰোফোন বা ভাষণ চিনাক্তিকৰণ প্ৰস্তুত নহয়। আপুনি তলত টাইপ কৰিব পাৰে।';
 }

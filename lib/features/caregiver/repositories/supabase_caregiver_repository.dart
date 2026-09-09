@@ -18,12 +18,15 @@ import '../../reminders/services/notification_service.dart';
 import '../models/caregiver_models.dart';
 import 'caregiver_repository.dart';
 
-class SupabaseCaregiverRepository implements ICaregiverRepository {
+class SupabaseCaregiverRepository
+    implements ICaregiverRepository, IFamilyPhotoReader {
   final SupabaseClient? _client;
   final IConnectivityMonitor _connectivityMonitor;
 
   static CaregiverProfile? _cachedProfile;
   static final List<PatientSummary> _offlinePatients = [];
+  static final Map<String, List<Map<String, dynamic>>> _offlineFamilyPhotos =
+      {};
 
   SupabaseCaregiverRepository({
     SupabaseClient? client,
@@ -89,9 +92,7 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     }
 
     // Offline fallback: create a local-only caregiver profile
-    debugPrint(
-      '⚠️ Supabase unavailable. Registering in offline demo mode.',
-    );
+    debugPrint('⚠️ Supabase unavailable. Registering in offline demo mode.');
     _cachedProfile = CaregiverProfile(
       id: 'caregiver-local-${DateTime.now().millisecondsSinceEpoch}',
       email: email,
@@ -129,7 +130,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
           // Self-heal: If profile record is missing, create it
           if (profileData == null) {
             try {
-              final fullName = user.userMetadata?['full_name'] as String? ?? 'Caregiver';
+              final fullName =
+                  user.userMetadata?['full_name'] as String? ?? 'Caregiver';
               final profileInsert = {
                 'id': user.id,
                 'email': user.email ?? cleanEmail,
@@ -148,7 +150,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
           _cachedProfile = CaregiverProfile(
             id: user.id,
             email: user.email ?? cleanEmail,
-            fullName: profileData?['full_name'] as String? ??
+            fullName:
+                profileData?['full_name'] as String? ??
                 user.userMetadata?['full_name'] as String? ??
                 'Caregiver',
             phone: profileData?['phone'] as String?,
@@ -202,7 +205,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
         _cachedProfile = CaregiverProfile(
           id: user.id,
           email: user.email ?? '',
-          fullName: profileData?['full_name'] as String? ??
+          fullName:
+              profileData?['full_name'] as String? ??
               user.userMetadata?['full_name'] as String? ??
               'Caregiver',
           phone: profileData?['phone'] as String?,
@@ -257,11 +261,14 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
                   : input.fullName.trim(),
               'p_relationship_label': input.relationship.trim(),
               if (input.dateOfBirth != null)
-                'p_date_of_birth':
-                    input.dateOfBirth!.toIso8601String().split('T').first,
+                'p_date_of_birth': input.dateOfBirth!
+                    .toIso8601String()
+                    .split('T')
+                    .first,
               if (input.emergencyContactPhone != null &&
                   input.emergencyContactPhone!.trim().isNotEmpty)
-                'p_emergency_contact_phone': input.emergencyContactPhone!.trim(),
+                'p_emergency_contact_phone': input.emergencyContactPhone!
+                    .trim(),
               'p_accessibility_settings': input.toAccessibilitySettings(),
               'p_initial_reminders': input.initialReminders
                   .where((r) => r.isEnabled)
@@ -274,13 +281,17 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             final data = Map<String, dynamic>.from(rpcResult as Map);
             final createdSummary = PatientSummary(
               id: data['id'] as String,
-              fullName: data['display_name'] as String? ?? input.fullName.trim(),
-              preferredName: data['preferred_name'] as String? ??
+              fullName:
+                  data['display_name'] as String? ?? input.fullName.trim(),
+              preferredName:
+                  data['preferred_name'] as String? ??
                   input.preferredName.trim(),
-              relationship: data['relationship_label'] as String? ??
+              relationship:
+                  data['relationship_label'] as String? ??
                   input.relationship.trim(),
               primaryCaregiverId: currentUser.id,
-              emergencyContactPhone: data['emergency_contact_phone'] as String? ??
+              emergencyContactPhone:
+                  data['emergency_contact_phone'] as String? ??
                   input.emergencyContactPhone?.trim(),
               lastActiveAt: DateTime.now(),
             );
@@ -310,7 +321,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
           await activeClient.from('profiles').upsert({
             'id': currentUser.id,
             'email': currentUser.email ?? '',
-            'full_name': currentUser.userMetadata?['full_name'] as String? ??
+            'full_name':
+                currentUser.userMetadata?['full_name'] as String? ??
                 _cachedProfile?.fullName ??
                 'Caregiver',
             'role': 'caregiver',
@@ -328,8 +340,10 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
               ? input.preferredName.trim()
               : input.fullName.trim(),
           if (input.dateOfBirth != null)
-            'date_of_birth':
-                input.dateOfBirth!.toIso8601String().split('T').first,
+            'date_of_birth': input.dateOfBirth!
+                .toIso8601String()
+                .split('T')
+                .first,
           if (input.emergencyContactPhone != null &&
               input.emergencyContactPhone!.trim().isNotEmpty)
             'emergency_contact_phone': input.emergencyContactPhone!.trim(),
@@ -400,7 +414,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
           ? input.preferredName.trim()
           : input.fullName.trim(),
       relationship: input.relationship.trim(),
-      primaryCaregiverId: caregiverId ??
+      primaryCaregiverId:
+          caregiverId ??
           _cachedProfile?.id ??
           '00000000-0000-0000-0000-000000000000',
       emergencyContactPhone: input.emergencyContactPhone?.trim(),
@@ -417,12 +432,16 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final status = await _connectivityMonitor.checkStatus();
     final currentUser = activeClient?.auth.currentUser;
 
-    if (activeClient != null && status == NetworkStatus.online && currentUser != null) {
+    if (activeClient != null &&
+        status == NetworkStatus.online &&
+        currentUser != null) {
       try {
         // Query assigned patients via links
         final response = await activeClient
             .from('patients')
-            .select('*, caregiver_patient_links(relationship_label, access_role, caregiver_id)');
+            .select(
+              '*, caregiver_patient_links(relationship_label, access_role, caregiver_id)',
+            );
 
         final remoteList = (response as List)
             .map((item) => PatientSummary.fromMap(item as Map<String, dynamic>))
@@ -430,7 +449,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
 
         // Merge any locally created patients that might not be in remote yet
         final combined = <PatientSummary>[
-          ..._offlinePatients.where((op) => !remoteList.any((rp) => rp.id == op.id)),
+          ..._offlinePatients.where(
+            (op) => !remoteList.any((rp) => rp.id == op.id),
+          ),
           ...remoteList,
         ];
 
@@ -447,7 +468,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             .toList();
 
         final combinedDirect = <PatientSummary>[
-          ..._offlinePatients.where((op) => !directList.any((rp) => rp.id == op.id)),
+          ..._offlinePatients.where(
+            (op) => !directList.any((rp) => rp.id == op.id),
+          ),
           ...directList,
         ];
 
@@ -459,7 +482,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
 
     if (_offlinePatients.isNotEmpty) {
       final matching = _offlinePatients
-          .where((p) => caregiverId.isEmpty || p.primaryCaregiverId == caregiverId)
+          .where(
+            (p) => caregiverId.isEmpty || p.primaryCaregiverId == caregiverId,
+          )
           .toList();
       return List.unmodifiable(matching);
     }
@@ -473,7 +498,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
 
-    if (activeClient != null && status == NetworkStatus.online && patientId.isNotEmpty) {
+    if (activeClient != null &&
+        status == NetworkStatus.online &&
+        patientId.isNotEmpty) {
       try {
         // DB columns: successful_trials, total_trials, difficulty_level (int), completed_at
         final response = await activeClient
@@ -494,7 +521,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
             gameTitle: _formatGameTitle(type),
             gameType: type,
             difficulty: _difficultyLevelToString(diffLevel),
-            score: 0, // No score column in schema; computed client-side if needed
+            score:
+                0, // No score column in schema; computed client-side if needed
             durationSeconds: (map['duration_seconds'] as num?)?.toInt() ?? 0,
             correctCount: (map['successful_trials'] as num?)?.toInt() ?? 0,
             totalCount: (map['total_trials'] as num?)?.toInt() ?? 0,
@@ -523,7 +551,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
 
-    if (activeClient != null && status == NetworkStatus.online && patientId.isNotEmpty) {
+    if (activeClient != null &&
+        status == NetworkStatus.online &&
+        patientId.isNotEmpty) {
       try {
         // Query reminders for this patient with latest log status
         final response = await activeClient
@@ -540,8 +570,10 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
           String logStatus = 'pending';
           DateTime? acknowledgedAt;
           DateTime? snoozedUntil;
-          if (map['reminder_logs'] is List && (map['reminder_logs'] as List).isNotEmpty) {
-            final latestLog = (map['reminder_logs'] as List).last as Map<String, dynamic>;
+          if (map['reminder_logs'] is List &&
+              (map['reminder_logs'] as List).isNotEmpty) {
+            final latestLog =
+                (map['reminder_logs'] as List).last as Map<String, dynamic>;
             logStatus = latestLog['status'] as String? ?? 'pending';
             acknowledgedAt = latestLog['acknowledged_at'] != null
                 ? DateTime.tryParse(latestLog['acknowledged_at'] as String)
@@ -566,7 +598,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
         // Merge any locally created reminders not yet synced
         final combined = <CaregiverReminderRecord>[
           ..._offlineReminders.where(
-            (or) => or.patientId == patientId && !remoteList.any((rr) => rr.id == or.id),
+            (or) =>
+                or.patientId == patientId &&
+                !remoteList.any((rr) => rr.id == or.id),
           ),
           ...remoteList,
         ];
@@ -610,6 +644,35 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     // No remote data and no Hive data — return empty list.
     // The widget renders a clean empty state with an "Add Reminder" prompt.
     return [];
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getFamilyPhotos(String patientId) async {
+    if (patientId.isEmpty) return [];
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+    if (activeClient != null && status == NetworkStatus.online) {
+      try {
+        final response = await activeClient
+            .from('family_photos')
+            .select(
+              'id, title, relationship, photo_url, audio_note_url, display_order',
+            )
+            .eq('patient_id', patientId)
+            .eq('is_active', true)
+            .eq('is_deleted', false)
+            .order('display_order', ascending: true);
+        final photos = (response as List)
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList(growable: false);
+        _offlineFamilyPhotos[patientId] = photos;
+        return photos;
+      } catch (e) {
+        debugPrint('Family photo fetch error: $e');
+      }
+    }
+    return _offlineFamilyPhotos[patientId] ?? const [];
   }
 
   void _syncToHiveAndNotifications({
@@ -900,7 +963,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     // Update offline cache
     final idx = _offlineReminders.indexWhere((r) => r.id == reminderId);
     if (idx >= 0) {
-      _offlineReminders[idx] = _offlineReminders[idx].copyWith(isActive: isActive);
+      _offlineReminders[idx] = _offlineReminders[idx].copyWith(
+        isActive: isActive,
+      );
       final r = _offlineReminders[idx];
       _syncToHiveAndNotifications(
         reminderId: r.id,
@@ -977,7 +1042,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     // Pre-fill 7 days with zeros
     for (int i = 6; i >= 0; i--) {
       final d = today.subtract(Duration(days: i));
-      final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+      final key =
+          '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
       gamesPerDay[key] = 0;
       remindersPerDay[key] = 0;
     }
@@ -985,7 +1051,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final activeClient = client;
     final status = await _connectivityMonitor.checkStatus();
 
-    if (activeClient != null && status == NetworkStatus.online && patientId.isNotEmpty) {
+    if (activeClient != null &&
+        status == NetworkStatus.online &&
+        patientId.isNotEmpty) {
       try {
         // 1. Count game sessions per day using completed_at
         final gamesResponse = await activeClient
@@ -997,10 +1065,13 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
 
         for (final item in (gamesResponse as List)) {
           final map = item as Map<String, dynamic>;
-          final completedAt = DateTime.tryParse(map['completed_at'] as String? ?? '');
+          final completedAt = DateTime.tryParse(
+            map['completed_at'] as String? ?? '',
+          );
           if (completedAt != null) {
             final local = completedAt.toLocal();
-            final key = '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
+            final key =
+                '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
             if (gamesPerDay.containsKey(key)) {
               gamesPerDay[key] = (gamesPerDay[key] ?? 0) + 1;
             }
@@ -1018,10 +1089,13 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
 
         for (final item in (logsResponse as List)) {
           final map = item as Map<String, dynamic>;
-          final scheduledFor = DateTime.tryParse(map['scheduled_for'] as String? ?? '');
+          final scheduledFor = DateTime.tryParse(
+            map['scheduled_for'] as String? ?? '',
+          );
           if (scheduledFor != null) {
             final local = scheduledFor.toLocal();
-            final key = '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
+            final key =
+                '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
             if (remindersPerDay.containsKey(key)) {
               remindersPerDay[key] = (remindersPerDay[key] ?? 0) + 1;
             }
@@ -1042,7 +1116,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
         });
         for (final log in localLogs) {
           final local = log.actionTimestamp.toLocal();
-          final key = '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
+          final key =
+              '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
           if (remindersPerDay.containsKey(key)) {
             remindersPerDay[key] = (remindersPerDay[key] ?? 0) + 1;
           }
@@ -1054,7 +1129,8 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
     final List<DailyActivitySummary> summaries = [];
     for (int i = 6; i >= 0; i--) {
       final date = today.subtract(Duration(days: i));
-      final key = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final key =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
       final games = gamesPerDay[key] ?? 0;
       final reminders = remindersPerDay[key] ?? 0;
       summaries.add(
@@ -1081,7 +1157,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
 
     try {
       final events = HiveDatabase.syncQueueBox.values;
-      pendingCount = events.where((e) => e.syncStatus == SyncStatus.pending).length;
+      pendingCount = events
+          .where((e) => e.syncStatus == SyncStatus.pending)
+          .length;
 
       // Derive last sync time from the most recently processed (non-pending) event
       final processedEvents = events
@@ -1119,7 +1197,9 @@ class SupabaseCaregiverRepository implements ICaregiverRepository {
       default:
         return type
             .split('_')
-            .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}')
+            .map(
+              (w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}',
+            )
             .join(' ');
     }
   }

@@ -96,17 +96,28 @@ abstract class IAudioService {
   /// Check if TTS is currently speaking
   Future<bool> isSpeaking();
 
+  /// Whether speech recognition is currently listening
+  bool get isListening;
+
+  /// Check whether speech recognition is supported and available on this platform/device
+  Future<bool> isSpeechRecognitionAvailable();
+
+  /// Check whether microphone permission has been granted
+  Future<bool> hasMicrophonePermission();
+
   /// Callback when speaking state changes
   void Function(bool isSpeaking)? onSpeakingChanged;
 
-  /// Listen for speech input and return recognized text
+  /// Listen for speech input and return recognized text.
+  /// Supports streaming partial results to [onPartialResult] for live transcription.
   Future<String?> listenForSpeech({
     String? languageCode,
     int? timeoutSeconds,
     bool showListeningUI = true,
+    void Function(String partialResult)? onPartialResult,
   });
 
-  /// Stop speech listening
+  /// Stop speech listening immediately
   Future<void> stopListening();
 
   /// Play audio feedback sound
@@ -131,6 +142,29 @@ class AudioService implements IAudioService {
   bool _isSpeaking = false;
   String _currentLanguage = 'en';
   String? _activeTtsLanguage;
+  Completer<String?>? _activeSpeechCompleter;
+  String? _lastRecognizedWords;
+
+  @override
+  bool get isListening => _speechToText.isListening;
+
+  @override
+  Future<bool> hasMicrophonePermission() async {
+    return _speechToText.hasPermission;
+  }
+
+  @override
+  Future<bool> isSpeechRecognitionAvailable() async {
+    try {
+      if (!_speechToText.isAvailable) {
+        return await _speechToText.initialize(debugLogging: kDebugMode);
+      }
+      return _speechToText.isAvailable;
+    } catch (e) {
+      debugPrint('⚠️ Error checking speech recognition availability: $e');
+      return false;
+    }
+  }
 
   @override
   void Function(bool isSpeaking)? onSpeakingChanged;
@@ -303,6 +337,11 @@ class AudioService implements IAudioService {
     }
 
     try {
+      // Mutual exclusion: stop active speech recognition before speaking
+      if (_speechToText.isListening) {
+        await stopListening();
+      }
+
       // Stop any ongoing speech first
       await stopSpeaking();
 
@@ -511,39 +550,43 @@ class AudioService implements IAudioService {
     String? languageCode,
     int? timeoutSeconds,
     bool showListeningUI = true,
+    void Function(String partialResult)? onPartialResult,
   }) async {
     if (!_isInitialized) {
       final success = await initialize();
       if (!success) return null;
     }
 
+    Completer<String?>? completer;
     try {
-      final bool available = await _speechToText.initialize(
-        debugLogging: kDebugMode,
-      );
+      // Mutual exclusion: ensure TTS stops before speech recognition begins
+      await stopSpeaking();
 
+      final bool available = await isSpeechRecognitionAvailable();
       if (!available) {
-        debugPrint('❌ Speech recognition not available');
+        debugPrint('❌ Speech recognition not available on this platform/device');
         return null;
       }
 
       final String langCode = languageCode ?? _currentLanguage;
-      final String localeId = _localeForSpeechToText(langCode);
+      final String localeId = VoiceLocaleResolver.resolveSttLocale(langCode);
 
-      final completer = Completer<String?>();
-      String? recognizedWords;
+      completer = Completer<String?>();
+      _activeSpeechCompleter = completer;
+      _lastRecognizedWords = null;
 
       await _speechToText.listen(
         onResult: (result) {
-          recognizedWords = result.recognizedWords;
-          if (result.finalResult && !completer.isCompleted) {
-            completer.complete(recognizedWords);
+          _lastRecognizedWords = result.recognizedWords;
+          onPartialResult?.call(result.recognizedWords);
+          if (result.finalResult && _activeSpeechCompleter != null && !_activeSpeechCompleter!.isCompleted) {
+            _activeSpeechCompleter!.complete(result.recognizedWords);
           }
         },
         listenOptions: stt.SpeechListenOptions(
           listenMode: stt.ListenMode.confirmation,
           cancelOnError: true,
-          partialResults: showListeningUI,
+          partialResults: true,
           localeId: localeId,
           listenFor: Duration(
             seconds: timeoutSeconds ?? VoiceConfig.speechRecognitionTimeout,
@@ -552,13 +595,13 @@ class AudioService implements IAudioService {
         ),
       );
 
-      // Set a fallback timer to resolve with whatever was recognized
+      // Timeout fallback to resolve with whatever words were captured
       final timeoutDuration = Duration(
         seconds: (timeoutSeconds ?? VoiceConfig.speechRecognitionTimeout) + 1,
       );
       Timer(timeoutDuration, () {
-        if (!completer.isCompleted) {
-          completer.complete(recognizedWords);
+        if (_activeSpeechCompleter != null && !_activeSpeechCompleter!.isCompleted) {
+          _activeSpeechCompleter!.complete(_lastRecognizedWords);
         }
       });
 
@@ -566,14 +609,28 @@ class AudioService implements IAudioService {
       return finalResult?.trim();
     } catch (e) {
       debugPrint('❌ Error in speech recognition: $e');
+      if (_activeSpeechCompleter != null && !_activeSpeechCompleter!.isCompleted) {
+        _activeSpeechCompleter!.complete(_lastRecognizedWords);
+      }
       return null;
+    } finally {
+      if (completer != null && _activeSpeechCompleter == completer) {
+        _activeSpeechCompleter = null;
+      }
     }
   }
 
   @override
   Future<void> stopListening() async {
-    if (_speechToText.isListening) {
-      await _speechToText.stop();
+    try {
+      if (_speechToText.isListening) {
+        await _speechToText.stop();
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error stopping speech-to-text: $e');
+    }
+    if (_activeSpeechCompleter != null && !_activeSpeechCompleter!.isCompleted) {
+      _activeSpeechCompleter!.complete(_lastRecognizedWords);
     }
   }
 
@@ -629,21 +686,61 @@ class AudioService implements IAudioService {
   // Helper methods
 
   String _ttsLanguageFromLocale(String languageCode) {
-    return VoiceConfig.ttsLanguageMap[languageCode] ?? 'en-US';
+    return VoiceLocaleResolver.resolveTtsLocale(languageCode);
+  }
+}
+
+/// Centralized resolver linking NIRVANA's 8 supported locales
+/// (en, hi, as, bn, ne, mni, kha, lus) to platform STT and TTS tags.
+class VoiceLocaleResolver {
+  VoiceLocaleResolver._();
+
+  /// Maps supported project locales to STT BCP-47 tag (e.g. 'en_US', 'hi_IN')
+  static String resolveSttLocale(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return 'en_US';
+      case 'hi':
+        return 'hi_IN';
+      case 'as':
+        return 'as_IN';
+      case 'bn':
+        return 'bn_IN';
+      case 'ne':
+        return 'ne_NP';
+      case 'mni':
+        return 'mni_IN';
+      case 'kha':
+        return 'kha_IN';
+      case 'lus':
+        return 'lus_IN';
+      default:
+        return 'en_US';
+    }
   }
 
-  String _localeForSpeechToText(String languageCode) {
-    final Map<String, String> sttLocaleMap = {
-      'en': 'en_US',
-      'hi': 'hi_IN',
-      'as': 'as_IN',
-      'bn': 'bn_IN',
-      'mni': 'mni_IN',
-      'kha': 'kha_IN',
-      'lus': 'lus_IN',
-      'ne': 'ne_NP',
-    };
-    return sttLocaleMap[languageCode] ?? 'en_US';
+  /// Maps supported project locales to TTS language tag (e.g. 'en-US', 'hi-IN')
+  static String resolveTtsLocale(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return 'en-US';
+      case 'hi':
+        return 'hi-IN';
+      case 'as':
+        return 'as-IN';
+      case 'bn':
+        return 'bn-IN';
+      case 'ne':
+        return 'ne-NP';
+      case 'mni':
+        return 'mni-IN';
+      case 'kha':
+        return 'kha-IN';
+      case 'lus':
+        return 'lus-IN';
+      default:
+        return 'en-US';
+    }
   }
 }
 
@@ -651,7 +748,11 @@ class AudioService implements IAudioService {
 final audioServiceProvider = Provider<IAudioService>((ref) {
   final service = AudioService();
   service.onSpeakingChanged = (isSpeaking) {
-    ref.read(isSpeakingProvider.notifier).state = isSpeaking;
+    try {
+      ref.read(isSpeakingProvider.notifier).state = isSpeaking;
+    } catch (_) {
+      // Ignore if container or ref is already disposed
+    }
   };
 
   final initialLocale = ref.read(localeProvider);

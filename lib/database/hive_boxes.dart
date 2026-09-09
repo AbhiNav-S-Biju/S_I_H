@@ -12,6 +12,10 @@ class HiveBoxes {
   static const String reminderLogs = 'nirvana_reminder_logs';
   static const String syncQueue = 'nirvana_sync_queue';
   static const String patientSession = 'nirvana_patient_session';
+  static const String settings = 'nirvana_settings';
+
+  // Settings keys
+  static const String settingsKeyLocale = 'locale_language_code';
 }
 
 class HiveTypeIds {

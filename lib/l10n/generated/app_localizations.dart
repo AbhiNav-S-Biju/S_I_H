@@ -727,6 +727,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter Caregiver Portal'**
   String get caregiverPortalButton;
+
+  /// Title of the Ask NIRVANA screen
+  ///
+  /// In en, this message translates to:
+  /// **'Ask NIRVANA'**
+  String get askNirvanaTitle;
+
+  /// Idle status label for the NIRVANA assistant
+  ///
+  /// In en, this message translates to:
+  /// **'NIRVANA Companion'**
+  String get askNirvanaCompanionLabel;
+
+  /// Status label when voice recognition is active
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m listening...'**
+  String get askNirvanaListening;
+
+  /// Status label when assistant is generating response
+  ///
+  /// In en, this message translates to:
+  /// **'Let me think...'**
+  String get askNirvanaThinking;
+
+  /// Status label when TTS is playing
+  ///
+  /// In en, this message translates to:
+  /// **'Speaking...'**
+  String get askNirvanaSpeaking;
+
+  /// Prompt below microphone button in idle state
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to speak'**
+  String get askNirvanaTapToSpeak;
+
+  /// Prompt below microphone button in listening state
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m listening... (Tap to finish)'**
+  String get askNirvanaListeningPrompt;
+
+  /// Prompt below microphone button in speaking state
+  ///
+  /// In en, this message translates to:
+  /// **'Speaking... (Tap to stop)'**
+  String get askNirvanaSpeakingPrompt;
+
+  /// Prompt below microphone button in thinking state
+  ///
+  /// In en, this message translates to:
+  /// **'Let me think...'**
+  String get askNirvanaThinkingPrompt;
+
+  /// Error state prompt under microphone button
+  ///
+  /// In en, this message translates to:
+  /// **'I couldn\'t understand that. Please try again.'**
+  String get askNirvanaErrorPrompt;
+
+  /// Clear conversation button label
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get askNirvanaClearButton;
+
+  /// Dialog title when confirming conversation clear
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Conversation?'**
+  String get askNirvanaClearTitle;
+
+  /// Dialog body for conversation clear confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'This will start a fresh, new conversation. Are you sure?'**
+  String get askNirvanaClearMessage;
+
+  /// Button to read assistant response aloud
+  ///
+  /// In en, this message translates to:
+  /// **'Read Aloud'**
+  String get askNirvanaReadAloud;
+
+  /// Hint text for the secondary text input field
+  ///
+  /// In en, this message translates to:
+  /// **'Or type here...'**
+  String get askNirvanaTypeHere;
+
+  /// Initial greeting message from the NIRVANA assistant
+  ///
+  /// In en, this message translates to:
+  /// **'Hello! I am NIRVANA, your companion. Tap the large microphone below to talk with me, or type your question.'**
+  String get askNirvanaGreeting;
+
+  /// Message shown when speech recognition returns empty result
+  ///
+  /// In en, this message translates to:
+  /// **'I didn\'t hear anything. Tap to speak again.'**
+  String get askNirvanaNoSpeech;
+
+  /// Message shown when speech recognition is unavailable
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone or speech recognition is not ready. You can type below anytime.'**
+  String get askNirvanaMicUnavailable;
 }
 
 class _AppLocalizationsDelegate

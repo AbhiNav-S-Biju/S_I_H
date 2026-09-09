@@ -340,4 +340,65 @@ class AppLocalizationsNe extends AppLocalizations {
 
   @override
   String get caregiverPortalButton => 'हेरचाहकर्ता पोर्टलमा प्रवेश गर्नुहोस्';
+
+  @override
+  String get askNirvanaTitle => 'NIRVANA लाई सोध्नुहोस्';
+
+  @override
+  String get askNirvanaCompanionLabel => 'NIRVANA साथी';
+
+  @override
+  String get askNirvanaListening => 'म सुनिरहेको छु...';
+
+  @override
+  String get askNirvanaThinking => 'सोचिरहेको छु...';
+
+  @override
+  String get askNirvanaSpeaking => 'बोलिरहेको छु...';
+
+  @override
+  String get askNirvanaTapToSpeak => 'बोल्न ट्याप गर्नुहोस्';
+
+  @override
+  String get askNirvanaListeningPrompt =>
+      'म सुनिरहेको छु... (समाप्त गर्न ट्याप गर्नुहोस्)';
+
+  @override
+  String get askNirvanaSpeakingPrompt =>
+      'बोलिरहेको छु... (रोक्न ट्याप गर्नुहोस्)';
+
+  @override
+  String get askNirvanaThinkingPrompt => 'सोचिरहेको छु...';
+
+  @override
+  String get askNirvanaErrorPrompt =>
+      'मैले बुझिन। कृपया फेरि प्रयास गर्नुहोस्।';
+
+  @override
+  String get askNirvanaClearButton => 'हटाउनुहोस्';
+
+  @override
+  String get askNirvanaClearTitle => 'कुराकानी हटाउने?';
+
+  @override
+  String get askNirvanaClearMessage =>
+      'यसले नयाँ कुराकानी सुरु गर्नेछ। के तपाईं निश्चित हुनुहुन्छ?';
+
+  @override
+  String get askNirvanaReadAloud => 'जोरसँग पढ्नुहोस्';
+
+  @override
+  String get askNirvanaTypeHere => 'वा यहाँ टाइप गर्नुहोस्...';
+
+  @override
+  String get askNirvanaGreeting =>
+      'नमस्ते! म निर्वाण, तपाईंको साथी। कुरा गर्न तलको माइक थिच्नुहोस्, वा आफ्नो प्रश्न लेख्नुहोस्।';
+
+  @override
+  String get askNirvanaNoSpeech =>
+      'मैले केही सुनिनँ। फेरि बोल्न ट्याप गर्नुहोस्।';
+
+  @override
+  String get askNirvanaMicUnavailable =>
+      'माइक्रोफोन वा भाषण पहिचान तयार छैन। तपाईं तल टाइप गर्न सक्नुहुन्छ।';
 }

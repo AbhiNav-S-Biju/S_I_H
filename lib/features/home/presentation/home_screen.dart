@@ -101,7 +101,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 18.0),
 
-              // 2. Primary Action 1: Daily Activities (Games)
+              // 2. Primary Action: Ask NIRVANA Voice Assistant
               ElderCard(
                 padding: const EdgeInsets.all(22.0),
                 backgroundColor: theme.colorScheme.primaryContainer.withValues(
@@ -109,6 +109,59 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 borderColor: theme.colorScheme.primary,
                 borderWidth: 2.5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12.0),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.mic_rounded,
+                            color: Colors.white,
+                            size: 32.0,
+                          ),
+                        ),
+                        const SizedBox(width: 14.0),
+                        Expanded(
+                          child: Text(
+                            'Ask NIRVANA',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: ElderColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12.0),
+                    Text(
+                      'Talk with your voice anytime. Ask questions, hear stories, or just chat.',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: ElderColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                    LargeActionButton(
+                      label: 'Talk with NIRVANA',
+                      icon: Icons.record_voice_over_rounded,
+                      onPressed: () => context.push('/ask-nirvana'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16.0),
+
+              // 3. Primary Action 2: Daily Activities (Games)
+              ElderCard(
+                padding: const EdgeInsets.all(22.0),
+                backgroundColor: ElderColors.surface,
+                borderColor: ElderColors.border,
+                borderWidth: 2.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

@@ -59,6 +59,7 @@ class HiveDatabase {
       Hive.openBox<HiveReminderLog>(HiveBoxes.reminderLogs),
       Hive.openBox<HiveSyncEvent>(HiveBoxes.syncQueue),
       Hive.openBox<HivePatientDeviceSession>(HiveBoxes.patientSession),
+      Hive.openBox<dynamic>(HiveBoxes.settings),
     ]);
   }
 
@@ -74,6 +75,9 @@ class HiveDatabase {
 
   static Box<HivePatientDeviceSession> get patientSessionBox =>
       Hive.box<HivePatientDeviceSession>(HiveBoxes.patientSession);
+
+  /// Settings box — stores primitive key-value preferences (language, etc.)
+  static Box<dynamic> get settingsBox => Hive.box<dynamic>(HiveBoxes.settings);
 
   /// Returns the current locally stored patient session, if any
   static HivePatientDeviceSession? get currentPatientSession {

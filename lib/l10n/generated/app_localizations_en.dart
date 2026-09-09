@@ -339,4 +339,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get caregiverPortalButton => 'Enter Caregiver Portal';
+
+  @override
+  String get askNirvanaTitle => 'Ask NIRVANA';
+
+  @override
+  String get askNirvanaCompanionLabel => 'NIRVANA Companion';
+
+  @override
+  String get askNirvanaListening => 'I\'m listening...';
+
+  @override
+  String get askNirvanaThinking => 'Let me think...';
+
+  @override
+  String get askNirvanaSpeaking => 'Speaking...';
+
+  @override
+  String get askNirvanaTapToSpeak => 'Tap to speak';
+
+  @override
+  String get askNirvanaListeningPrompt => 'I\'m listening... (Tap to finish)';
+
+  @override
+  String get askNirvanaSpeakingPrompt => 'Speaking... (Tap to stop)';
+
+  @override
+  String get askNirvanaThinkingPrompt => 'Let me think...';
+
+  @override
+  String get askNirvanaErrorPrompt =>
+      'I couldn\'t understand that. Please try again.';
+
+  @override
+  String get askNirvanaClearButton => 'Clear';
+
+  @override
+  String get askNirvanaClearTitle => 'Clear Conversation?';
+
+  @override
+  String get askNirvanaClearMessage =>
+      'This will start a fresh, new conversation. Are you sure?';
+
+  @override
+  String get askNirvanaReadAloud => 'Read Aloud';
+
+  @override
+  String get askNirvanaTypeHere => 'Or type here...';
+
+  @override
+  String get askNirvanaGreeting =>
+      'Hello! I am NIRVANA, your companion. Tap the large microphone below to talk with me, or type your question.';
+
+  @override
+  String get askNirvanaNoSpeech =>
+      'I didn\'t hear anything. Tap to speak again.';
+
+  @override
+  String get askNirvanaMicUnavailable =>
+      'Microphone or speech recognition is not ready. You can type below anytime.';
 }

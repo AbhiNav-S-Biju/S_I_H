@@ -6,6 +6,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import '../../database/hive_boxes.dart';
 
 /// Notifier for Reduced Motion mode (disables transitions, heavy animations)
 class ReducedMotionNotifier extends StateNotifier<bool> {
@@ -55,14 +58,53 @@ final textScaleProvider =
       return TextScaleNotifier();
     });
 
-/// Notifier for Active Language / Locale
-class LocaleNotifier extends StateNotifier<Locale> {
-  LocaleNotifier() : super(const Locale('en'));
+/// Languages fully supported by NIRVANA (UI + STT + TTS all verified).
+/// Update this list as new languages gain full support.
+const List<String> nirvanaFullySupportedLocales = [
+  'en', // English — full UI, TTS (en-US), STT (en_US)
+  'hi', // Hindi — full UI, TTS (hi-IN), STT (hi_IN)
+  'bn', // Bengali — full UI, TTS (bn-IN, with cloud fallback), STT (bn_IN)
+  'as', // Assamese — full UI, TTS (as-IN, with cloud fallback), STT (as_IN)
+  'ne', // Nepali — full UI, TTS (ne-NP, with cloud fallback), STT (ne_NP)
+];
 
-  void setLocale(Locale locale) => state = locale;
+/// Notifier for Active Language / Locale, with Hive-backed persistence.
+class LocaleNotifier extends StateNotifier<Locale> {
+  LocaleNotifier() : super(_loadSavedLocale());
+
+  /// Reads the saved language code from Hive. Falls back to English.
+  static Locale _loadSavedLocale() {
+    try {
+      if (Hive.isBoxOpen(HiveBoxes.settings)) {
+        final saved = Hive.box<dynamic>(HiveBoxes.settings)
+            .get(HiveBoxes.settingsKeyLocale) as String?;
+        if (saved != null && nirvanaFullySupportedLocales.contains(saved)) {
+          return Locale(saved);
+        }
+      }
+    } catch (_) {}
+    return const Locale('en');
+  }
+
+  void setLocale(Locale locale) {
+    state = locale;
+    _persist(locale.languageCode);
+  }
 
   void setLanguageCode(String code) {
     state = Locale(code);
+    _persist(code);
+  }
+
+  void _persist(String code) {
+    try {
+      if (Hive.isBoxOpen(HiveBoxes.settings)) {
+        Hive.box<dynamic>(HiveBoxes.settings)
+            .put(HiveBoxes.settingsKeyLocale, code);
+      }
+    } catch (e) {
+      debugPrint('⚠️ Could not persist locale: $e');
+    }
   }
 }
 

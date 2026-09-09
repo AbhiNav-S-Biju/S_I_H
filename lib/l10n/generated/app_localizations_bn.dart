@@ -339,4 +339,62 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get caregiverPortalButton => 'পরিচর্যাকারী পোর্টালে প্রবেশ করুন';
+
+  @override
+  String get askNirvanaTitle => 'NIRVANA-কে জিজ্ঞেস করুন';
+
+  @override
+  String get askNirvanaCompanionLabel => 'NIRVANA সাথী';
+
+  @override
+  String get askNirvanaListening => 'আমি শুনছি...';
+
+  @override
+  String get askNirvanaThinking => 'ভাবছি...';
+
+  @override
+  String get askNirvanaSpeaking => 'বলছি...';
+
+  @override
+  String get askNirvanaTapToSpeak => 'বলতে ট্যাপ করুন';
+
+  @override
+  String get askNirvanaListeningPrompt => 'আমি শুনছি... (শেষ করতে ট্যাপ করুন)';
+
+  @override
+  String get askNirvanaSpeakingPrompt => 'বলছি... (থামাতে ট্যাপ করুন)';
+
+  @override
+  String get askNirvanaThinkingPrompt => 'ভাবছি...';
+
+  @override
+  String get askNirvanaErrorPrompt => 'আমি বুঝতে পারিনি। আবার চেষ্টা করুন।';
+
+  @override
+  String get askNirvanaClearButton => 'মুছে ফেলুন';
+
+  @override
+  String get askNirvanaClearTitle => 'কথোপকথন মুছে ফেলবেন?';
+
+  @override
+  String get askNirvanaClearMessage =>
+      'এটি একটি নতুন কথোপকথন শুরু করবে। আপনি কি নিশ্চিত?';
+
+  @override
+  String get askNirvanaReadAloud => 'জোরে পড়ুন';
+
+  @override
+  String get askNirvanaTypeHere => 'বা এখানে লিখুন...';
+
+  @override
+  String get askNirvanaGreeting =>
+      'নমস্কার! আমি নির্বাণা, আপনার সাথী। কথা বলতে নিচের মাইকে টাপ করুন, বা আপনার প্রশ্ন লিখুন।';
+
+  @override
+  String get askNirvanaNoSpeech =>
+      'আমি কিছু শুনতে পাইনি। আবার বলতে ট্যাপ করুন।';
+
+  @override
+  String get askNirvanaMicUnavailable =>
+      'মাইক্রোফোন বা স্পীচ রিকগনিশন প্রস্তুত নয়। আপনি নিচে টাইপ করতে পারেন।';
 }

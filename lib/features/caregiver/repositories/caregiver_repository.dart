@@ -5,6 +5,10 @@
 
 import '../models/caregiver_models.dart';
 
+abstract class IFamilyPhotoReader {
+  Future<List<Map<String, dynamic>>> getFamilyPhotos(String patientId);
+}
+
 abstract class ICaregiverRepository {
   /// Registers a new caregiver via Supabase Auth, then creates a profiles row
   Future<CaregiverProfile> register({

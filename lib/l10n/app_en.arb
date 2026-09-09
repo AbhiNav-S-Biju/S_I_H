@@ -411,5 +411,77 @@
   "caregiverPortalButton": "Enter Caregiver Portal",
   "@caregiverPortalButton": {
     "description": "Action button to enter Caregiver Portal"
+  },
+  "askNirvanaTitle": "Ask NIRVANA",
+  "@askNirvanaTitle": {
+    "description": "Title of the Ask NIRVANA screen"
+  },
+  "askNirvanaCompanionLabel": "NIRVANA Companion",
+  "@askNirvanaCompanionLabel": {
+    "description": "Idle status label for the NIRVANA assistant"
+  },
+  "askNirvanaListening": "I'm listening...",
+  "@askNirvanaListening": {
+    "description": "Status label when voice recognition is active"
+  },
+  "askNirvanaThinking": "Let me think...",
+  "@askNirvanaThinking": {
+    "description": "Status label when assistant is generating response"
+  },
+  "askNirvanaSpeaking": "Speaking...",
+  "@askNirvanaSpeaking": {
+    "description": "Status label when TTS is playing"
+  },
+  "askNirvanaTapToSpeak": "Tap to speak",
+  "@askNirvanaTapToSpeak": {
+    "description": "Prompt below microphone button in idle state"
+  },
+  "askNirvanaListeningPrompt": "I'm listening... (Tap to finish)",
+  "@askNirvanaListeningPrompt": {
+    "description": "Prompt below microphone button in listening state"
+  },
+  "askNirvanaSpeakingPrompt": "Speaking... (Tap to stop)",
+  "@askNirvanaSpeakingPrompt": {
+    "description": "Prompt below microphone button in speaking state"
+  },
+  "askNirvanaThinkingPrompt": "Let me think...",
+  "@askNirvanaThinkingPrompt": {
+    "description": "Prompt below microphone button in thinking state"
+  },
+  "askNirvanaErrorPrompt": "I couldn't understand that. Please try again.",
+  "@askNirvanaErrorPrompt": {
+    "description": "Error state prompt under microphone button"
+  },
+  "askNirvanaClearButton": "Clear",
+  "@askNirvanaClearButton": {
+    "description": "Clear conversation button label"
+  },
+  "askNirvanaClearTitle": "Clear Conversation?",
+  "@askNirvanaClearTitle": {
+    "description": "Dialog title when confirming conversation clear"
+  },
+  "askNirvanaClearMessage": "This will start a fresh, new conversation. Are you sure?",
+  "@askNirvanaClearMessage": {
+    "description": "Dialog body for conversation clear confirmation"
+  },
+  "askNirvanaReadAloud": "Read Aloud",
+  "@askNirvanaReadAloud": {
+    "description": "Button to read assistant response aloud"
+  },
+  "askNirvanaTypeHere": "Or type here...",
+  "@askNirvanaTypeHere": {
+    "description": "Hint text for the secondary text input field"
+  },
+  "askNirvanaGreeting": "Hello! I am NIRVANA, your companion. Tap the large microphone below to talk with me, or type your question.",
+  "@askNirvanaGreeting": {
+    "description": "Initial greeting message from the NIRVANA assistant"
+  },
+  "askNirvanaNoSpeech": "I didn't hear anything. Tap to speak again.",
+  "@askNirvanaNoSpeech": {
+    "description": "Message shown when speech recognition returns empty result"
+  },
+  "askNirvanaMicUnavailable": "Microphone or speech recognition is not ready. You can type below anytime.",
+  "@askNirvanaMicUnavailable": {
+    "description": "Message shown when speech recognition is unavailable"
   }
 }
