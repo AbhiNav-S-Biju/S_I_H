@@ -38,13 +38,13 @@ void main() {
       expect(controllerHard.state.trayPieces.length, equals(6));
     });
 
-    test('Initial state contains familiar image and landmark guidance', () {
+    test('Initial state contains familiar North East image and landmark guidance', () {
       final controller = JigsawPuzzleController(
-        initialImage: PuzzleImage.morningTea,
+        initialImage: PuzzleImage.kazirangaRhino,
         initialDifficulty: GameDifficulty.easy,
       );
 
-      expect(controller.state.activeImage.id, equals('puzzle_morning_tea'));
+      expect(controller.state.activeImage.id, equals('puzzle_kaziranga_rhino'));
       expect(controller.state.placedPieceIds, isEmpty);
       expect(controller.state.isCompleted, isFalse);
       expect(controller.state.voicePrompt, isNotNull);
@@ -196,15 +196,114 @@ void main() {
 
     test('Image switching updates active scene cleanly', () {
       final controller = JigsawPuzzleController(
-        initialImage: PuzzleImage.morningTea,
+        initialImage: PuzzleImage.kazirangaRhino,
       );
 
-      expect(controller.state.activeImage.id, equals('puzzle_morning_tea'));
-      controller.changeImage(PuzzleImage.courtyardGarden);
+      expect(controller.state.activeImage.id, equals('puzzle_kaziranga_rhino'));
+      controller.changeImage(PuzzleImage.tawangMonastery);
 
-      expect(controller.state.activeImage.id, equals('puzzle_courtyard_garden'));
+      expect(controller.state.activeImage.id, equals('puzzle_tawang_monastery'));
       expect(controller.state.placedPieceIds, isEmpty);
       expect(controller.state.trayPieces.length, equals(2));
+    });
+
+    test('All 5 North Eastern scenes have complete semantic landmark descriptions', () {
+      for (final image in PuzzleImage.defaultFamiliarImages) {
+        expect(image.assetPath, startsWith('assets/images/puzzle/'));
+
+        // Check 1x2 clues
+        for (int c = 0; c < 2; c++) {
+          final clue = image.getLandmarkClue(
+            row: 0,
+            col: c,
+            totalRows: 1,
+            totalCols: 2,
+            langCode: 'en',
+          );
+          expect(clue.isNotEmpty, isTrue);
+          expect(clue.contains('top-left'), isFalse);
+          expect(clue.contains('corner'), isFalse);
+        }
+
+        // Check 2x2 clues
+        for (int r = 0; r < 2; r++) {
+          for (int c = 0; c < 2; c++) {
+            final clue = image.getLandmarkClue(
+              row: r,
+              col: c,
+              totalRows: 2,
+              totalCols: 2,
+              langCode: 'en',
+            );
+            expect(clue.isNotEmpty, isTrue);
+            expect(clue.contains('top-left'), isFalse);
+            expect(clue.contains('corner'), isFalse);
+          }
+        }
+
+        // Check 2x3 clues
+        for (int r = 0; r < 2; r++) {
+          for (int c = 0; c < 3; c++) {
+            final clue = image.getLandmarkClue(
+              row: r,
+              col: c,
+              totalRows: 2,
+              totalCols: 3,
+              langCode: 'en',
+            );
+            expect(clue.isNotEmpty, isTrue);
+            expect(clue.contains('top-left'), isFalse);
+            expect(clue.contains('corner'), isFalse);
+          }
+        }
+      }
+    });
+
+    test('Image is selected randomly and changes on consecutive activity launches', () {
+      JigsawPuzzleController.resetCycleForTesting();
+
+      String? previousImageId;
+      final seenAcrossFive = <String>[];
+
+      // Simulate 5 consecutive launches of the activity
+      for (int i = 0; i < 5; i++) {
+        final controller = JigsawPuzzleController(
+          initialDifficulty: GameDifficulty.easy,
+        );
+        final currentId = controller.state.activeImage.id;
+
+        // Verify: NEVER the same as previous launch
+        if (previousImageId != null) {
+          expect(
+            currentId,
+            isNot(equals(previousImageId)),
+            reason: 'Launch #$i must have a different picture from launch #${i - 1}',
+          );
+        }
+
+        seenAcrossFive.add(currentId);
+        previousImageId = currentId;
+      }
+
+      // Over 5 launches, all 5 distinct North Eastern images were shown
+      expect(seenAcrossFive.toSet().length, equals(5));
+
+      // 6th launch (start of new cycle) must also never repeat the 5th image
+      final sixthController = JigsawPuzzleController(
+        initialDifficulty: GameDifficulty.easy,
+      );
+      expect(sixthController.state.activeImage.id, isNot(equals(previousImageId)));
+    });
+
+    test('pickRandomImage changes active picture to another scene', () {
+      final controller = JigsawPuzzleController(
+        initialImage: PuzzleImage.kazirangaRhino,
+      );
+      expect(controller.state.activeImage.id, equals('puzzle_kaziranga_rhino'));
+
+      final newImage = controller.pickRandomImage(avoidCurrent: true);
+      expect(newImage.id, isNot(equals('puzzle_kaziranga_rhino')));
+      expect(controller.state.activeImage.id, equals(newImage.id));
     });
   });
 }

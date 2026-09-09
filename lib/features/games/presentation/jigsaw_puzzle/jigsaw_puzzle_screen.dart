@@ -12,6 +12,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../controllers/jigsaw_puzzle_controller.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_session.dart';
+import '../../models/puzzle_item.dart';
 import '../widgets/elder_game_button.dart';
 import '../widgets/game_completion_dialog.dart';
 import '../widgets/game_header.dart';
@@ -21,12 +22,14 @@ import 'widgets/puzzle_piece_tile.dart';
 
 class JigsawPuzzleScreen extends ConsumerStatefulWidget {
   final GameDifficulty difficulty;
+  final PuzzleImage? initialImage;
   final ValueChanged<GameSession>? onGameCompleted;
   final VoidCallback? onExit;
 
   const JigsawPuzzleScreen({
     super.key,
     this.difficulty = GameDifficulty.easy,
+    this.initialImage,
     this.onGameCompleted,
     this.onExit,
   });
@@ -43,6 +46,7 @@ class _JigsawPuzzleScreenState extends ConsumerState<JigsawPuzzleScreen> {
     super.initState();
     _controller = JigsawPuzzleController(
       initialDifficulty: widget.difficulty,
+      initialImage: widget.initialImage,
     );
     _speakInitialPrompt();
   }

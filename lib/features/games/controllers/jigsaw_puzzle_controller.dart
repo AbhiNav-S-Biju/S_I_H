@@ -149,6 +149,61 @@ class JigsawPuzzleController {
   late JigsawPuzzleState _state;
   JigsawPuzzleState get state => _state;
 
+  /// Global non-repeating randomized cycle manager across activity launches
+  static final List<String> _globalShuffledCycleIds = [];
+  static int _globalCycleCursor = 0;
+  static String? _globalLastOpenedImageId;
+
+  /// Visible for testing: resets the static cycle
+  static void resetCycleForTesting() {
+    _globalShuffledCycleIds.clear();
+    _globalCycleCursor = 0;
+    _globalLastOpenedImageId = null;
+  }
+
+  /// Obtains the next random picture from a randomized shuffled sequence,
+  /// guaranteeing that the picture changes every single time the activity is opened
+  /// and never repeats consecutively.
+  static PuzzleImage getNextRotatingImage({
+    List<PuzzleImage>? pool,
+    Random? rng,
+  }) {
+    final images = pool ?? PuzzleImage.defaultFamiliarImages;
+    if (images.isEmpty) return PuzzleImage.defaultFamiliarImages.first;
+    if (images.length == 1) return images.first;
+
+    final random = rng ?? Random();
+
+    // If cycle is empty or exhausted, generate a new shuffled permutation
+    if (_globalShuffledCycleIds.isEmpty ||
+        _globalCycleCursor >= _globalShuffledCycleIds.length) {
+      final ids = images.map((img) => img.id).toList()..shuffle(random);
+
+      // Ensure the first image in the new cycle is not the same as the last seen image
+      if (_globalLastOpenedImageId != null &&
+          ids.first == _globalLastOpenedImageId &&
+          ids.length > 1) {
+        final swapIdx = 1 + random.nextInt(ids.length - 1);
+        final temp = ids[0];
+        ids[0] = ids[swapIdx];
+        ids[swapIdx] = temp;
+      }
+
+      _globalShuffledCycleIds
+        ..clear()
+        ..addAll(ids);
+      _globalCycleCursor = 0;
+    }
+
+    final nextId = _globalShuffledCycleIds[_globalCycleCursor++];
+    _globalLastOpenedImageId = nextId;
+
+    return images.firstWhere(
+      (img) => img.id == nextId,
+      orElse: () => images.first,
+    );
+  }
+
   JigsawPuzzleController({
     List<PuzzleImage>? images,
     Random? random,
@@ -158,10 +213,24 @@ class JigsawPuzzleController {
   })  : availableImages = images ?? PuzzleImage.defaultFamiliarImages,
         _random = random ?? Random(),
         _uuid = uuid ?? const Uuid() {
+    // If initialImage is not explicitly specified, obtain the next rotating random image
+    // ensuring that every time the activity is opened, a different picture is presented.
+    final chosenImage = initialImage ??
+        getNextRotatingImage(pool: availableImages, rng: _random);
+    _globalLastOpenedImageId = chosenImage.id;
+
     startNewGame(
       difficulty: initialDifficulty,
-      image: initialImage ?? availableImages.first,
+      image: chosenImage,
     );
+  }
+
+  /// Randomly selects a different familiar scene for variety
+  PuzzleImage pickRandomImage({bool avoidCurrent = true}) {
+    final newImage =
+        getNextRotatingImage(pool: availableImages, rng: _random);
+    changeImage(newImage);
+    return newImage;
   }
 
   /// Initializes a new puzzle round with chosen difficulty and image
@@ -170,7 +239,7 @@ class JigsawPuzzleController {
     PuzzleImage? image,
     int consecutiveSuccessCount = 0,
   }) {
-    final activeImg = image ?? _stateOrFirst(difficulty);
+    final activeImg = image ?? _stateOrRandom();
     final rows = difficulty.jigsawRows;
     final cols = difficulty.jigsawCols;
 
@@ -210,11 +279,11 @@ class JigsawPuzzleController {
     );
   }
 
-  PuzzleImage _stateOrFirst(GameDifficulty diff) {
+  PuzzleImage _stateOrRandom() {
     try {
       return _state.activeImage;
     } catch (_) {
-      return availableImages.first;
+      return getNextRotatingImage(pool: availableImages, rng: _random);
     }
   }
 
@@ -375,6 +444,7 @@ class JigsawPuzzleController {
 
   /// Changes active familiar scene
   void changeImage(PuzzleImage image) {
+    _globalLastOpenedImageId = image.id;
     startNewGame(
       difficulty: _state.difficulty,
       image: image,

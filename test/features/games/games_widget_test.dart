@@ -43,6 +43,7 @@ void main() {
           child: MaterialApp(
             home: JigsawPuzzleScreen(
               difficulty: GameDifficulty.easy,
+              initialImage: PuzzleImage.kazirangaRhino,
             ),
           ),
         ),
@@ -50,7 +51,7 @@ void main() {
 
       expect(find.text('Familiar Jigsaw'), findsOneWidget);
       expect(find.text('Gentle'), findsOneWidget);
-      expect(find.text('Morning Tea & Marigolds'), findsOneWidget);
+      expect(find.text('Kaziranga One-Horned Rhino'), findsOneWidget);
       expect(find.widgetWithText(ElderGameButton, 'Hint'), findsOneWidget);
       expect(find.textContaining('Pieces to place'), findsOneWidget);
     });
