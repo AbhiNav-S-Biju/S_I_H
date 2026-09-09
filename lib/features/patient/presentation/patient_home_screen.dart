@@ -87,10 +87,7 @@ class PatientHomeScreen extends ConsumerWidget {
               // Date
               Text(
                 _formattedDate(),
-                style: TextStyle(
-                  fontSize: 17,
-                  color: ElderColors.textMuted,
-                ),
+                style: TextStyle(fontSize: 17, color: ElderColors.textMuted),
               ),
 
               const SizedBox(height: 32),
@@ -138,12 +135,27 @@ class PatientHomeScreen extends ConsumerWidget {
   String _formattedDate() {
     final now = DateTime.now();
     const days = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-      'Friday', 'Saturday', 'Sunday'
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
     ];
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${days[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}';
   }
@@ -161,10 +173,7 @@ class _WellnessCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            ElderColors.primary,
-            ElderColors.primary.withAlpha(200),
-          ],
+          colors: [ElderColors.primary, ElderColors.primary.withAlpha(200)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -251,6 +260,13 @@ class _QuickAccessGrid extends StatelessWidget {
         color: const Color(0xFFB45309),
         bgColor: const Color(0xFFFEF3C7),
         onTap: () {}, // Future: context.go('/patient/photos')
+      ),
+      _QuickTile(
+        icon: Icons.record_voice_over_rounded,
+        label: 'Ask\nNIRVANA',
+        color: ElderColors.primary,
+        bgColor: ElderColors.primaryContainer,
+        onTap: () => context.push('/ask-nirvana'),
       ),
       _QuickTile(
         icon: Icons.settings_rounded,
@@ -340,10 +356,13 @@ class _UpcomingReminderCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final effectivePatientId =
-        patientId.isNotEmpty ? patientId : (HiveDatabase.pairedPatientId ?? '');
+    final effectivePatientId = patientId.isNotEmpty
+        ? patientId
+        : (HiveDatabase.pairedPatientId ?? '');
 
-    final remindersAsync = ref.watch(activeRemindersProvider(effectivePatientId));
+    final remindersAsync = ref.watch(
+      activeRemindersProvider(effectivePatientId),
+    );
 
     return remindersAsync.when(
       data: (reminders) {
@@ -402,7 +421,10 @@ class _UpcomingReminderCard extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF0284C7),
                       borderRadius: BorderRadius.circular(12),
@@ -451,7 +473,9 @@ class _UpcomingReminderCard extends ConsumerWidget {
                         );
                         await notif.cancelReminder(nextReminder.notificationId);
 
-                        ref.invalidate(activeRemindersProvider(effectivePatientId));
+                        ref.invalidate(
+                          activeRemindersProvider(effectivePatientId),
+                        );
                       },
                       icon: const Icon(Icons.check, size: 20),
                       label: const Text('Mark Done'),
@@ -472,7 +496,10 @@ class _UpcomingReminderCard extends ConsumerWidget {
                       minimumSize: const Size(0, 48),
                       foregroundColor: const Color(0xFF0284C7),
                       side: const BorderSide(color: Color(0xFF0284C7)),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -507,9 +534,7 @@ class _EncouragementBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: ElderColors.primaryContainer,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: ElderColors.primary.withAlpha(50),
-        ),
+        border: Border.all(color: ElderColors.primary.withAlpha(50)),
       ),
       child: Row(
         children: [

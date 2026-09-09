@@ -23,15 +23,9 @@ import '../../features/settings/presentation/settings_screen.dart';
 import '../shell/elder_app_shell.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final rootNavigatorKey = GlobalKey<NavigatorState>(
-    debugLabel: 'root',
-  );
-  final homeNavigatorKey = GlobalKey<NavigatorState>(
-    debugLabel: 'home',
-  );
-  final gamesNavigatorKey = GlobalKey<NavigatorState>(
-    debugLabel: 'games',
-  );
+  final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  final homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
+  final gamesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'games');
 
   // Landing page is always the initial route — portal selection
   const initialLocation = '/';
@@ -44,7 +38,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final loc = state.matchedLocation;
 
       final isCaregiverRoute = loc.startsWith('/caregiver');
-      final isProtectedCaregiver = loc == '/caregiver/dashboard' ||
+      final isProtectedCaregiver =
+          loc == '/caregiver/dashboard' ||
           loc == '/caregiver/onboarding' ||
           loc == '/caregiver/add-patient';
       final isAuthenticated = authState.value != null;
@@ -72,10 +67,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       // 0. Landing / Portal Selection
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const LandingScreen(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const LandingScreen()),
 
       // 1. Onboarding Flow (Full screen)
       GoRoute(
@@ -138,16 +130,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           onSessionCompleted: (session) async {
             debugPrint('Patient Games — Session Completed: $session');
 
-            final pairedId = HiveDatabase.pairedPatientId ??
+            final pairedId =
+                HiveDatabase.pairedPatientId ??
                 HiveDatabase.currentPatientSession?.patientId;
 
             if (pairedId != null && pairedId.isNotEmpty) {
               await ref
                   .read(gameSessionRepositoryProvider)
-                  .recordGameSession(
-                    session: session,
-                    patientId: pairedId,
-                  );
+                  .recordGameSession(session: session, patientId: pairedId);
 
               await ref
                   .read(caregiverEventNotificationServiceProvider)
@@ -230,11 +220,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     // 2. Paired patient session in Hive (if paired elder device)
                     // 3. First assigned patient if available
                     final selected = ref.read(selectedPatientProvider);
-                    final pairedId = HiveDatabase.pairedPatientId ??
+                    final pairedId =
+                        HiveDatabase.pairedPatientId ??
                         HiveDatabase.currentPatientSession?.patientId;
                     final assigned = ref.read(assignedPatientsProvider).value;
 
-                    final effectivePatientId = selected?.id ??
+                    final effectivePatientId =
+                        selected?.id ??
                         pairedId ??
                         (assigned != null && assigned.isNotEmpty
                             ? assigned.first.id
