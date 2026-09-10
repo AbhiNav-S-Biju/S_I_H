@@ -10,6 +10,10 @@ The NIRVANA backend runs on **Supabase PostgreSQL** and is architected specifica
 3. **Non-Clinical Activity Telemetry**: Data collected from games consists solely of participation metrics (consistency, trials completed, duration, preferred activities), strictly devoid of diagnostic or clinical assessments.
 4. **Soft Deletions**: Entities that can be deleted by caregivers (such as reminders or family photos) use `is_deleted = true` tombstones with `updated_at` timestamps to avoid resurrecting records across distributed offline devices.
 
+### Secure social media credentials
+
+Patient-home social media accounts are scoped by `patient_id`. Authenticated clients use `SupabaseSocialMediaAccountRepository`: usernames are stored in `public.social_media_accounts`, while passwords are encrypted client-side with AES-GCM before upload. The encryption key remains in platform-protected `flutter_secure_storage`, and Supabase RLS limits rows to linked caregivers. Unauthenticated or offline patient devices use `SecureSocialMediaAccountRepository` locally. Plaintext passwords are never sent to Supabase, logged, added to analytics, or included in sync payloads.
+
 ---
 
 ## 2. Entity Relationship Diagram

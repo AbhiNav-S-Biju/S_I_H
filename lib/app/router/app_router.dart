@@ -20,6 +20,7 @@ import '../../features/landing/landing.dart';
 import '../../features/patient/patient.dart';
 import '../../features/settings/presentation/language_selector_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/social_accounts/presentation/social_media_accounts_screen.dart';
 import '../shell/elder_app_shell.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -122,6 +123,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/patient/home',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientHomeScreen(),
+      ),
+      GoRoute(
+        path: '/patient/social-accounts',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const SocialMediaAccountsScreen(),
       ),
       GoRoute(
         path: '/patient/games',
