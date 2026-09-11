@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS public.caregiver_patient_links (
 CREATE TABLE IF NOT EXISTS public.game_sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     patient_id UUID NOT NULL REFERENCES public.patients(id) ON DELETE CASCADE,
-    game_type TEXT NOT NULL CHECK (game_type IN ('remember_objects', 'who_is_this', 'grocery_memory')),
+    game_type TEXT NOT NULL CHECK (game_type IN ('remember_objects', 'who_is_this', 'grocery_memory', 'jigsaw_puzzle')),
     difficulty_level INT NOT NULL DEFAULT 1 CHECK (difficulty_level >= 1 AND difficulty_level <= 5),
     total_trials INT NOT NULL DEFAULT 0 CHECK (total_trials >= 0),
     successful_trials INT NOT NULL DEFAULT 0 CHECK (successful_trials >= 0),

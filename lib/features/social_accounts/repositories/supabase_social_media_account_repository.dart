@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -91,12 +92,20 @@ class SupabaseSocialMediaAccountRepository
             as List<dynamic>;
 
     final accounts = <SocialMediaAccount>[];
+    int decryptionFailures = 0;
     for (final rawRow in rows) {
       final row = Map<String, dynamic>.from(rawRow);
       final account = _fromRow(row, key);
-      accounts.add(
-        account.copyWith(password: await _decryptPassword(row, key)),
-      );
+      try {
+        final password = await _decryptPassword(row, key);
+        accounts.add(account.copyWith(password: password));
+      } catch (_) {
+        decryptionFailures++;
+        debugPrint('⚠️ Social account decryption failed for account ${account.id} (platform: ${account.platform.name}) - likely created on another device');
+      }
+    }
+    if (decryptionFailures > 0) {
+      debugPrint('ℹ️ $decryptionFailures social media account(s) could not be decrypted (created on another device or legacy). They are hidden from this device.');
     }
     return accounts;
   }
