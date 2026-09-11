@@ -42,7 +42,8 @@ class FakeReminderRepository implements IReminderRepository {
   List<Reminder> reminders = [];
 
   @override
-  Future<List<Reminder>> getActiveReminders(String patientId) async => reminders;
+  Future<List<Reminder>> getActiveReminders(String patientId) async =>
+      reminders;
 
   @override
   Future<Reminder?> getReminderById(String reminderId) async => null;
@@ -245,28 +246,44 @@ void main() {
     });
   });
 
-  group('Ask NIRVANA Data Responder - Intent 4: ORIENTATION (Time, Day, Date)', () {
-    test('Tells current time', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('What time is it?', 'en');
+  group(
+    'Ask NIRVANA Data Responder - Intent 4: ORIENTATION (Time, Day, Date)',
+    () {
+      test('Tells current time', () async {
+        final responder = container.read(nirvanaDataResponderProvider);
+        final response = await responder.respond('What time is it?', 'en');
 
-      expect(response, startsWith('The time is'));
-    });
+        expect(response, startsWith('The time is'));
+      });
 
-    test('Tells current day of week', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('What day is today?', 'en');
+      test('Tells current day of week', () async {
+        final responder = container.read(nirvanaDataResponderProvider);
+        final response = await responder.respond('What day is today?', 'en');
 
-      expect(response, startsWith('Today is'));
-    });
+        expect(response, startsWith('Today is'));
+      });
 
-    test('Tells current date', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('What is today\'s date?', 'en');
+      test('Tells current date', () async {
+        final responder = container.read(nirvanaDataResponderProvider);
+        final response = await responder.respond(
+          'What is today\'s date?',
+          'en',
+        );
 
-      expect(response, contains("Today's date is"));
-    });
-  });
+        expect(response, contains("Today's date is"));
+      });
+
+      test('Executes authoritative date and time tools locally', () async {
+        final responder = container.read(nirvanaDataResponderProvider);
+
+        final date = await responder.executeTool('get_current_date', const {});
+        final time = await responder.executeTool('get_current_time', const {});
+
+        expect(date, startsWith("Today's date is"));
+        expect(time, startsWith('The time is'));
+      });
+    },
+  );
 
   group('Ask NIRVANA Data Responder - Intent 5: GAMES & BOREDOM', () {
     test('Offers game, memory, and story choices on "I\'m bored"', () async {
@@ -289,28 +306,34 @@ void main() {
     });
   });
 
-  group('Ask NIRVANA Data Responder - Intent 6: SOCIAL (Greeting, Gratitude, Goodbye)', () {
-    test('Responds to greeting warmly', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Hello', 'en');
+  group(
+    'Ask NIRVANA Data Responder - Intent 6: SOCIAL (Greeting, Gratitude, Goodbye)',
+    () {
+      test('Responds to greeting warmly', () async {
+        final responder = container.read(nirvanaDataResponderProvider);
+        final response = await responder.respond('Hello', 'en');
 
-      expect(response, contains('Hello! It is wonderful to talk with you'));
-    });
+        expect(response, contains('Hello! It is wonderful to talk with you'));
+      });
 
-    test('Responds to gratitude warmly', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Thank you', 'en');
+      test('Responds to gratitude warmly', () async {
+        final responder = container.read(nirvanaDataResponderProvider);
+        final response = await responder.respond('Thank you', 'en');
 
-      expect(response, equals('You are always welcome. I am right here with you.'));
-    });
+        expect(
+          response,
+          equals('You are always welcome. I am right here with you.'),
+        );
+      });
 
-    test('Responds to goodbye warmly', () async {
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Goodbye', 'en');
+      test('Responds to goodbye warmly', () async {
+        final responder = container.read(nirvanaDataResponderProvider);
+        final response = await responder.respond('Goodbye', 'en');
 
-      expect(response, contains('Take care and rest well'));
-    });
-  });
+        expect(response, contains('Take care and rest well'));
+      });
+    },
+  );
 
   group('Ask NIRVANA Data Responder - Intent 7: HELP', () {
     test('Lists capabilities including stories', () async {
@@ -324,14 +347,17 @@ void main() {
   });
 
   group('Ask NIRVANA Data Responder - AI Fallback Delegation', () {
-    test('Delegates unmapped conversational queries to AI assistant service', () async {
-      fakeAiAssistant.responseToReturn =
-          'The sky appears blue because of how the Earth\'s atmosphere scatters sunlight.';
+    test(
+      'Delegates unmapped conversational queries to AI assistant service',
+      () async {
+        fakeAiAssistant.responseToReturn =
+            'The sky appears blue because of how the Earth\'s atmosphere scatters sunlight.';
 
-      final responder = container.read(nirvanaDataResponderProvider);
-      final response = await responder.respond('Why is the sky blue?', 'en');
+        final responder = container.read(nirvanaDataResponderProvider);
+        final response = await responder.respond('Why is the sky blue?', 'en');
 
-      expect(response, contains('sky appears blue'));
-    });
+        expect(response, contains('sky appears blue'));
+      },
+    );
   });
 }

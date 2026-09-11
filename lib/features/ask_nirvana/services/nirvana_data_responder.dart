@@ -31,14 +31,18 @@ class NirvanaDataResponder {
 
   static const unavailable = "I don't have that information right now.";
 
-  Future<String> respond(String query, String langCode) async {
+  Future<String> respond(
+    String query,
+    String langCode, {
+    List<Map<String, String>> conversation = const [],
+  }) async {
     final result = _router.route(query);
     debugPrint('Ask NIRVANA intent: ${result.intent}');
     switch (result.intent) {
       // 1. Stories
       case NirvanaIntent.tellStory:
       case NirvanaIntent.tellAnotherStory:
-        return _storyResponse(result, langCode);
+        return _storyResponse(result, langCode, query);
 
       // 2. Reminders & Medicine
       case NirvanaIntent.getNextReminder:
@@ -92,10 +96,20 @@ class NirvanaDataResponder {
       case NirvanaIntent.generalConversation:
         final IAiAssistantService aiService =
             _aiService ?? _ref.read(aiAssistantServiceProvider);
-        return await aiService.getAiFallbackResponse(
+        final advancedService = aiService is IAdvancedNirvanaAiService
+            ? aiService as IAdvancedNirvanaAiService
+            : null;
+        if (advancedService != null) {
+          return advancedService.getAiResponse(
+            query: query,
+            languageCode: langCode,
+            toolExecutor: executeTool,
+            conversation: conversation,
+          );
+        }
+        return aiService.getAiFallbackResponse(
           query: query,
           languageCode: langCode,
-          patientContext: _patientId.isNotEmpty ? 'Patient ID: $_patientId' : null,
         );
     }
   }
@@ -105,12 +119,67 @@ class NirvanaDataResponder {
       HiveDatabase.currentPatientSession?.patientId ??
       '';
 
+  Future<String> executeTool(
+    String toolName,
+    Map<String, dynamic> arguments,
+  ) async {
+    switch (toolName) {
+      case 'get_next_reminder':
+        return _reminderResponse(false, false, 'en');
+      case 'get_today_reminders':
+        return _reminderResponse(false, true, 'en');
+      case 'get_daily_routine':
+        return _routineResponse(RoutinePeriod.allDay);
+      case 'get_family_members':
+        return _familyResponse(arguments['relation'] as String?);
+      case 'get_family_memories':
+        return _memoryResponse();
+      case 'get_recent_activity':
+        return _activityResponse();
+      case 'get_available_games':
+        return 'Available games include Remember Objects, Who Is This?, Grocery Memory, and Familiar Jigsaw.';
+      case 'start_game':
+        return _gameResponse(GameIntentAction.startGame, false, 'en');
+      case 'get_current_date':
+        return _orientationResponse(OrientationTarget.date);
+      case 'get_current_time':
+        return _orientationResponse(OrientationTarget.time);
+      default:
+        return unavailable;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Story handler
   // ---------------------------------------------------------------------------
-  String _storyResponse(NirvanaIntentResult result, String langCode) {
+  Future<String> _storyResponse(
+    NirvanaIntentResult result,
+    String langCode,
+    String query,
+  ) async {
     final NirvanaStoryService storyService =
         _storyService ?? _ref.read(nirvanaStoryServiceProvider);
+    if (await _ref.read(connectivityMonitorProvider).checkStatus() ==
+        NetworkStatus.online) {
+      final IAiAssistantService resolvedAiService =
+          _aiService ?? _ref.read(aiAssistantServiceProvider);
+      final advancedService = resolvedAiService is IAdvancedNirvanaAiService
+          ? resolvedAiService as IAdvancedNirvanaAiService
+          : null;
+      final remote = advancedService != null
+          ? await advancedService.getAiResponse(
+              query: query,
+              languageCode: langCode,
+            )
+          : await resolvedAiService.getAiFallbackResponse(
+              query: query,
+              languageCode: langCode,
+            );
+      if (remote.isNotEmpty &&
+          !remote.startsWith("I can't connect right now")) {
+        return remote;
+      }
+    }
     final story = storyService.getStory(
       languageCode: langCode,
       category: result.storyCategory,
@@ -254,7 +323,11 @@ class NirvanaDataResponder {
   // ---------------------------------------------------------------------------
   // Games & Boredom handler
   // ---------------------------------------------------------------------------
-  String _gameResponse(GameIntentAction? action, bool isBored, String langCode) {
+  String _gameResponse(
+    GameIntentAction? action,
+    bool isBored,
+    String langCode,
+  ) {
     if (isBored) {
       const boredMessages = {
         'en':
@@ -363,12 +436,10 @@ class NirvanaDataResponder {
     const goodbyes = {
       'en':
           'Take care and rest well. I will be right here whenever you need me.',
-      'hi':
-          'अपना ख्याल रखिए और आराम कीजिए। जब भी जरूरत हो, मैं यहीं हूँ।',
+      'hi': 'अपना ख्याल रखिए और आराम कीजिए। जब भी जरूरत हो, मैं यहीं हूँ।',
       'bn':
           'নিজের খেয়াল রাখুন এবং বিশ্রাম নিন। যখনই প্রয়োজন হবে আমি এখানেই আছি।',
-      'as':
-          'নিজৰ যত্ন লওক আৰু বিশ্ৰাম কৰক। প্ৰয়োজন হ’লেই মই ইয়াতেই আছোঁ।',
+      'as': 'নিজৰ যত্ন লওক আৰু বিশ্ৰাম কৰক। প্ৰয়োজন হ’লেই মই ইয়াতেই আছোঁ।',
       'ne':
           'आफ्नो ख्याल राख्नुहोस् र आराम गर्नुहोस्। तपाईंलाई आवश्यक पर्दा म यहीँ हुनेछु।',
     };

@@ -27,8 +27,22 @@ abstract class IAiAssistantService {
   });
 }
 
+abstract interface class IAdvancedNirvanaAiService {
+  Future<String> getAiResponse({
+    required String query,
+    required String languageCode,
+    String? patientContext,
+    NirvanaToolExecutor? toolExecutor,
+    List<Map<String, String>> conversation = const [],
+  });
+}
+
+typedef NirvanaToolExecutor =
+    Future<String> Function(String toolName, Map<String, dynamic> arguments);
+
 /// Supabase Edge Function implementation of IAiAssistantService
-class SupabaseAiAssistantService implements IAiAssistantService {
+class SupabaseAiAssistantService
+    implements IAiAssistantService, IAdvancedNirvanaAiService {
   final SupabaseClient? _supabaseClient;
   final IConnectivityMonitor _connectivityMonitor;
   final Duration _timeout;
@@ -37,9 +51,9 @@ class SupabaseAiAssistantService implements IAiAssistantService {
     SupabaseClient? supabaseClient,
     required IConnectivityMonitor connectivityMonitor,
     Duration timeout = const Duration(seconds: 7),
-  })  : _supabaseClient = supabaseClient,
-        _connectivityMonitor = connectivityMonitor,
-        _timeout = timeout;
+  }) : _supabaseClient = supabaseClient,
+       _connectivityMonitor = connectivityMonitor,
+       _timeout = timeout;
 
   // Localized offline & connection failure fallbacks
   static const Map<String, String> _connectionFailureMessages = {
@@ -80,6 +94,19 @@ class SupabaseAiAssistantService implements IAiAssistantService {
     required String query,
     required String languageCode,
     String? patientContext,
+  }) => getAiResponse(
+    query: query,
+    languageCode: languageCode,
+    patientContext: patientContext,
+  );
+
+  @override
+  Future<String> getAiResponse({
+    required String query,
+    required String languageCode,
+    String? patientContext,
+    NirvanaToolExecutor? toolExecutor,
+    List<Map<String, String>> conversation = const [],
   }) async {
     final cleanQuery = query.trim();
     if (cleanQuery.isEmpty) {
@@ -95,7 +122,9 @@ class SupabaseAiAssistantService implements IAiAssistantService {
     try {
       final status = await _connectivityMonitor.checkStatus();
       if (status == NetworkStatus.offline) {
-        debugPrint('ℹ️ [AiAssistantService] Offline mode: returning local fallback');
+        debugPrint(
+          'ℹ️ [AiAssistantService] Offline mode: returning local fallback',
+        );
         return _getConnectionFailureMessage(languageCode);
       }
     } catch (e) {
@@ -106,23 +135,47 @@ class SupabaseAiAssistantService implements IAiAssistantService {
     // 3. Supabase Client Verification
     final client = _supabaseClient ?? _resolveDefaultSupabaseClient();
     if (client == null || !SupabaseConfig.isConfigured) {
-      debugPrint('ℹ️ [AiAssistantService] Supabase not configured: returning friendly local message');
+      debugPrint(
+        'ℹ️ [AiAssistantService] Supabase not configured: returning friendly local message',
+      );
       return _getConnectionFailureMessage(languageCode);
     }
 
     // 4. Remote Supabase Edge Function Call with Timeout & Error Recovery
     try {
-      final response = await client.functions
-          .invoke(
-            'ask-nirvana-ai',
-            body: {
-              'query': cleanQuery,
-              'languageCode': languageCode,
-              if (patientContext != null && patientContext.isNotEmpty)
-                'patientContext': patientContext,
-            },
-          )
-          .timeout(_timeout);
+      var response = await _invoke(
+        client,
+        body: {
+          'query': cleanQuery,
+          'languageCode': languageCode,
+          if (patientContext != null && patientContext.isNotEmpty)
+            'patientContext': patientContext,
+          if (conversation.isNotEmpty) 'conversation': conversation,
+        },
+      );
+
+      final toolCalls = _readToolCalls(response.data);
+      if (toolCalls.isNotEmpty && toolExecutor != null) {
+        final toolResults = <Map<String, dynamic>>[];
+        for (final call in toolCalls) {
+          final result = await toolExecutor(
+            call['name'] as String,
+            (call['arguments'] as Map<String, dynamic>?) ?? const {},
+          );
+          toolResults.add({'name': call['name'], 'result': result});
+        }
+        response = await _invoke(
+          client,
+          body: {
+            'query': cleanQuery,
+            'languageCode': languageCode,
+            'toolResults': toolResults,
+            if (patientContext != null && patientContext.isNotEmpty)
+              'patientContext': patientContext,
+            if (conversation.isNotEmpty) 'conversation': conversation,
+          },
+        );
+      }
 
       if (response.status == 200 && response.data != null) {
         final data = response.data;
@@ -136,15 +189,46 @@ class SupabaseAiAssistantService implements IAiAssistantService {
         }
       }
 
-      debugPrint('⚠️ [AiAssistantService] Edge function returned status: ${response.status}');
+      debugPrint(
+        '⚠️ [AiAssistantService] Edge function returned status: ${response.status}',
+      );
       return _getConnectionFailureMessage(languageCode);
     } on TimeoutException {
-      debugPrint('⏱️ [AiAssistantService] Edge function timed out after ${_timeout.inSeconds}s');
+      debugPrint(
+        '⏱️ [AiAssistantService] Edge function timed out after ${_timeout.inSeconds}s',
+      );
       return _getConnectionFailureMessage(languageCode);
     } catch (e) {
       debugPrint('⚠️ [AiAssistantService] Exception calling AI fallback: $e');
       return _getConnectionFailureMessage(languageCode);
     }
+  }
+
+  Future<dynamic> _invoke(
+    SupabaseClient client, {
+    required Map<String, dynamic> body,
+  }) {
+    return client.functions
+        .invoke('ask-nirvana-ai', body: body)
+        .timeout(_timeout);
+  }
+
+  List<Map<String, dynamic>> _readToolCalls(dynamic data) {
+    if (data is! Map) return const [];
+    final calls = data['toolCalls'];
+    if (calls is! List) return const [];
+    return calls
+        .whereType<Map>()
+        .map(
+          (call) => <String, dynamic>{
+            'name': call['name']?.toString() ?? '',
+            'arguments': call['arguments'] is Map
+                ? Map<String, dynamic>.from(call['arguments'] as Map)
+                : <String, dynamic>{},
+          },
+        )
+        .where((call) => (call['name'] as String).isNotEmpty)
+        .toList(growable: false);
   }
 
   /// Client-side emergency & medical query detection for immediate elder safety

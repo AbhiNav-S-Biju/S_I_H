@@ -331,9 +331,19 @@ class AskNirvanaNotifier extends StateNotifier<AskNirvanaState> {
     // 3. Generate response from real NIRVANA data layer
     final activeLocale = _ref.read(localeProvider);
     final dataResponder = _ref.read(nirvanaDataResponderProvider);
+    final conversation = state.messages
+        .take(12)
+        .map(
+          (message) => <String, String>{
+            'role': message.isUser ? 'user' : 'model',
+            'text': message.text,
+          },
+        )
+        .toList(growable: false);
     final responseText = await dataResponder.respond(
       userInput,
       activeLocale.languageCode,
+      conversation: conversation,
     );
     if (!mounted) return;
 
