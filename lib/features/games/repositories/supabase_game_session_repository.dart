@@ -72,6 +72,7 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
     }
 
     final sessionId = session.id.isNotEmpty ? session.id : _generateUuid();
+    final effectiveDeviceId = deviceId ?? HiveDatabase.getOrCreateDeviceId();
     final startedAt = session.completedAt
         .subtract(Duration(seconds: session.durationSeconds))
         .toUtc();
@@ -89,6 +90,7 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
       'started_at': startedAt.toIso8601String(),
       'completed_at': completedAt.toIso8601String(),
       'created_at': DateTime.now().toUtc().toIso8601String(),
+      'device_id': effectiveDeviceId,
     };
 
     final client = _activeClient;
@@ -100,12 +102,11 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
       final isAuthenticated = client.auth.currentUser != null;
       if (!isAuthenticated) {
         try {
-          final pairedDeviceId = deviceId ?? HiveDatabase.getOrCreateDeviceId();
           await client.rpc(
             'record_patient_game_session',
             params: {
               'p_patient_id': effectivePatientId,
-              'p_device_id': pairedDeviceId,
+              'p_device_id': effectiveDeviceId,
               'p_session': payload,
             },
           );

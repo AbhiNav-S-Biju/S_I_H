@@ -15,6 +15,7 @@ import '../models/game_enums.dart';
 import '../models/game_level.dart';
 import '../models/game_session.dart';
 import '../services/game_progress_service.dart';
+import '../../../database/hive_database.dart';
 import 'game_level_map_screen.dart';
 import 'widgets/elder_game_button.dart';
 
@@ -39,6 +40,17 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
     );
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final patientId = HiveDatabase.pairedPatientId;
+    if (patientId != null) {
+      GameProgressService.instance.initializeForPatient(patientId).then((_) {
+        if (mounted) setState(() {});
+      });
     }
   }
 

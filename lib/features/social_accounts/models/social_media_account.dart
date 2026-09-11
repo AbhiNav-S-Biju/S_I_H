@@ -1,15 +1,16 @@
 import 'dart:convert';
 
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 
 enum SocialPlatform {
-  instagram('Instagram', Icons.camera_alt_rounded),
-  facebook('Facebook', Icons.facebook),
-  xTwitter('X / Twitter', Icons.alternate_email_rounded),
-  linkedIn('LinkedIn', Icons.business_center_rounded),
-  snapchat('Snapchat', Icons.chat_bubble_rounded),
-  tikTok('TikTok', Icons.music_note_rounded),
-  discord('Discord', Icons.forum_rounded);
+  instagram('Instagram', FontAwesomeIcons.instagram),
+  facebook('Facebook', FontAwesomeIcons.facebookF),
+  xTwitter('X / Twitter', FontAwesomeIcons.xTwitter),
+  linkedIn('LinkedIn', FontAwesomeIcons.linkedinIn),
+  snapchat('Snapchat', FontAwesomeIcons.snapchat),
+  tikTok('TikTok', FontAwesomeIcons.tiktok),
+  discord('Discord', FontAwesomeIcons.discord);
 
   const SocialPlatform(this.label, this.icon);
 

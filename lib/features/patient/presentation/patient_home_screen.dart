@@ -321,8 +321,8 @@ class _QuickAccessGrid extends StatelessWidget {
         icon: Icons.extension_rounded,
         label: 'Memory Games',
         tag: 'BRAIN GYM',
-        color: ElderColors.primary,
-        bgColor: ElderColors.pastelLavender,
+        color: ElderColors.lavenderDeep,
+        bgColor: ElderColors.pastelLavenderBg,
         onTap: () => context.push('/patient/games'),
       ),
       _ClayQuickTile(
@@ -361,8 +361,8 @@ class _QuickAccessGrid extends StatelessWidget {
         icon: Icons.record_voice_over_rounded,
         label: 'Ask NIRVANA',
         tag: 'AI COMPANION',
-        color: ElderColors.primary,
-        bgColor: ElderColors.pastelLavender,
+        color: ElderColors.skyDeep,
+        bgColor: ElderColors.pastelSkyBg,
         onTap: () => context.push('/ask-nirvana'),
       ),
     ];
@@ -409,7 +409,7 @@ class _ClayQuickTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: ElderColors.surface,
         borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
         border: Border.all(color: ElderColors.borderLight, width: 1.5),
         boxShadow: ElderColors.clayShadow(),

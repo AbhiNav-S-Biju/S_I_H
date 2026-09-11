@@ -502,15 +502,10 @@ class SupabaseCaregiverRepository
         status == NetworkStatus.online &&
         patientId.isNotEmpty) {
       try {
-        // DB columns: successful_trials, total_trials, difficulty_level (int), completed_at
-        final response = await activeClient
-            .from('game_sessions')
-            .select(
-              'id, game_type, difficulty_level, total_trials, successful_trials, duration_seconds, completed_at, created_at',
-            )
-            .eq('patient_id', patientId)
-            .order('completed_at', ascending: false)
-            .limit(20);
+        final response = await activeClient.rpc(
+          'get_caregiver_game_history',
+          params: {'p_patient_id': patientId, 'p_limit': 20},
+        );
 
         return (response as List).map((item) {
           final map = item as Map<String, dynamic>;
@@ -534,6 +529,7 @@ class SupabaseCaregiverRepository
         }).toList();
       } catch (e) {
         debugPrint('⚠️ Remote game history fetch error: $e');
+        rethrow;
       }
     }
 

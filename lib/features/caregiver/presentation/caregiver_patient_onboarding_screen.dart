@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/features/caregiver/models/caregiver_models.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
 
@@ -168,7 +169,11 @@ class _CaregiverPatientOnboardingScreenState
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: ElderColors.primary, size: 20),
+                  const Icon(
+                    Icons.info_outline,
+                    color: ElderColors.primary,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -199,7 +204,10 @@ class _CaregiverPatientOnboardingScreenState
               Navigator.of(ctx).pop();
               context.go('/caregiver/dashboard');
             },
-            child: const Text('Go to Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Go to Dashboard',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -211,10 +219,10 @@ class _CaregiverPatientOnboardingScreenState
     final onboardingState = ref.watch(patientOnboardingProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FAF9),
+      backgroundColor: Clay3DTheme.canvas,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         foregroundColor: ElderColors.textPrimary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -234,52 +242,83 @@ class _CaregiverPatientOnboardingScreenState
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
-          TextButton(
-            onPressed: () => context.go('/caregiver/dashboard'),
-            child: const Text('Skip to Dashboard', style: TextStyle(color: Colors.grey)),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: FilledButton.icon(
+              onPressed: () => context.go('/caregiver/dashboard'),
+              style: FilledButton.styleFrom(
+                backgroundColor: ElderColors.surface,
+                foregroundColor: ElderColors.textSecondary,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                minimumSize: const Size(0, 38),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(NirvanaRadii.button),
+                  side: const BorderSide(color: ElderColors.borderLight),
+                ),
+                shadowColor: Colors.transparent,
+              ),
+              icon: const Icon(Icons.exit_to_app_rounded, size: 17),
+              label: const Text('Skip'),
+            ),
           ),
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Progress Header
-            _buildProgressIndicator(),
+        child: ClayBackdrop3D(
+          child: Column(
+            children: [
+              // Progress Header
+              _buildProgressIndicator(),
 
-            if (onboardingState.errorMessage != null)
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.red.shade200),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        onboardingState.errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 13),
+              if (onboardingState.errorMessage != null)
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          onboardingState.errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // Step Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                  child: _buildCurrentStepContent(),
                 ),
               ),
 
-            // Step Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: _buildCurrentStepContent(),
-              ),
-            ),
-
-            // Bottom Navigation Controls
-            _buildBottomBar(onboardingState.isLoading),
-          ],
+              // Bottom Navigation Controls
+              _buildBottomBar(onboardingState.isLoading),
+            ],
+          ),
         ),
       ),
     );
@@ -289,7 +328,7 @@ class _CaregiverPatientOnboardingScreenState
     final stepLabels = ['Profile', 'Comfort', 'Reminders', 'Pairing'];
 
     return Container(
-      color: Colors.white,
+      color: ElderColors.surface.withValues(alpha: 0.94),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: List.generate(4, (index) {
@@ -311,15 +350,21 @@ class _CaregiverPatientOnboardingScreenState
                               shape: BoxShape.circle,
                               color: isCompleted || isCurrent
                                   ? ElderColors.primary
-                                  : Colors.grey.shade300,
+                                  : ElderColors.border,
                             ),
                             child: Center(
                               child: isCompleted
-                                  ? const Icon(Icons.check, color: Colors.white, size: 16)
+                                  ? const Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 16,
+                                    )
                                   : Text(
                                       '${index + 1}',
                                       style: TextStyle(
-                                        color: isCurrent ? Colors.white : Colors.grey.shade700,
+                                        color: isCurrent
+                                            ? Colors.white
+                                            : ElderColors.textSecondary,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13,
                                       ),
@@ -333,8 +378,12 @@ class _CaregiverPatientOnboardingScreenState
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                                color: isCurrent ? ElderColors.primary : Colors.grey.shade600,
+                                fontWeight: isCurrent
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isCurrent
+                                    ? ElderColors.primary
+                                    : ElderColors.textSecondary,
                               ),
                             ),
                           ),
@@ -346,7 +395,7 @@ class _CaregiverPatientOnboardingScreenState
                         decoration: BoxDecoration(
                           color: isCompleted || isCurrent
                               ? ElderColors.primary
-                              : Colors.grey.shade200,
+                              : ElderColors.borderLight,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -386,7 +435,11 @@ class _CaregiverPatientOnboardingScreenState
         children: [
           const Text(
             'Patient Information',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: ElderColors.textPrimary),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: ElderColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
@@ -397,38 +450,57 @@ class _CaregiverPatientOnboardingScreenState
 
           // Full Name
           _buildFieldLabel('Full Name *'),
-          TextFormField(
-            key: const Key('patient_full_name_field'),
-            controller: _fullNameController,
-            decoration: _inputDecoration('e.g. Elena Rostova', Icons.person_outline),
-            validator: (val) {
-              if (val == null || val.trim().isEmpty) return 'Please enter the patient\'s name';
-              if (val.trim().length < 2) return 'Name must be at least 2 characters';
-              return null;
-            },
+          _buildClayField(
+            child: TextFormField(
+              key: const Key('patient_full_name_field'),
+              controller: _fullNameController,
+              decoration: _inputDecoration(
+                'e.g. Elena Rostova',
+                Icons.person_outline,
+              ),
+              validator: (val) {
+                if (val == null || val.trim().isEmpty) {
+                  return 'Please enter the patient\'s name';
+                }
+                if (val.trim().length < 2) {
+                  return 'Name must be at least 2 characters';
+                }
+                return null;
+              },
+            ),
           ),
           const SizedBox(height: 16),
 
           // Preferred Name
           _buildFieldLabel('Preferred Name / Nickname'),
-          TextFormField(
-            key: const Key('patient_preferred_name_field'),
-            controller: _preferredNameController,
-            decoration: _inputDecoration('e.g. Mom, Dad, Grandma', Icons.favorite_border),
+          _buildClayField(
+            child: TextFormField(
+              key: const Key('patient_preferred_name_field'),
+              controller: _preferredNameController,
+              decoration: _inputDecoration(
+                'e.g. Mom, Dad, Grandma',
+                Icons.favorite_border,
+              ),
+            ),
           ),
           const SizedBox(height: 16),
 
           // Relationship
           _buildFieldLabel('Relationship to Caregiver *'),
-          DropdownButtonFormField<String>(
-            value: _selectedRelationship,
-            decoration: _inputDecoration('Select Relationship', Icons.people_outline),
-            items: _relationshipOptions.map((rel) {
-              return DropdownMenuItem(value: rel, child: Text(rel));
-            }).toList(),
-            onChanged: (val) {
-              if (val != null) setState(() => _selectedRelationship = val);
-            },
+          _buildClayField(
+            child: DropdownButtonFormField<String>(
+              value: _selectedRelationship,
+              decoration: _inputDecoration(
+                'Select Relationship',
+                Icons.people_outline,
+              ),
+              items: _relationshipOptions.map((rel) {
+                return DropdownMenuItem(value: rel, child: Text(rel));
+              }).toList(),
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedRelationship = val);
+              },
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -450,13 +522,17 @@ class _CaregiverPatientOnboardingScreenState
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: ElderColors.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: ElderColors.borderLight),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today_outlined, color: Colors.grey, size: 20),
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     _dateOfBirth != null
@@ -464,13 +540,19 @@ class _CaregiverPatientOnboardingScreenState
                         : 'Select Date of Birth',
                     style: TextStyle(
                       fontSize: 15,
-                      color: _dateOfBirth != null ? Colors.black87 : Colors.grey.shade600,
+                      color: _dateOfBirth != null
+                          ? Colors.black87
+                          : Colors.grey.shade600,
                     ),
                   ),
                   const Spacer(),
                   if (_dateOfBirth != null)
                     IconButton(
-                      icon: const Icon(Icons.clear, size: 18, color: Colors.grey),
+                      icon: const Icon(
+                        Icons.clear,
+                        size: 18,
+                        color: Colors.grey,
+                      ),
                       onPressed: () => setState(() => _dateOfBirth = null),
                     ),
                 ],
@@ -481,25 +563,32 @@ class _CaregiverPatientOnboardingScreenState
 
           // Emergency Contact Phone
           _buildFieldLabel('Emergency Contact Phone'),
-          TextFormField(
-            key: const Key('patient_emergency_phone_field'),
-            controller: _emergencyPhoneController,
-            keyboardType: TextInputType.phone,
-            decoration: _inputDecoration('+1 555-0199', Icons.phone_outlined),
+          _buildClayField(
+            child: TextFormField(
+              key: const Key('patient_emergency_phone_field'),
+              controller: _emergencyPhoneController,
+              keyboardType: TextInputType.phone,
+              decoration: _inputDecoration('+1 555-0199', Icons.phone_outlined),
+            ),
           ),
           const SizedBox(height: 16),
 
           // Timezone
           _buildFieldLabel('Timezone'),
-          DropdownButtonFormField<String>(
-            value: _selectedTimezone,
-            decoration: _inputDecoration('Select Timezone', Icons.access_time),
-            items: _timezoneOptions.map((tz) {
-              return DropdownMenuItem(value: tz, child: Text(tz));
-            }).toList(),
-            onChanged: (val) {
-              if (val != null) setState(() => _selectedTimezone = val);
-            },
+          _buildClayField(
+            child: DropdownButtonFormField<String>(
+              value: _selectedTimezone,
+              decoration: _inputDecoration(
+                'Select Timezone',
+                Icons.access_time,
+              ),
+              items: _timezoneOptions.map((tz) {
+                return DropdownMenuItem(value: tz, child: Text(tz));
+              }).toList(),
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedTimezone = val);
+              },
+            ),
           ),
         ],
       ),
@@ -513,7 +602,11 @@ class _CaregiverPatientOnboardingScreenState
       children: [
         const Text(
           'Visual & Comfort Preferences',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: ElderColors.textPrimary),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: ElderColors.textPrimary,
+          ),
         ),
         const SizedBox(height: 6),
         Text(
@@ -526,9 +619,10 @@ class _CaregiverPatientOnboardingScreenState
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: ElderColors.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: ElderColors.borderLight),
+            boxShadow: ElderColors.clayShadow(opacity: 0.06, blur: 12),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,8 +630,17 @@ class _CaregiverPatientOnboardingScreenState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Font Size & Scale', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text('${(_fontScale * 100).round()}%', style: const TextStyle(fontWeight: FontWeight.bold, color: ElderColors.primary)),
+                  const Text(
+                    'Font Size & Scale',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(
+                    '${(_fontScale * 100).round()}%',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: ElderColors.primary,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -552,8 +655,14 @@ class _CaregiverPatientOnboardingScreenState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
-                  Text('Standard (100%)', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  Text('Extra Large (180%)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  Text(
+                    'Standard (100%)',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  Text(
+                    'Extra Large (180%)',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
                 ],
               ),
             ],
@@ -572,7 +681,8 @@ class _CaregiverPatientOnboardingScreenState
 
         _buildSwitchCard(
           title: 'Large Touch Targets',
-          subtitle: 'Oversized buttons with generous spacing to avoid accidental taps.',
+          subtitle:
+              'Oversized buttons with generous spacing to avoid accidental taps.',
           value: _largeText,
           onChanged: (v) => setState(() => _largeText = v),
           icon: Icons.touch_app_outlined,
@@ -581,7 +691,8 @@ class _CaregiverPatientOnboardingScreenState
 
         _buildSwitchCard(
           title: 'Audio Prompt Guidance',
-          subtitle: 'Read aloud daily reminders and spoken activity instructions.',
+          subtitle:
+              'Read aloud daily reminders and spoken activity instructions.',
           value: _audioPrompts,
           onChanged: (v) => setState(() => _audioPrompts = v),
           icon: Icons.volume_up_outlined,
@@ -590,7 +701,8 @@ class _CaregiverPatientOnboardingScreenState
 
         _buildSwitchCard(
           title: 'Gentle Haptic Feedback',
-          subtitle: 'Vibration confirmations when tapping buttons and completing routines.',
+          subtitle:
+              'Vibration confirmations when tapping buttons and completing routines.',
           value: _hapticFeedback,
           onChanged: (v) => setState(() => _hapticFeedback = v),
           icon: Icons.vibration,
@@ -615,7 +727,11 @@ class _CaregiverPatientOnboardingScreenState
       children: [
         const Text(
           'Daily Routine & Reminders',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: ElderColors.textPrimary),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: ElderColors.textPrimary,
+          ),
         ),
         const SizedBox(height: 6),
         Text(
@@ -664,13 +780,18 @@ class _CaregiverPatientOnboardingScreenState
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: item.isEnabled ? ElderColors.textPrimary : Colors.grey,
+                          color: item.isEnabled
+                              ? ElderColors.textPrimary
+                              : Colors.grey,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         item.description,
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ],
                   ),
@@ -690,7 +811,10 @@ class _CaregiverPatientOnboardingScreenState
                       : null,
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: item.isEnabled
                           ? ElderColors.primary.withValues(alpha: 0.1)
@@ -701,7 +825,9 @@ class _CaregiverPatientOnboardingScreenState
                       item.timeOfDay.format(context),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: item.isEnabled ? ElderColors.primary : Colors.grey,
+                        color: item.isEnabled
+                            ? ElderColors.primary
+                            : Colors.grey,
                         fontSize: 14,
                       ),
                     ),
@@ -716,7 +842,9 @@ class _CaregiverPatientOnboardingScreenState
           style: OutlinedButton.styleFrom(
             foregroundColor: ElderColors.primary,
             side: const BorderSide(color: ElderColors.primary),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           onPressed: _showAddCustomReminderDialog,
@@ -737,7 +865,9 @@ class _CaregiverPatientOnboardingScreenState
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text('Add Routine Reminder'),
           content: SingleChildScrollView(
             child: Column(
@@ -745,24 +875,42 @@ class _CaregiverPatientOnboardingScreenState
               children: [
                 TextField(
                   controller: titleController,
-                  decoration: _inputDecoration('Reminder Title (e.g. Afternoon Tea)', Icons.alarm),
+                  decoration: _inputDecoration(
+                    'Reminder Title (e.g. Afternoon Tea)',
+                    Icons.alarm,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: descController,
-                  decoration: _inputDecoration('Description (optional)', Icons.notes),
+                  decoration: _inputDecoration(
+                    'Description (optional)',
+                    Icons.notes,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: reminderType,
                   decoration: _inputDecoration('Type', Icons.category),
                   items: const [
-                    DropdownMenuItem(value: 'medication', child: Text('Medication')),
-                    DropdownMenuItem(value: 'hydration', child: Text('Hydration')),
+                    DropdownMenuItem(
+                      value: 'medication',
+                      child: Text('Medication'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'hydration',
+                      child: Text('Hydration'),
+                    ),
                     DropdownMenuItem(value: 'meal', child: Text('Meal')),
-                    DropdownMenuItem(value: 'activity', child: Text('Activity')),
+                    DropdownMenuItem(
+                      value: 'activity',
+                      child: Text('Activity'),
+                    ),
                     DropdownMenuItem(value: 'social', child: Text('Social')),
-                    DropdownMenuItem(value: 'general', child: Text('General Routine')),
+                    DropdownMenuItem(
+                      value: 'general',
+                      child: Text('General Routine'),
+                    ),
                   ],
                   onChanged: (v) {
                     if (v != null) setDialogState(() => reminderType = v);
@@ -771,14 +919,23 @@ class _CaregiverPatientOnboardingScreenState
                 const SizedBox(height: 12),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.schedule, color: ElderColors.primary),
+                  leading: const Icon(
+                    Icons.schedule,
+                    color: ElderColors.primary,
+                  ),
                   title: const Text('Scheduled Time'),
                   trailing: TextButton(
                     onPressed: () async {
-                      final t = await showTimePicker(context: ctx, initialTime: pickedTime);
+                      final t = await showTimePicker(
+                        context: ctx,
+                        initialTime: pickedTime,
+                      );
                       if (t != null) setDialogState(() => pickedTime = t);
                     },
-                    child: Text(pickedTime.format(ctx), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(
+                      pickedTime.format(ctx),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
@@ -825,7 +982,11 @@ class _CaregiverPatientOnboardingScreenState
       children: [
         const Text(
           'Pair Patient Device',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: ElderColors.textPrimary),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: ElderColors.textPrimary,
+          ),
         ),
         const SizedBox(height: 6),
         Text(
@@ -837,16 +998,12 @@ class _CaregiverPatientOnboardingScreenState
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: ElderColors.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: ElderColors.primary.withValues(alpha: 0.2)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color: ElderColors.primary.withValues(alpha: 0.2),
+            ),
+            boxShadow: ElderColors.clayShadow(opacity: 0.08, blur: 16),
           ),
           child: Column(
             children: [
@@ -866,17 +1023,28 @@ class _CaregiverPatientOnboardingScreenState
               const SizedBox(height: 18),
               const Text(
                 'Device Pairing Ready',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ElderColors.textPrimary),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: ElderColors.textPrimary,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Your patient profile and preferences are configured. You can generate a 6-digit one-time pairing code anytime from your Caregiver Dashboard to connect your patient\'s device.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade700, height: 1.4),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade700,
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 16),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
                   borderRadius: BorderRadius.circular(10),
@@ -885,11 +1053,19 @@ class _CaregiverPatientOnboardingScreenState
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.check_circle_outline, color: Colors.green.shade800, size: 18),
+                    Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green.shade800,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Ready to Pair via Caregiver Dashboard',
-                      style: TextStyle(fontSize: 12, color: Colors.green.shade900, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.green.shade900,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -903,8 +1079,9 @@ class _CaregiverPatientOnboardingScreenState
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: ElderColors.backgroundAlt,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ElderColors.borderLight),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -915,10 +1092,18 @@ class _CaregiverPatientOnboardingScreenState
               ),
               const SizedBox(height: 10),
               _buildSummaryRow('Name', _fullNameController.text),
-              _buildSummaryRow('Preferred Name', _preferredNameController.text.isNotEmpty ? _preferredNameController.text : _fullNameController.text),
+              _buildSummaryRow(
+                'Preferred Name',
+                _preferredNameController.text.isNotEmpty
+                    ? _preferredNameController.text
+                    : _fullNameController.text,
+              ),
               _buildSummaryRow('Relationship', _selectedRelationship),
               _buildSummaryRow('Timezone', _selectedTimezone),
-              _buildSummaryRow('Active Reminders', '${_reminders.where((r) => r.isEnabled).length} configured'),
+              _buildSummaryRow(
+                'Active Reminders',
+                '${_reminders.where((r) => r.isEnabled).length} configured',
+              ),
             ],
           ),
         ),
@@ -932,10 +1117,17 @@ class _CaregiverPatientOnboardingScreenState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+          Text(
+            label,
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+          ),
           Text(
             value.isNotEmpty ? value : '—',
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: ElderColors.textPrimary),
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: ElderColors.textPrimary,
+            ),
           ),
         ],
       ),
@@ -944,7 +1136,10 @@ class _CaregiverPatientOnboardingScreenState
 
   Widget _buildBottomBar(bool isLoading) {
     return Container(
-      color: Colors.white,
+      decoration: BoxDecoration(
+        color: ElderColors.surface.withValues(alpha: 0.96),
+        boxShadow: ElderColors.clayShadow(opacity: 0.08, blur: 14),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Row(
         children: [
@@ -954,10 +1149,17 @@ class _CaregiverPatientOnboardingScreenState
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 48),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                 ),
-                onPressed: isLoading ? null : () => setState(() => _currentStep--),
+                onPressed: isLoading
+                    ? null
+                    : () => setState(() => _currentStep--),
                 child: const Text('Back'),
               ),
             ),
@@ -970,7 +1172,9 @@ class _CaregiverPatientOnboardingScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: ElderColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
               onPressed: isLoading
@@ -990,11 +1194,17 @@ class _CaregiverPatientOnboardingScreenState
                   ? const SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
                   : Text(
                       _currentStep == 3 ? 'Finish & Save Patient' : 'Continue',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
             ),
           ),
@@ -1017,6 +1227,17 @@ class _CaregiverPatientOnboardingScreenState
     );
   }
 
+  Widget _buildClayField({required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: ElderColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: Clay3DTheme.cardShadow(blur: 10, offset: 3),
+      ),
+      child: ClipRRect(borderRadius: BorderRadius.circular(16), child: child),
+    );
+  }
+
   Widget _buildSwitchCard({
     required String title,
     required String subtitle,
@@ -1027,9 +1248,10 @@ class _CaregiverPatientOnboardingScreenState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: ElderColors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: ElderColors.borderLight),
+        boxShadow: ElderColors.clayShadow(opacity: 0.05, blur: 10),
       ),
       child: Row(
         children: [
@@ -1039,9 +1261,18 @@ class _CaregiverPatientOnboardingScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
               ],
             ),
           ),
@@ -1061,15 +1292,15 @@ class _CaregiverPatientOnboardingScreenState
       hintText: hint,
       prefixIcon: Icon(icon, color: Colors.grey.shade600, size: 20),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: ElderColors.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: const BorderSide(color: ElderColors.borderLight),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: const BorderSide(color: ElderColors.borderLight),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

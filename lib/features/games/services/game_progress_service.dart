@@ -6,6 +6,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/network/connectivity_monitor.dart';
+import '../../../database/hive_database.dart';
 import '../models/game_enums.dart';
 import '../models/game_level.dart';
 
@@ -16,19 +19,21 @@ final gameProgressServiceProvider = Provider<GameProgressService>((ref) {
 
 /// Riverpod provider for a specific game's level progress map
 final gameLevelProgressProvider =
-    StateNotifierProvider.family<GameLevelNotifier, Map<int, GameLevelProgress>, GameType>(
-  (ref, gameType) {
-    final service = ref.watch(gameProgressServiceProvider);
-    return GameLevelNotifier(service, gameType);
-  },
-);
+    StateNotifierProvider.family<
+      GameLevelNotifier,
+      Map<int, GameLevelProgress>,
+      GameType
+    >((ref, gameType) {
+      final service = ref.watch(gameProgressServiceProvider);
+      return GameLevelNotifier(service, gameType);
+    });
 
 class GameLevelNotifier extends StateNotifier<Map<int, GameLevelProgress>> {
   final GameProgressService _service;
   final GameType _gameType;
 
   GameLevelNotifier(this._service, this._gameType)
-      : super(_service.getLevelProgressMap(_gameType)) {
+    : super(_service.getLevelProgressMap(_gameType)) {
     _service.addListener(_onServiceChanged);
   }
 
@@ -57,6 +62,25 @@ class GameProgressService extends ChangeNotifier {
   final Map<GameType, DateTime> _allCompletedDates = {};
 
   bool _initialized = false;
+  String? _patientId;
+  bool _remoteLoaded = false;
+
+  SupabaseClient? get _client {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> initializeForPatient(String patientId) async {
+    await init();
+    if (patientId.isEmpty || _patientId == patientId && _remoteLoaded) return;
+    _patientId = patientId;
+    _remoteLoaded = true;
+    await _loadRemoteProgress();
+    notifyListeners();
+  }
 
   /// Initializes the storage box if available
   Future<void> init() async {
@@ -147,15 +171,19 @@ class GameProgressService extends ChangeNotifier {
     if (completedDate == null) return false;
 
     // Check if currentDate is a subsequent calendar day
-    final isNewDay = (currentTime.year > completedDate.year) ||
-        (currentTime.year == completedDate.year && currentTime.month > completedDate.month) ||
+    final isNewDay =
+        (currentTime.year > completedDate.year) ||
+        (currentTime.year == completedDate.year &&
+            currentTime.month > completedDate.month) ||
         (currentTime.year == completedDate.year &&
             currentTime.month == completedDate.month &&
             currentTime.day > completedDate.day);
 
     if (isNewDay) {
       resetGameProgress(gameType);
-      debugPrint('🌅 Daily Reset: Reset 8 levels for $gameType for the new day.');
+      debugPrint(
+        '🌅 Daily Reset: Reset 8 levels for $gameType for the new day.',
+      );
       return true;
     }
     return false;
@@ -254,7 +282,9 @@ class GameProgressService extends ChangeNotifier {
     int timeSeconds = 0,
   }) async {
     final current = getProgress(gameType, levelNumber);
-    final updatedStars = stars > current.starsEarned ? stars : current.starsEarned;
+    final updatedStars = stars > current.starsEarned
+        ? stars
+        : current.starsEarned;
     final updatedScore = score > current.bestScore ? score : current.bestScore;
 
     final updated = GameLevelProgress(
@@ -294,6 +324,86 @@ class GameProgressService extends ChangeNotifier {
     }
 
     notifyListeners();
+    await _saveRemoteProgress(gameType, updated);
+  }
+
+  Future<void> _loadRemoteProgress() async {
+    final patientId = _patientId;
+    final client = _client;
+    if (patientId == null || client == null) return;
+    try {
+      if (await ConnectivityMonitor().checkStatus() != NetworkStatus.online) {
+        return;
+      }
+      final rows = await client.rpc(
+        'get_patient_game_progress',
+        params: {
+          'p_patient_id': patientId,
+          'p_device_id': HiveDatabase.getOrCreateDeviceId(),
+        },
+      );
+      if (rows is! List) return;
+      for (final raw in rows) {
+        if (raw is! Map) continue;
+        final gameType = GameType.values.firstWhere(
+          (type) => type.id == raw['game_type'],
+          orElse: () => GameType.rememberObjects,
+        );
+        final levelNumber = (raw['level_number'] as num?)?.toInt() ?? 1;
+        final remote = GameLevelProgress(
+          levelNumber: levelNumber,
+          isCompleted: true,
+          starsEarned: (raw['stars_earned'] as num?)?.toInt() ?? 0,
+          bestScore: (raw['best_score'] as num?)?.toInt() ?? 0,
+          timesPlayed: (raw['times_played'] as num?)?.toInt() ?? 0,
+          completedAt: DateTime.tryParse(raw['completed_at'] as String? ?? ''),
+        );
+        final local = getProgress(gameType, levelNumber);
+        if (remote.starsEarned >= local.starsEarned &&
+            remote.bestScore >= local.bestScore) {
+          _cache[gameType]![levelNumber] = remote;
+          if (_box?.isOpen == true) {
+            await _box!.put(
+              '${gameType.name}_level_$levelNumber',
+              remote.toMap(),
+            );
+          }
+        }
+      }
+    } catch (error) {
+      debugPrint('Game progress remote load skipped: $error');
+    }
+  }
+
+  Future<void> _saveRemoteProgress(
+    GameType gameType,
+    GameLevelProgress progress,
+  ) async {
+    final patientId = _patientId;
+    final client = _client;
+    if (patientId == null || client == null) return;
+    try {
+      if (await ConnectivityMonitor().checkStatus() != NetworkStatus.online) {
+        return;
+      }
+      await client.rpc(
+        'upsert_patient_game_progress',
+        params: {
+          'p_patient_id': patientId,
+          'p_device_id': HiveDatabase.getOrCreateDeviceId(),
+          'p_progress': {
+            'game_type': gameType.id,
+            'level_number': progress.levelNumber,
+            'stars_earned': progress.starsEarned,
+            'best_score': progress.bestScore,
+            'times_played': progress.timesPlayed,
+            'completed_at': progress.completedAt?.toUtc().toIso8601String(),
+          },
+        },
+      );
+    } catch (error) {
+      debugPrint('Game progress remote save skipped: $error');
+    }
   }
 
   /// Resets progress for testing

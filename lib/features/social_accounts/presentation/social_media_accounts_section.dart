@@ -209,34 +209,84 @@ class _SocialMediaAccountTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(child: Icon(account.platform.icon)),
-      title: Text(
-        account.platform.label,
-        style: const TextStyle(fontWeight: FontWeight.w800),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+      decoration: BoxDecoration(
+        color: ElderColors.background,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: ElderColors.borderLight),
       ),
-      subtitle: Text('${account.usernameOrEmail}\nPassword: ••••••••'),
-      isThreeLine: true,
-      trailing: Wrap(
+      child: Row(
         children: [
-          IconButton(
-            tooltip: 'Copy password',
-            onPressed: () => _copyPassword(context),
-            icon: const Icon(Icons.copy_rounded),
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: ElderColors.primary.withValues(alpha: 0.12),
+            foregroundColor: ElderColors.primary,
+            child: Icon(account.platform.icon),
           ),
-          IconButton(
-            tooltip: 'Edit account',
-            onPressed: onEdit,
-            icon: const Icon(Icons.edit_rounded),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  account.platform.label,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  account.usernameOrEmail,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: const TextStyle(
+                    color: ElderColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                const Text(
+                  'Password: ••••••••',
+                  style: TextStyle(
+                    color: ElderColors.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
           ),
-          IconButton(
-            tooltip: 'Delete account',
-            onPressed: onDelete,
-            icon: const Icon(Icons.delete_outline_rounded),
+          PopupMenuButton<_AccountAction>(
+            tooltip: 'Account actions',
+            onSelected: (action) {
+              switch (action) {
+                case _AccountAction.copyPassword:
+                  _copyPassword(context);
+                case _AccountAction.edit:
+                  onEdit();
+                case _AccountAction.delete:
+                  onDelete();
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: _AccountAction.copyPassword,
+                child: Text('Copy password'),
+              ),
+              PopupMenuItem(
+                value: _AccountAction.edit,
+                child: Text('Edit account'),
+              ),
+              PopupMenuItem(
+                value: _AccountAction.delete,
+                child: Text('Delete account'),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 }
+
+enum _AccountAction { copyPassword, edit, delete }

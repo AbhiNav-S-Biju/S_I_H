@@ -40,6 +40,24 @@ class SupabaseSyncRepository implements ISupabaseSyncRepository {
     }
 
     try {
+      if (entityType == 'game_session') {
+        final deviceId = payload['device_id'] as String?;
+        if (deviceId == null || deviceId.isEmpty) {
+          throw const PostgrestException(
+            message: 'Queued game session is missing its paired device ID.',
+          );
+        }
+        await activeClient.rpc(
+          'record_patient_game_session',
+          params: {
+            'p_patient_id': patientId,
+            'p_device_id': deviceId,
+            'p_session': payload,
+          },
+        );
+        return {'status': 'success', 'entity_type': entityType};
+      }
+
       final response = await activeClient.rpc(
         'process_sync_event',
         params: {

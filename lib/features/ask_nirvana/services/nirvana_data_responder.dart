@@ -42,7 +42,7 @@ class NirvanaDataResponder {
       // 1. Stories
       case NirvanaIntent.tellStory:
       case NirvanaIntent.tellAnotherStory:
-        return _storyResponse(result, langCode, query);
+        return _storyResponse(result, langCode, query, conversation);
 
       // 2. Reminders & Medicine
       case NirvanaIntent.getNextReminder:
@@ -156,6 +156,7 @@ class NirvanaDataResponder {
     NirvanaIntentResult result,
     String langCode,
     String query,
+    List<Map<String, String>> conversation,
   ) async {
     final NirvanaStoryService storyService =
         _storyService ?? _ref.read(nirvanaStoryServiceProvider);
@@ -170,6 +171,7 @@ class NirvanaDataResponder {
           ? await advancedService.getAiResponse(
               query: query,
               languageCode: langCode,
+              conversation: conversation,
             )
           : await resolvedAiService.getAiFallbackResponse(
               query: query,
