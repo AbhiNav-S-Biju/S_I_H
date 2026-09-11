@@ -14,6 +14,7 @@ import 'models/hive_difficulty_stats.dart';
 import 'models/hive_reminder.dart';
 import 'models/hive_reminder_log.dart';
 import 'models/hive_sync_event.dart';
+import 'models/hive_family_photo.dart';
 
 class HiveDatabase {
   HiveDatabase._();
@@ -55,6 +56,9 @@ class HiveDatabase {
     if (!Hive.isAdapterRegistered(HiveTypeIds.hiveDifficultyStats)) {
       Hive.registerAdapter(HiveDifficultyStatsAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTypeIds.hiveFamilyPhoto)) {
+      Hive.registerAdapter(HiveFamilyPhotoAdapter());
+    }
   }
 
   /// Opens the core Hive boxes required for offline-first operation.
@@ -66,6 +70,7 @@ class HiveDatabase {
       Hive.openBox<HivePatientDeviceSession>(HiveBoxes.patientSession),
       Hive.openBox<dynamic>(HiveBoxes.settings),
       Hive.openBox<HiveDifficultyStats>(HiveBoxes.difficultyStats),
+      Hive.openBox<HiveFamilyPhoto>(HiveBoxes.familyPhotos),
     ]);
   }
 
@@ -87,6 +92,9 @@ class HiveDatabase {
 
   /// Settings box — stores primitive key-value preferences (language, etc.)
   static Box<dynamic> get settingsBox => Hive.box<dynamic>(HiveBoxes.settings);
+
+  static Box<HiveFamilyPhoto> get familyPhotosBox =>
+      Hive.box<HiveFamilyPhoto>(HiveBoxes.familyPhotos);
 
   /// Returns the current locally stored patient session, if any
   static HivePatientDeviceSession? get currentPatientSession {

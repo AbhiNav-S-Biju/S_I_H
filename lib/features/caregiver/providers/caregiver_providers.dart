@@ -7,6 +7,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/connectivity_monitor.dart';
+import '../../../core/network/sync_engine.dart';
 import '../models/caregiver_models.dart';
 import '../repositories/caregiver_notification_repository.dart';
 import '../repositories/caregiver_repository.dart';
@@ -20,35 +21,40 @@ import '../services/caregiver_push_notification_service.dart';
 /// Caregiver Push Notification Service provider
 final caregiverPushNotificationServiceProvider =
     Provider<CaregiverPushNotificationService>((ref) {
-  return CaregiverPushNotificationService();
-});
+      return CaregiverPushNotificationService();
+    });
 
 /// Stream provider for notification tap payloads (deep linking)
 final caregiverPushNotificationTappedProvider =
     StreamProvider.autoDispose<CaregiverNotificationPayload>((ref) {
-  final service = ref.watch(caregiverPushNotificationServiceProvider);
-  return service.onNotificationTapped;
-});
+      final service = ref.watch(caregiverPushNotificationServiceProvider);
+      return service.onNotificationTapped;
+    });
 
 /// Caregiver repository provider
 final caregiverRepositoryProvider = Provider<ICaregiverRepository>((ref) {
   final monitor = ref.watch(connectivityMonitorProvider);
-  return SupabaseCaregiverRepository(connectivityMonitor: monitor);
+  return SupabaseCaregiverRepository(
+    connectivityMonitor: monitor,
+    syncEngine: ref.watch(syncEngineProvider),
+  );
 });
 
 /// Caregiver notification repository provider
 final caregiverNotificationRepositoryProvider =
     Provider<ICaregiverNotificationRepository>((ref) {
-  final monitor = ref.watch(connectivityMonitorProvider);
-  return SupabaseCaregiverNotificationRepository(connectivityMonitor: monitor);
-});
+      final monitor = ref.watch(connectivityMonitorProvider);
+      return SupabaseCaregiverNotificationRepository(
+        connectivityMonitor: monitor,
+      );
+    });
 
 /// Centralized event dispatcher creating telemetry alerts for caregivers
 final caregiverEventNotificationServiceProvider =
     Provider<CaregiverEventNotificationService>((ref) {
-  final repo = ref.watch(caregiverNotificationRepositoryProvider);
-  return CaregiverEventNotificationService(repository: repo);
-});
+      final repo = ref.watch(caregiverNotificationRepositoryProvider);
+      return CaregiverEventNotificationService(repository: repo);
+    });
 
 /// Caregiver Authentication StateNotifier
 class CaregiverAuthNotifier
@@ -59,8 +65,8 @@ class CaregiverAuthNotifier
   CaregiverAuthNotifier(
     this._repository, [
     CaregiverPushNotificationService? pushService,
-  ])  : _pushService = pushService ?? CaregiverPushNotificationService(),
-        super(const AsyncValue.data(null)) {
+  ]) : _pushService = pushService ?? CaregiverPushNotificationService(),
+       super(const AsyncValue.data(null)) {
     _init();
   }
 
@@ -185,7 +191,7 @@ class PatientOnboardingNotifier extends StateNotifier<PatientOnboardingState> {
   final Ref _ref;
 
   PatientOnboardingNotifier(this._repository, this._ref)
-      : super(const PatientOnboardingState());
+    : super(const PatientOnboardingState());
 
   Future<PatientSummary?> createPatient(CreatePatientInput input) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
@@ -234,10 +240,12 @@ class PatientOnboardingNotifier extends StateNotifier<PatientOnboardingState> {
 }
 
 final patientOnboardingProvider =
-    StateNotifierProvider<PatientOnboardingNotifier, PatientOnboardingState>((ref) {
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return PatientOnboardingNotifier(repo, ref);
-});
+    StateNotifierProvider<PatientOnboardingNotifier, PatientOnboardingState>((
+      ref,
+    ) {
+      final repo = ref.watch(caregiverRepositoryProvider);
+      return PatientOnboardingNotifier(repo, ref);
+    });
 
 /// Game History for selected patient
 final selectedPatientGameHistoryProvider =
@@ -265,7 +273,7 @@ class CaregiverRemindersNotifier extends StateNotifier<AsyncValue<void>> {
   final Ref _ref;
 
   CaregiverRemindersNotifier(this._repository, this._ref)
-      : super(const AsyncValue.data(null));
+    : super(const AsyncValue.data(null));
 
   Future<CaregiverReminderRecord?> createReminder(
     CreateOrUpdateReminderInput input,
@@ -322,9 +330,9 @@ class CaregiverRemindersNotifier extends StateNotifier<AsyncValue<void>> {
 /// Provider for caregiver reminder CRUD operations
 final caregiverRemindersNotifierProvider =
     StateNotifierProvider<CaregiverRemindersNotifier, AsyncValue<void>>((ref) {
-  final repo = ref.watch(caregiverRepositoryProvider);
-  return CaregiverRemindersNotifier(repo, ref);
-});
+      final repo = ref.watch(caregiverRepositoryProvider);
+      return CaregiverRemindersNotifier(repo, ref);
+    });
 
 /// 7-Day Activity Summary for selected patient
 final selectedPatientSevenDayActivityProvider =
@@ -418,21 +426,21 @@ class PairingCodeNotifier extends StateNotifier<PairingCodeState> {
 
 /// Provider for pairing code generation
 final pairingCodeProvider =
-    StateNotifierProvider.autoDispose<PairingCodeNotifier, PairingCodeState>(
-  (ref) {
-    final repo = ref.watch(pairingRepositoryProvider);
-    return PairingCodeNotifier(repo);
-  },
-);
+    StateNotifierProvider.autoDispose<PairingCodeNotifier, PairingCodeState>((
+      ref,
+    ) {
+      final repo = ref.watch(pairingRepositoryProvider);
+      return PairingCodeNotifier(repo);
+    });
 
 /// Fetches the currently linked device for the selected patient
 final patientLinkedDeviceProvider =
     FutureProvider.autoDispose<PatientDeviceSummary?>((ref) async {
-  final selected = ref.watch(selectedPatientProvider);
-  if (selected == null) return null;
-  final repo = ref.watch(pairingRepositoryProvider);
-  return repo.getLinkedDevice(selected.id);
-});
+      final selected = ref.watch(selectedPatientProvider);
+      if (selected == null) return null;
+      final repo = ref.watch(pairingRepositoryProvider);
+      return repo.getLinkedDevice(selected.id);
+    });
 
 // ==============================================================================
 // CAREGIVER NOTIFICATION PROVIDERS
@@ -441,38 +449,39 @@ final patientLinkedDeviceProvider =
 /// Realtime notification stream provider for the active caregiver
 final caregiverNotificationsStreamProvider =
     StreamProvider.autoDispose<List<CaregiverNotification>>((ref) {
-  final authState = ref.watch(caregiverAuthProvider);
-  final caregiver = authState.value;
-  if (caregiver == null) return const Stream.empty();
+      final authState = ref.watch(caregiverAuthProvider);
+      final caregiver = authState.value;
+      if (caregiver == null) return const Stream.empty();
 
-  final selectedPatient = ref.watch(selectedPatientProvider);
-  final repo = ref.watch(caregiverNotificationRepositoryProvider);
+      final selectedPatient = ref.watch(selectedPatientProvider);
+      final repo = ref.watch(caregiverNotificationRepositoryProvider);
 
-  return repo.getNotificationsStream(
-    caregiver.id,
-    patientId: selectedPatient?.id,
-  );
-});
+      return repo.getNotificationsStream(
+        caregiver.id,
+        patientId: selectedPatient?.id,
+      );
+    });
 
 /// Future provider for caregiver notifications (used for initial load / refresh)
 final caregiverNotificationsProvider =
     FutureProvider.autoDispose<List<CaregiverNotification>>((ref) async {
-  final authState = ref.watch(caregiverAuthProvider);
-  final caregiver = authState.value;
-  if (caregiver == null) return [];
+      final authState = ref.watch(caregiverAuthProvider);
+      final caregiver = authState.value;
+      if (caregiver == null) return [];
 
-  final selectedPatient = ref.watch(selectedPatientProvider);
-  final repo = ref.watch(caregiverNotificationRepositoryProvider);
+      final selectedPatient = ref.watch(selectedPatientProvider);
+      final repo = ref.watch(caregiverNotificationRepositoryProvider);
 
-  return repo.getNotifications(
-    caregiver.id,
-    patientId: selectedPatient?.id,
-  );
-});
+      return repo.getNotifications(
+        caregiver.id,
+        patientId: selectedPatient?.id,
+      );
+    });
 
 /// Realtime unread notifications count
-final unreadCaregiverNotificationsCountProvider =
-    Provider.autoDispose<int>((ref) {
+final unreadCaregiverNotificationsCountProvider = Provider.autoDispose<int>((
+  ref,
+) {
   final streamAsync = ref.watch(caregiverNotificationsStreamProvider);
   return streamAsync.when(
     data: (list) => list.where((n) => !n.isRead).length,
@@ -487,7 +496,7 @@ class CaregiverNotificationsNotifier extends StateNotifier<AsyncValue<void>> {
   final Ref _ref;
 
   CaregiverNotificationsNotifier(this._repository, this._ref)
-      : super(const AsyncValue.data(null));
+    : super(const AsyncValue.data(null));
 
   Future<void> markAsRead(String notificationId) async {
     try {
@@ -509,9 +518,9 @@ class CaregiverNotificationsNotifier extends StateNotifier<AsyncValue<void>> {
 }
 
 final caregiverNotificationsNotifierProvider =
-    StateNotifierProvider<CaregiverNotificationsNotifier, AsyncValue<void>>(
-  (ref) {
-    final repo = ref.watch(caregiverNotificationRepositoryProvider);
-    return CaregiverNotificationsNotifier(repo, ref);
-  },
-);
+    StateNotifierProvider<CaregiverNotificationsNotifier, AsyncValue<void>>((
+      ref,
+    ) {
+      final repo = ref.watch(caregiverNotificationRepositoryProvider);
+      return CaregiverNotificationsNotifier(repo, ref);
+    });

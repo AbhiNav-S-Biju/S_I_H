@@ -205,24 +205,7 @@ class PatientDashboard extends ConsumerWidget {
             tokenColor: _DashboardPalette.tokenCoral,
             tag: 'MEMORIES',
             title: 'Family Photos',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: _DashboardPalette.textDark,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  content: Text(
-                    'Family Photos feature coming soon!',
-                    style: GoogleFonts.nunito(
-                      color: _DashboardPalette.textLight,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              );
-            },
+            onTap: () => context.push('/patient/family-photos'),
           ),
           _ActionCardItem(
             tokenType: ClayTokenType.gear,

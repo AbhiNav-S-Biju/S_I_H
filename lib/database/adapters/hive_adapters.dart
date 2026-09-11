@@ -4,6 +4,7 @@
 // dependency on build_runner code generation.
 // ==============================================================================
 
+import 'dart:typed_data';
 import 'package:hive/hive.dart';
 import '../hive_boxes.dart';
 import '../models/hive_patient_session.dart';
@@ -11,6 +12,7 @@ import '../models/hive_difficulty_stats.dart';
 import '../models/hive_reminder.dart';
 import '../models/hive_reminder_log.dart';
 import '../models/hive_sync_event.dart';
+import '../models/hive_family_photo.dart';
 
 class HiveSyncEventAdapter extends TypeAdapter<HiveSyncEvent> {
   @override
@@ -164,6 +166,7 @@ class HiveReminderLogAdapter extends TypeAdapter<HiveReminderLog> {
       ..write(obj.metadata);
   }
 }
+
 class HivePatientDeviceSessionAdapter
     extends TypeAdapter<HivePatientDeviceSession> {
   @override
@@ -235,9 +238,8 @@ class HiveDifficultyStatsAdapter extends TypeAdapter<HiveDifficultyStats> {
       patientId: fields[0] as String? ?? 'default_patient',
       gameTypeId: fields[1] as String? ?? 'remember_objects',
       difficultyId: fields[2] as String? ?? 'easy',
-      rewardScores: (fields[3] as List?)
-              ?.map((e) => (e as num).toDouble())
-              .toList() ??
+      rewardScores:
+          (fields[3] as List?)?.map((e) => (e as num).toDouble()).toList() ??
           [],
       lastPlayedAt: fields[4] != null
           ? DateTime.tryParse(fields[4] as String) ?? DateTime.now()
@@ -259,5 +261,60 @@ class HiveDifficultyStatsAdapter extends TypeAdapter<HiveDifficultyStats> {
       ..write(obj.rewardScores)
       ..writeByte(4)
       ..write(obj.lastPlayedAt.toIso8601String());
+  }
+}
+
+class HiveFamilyPhotoAdapter extends TypeAdapter<HiveFamilyPhoto> {
+  @override
+  final int typeId = HiveTypeIds.hiveFamilyPhoto;
+
+  @override
+  HiveFamilyPhoto read(BinaryReader reader) {
+    final fieldCount = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < fieldCount; i++) reader.readByte(): reader.read(),
+    };
+    final hasLocalBytes = fieldCount >= 11;
+    return HiveFamilyPhoto(
+      id: fields[0] as String,
+      patientId: fields[1] as String,
+      name: fields[2] as String,
+      relationship: fields[3] as String,
+      photoUrl: fields[4] as String? ?? '',
+      localPath: fields[5] as String?,
+      localBytes: hasLocalBytes ? fields[6] as Uint8List? : null,
+      displayOrder: fields[hasLocalBytes ? 7 : 6] as int? ?? 0,
+      isDeleted: fields[hasLocalBytes ? 8 : 7] as bool? ?? false,
+      createdAt: DateTime.parse(fields[hasLocalBytes ? 9 : 8] as String),
+      updatedAt: DateTime.parse(fields[hasLocalBytes ? 10 : 9] as String),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, HiveFamilyPhoto obj) {
+    writer
+      ..writeByte(11)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.patientId)
+      ..writeByte(2)
+      ..write(obj.name)
+      ..writeByte(3)
+      ..write(obj.relationship)
+      ..writeByte(4)
+      ..write(obj.photoUrl)
+      ..writeByte(5)
+      ..write(obj.localPath)
+      ..writeByte(6)
+      ..write(obj.localBytes)
+      ..writeByte(7)
+      ..write(obj.displayOrder)
+      ..writeByte(8)
+      ..write(obj.isDeleted)
+      ..writeByte(9)
+      ..write(obj.createdAt.toIso8601String())
+      ..writeByte(10)
+      ..write(obj.updatedAt.toIso8601String());
   }
 }

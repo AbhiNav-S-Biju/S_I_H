@@ -9,6 +9,7 @@ import '../../models/family_member_item.dart';
 import '../../models/game_enums.dart';
 import '../../models/game_level.dart';
 import '../../models/game_session.dart';
+import '../../../family_photos/providers/family_photo_providers.dart';
 import '../widgets/elder_game_button.dart';
 import '../widgets/game_completion_dialog.dart';
 import '../widgets/game_header.dart';
@@ -32,29 +33,50 @@ class WhoIsThisScreen extends ConsumerStatefulWidget {
 }
 
 class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
-  late final WhoIsThisController _controller;
+  WhoIsThisController? _controller;
+  Object? _loadError;
 
   @override
   void initState() {
     super.initState();
-    _controller = WhoIsThisController(
-      initialDifficulty: widget.level?.difficulty ?? widget.difficulty,
-    );
-    _speakCurrentQuestion();
+    _loadFamilyMembers();
+  }
+
+  Future<void> _loadFamilyMembers() async {
+    try {
+      final familyMembers = await ref.read(
+        whoIsThisFamilyMembersProvider.future,
+      );
+      if (!mounted) return;
+      setState(() {
+        _controller = WhoIsThisController(
+          familyMembers: familyMembers,
+          initialDifficulty: widget.level?.difficulty ?? widget.difficulty,
+        );
+      });
+      _speakCurrentQuestion();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _loadError = error);
+    }
   }
 
   void _speakCurrentQuestion() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      final controller = _controller;
+      if (controller == null) return;
       final voiceEnabled = ref.read(voiceEnabledProvider);
       if (voiceEnabled) {
-        final currentMember = _controller.state.currentQuestion;
+        final currentMember = controller.state.currentQuestion;
         if (currentMember != null) {
           final locale = ref.read(localeProvider);
-          final question =
-              currentMember.localizedQuestionPrompt(locale.languageCode);
-          final voiceNote =
-              currentMember.localizedVoiceNoteTranscription(locale.languageCode);
+          final question = currentMember.localizedQuestionPrompt(
+            locale.languageCode,
+          );
+          final voiceNote = currentMember.localizedVoiceNoteTranscription(
+            locale.languageCode,
+          );
           ref
               .read(audioServiceProvider)
               .speak(
@@ -102,13 +124,50 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
   Widget build(BuildContext context) {
     final activeLocale = ref.watch(localeProvider);
     final l10n = AppLocalizations.of(context);
-    final state = _controller.state;
+    if (_controller == null) {
+      return Scaffold(
+        body: Center(
+          child: _loadError == null
+              ? const CircularProgressIndicator()
+              : const Text('We could not load family photos right now.'),
+        ),
+      );
+    }
+
+    final controller = _controller!;
+    final state = controller.state;
     final langCode = activeLocale.languageCode;
     final currentMember = state.currentQuestion;
 
-    if (currentMember == null) {
-      return const Scaffold(
-        body: Center(child: Text('No questions available.')),
+    if (controller.availableFamily.length < 2 || currentMember == null) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.photo_album_rounded, size: 64),
+                const SizedBox(height: 16),
+                Text(
+                  controller.availableFamily.isEmpty
+                      ? 'Add some family photos first to play this activity.'
+                      : 'Add at least two family photos to play this activity.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                FilledButton(
+                  onPressed: _handleExit,
+                  child: const Text('Go back'),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -125,13 +184,14 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
             onExit: _handleExit,
             onHint: () {
               setState(() {
-                _controller.useHint();
+                controller.useHint();
               });
-              final currentMember = _controller.state.currentQuestion;
+              final currentMember = controller.state.currentQuestion;
               if (currentMember != null && ref.read(voiceEnabledProvider)) {
                 final locale = ref.read(localeProvider);
-                final hint =
-                    currentMember.localizedHintDescription(locale.languageCode);
+                final hint = currentMember.localizedHintDescription(
+                  locale.languageCode,
+                );
                 ref
                     .read(audioServiceProvider)
                     .speak(hint, languageCode: locale.languageCode);
@@ -158,12 +218,12 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                         langCode == 'hi'
                             ? 'कार्ड ${state.currentQuestionIndex + 1} / ${state.questions.length}'
                             : langCode == 'bn'
-                                ? 'কার্ড ${state.currentQuestionIndex + 1} / ${state.questions.length}'
-                                : langCode == 'as'
-                                    ? 'কাৰ্ড ${state.currentQuestionIndex + 1} / ${state.questions.length}'
-                                    : langCode == 'ne'
-                                        ? 'कार्ड ${state.currentQuestionIndex + 1} / ${state.questions.length}'
-                                        : 'Card ${state.currentQuestionIndex + 1} / ${state.questions.length}',
+                            ? 'কার্ড ${state.currentQuestionIndex + 1} / ${state.questions.length}'
+                            : langCode == 'as'
+                            ? 'কাৰ্ড ${state.currentQuestionIndex + 1} / ${state.questions.length}'
+                            : langCode == 'ne'
+                            ? 'कार्ड ${state.currentQuestionIndex + 1} / ${state.questions.length}'
+                            : 'Card ${state.currentQuestionIndex + 1} / ${state.questions.length}',
                         style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w700,
@@ -223,11 +283,35 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                               width: 3.0,
                             ),
                           ),
-                          child: Icon(
-                            currentMember.avatarIcon,
-                            size: 64.0,
-                            color: currentMember.avatarColor,
-                          ),
+                          child:
+                              currentMember.photoUrl?.startsWith('http') == true
+                              ? ClipOval(
+                                  child: Image.network(
+                                    currentMember.photoUrl!,
+                                    width: 110,
+                                    height: 110,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Icon(
+                                      currentMember.avatarIcon,
+                                      size: 64,
+                                      color: currentMember.avatarColor,
+                                    ),
+                                  ),
+                                )
+                              : currentMember.localBytes != null
+                              ? ClipOval(
+                                  child: Image.memory(
+                                    currentMember.localBytes!,
+                                    width: 110,
+                                    height: 110,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Icon(
+                                  currentMember.avatarIcon,
+                                  size: 64.0,
+                                  color: currentMember.avatarColor,
+                                ),
                         ),
                         const SizedBox(height: 14.0),
                         Text(
@@ -300,8 +384,9 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                                 const SizedBox(width: 8.0),
                                 Expanded(
                                   child: Text(
-                                    currentMember
-                                        .localizedHintDescription(langCode),
+                                    currentMember.localizedHintDescription(
+                                      langCode,
+                                    ),
                                     style: const TextStyle(
                                       fontSize: 15.0,
                                       fontWeight: FontWeight.w600,
@@ -336,20 +421,22 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                     final isEliminated = state.eliminatedDistractors.contains(
                       option,
                     );
-                    final localizedOption = FamilyMemberItem.localizeRelationship(option, langCode);
+                    final localizedOption =
+                        FamilyMemberItem.localizeRelationship(option, langCode);
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: Semantics(
                         button: true,
                         selected: isSelected,
-                        label: '$localizedOption ${isEliminated ? 'Eliminated' : ''}',
+                        label:
+                            '$localizedOption ${isEliminated ? 'Eliminated' : ''}',
                         child: InkWell(
                           onTap: isEliminated
                               ? null
                               : () {
                                   setState(() {
-                                    _controller.selectRelationship(option);
+                                    controller.selectRelationship(option);
                                   });
                                 },
                           borderRadius: BorderRadius.circular(16.0),
@@ -419,7 +506,8 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                   // Navigation / Next Card Button
                   ElderGameButton(
                     label: state.isLastQuestion
-                        ? (l10n?.completeActivityButton ?? 'Complete Activity ➔')
+                        ? (l10n?.completeActivityButton ??
+                              'Complete Activity ➔')
                         : (l10n?.continueButton ?? 'Next Person ➔'),
                     icon: state.isLastQuestion
                         ? Icons.check_rounded
@@ -427,13 +515,17 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                     onPressed: state.selectedRelationship != null
                         ? () async {
                             if (state.isLastQuestion) {
-                              final session = _controller.completeGame();
+                              final session = controller.completeGame();
                               await GameCompletionDialog.show(
                                 context,
                                 session: session,
                                 level: widget.level,
-                                onNextLevel: widget.level != null && widget.level!.levelNumber < 8
-                                    ? () => _loadNextLevel(widget.level!.levelNumber + 1)
+                                onNextLevel:
+                                    widget.level != null &&
+                                        widget.level!.levelNumber < 8
+                                    ? () => _loadNextLevel(
+                                        widget.level!.levelNumber + 1,
+                                      )
                                     : null,
                                 onFinish: () {
                                   if (mounted) {
@@ -443,7 +535,7 @@ class _WhoIsThisScreenState extends ConsumerState<WhoIsThisScreen> {
                               );
                             } else {
                               setState(() {
-                                _controller.nextQuestion();
+                                controller.nextQuestion();
                               });
                               _speakCurrentQuestion();
                             }

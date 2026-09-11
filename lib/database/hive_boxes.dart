@@ -13,6 +13,7 @@ class HiveBoxes {
   static const String syncQueue = 'nirvana_sync_queue';
   static const String patientSession = 'nirvana_patient_session';
   static const String settings = 'nirvana_settings';
+  static const String familyPhotos = 'nirvana_family_photos';
 
   // Settings keys
   static const String settingsKeyLocale = 'locale_language_code';
@@ -27,4 +28,5 @@ class HiveTypeIds {
   static const int hiveReminderLog = 3;
   static const int hivePatientDeviceSession = 4;
   static const int hiveDifficultyStats = 5;
+  static const int hiveFamilyPhoto = 6;
 }

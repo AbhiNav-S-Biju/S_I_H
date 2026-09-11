@@ -50,6 +50,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   cryptography: ^2.7.0
   supabase: ^2.13.4
+  image_picker: ^1.1.2
 
   # Voice-assisted interaction
   flutter_tts: ^4.1.0

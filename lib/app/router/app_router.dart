@@ -14,6 +14,7 @@ import '../../database/hive_database.dart';
 import '../../features/ask_nirvana/ask_nirvana.dart';
 import '../../features/caregiver/caregiver.dart';
 import '../../features/games/games.dart';
+import '../../features/family_photos/presentation/family_photos_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/landing/landing.dart';
@@ -167,6 +168,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/patient/reminders',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PatientRemindersScreen(),
+      ),
+      GoRoute(
+        path: '/patient/family-photos',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const FamilyPhotosScreen(),
       ),
       GoRoute(
         path: '/patient/settings',

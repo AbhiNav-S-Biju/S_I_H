@@ -347,7 +347,7 @@ class _QuickAccessGrid extends StatelessWidget {
         tag: 'MEMORIES',
         color: ElderColors.coralDeep,
         bgColor: ElderColors.pastelPeach,
-        onTap: () {},
+        onTap: () => context.push('/patient/family-photos'),
       ),
       _ClayQuickTile(
         icon: Icons.settings_rounded,

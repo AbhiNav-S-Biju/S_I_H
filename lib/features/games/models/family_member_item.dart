@@ -3,7 +3,9 @@
 // Description: Bundled demo family members for the "Who Is This?" relationship game
 // ==============================================================================
 
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../../family_photos/models/family_photo.dart';
 
 class FamilyMemberItem {
   final String id;
@@ -16,6 +18,9 @@ class FamilyMemberItem {
   final Color avatarColor;
   final List<String>
   alternativeRelationshipOptions; // Distractors for selection
+  final String? photoUrl;
+  final String? localPath;
+  final Uint8List? localBytes;
 
   const FamilyMemberItem({
     required this.id,
@@ -26,7 +31,61 @@ class FamilyMemberItem {
     required this.avatarIcon,
     required this.avatarColor,
     required this.alternativeRelationshipOptions,
+    this.photoUrl,
+    this.localPath,
+    this.localBytes,
   });
+
+  factory FamilyMemberItem.fromFamilyPhoto(FamilyPhoto photo) {
+    const commonRelationships = [
+      'Daughter',
+      'Son',
+      'Sister',
+      'Brother',
+      'Granddaughter',
+      'Grandson',
+      'Friend',
+      'Family Member',
+    ];
+    final options = <String>[photo.relationship];
+    for (final relationship in commonRelationships) {
+      if (options.length >= 4) break;
+      if (!options.contains(relationship)) options.add(relationship);
+    }
+    return FamilyMemberItem(
+      id: photo.id,
+      name: photo.name,
+      relationship: photo.relationship,
+      hintDescription: _relationshipHint(photo.relationship),
+      voiceNoteTranscription: 'A familiar person is smiling in this picture.',
+      avatarIcon: Icons.person_rounded,
+      avatarColor: const Color(0xFF9B8EC4),
+      alternativeRelationshipOptions: options,
+      photoUrl: photo.photoUrl,
+      localPath: photo.localPath,
+      localBytes: photo.localBytes,
+    );
+  }
+
+  static String _relationshipHint(String relationship) {
+    switch (relationship.trim().toLowerCase()) {
+      case 'daughter':
+      case 'son':
+        return 'This person is part of your immediate family and has shared many everyday moments with you.';
+      case 'granddaughter':
+      case 'grandson':
+        return 'This cheerful young family member brings a special joy and a new generation of memories.';
+      case 'sister':
+      case 'brother':
+        return 'You grew up sharing family memories and know this person from long ago.';
+      case 'friend':
+        return 'This is someone who has chosen to share good times and warm memories with you.';
+      case 'family pet':
+        return 'This loving companion brings comfort, playful moments, and plenty of affection.';
+      default:
+        return 'This person is someone special who shares meaningful memories with you.';
+    }
+  }
 
   String localizedRelationship(String languageCode) {
     return localizeRelationship(relationship, languageCode);
@@ -113,29 +172,38 @@ class FamilyMemberItem {
 
   static const Map<String, Map<String, String>> _localizedHints = {
     'fam_emily': {
-      'en': 'She is your daughter Sarah\'s child and loves painting!',
-      'hi': 'वह आपकी बेटी सारा की बच्ची है और उसे पेंटिंग करना पसंद है!',
-      'bn': 'সে আপনার মেয়ে সারার সন্তান এবং ছবি আঁকতে ভালোবাসে!',
-      'as': 'তেওঁ আপোনাৰ জীয়াৰী চাৰাৰ সন্তান আৰু ছবি আঁকি ভাল পায়!',
-      'ne': 'उनी आपकी छोरी साराकी छोरी हुन् र चित्र बनाउन मन पराउँछिन्!',
+      'en':
+          'She brings a bright new generation of memories and loves painting!',
+      'hi':
+          'वह आपके जीवन में नई पीढ़ी की खुशियां और चित्रकारी की यादें लाती है!',
+      'bn':
+          'সে আপনার জীবনে নতুন প্রজন্মের আনন্দ এবং ছবি আঁকার স্মৃতি নিয়ে আসে!',
+      'as': 'তেওঁ আপোনাৰ জীৱনলৈ নতুন প্ৰজন্মৰ আনন্দ আৰু ছবি আঁকাৰ স্মৃতি আনে!',
+      'ne':
+          'उनी तपाईंको जीवनमा नयाँ पुस्ताको खुसी र चित्रकलाका सम्झना ल्याउँछिन्!',
     },
     'fam_sarah': {
       'en': 'She calls you every morning and brings your favorite tea.',
       'hi': 'वह आपको हर सुबह फोन करती है और आपकी पसंदीदा चाय लाती है।',
       'bn': 'সে প্রতিদিন সকালে আপনাকে फोन করে এবং আপনার পছন্দের চা নিয়ে আসে।',
       'as': 'তেওঁ প্ৰতি পুৱা আপোনাক ফোন কৰে আৰু আপোনাৰ প্ৰিয় চাহ আনে।',
-      'ne': 'उनी हरेक बिहान तपाईंलाई फोन गर्छिन् र तपाईंको मनपर्ने चिया ल्याउँछिन्।',
+      'ne':
+          'उनी हरेक बिहान तपाईंलाई फोन गर्छिन् र तपाईंको मनपर्ने चिया ल्याउँछिन्।',
     },
     'fam_david': {
       'en': 'He loves gardening with you and fixing things around the house.',
       'hi': 'उसे आपके साथ बागवानी करना और घर के काम ठीक करना पसंद है।',
-      'bn': 'সে আপনার সাথে বাগানের কাজ করতে এবং বাড়ির জিনিস মেরামত করতে পছন্দ করে।',
-      'as': 'তেওঁ আপোনাৰ সৈতে বাগিচা কাম কৰিবলৈ আৰু ঘৰৰ কাম ঠিক কৰিবলৈ ভাল পায়।',
-      'ne': 'उनलाई तपाईंसँग बगैंचाको काम गर्न र घरका कुराहरू मर्मत गर्न मन पर्छ।',
+      'bn':
+          'সে আপনার সাথে বাগানের কাজ করতে এবং বাড়ির জিনিস মেরামত করতে পছন্দ করে।',
+      'as':
+          'তেওঁ আপোনাৰ সৈতে বাগিচা কাম কৰিবলৈ আৰু ঘৰৰ কাম ঠিক কৰিবলৈ ভাল পায়।',
+      'ne':
+          'उनलाई तपाईंसँग बगैंचाको काम गर्न र घरका कुराहरू मर्मत गर्न मन पर्छ।',
     },
     'fam_bailey': {
       'en': 'The cheerful dog who wags his tail and sits by your feet!',
-      'hi': 'खुशमिजाज कुत्ता जो अपनी पूंछ हिलाता है और आपके पैरों के पास बैठता है!',
+      'hi':
+          'खुशमिजाज कुत्ता जो अपनी पूंछ हिलाता है और आपके पैरों के पास बैठता है!',
       'bn': 'আনন্দময় কুকুরটি যে লেজ নাড়ায় এবং আপনার পায়ের কাছে বসে!',
       'as': 'আনন্দময় কুকুৰটো যিয়ে নেজ জোকাৰি আপোনাৰ ভৰিৰ কাষত বহে!',
       'ne': 'हँसिलो कुकुर जसले पुच्छर हल्लाउँछ र तपाईंको खुट्टा नजिक बस्छ!',
@@ -162,7 +230,8 @@ class FamilyMemberItem {
       'hi': 'अरे पिताजी, हमारे सप्ताहांत की सैर का बेसब्री से इंतज़ार है!',
       'bn': 'আরে বাবা, আমাদের উইকএন্ডে হাঁটার অপেক্ষায় রইলাম!',
       'as': 'নমস্কাৰ দেউতা, সপ্তাহান্তৰ খোজ কঢ়াৰ বাবে আগ্ৰহেৰে বাট চাই আছোঁ!',
-      'ne': 'नमस्ते बुबा, सप्ताहन्तको पैदल यात्राको उत्सुकताका साथ पर्खाइमा छु!',
+      'ne':
+          'नमस्ते बुबा, सप्ताहन्तको पैदल यात्राको उत्सुकताका साथ पर्खाइमा छु!',
     },
     'fam_bailey': {
       'en': 'Woof woof! Friendly tail wags!',
@@ -295,7 +364,7 @@ class FamilyMemberItem {
       name: 'Emily',
       relationship: 'Granddaughter',
       hintDescription:
-          'She is your daughter Sarah\'s child and loves painting!',
+          'She brings a bright new generation of memories and loves painting!',
       voiceNoteTranscription:
           'Hi Grandpa! Hope you are having a wonderful day!',
       avatarIcon: Icons.face_3_rounded,

@@ -7,6 +7,7 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/network/connectivity_monitor.dart';
 import '../../../database/hive_boxes.dart';
@@ -15,24 +16,36 @@ import '../../../database/models/hive_reminder.dart';
 import '../../../database/models/hive_sync_event.dart';
 import '../../reminders/models/reminder.dart';
 import '../../reminders/services/notification_service.dart';
+import '../../family_photos/models/family_photo.dart';
+import '../../family_photos/repositories/family_photo_repository.dart';
+import '../../../database/models/hive_family_photo.dart';
+import '../../../core/network/sync_engine.dart';
+import 'package:uuid/uuid.dart';
 import '../models/caregiver_models.dart';
 import 'caregiver_repository.dart';
 
 class SupabaseCaregiverRepository
-    implements ICaregiverRepository, IFamilyPhotoReader {
+    implements
+        ICaregiverRepository,
+        IFamilyPhotoReader,
+        IFamilyPhotoRepository {
   final SupabaseClient? _client;
   final IConnectivityMonitor _connectivityMonitor;
+  final SyncEngine? _syncEngine;
 
   static CaregiverProfile? _cachedProfile;
   static final List<PatientSummary> _offlinePatients = [];
   static final Map<String, List<Map<String, dynamic>>> _offlineFamilyPhotos =
       {};
+  static const _familyPhotoBucket = 'family-photos';
 
   SupabaseCaregiverRepository({
     SupabaseClient? client,
     IConnectivityMonitor? connectivityMonitor,
+    SyncEngine? syncEngine,
   }) : _client = client,
-       _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor();
+       _connectivityMonitor = connectivityMonitor ?? ConnectivityMonitor(),
+       _syncEngine = syncEngine;
 
   SupabaseClient? get client {
     if (_client != null) return _client;
@@ -652,7 +665,7 @@ class SupabaseCaregiverRepository
         final response = await activeClient
             .from('family_photos')
             .select(
-              'id, title, relationship, photo_url, audio_note_url, display_order',
+              'id, patient_id, title, relationship, photo_url, audio_note_url, display_order, is_active, is_deleted, created_at, updated_at',
             )
             .eq('patient_id', patientId)
             .eq('is_active', true)
@@ -669,6 +682,219 @@ class SupabaseCaregiverRepository
       }
     }
     return _offlineFamilyPhotos[patientId] ?? const [];
+  }
+
+  @override
+  Future<List<FamilyPhoto>> getFamilyPhotoModels(String patientId) async {
+    final status = await _connectivityMonitor.checkStatus();
+    if (status == NetworkStatus.online &&
+        Hive.isBoxOpen(HiveBoxes.familyPhotos)) {
+      final pendingLocal = HiveDatabase.familyPhotosBox.values.where(
+        (photo) =>
+            photo.patientId == patientId &&
+            !photo.isDeleted &&
+            photo.photoUrl.isEmpty &&
+            (photo.localPath?.isNotEmpty == true ||
+                photo.localBytes?.isNotEmpty == true),
+      );
+      for (final localPhoto in pendingLocal) {
+        try {
+          await saveFamilyPhoto(
+            photo: FamilyPhoto.fromHive(localPhoto),
+            image: localPhoto.localBytes != null
+                ? XFile.fromData(
+                    localPhoto.localBytes!,
+                    name: '${localPhoto.id}.jpg',
+                  )
+                : XFile(localPhoto.localPath!),
+          );
+        } catch (error) {
+          debugPrint('Pending family photo upload skipped: $error');
+        }
+      }
+    }
+    final records = await getFamilyPhotos(patientId);
+    if (records.isEmpty && Hive.isBoxOpen(HiveBoxes.familyPhotos)) {
+      final cached = HiveDatabase.familyPhotosBox.values
+          .where((photo) => photo.patientId == patientId && !photo.isDeleted)
+          .map(FamilyPhoto.fromHive)
+          .toList(growable: false);
+      final hydratedCached = <FamilyPhoto>[];
+      for (final photo in cached) {
+        hydratedCached.add(await _hydratePhotoUrl(photo));
+      }
+      return hydratedCached;
+    }
+    final hydrated = <FamilyPhoto>[];
+    for (final record in records) {
+      final photo = FamilyPhoto.fromMap(record);
+      final cached = Hive.isBoxOpen(HiveBoxes.familyPhotos)
+          ? HiveDatabase.familyPhotosBox.get(photo.id)
+          : null;
+      final merged = cached == null
+          ? photo
+          : photo.copyWith(
+              localPath: cached.localPath,
+              localBytes: cached.localBytes,
+            );
+      final hydratedPhoto = await _hydratePhotoUrl(merged);
+      hydrated.add(hydratedPhoto);
+    }
+    return hydrated;
+  }
+
+  @override
+  Future<FamilyPhoto> saveFamilyPhoto({
+    required FamilyPhoto photo,
+    XFile? image,
+  }) async {
+    final now = DateTime.now();
+    var saved = photo.copyWith(updatedAt: now);
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (image != null &&
+        activeClient != null &&
+        status == NetworkStatus.online) {
+      final extension = image.name.contains('.')
+          ? image.name.split('.').last.toLowerCase()
+          : 'jpg';
+      final storagePath = '${photo.patientId}/${photo.id}.$extension';
+      final imageBytes = await image.readAsBytes();
+      try {
+        await activeClient.storage
+            .from(_familyPhotoBucket)
+            .uploadBinary(
+              storagePath,
+              imageBytes,
+              fileOptions: FileOptions(
+                upsert: true,
+                contentType: 'image/$extension',
+              ),
+            );
+        saved = saved.copyWith(
+          photoUrl: storagePath,
+          localPath: image.path,
+          localBytes: imageBytes,
+        );
+      } catch (error) {
+        debugPrint('Family photo storage upload deferred: $error');
+        saved = saved.copyWith(localPath: image.path, localBytes: imageBytes);
+      }
+    } else if (image != null) {
+      saved = saved.copyWith(
+        localPath: image.path,
+        localBytes: await image.readAsBytes(),
+      );
+    }
+
+    if (activeClient != null &&
+        status == NetworkStatus.online &&
+        saved.photoUrl.isNotEmpty) {
+      try {
+        await activeClient.from('family_photos').upsert({
+          'id': saved.id,
+          'patient_id': saved.patientId,
+          'title': saved.name,
+          'relationship': saved.relationship,
+          'photo_url': saved.photoUrl,
+          'audio_note_url': saved.audioNoteUrl,
+          'display_order': saved.displayOrder,
+          'is_active': true,
+          'is_deleted': false,
+          'created_at': saved.createdAt.toUtc().toIso8601String(),
+          'updated_at': saved.updatedAt.toUtc().toIso8601String(),
+        });
+      } catch (error) {
+        debugPrint('Family photo metadata sync deferred: $error');
+      }
+    }
+
+    await _cacheFamilyPhoto(saved);
+    if (_syncEngine != null && saved.photoUrl.isNotEmpty) {
+      await _syncEngine.enqueueEvent(
+        HiveSyncEvent(
+          eventId: const Uuid().v4(),
+          entityType: 'family_photo',
+          entityId: saved.id,
+          operation: 'update',
+          payload: saved.toMap(),
+          createdAt: saved.updatedAt,
+          patientId: saved.patientId,
+        ),
+      );
+    }
+    return saved;
+  }
+
+  @override
+  Future<void> softDeleteFamilyPhoto({
+    required String patientId,
+    required String photoId,
+  }) async {
+    final activeClient = client;
+    final status = await _connectivityMonitor.checkStatus();
+    if (activeClient != null && status == NetworkStatus.online) {
+      await activeClient
+          .from('family_photos')
+          .update({'is_active': false, 'is_deleted': true})
+          .eq('id', photoId)
+          .eq('patient_id', patientId);
+    }
+    await HiveDatabase.familyPhotosBox.delete(photoId);
+    _offlineFamilyPhotos[patientId] = (_offlineFamilyPhotos[patientId] ?? [])
+        .where((item) => item['id'] != photoId)
+        .toList();
+    if (_syncEngine != null) {
+      await _syncEngine.enqueueEvent(
+        HiveSyncEvent(
+          eventId: const Uuid().v4(),
+          entityType: 'family_photo',
+          entityId: photoId,
+          operation: 'delete',
+          payload: {'is_deleted': true, 'is_active': false},
+          createdAt: DateTime.now(),
+          patientId: patientId,
+        ),
+      );
+    }
+  }
+
+  Future<FamilyPhoto> _hydratePhotoUrl(FamilyPhoto photo) async {
+    if (photo.photoUrl.isEmpty || photo.photoUrl.startsWith('http')) {
+      return photo;
+    }
+    final activeClient = client;
+    if (activeClient == null) return photo;
+    try {
+      final signedUrl = await activeClient.storage
+          .from(_familyPhotoBucket)
+          .createSignedUrl(photo.photoUrl, 3600);
+      return photo.copyWith(photoUrl: signedUrl);
+    } catch (e) {
+      debugPrint('Family photo URL error: $e');
+      return photo;
+    }
+  }
+
+  Future<void> _cacheFamilyPhoto(FamilyPhoto photo) async {
+    if (!Hive.isBoxOpen(HiveBoxes.familyPhotos)) return;
+    await HiveDatabase.familyPhotosBox.put(
+      photo.id,
+      HiveFamilyPhoto(
+        id: photo.id,
+        patientId: photo.patientId,
+        name: photo.name,
+        relationship: photo.relationship,
+        photoUrl: photo.photoUrl,
+        localPath: photo.localPath,
+        localBytes: photo.localBytes,
+        displayOrder: photo.displayOrder,
+        isDeleted: photo.isDeleted,
+        createdAt: photo.createdAt,
+        updatedAt: photo.updatedAt,
+      ),
+    );
   }
 
   void _syncToHiveAndNotifications({
