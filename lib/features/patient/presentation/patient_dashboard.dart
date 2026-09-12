@@ -182,8 +182,13 @@ class PatientDashboard extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         const spacing = 16.0;
-        final cardWidth = (constraints.maxWidth - spacing) / 2.0;
-        final cardHeight = constraints.maxWidth < 360.0 ? 214.0 : 198.0;
+        final columns = constraints.maxWidth < 340.0 ? 1 : 2;
+        final cardWidth = (constraints.maxWidth - (spacing * (columns - 1))) /
+            columns;
+        // Minimum card height grows with text scale so labels never clip.
+        final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+        final cardHeight = (columns == 1 ? 150.0 : 198.0) *
+            textScale.clamp(1.0, 1.4);
 
         final items = [
           _ActionCardItem(
@@ -334,10 +339,17 @@ class _DashboardHeader extends StatelessWidget {
             ),
           ),
         ),
-        IconButton(
-          onPressed: onLogout,
-          tooltip: 'Log out',
-          icon: const Icon(Icons.logout_rounded),
+        Semantics(
+          button: true,
+          label: 'Log out',
+          child: IconButton(
+            onPressed: onLogout,
+            tooltip: 'Log out',
+            iconSize: 28.0,
+            padding: const EdgeInsets.all(12.0),
+            constraints: const BoxConstraints(minWidth: 56.0, minHeight: 56.0),
+            icon: const Icon(Icons.logout_rounded),
+          ),
         ),
       ],
     );

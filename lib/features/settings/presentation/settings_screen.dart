@@ -57,36 +57,17 @@ class SettingsScreen extends ConsumerWidget {
         child: Column(
           children: [
             // Top App Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  LargeIconButton(
-                    icon: Icons.arrow_back_rounded,
-                    tooltip: 'Back to Home',
-                    backgroundColor: ElderColors.surface,
-                    iconColor: ElderColors.textPrimary,
-                    size: 56.0,
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.go('/patient/home');
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 16.0),
-                  Expanded(
-                    child: Text(
-                      l10n?.settingsNavLabel ?? 'Settings',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: ElderColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            ClayHeader3D(
+              title: l10n?.settingsNavLabel ?? 'Settings',
+              subtitle: l10n?.settingsSubtitle ??
+                  'Adjust text size, contrast, or language anytime.',
+              onBack: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/patient/home');
+                }
+              },
             ),
 
             // Scrollable Content

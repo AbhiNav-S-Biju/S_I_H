@@ -175,10 +175,15 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     final hasNextLevel =
         level != null && level.levelNumber < 8 && widget.onNextLevel != null;
 
+    final media = MediaQuery.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.0)),
       backgroundColor: Colors.transparent,
       elevation: 0,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: media.size.width < 380 ? 16.0 : 28.0,
+        vertical: 24.0,
+      ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
         decoration: BoxDecoration(
@@ -186,7 +191,12 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
           borderRadius: BorderRadius.circular(28.0),
           boxShadow: NirvanaShadows.card(),
         ),
-        child: Column(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: media.size.height * 0.82,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -402,6 +412,8 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
               ),
             ],
           ],
+            ),
+          ),
         ),
       ),
     );

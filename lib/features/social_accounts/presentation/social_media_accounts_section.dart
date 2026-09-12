@@ -159,7 +159,7 @@ class SocialMediaAccountsSection extends ConsumerWidget {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (_, __) => const Text(
               'We could not load your saved accounts. Please try again.',
-              style: TextStyle(color: Colors.redAccent),
+              style: TextStyle(color: ElderColors.gentleErrorText),
             ),
             data: (items) {
               if (items.isEmpty) {

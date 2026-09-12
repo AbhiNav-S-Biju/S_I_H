@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/theme/elder_theme.dart';
+import '../../../app/theme/nirvana_responsive.dart';
+import '../../../app/widgets/clay_3d/clay_3d.dart';
 import 'social_media_accounts_section.dart';
 
 class SocialMediaAccountsScreen extends StatelessWidget {
@@ -8,11 +12,39 @@ class SocialMediaAccountsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Social media accounts')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: const SocialMediaAccountsSection(),
+      backgroundColor: ElderColors.backgroundClay,
+      body: ClayBackdrop3D(
+        child: SafeArea(
+          child: Column(
+            children: [
+              Builder(
+                builder: (context) => ClayHeader3D(
+                  title: 'Social accounts',
+                  subtitle: 'Saved logins for your favourite apps',
+                  onBack: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/patient/home');
+                    }
+                  },
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    NirvanaSpacing.pageHorizontal(context),
+                    8,
+                    NirvanaSpacing.pageHorizontal(context),
+                    32,
+                  ),
+                  child: const NirvanaContentWidth(
+                    child: SocialMediaAccountsSection(),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

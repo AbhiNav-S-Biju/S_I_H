@@ -279,15 +279,15 @@ class _CaregiverPatientOnboardingScreenState
                   ),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: ElderColors.gentleErrorBg,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.shade200),
+                    border: Border.all(color: ElderColors.gentleErrorBorder),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.error_outline,
-                        color: Colors.red,
+                        color: ElderColors.gentleErrorText,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -295,7 +295,7 @@ class _CaregiverPatientOnboardingScreenState
                         child: Text(
                           onboardingState.errorMessage!,
                           style: const TextStyle(
-                            color: Colors.red,
+                            color: ElderColors.gentleErrorText,
                             fontSize: 13,
                           ),
                         ),

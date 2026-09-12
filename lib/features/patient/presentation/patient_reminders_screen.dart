@@ -60,15 +60,22 @@ class PatientRemindersScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 14),
-              ClaySlab3D(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                borderRadius: 18,
-                child: Text(
-                  'Daily Routines',
-                  style: GoogleFonts.nunito(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: Clay3DTheme.textDark,
+              Flexible(
+                child: ClaySlab3D(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 8,
+                  ),
+                  borderRadius: 18,
+                  child: Text(
+                    'Daily Routines',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.nunito(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: Clay3DTheme.textDark,
+                    ),
                   ),
                 ),
               ),

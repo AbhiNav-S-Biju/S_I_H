@@ -139,8 +139,9 @@ class _CaregiverPatientLocationScreenState
         elevation: 0,
         title: Text(
           '$patientName — Live Location',
-          style: const TextStyle(
-            fontSize: 20,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w900,
             color: ElderColors.textPrimary,
           ),
@@ -177,51 +178,57 @@ class _CaregiverPatientLocationScreenState
               child: Row(
                 children: [
                   Expanded(
-                    child: SizedBox(
-                      height: 60,
-                      child: FilledButton.icon(
-                        onPressed: _callPatient,
-                        icon: const Icon(Icons.call_rounded),
-                        label: const Text(
-                          'CALL PATIENT',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                          ),
+                    child: FilledButton.icon(
+                      onPressed: _callPatient,
+                      icon: const Icon(Icons.call_rounded),
+                      label: const Text(
+                        'CALL PATIENT',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
                         ),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: ElderColors.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: ElderColors.primary,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(60),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: SizedBox(
-                      height: 60,
-                      child: OutlinedButton.icon(
-                        onPressed: session == null ? null : _stopSharing,
-                        icon: const Icon(Icons.stop_circle_rounded),
-                        label: const Text(
-                          'STOP SHARING',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                          ),
+                    child: OutlinedButton.icon(
+                      onPressed: session == null ? null : _stopSharing,
+                      icon: const Icon(Icons.stop_circle_rounded),
+                      label: const Text(
+                        'STOP SHARING',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
                         ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFFD32F2F),
-                          side: const BorderSide(
-                            color: Color(0xFFD32F2F),
-                            width: 2,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: ElderColors.gentleErrorText,
+                        minimumSize: const Size.fromHeight(60),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                        side: const BorderSide(
+                          color: ElderColors.gentleErrorPrimary,
+                          width: 2,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),

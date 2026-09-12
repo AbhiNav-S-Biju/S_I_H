@@ -148,9 +148,9 @@ class _PatientPairingSuccessScreenState
 
             const SizedBox(height: 32),
 
-            // Continue CTA
-            SizedBox(
-              width: 220,
+            // Continue CTA — clamped so it never exceeds narrow screens.
+            ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 200.0, maxWidth: 320.0),
               child: ClayButton3D(
                 label: 'Continue',
                 icon: Icons.arrow_forward_rounded,

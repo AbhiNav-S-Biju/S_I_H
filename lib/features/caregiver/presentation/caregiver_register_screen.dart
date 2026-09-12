@@ -335,7 +335,7 @@ class _CaregiverRegisterScreenState
                                 children: [
                                   const Icon(
                                     Icons.error_outline_rounded,
-                                    color: Color(0xFFC2410C),
+                                    color: ElderColors.gentleErrorText,
                                     size: 22,
                                   ),
                                   const SizedBox(width: 12),
@@ -343,7 +343,7 @@ class _CaregiverRegisterScreenState
                                     child: Text(
                                       _errorMessage!,
                                       style: const TextStyle(
-                                        color: Color(0xFF9A3412),
+                                        color: ElderColors.gentleErrorText,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         height: 1.3,

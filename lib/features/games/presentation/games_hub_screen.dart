@@ -82,8 +82,9 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
         ),
         title: Text(
           l10n?.activitiesTitle ?? 'Daily Activities',
-          style: const TextStyle(
-            fontSize: 22.0,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w900,
             color: ElderColors.textPrimary,
           ),
@@ -117,11 +118,13 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                         Text(
                           l10n?.activitiesBannerTitle ??
                               'Welcome to Today\'s Fun!',
-                          style: const TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w800,
-                            color: ElderColors.forestDeep,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: ElderColors.forestDeep,
+                              ),
                         ),
                         const SizedBox(height: 4.0),
                         Text(
@@ -312,8 +315,7 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        fontSize: 20.0,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: ElderColors.textPrimary,
                       ),
@@ -368,21 +370,25 @@ class _GamesHubScreenState extends ConsumerState<GamesHubScreen> {
                       : ElderColors.forestDeep,
                 ),
                 const SizedBox(width: 8.0),
-                Text(
-                  langCode == 'as'
-                      ? 'স্তৰ $completedCount / ৮ সম্পূৰ্ণ'
-                      : langCode == 'hi'
-                      ? 'स्तर $completedCount / 8 पूरे'
-                      : langCode == 'bn'
-                      ? 'ধাপ $completedCount / ৮ সম্পূর্ণ'
-                      : 'Level $completedCount of 8 Done',
-                  style: const TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w700,
-                    color: ElderColors.textPrimary,
+                Expanded(
+                  child: Text(
+                    langCode == 'as'
+                        ? 'স্তৰ $completedCount / ৮ সম্পূৰ্ণ'
+                        : langCode == 'hi'
+                        ? 'स्तर $completedCount / 8 पूरे'
+                        : langCode == 'bn'
+                        ? 'ধাপ $completedCount / ৮ সম্পূর্ণ'
+                        : 'Level $completedCount of 8 Done',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: ElderColors.textPrimary,
+                    ),
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8.0),
                 // Stars pill
                 Container(
                   padding: const EdgeInsets.symmetric(

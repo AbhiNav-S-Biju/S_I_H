@@ -30,44 +30,56 @@ class ClayButton3D extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isLoading ? null : onPressed,
-      child: Container(
-        height: minHeight,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(borderRadius),
-          boxShadow: Clay3DTheme.buttonShadow(tint: color),
-        ),
-        child: Center(
-          child: isLoading
-              ? SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    color: textColor,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (icon != null) ...[
-                      Icon(icon, size: 24, color: textColor),
-                      const SizedBox(width: 10),
-                    ],
-                    Text(
-                      label,
-                      style: GoogleFonts.nunito(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        color: textColor,
-                        letterSpacing: -0.2,
-                      ),
+    final isEnabled = !isLoading && onPressed != null;
+    return Semantics(
+      button: true,
+      enabled: isEnabled,
+      label: label,
+      child: GestureDetector(
+        onTap: isEnabled ? onPressed : null,
+        child: Container(
+          constraints: BoxConstraints(minHeight: minHeight),
+          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+          decoration: BoxDecoration(
+            color: isEnabled ? color : color.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(borderRadius),
+            boxShadow: Clay3DTheme.buttonShadow(tint: color),
+          ),
+          child: Center(
+            child: isLoading
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: textColor,
+                      strokeWidth: 2.5,
                     ),
-                  ],
-                ),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (icon != null) ...[
+                        Icon(icon, size: 24, color: textColor),
+                        const SizedBox(width: 10),
+                      ],
+                      Flexible(
+                        child: Text(
+                          label,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.nunito(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                            color: textColor,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

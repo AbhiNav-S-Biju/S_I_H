@@ -78,6 +78,57 @@ class NirvanaShadows {
           spreadRadius: 0,
         ),
       ];
+
+  /// CLAY RAISED — the two-entry dual shadow that defines every raised clay
+  /// surface: a warm-white highlight from the top-left and a warm-brown ambient
+  /// shadow to the bottom-right. Never a single Material elevation.
+  static List<BoxShadow> clayRaised({
+    double blur = 16.0,
+    double offset = 6.0,
+    double ambientAlpha = 0.16,
+    double highlightAlpha = 0.85,
+  }) =>
+      [
+        // Ambient shadow — bottom-right, warm brown, low opacity.
+        BoxShadow(
+          color: ElderColors.clayBackgroundShadow.withValues(alpha: ambientAlpha),
+          offset: Offset(offset, offset + 2),
+          blurRadius: blur,
+          spreadRadius: 0,
+        ),
+        // Highlight — top-left, warm white, low opacity.
+        BoxShadow(
+          color: ElderColors.clayBackgroundHighlight
+              .withValues(alpha: highlightAlpha),
+          offset: Offset(-offset, -offset),
+          blurRadius: blur,
+          spreadRadius: 0,
+        ),
+      ];
+
+  /// CLAY PRESSED — the simulated inset look for active/pressed states.
+  ///
+  /// Flutter has no native inset box-shadow, so we approximate it by pulling the
+  /// shadow *inside* the shape with a negative spread and swapping the highlight
+  /// to the bottom-right — the surface reads as gently pushed into the canvas.
+  static List<BoxShadow> clayPressed({
+    double blur = 10.0,
+    double spread = 4.0,
+  }) =>
+      [
+        BoxShadow(
+          color: ElderColors.clayBackgroundShadow.withValues(alpha: 0.30),
+          offset: const Offset(2, 2),
+          blurRadius: blur,
+          spreadRadius: -spread,
+        ),
+        BoxShadow(
+          color: ElderColors.clayBackgroundHighlight.withValues(alpha: 0.90),
+          offset: const Offset(-2, -2),
+          blurRadius: blur * 0.6,
+          spreadRadius: -spread,
+        ),
+      ];
 }
 
 // ==============================================================================
@@ -87,6 +138,49 @@ class NirvanaShadows {
 // ==============================================================================
 class ElderColors {
   ElderColors._();
+
+  // ---------------------------------------------------------------------------
+  // CLAY CANVAS — warm sand/cream base for the patient dashboard.
+  // Never stark white, never pure black. These layer with [Clay3DSurface] to
+  // produce the raised "puffy" look (light top-left highlight + warm-brown
+  // ambient shadow) required by the claymorphism spec.
+  // ---------------------------------------------------------------------------
+  /// Main sand background.
+  static const Color clayBackground = Color(0xFFECE3D3);
+  /// Top-left highlight tint used by the raised-surface shadow.
+  static const Color clayBackgroundHighlight = Color(0xFFFBF6EC);
+  /// Bottom-right ambient shadow tint (warm brown).
+  static const Color clayBackgroundShadow = Color(0xFFD6C9B2);
+  /// Raised card surface — cream, never white.
+  static const Color claySurface = Color(0xFFF4ECDD);
+  /// Primary readable ink — warm dark brown, never black.
+  static const Color clayInk = Color(0xFF40372B);
+  /// Secondary ink for supporting copy.
+  static const Color clayInkSoft = Color(0xFF8A7D68);
+
+  // ---------------------------------------------------------------------------
+  // CLAY ACCENT GRADIENTS — each a 2-stop linear gradient at ~150°.
+  // Colours are never the only signal: every gradient badge pairs with a label.
+  // ---------------------------------------------------------------------------
+  /// Purple — Daily Moment card & Memory Games.
+  static const List<Color> clayGradPurple = [Color(0xFFA996DD), Color(0xFF7A63BF)];
+  /// Teal — My Reminders.
+  static const List<Color> clayGradTeal = [Color(0xFF63C1AC), Color(0xFF3F9683)];
+  /// Sage — Social Accounts & caregiver banner.
+  static const List<Color> clayGradSage = [Color(0xFF8DBB8A), Color(0xFF5E8C5D)];
+  /// Coral — Family Photos & SOS.
+  static const List<Color> clayGradCoral = [Color(0xFFE78D7D), Color(0xFFC86454)];
+  /// Gold — date pill & Settings.
+  static const List<Color> clayGradGold = [Color(0xFFDAB671), Color(0xFFB0813A)];
+  /// Sky — Ask NIRVANA.
+  static const List<Color> clayGradSky = [Color(0xFF7FB6C8), Color(0xFF4C8698)];
+
+  /// Convenience: a [LinearGradient] for a 2-stop clay accent at ~150°.
+  static LinearGradient clayGradient(List<Color> colors) => LinearGradient(
+        colors: colors,
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
 
   // ---------------------------------------------------------------------------
   // Primary — muted lavender (not saturated violet)
@@ -326,9 +420,77 @@ class ElderTheme {
         backgroundColor: ElderColors.surface,
         elevation: 0,
         shadowColor: Colors.transparent,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w900,
+          color: ElderColors.textPrimary,
+        ),
+        contentTextStyle: textTheme.bodyLarge?.copyWith(
+          color: ElderColors.textSecondary,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(NirvanaRadii.card),
         ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: ElderColors.textPrimary,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(NirvanaRadii.button),
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.white;
+          }
+          return Colors.white;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return ElderColors.primary;
+          }
+          return ElderColors.border;
+        }),
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: ElderColors.primary,
+          minimumSize: const Size(64.0, 52.0),
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: ElderColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0.0,
+          minimumSize: const Size(64.0, buttonHeight),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(NirvanaRadii.button),
+          ),
+          textStyle: textTheme.labelLarge?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: ElderColors.borderLight,
+        thickness: 1.5,
+        space: 1.5,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: ElderColors.primary,
+        linearTrackColor: ElderColors.borderLight,
+        circularTrackColor: ElderColors.borderLight,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: ElderColors.background,

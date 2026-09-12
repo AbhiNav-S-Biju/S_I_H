@@ -200,12 +200,12 @@ class LanguageSelectorScreen extends ConsumerWidget {
                       vertical: 18.0,
                     ),
                     backgroundColor: isUnsupported
-                        ? const Color(0xFFF1EDE6)
+                        ? ElderColors.backgroundAlt
                         : isSelected
                             ? ElderColors.clayLavender.withValues(alpha: 0.18)
-                            : Colors.white,
+                            : ElderColors.surface,
                     borderColor: isUnsupported
-                        ? const Color(0xFFDDD7CE)
+                        ? ElderColors.border
                         : isSelected
                             ? ElderColors.clayLavender
                             : ElderColors.border,
@@ -229,7 +229,7 @@ class LanguageSelectorScreen extends ConsumerWidget {
                                   : Icons.radio_button_off_rounded,
                           size: 30.0,
                           color: isUnsupported
-                              ? const Color(0xFF94A3B8)
+                              ? ElderColors.textMuted
                               : isSelected
                                   ? ElderColors.clayLavender
                                   : ElderColors.textMuted,
@@ -245,10 +245,8 @@ class LanguageSelectorScreen extends ConsumerWidget {
                                   fontSize: 22.0,
                                   fontWeight: FontWeight.w800,
                                   color: isUnsupported
-                                      ? const Color(0xFF64748B)
-                                      : isSelected
-                                          ? ElderColors.textPrimary
-                                          : ElderColors.textPrimary,
+                                      ? ElderColors.textMuted
+                                      : ElderColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 2.0),
@@ -258,7 +256,7 @@ class LanguageSelectorScreen extends ConsumerWidget {
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w500,
                                   color: isUnsupported
-                                      ? const Color(0xFF94A3B8)
+                                      ? ElderColors.textMuted
                                       : isSelected
                                           ? ElderColors.clayLavender
                                           : ElderColors.textSecondary,
@@ -274,7 +272,7 @@ class LanguageSelectorScreen extends ConsumerWidget {
                               vertical: 4.0,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE2E8F0),
+                              color: ElderColors.backgroundAlt,
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             child: const Text(
@@ -282,7 +280,7 @@ class LanguageSelectorScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF64748B),
+                                color: ElderColors.textMuted,
                               ),
                             ),
                           ),

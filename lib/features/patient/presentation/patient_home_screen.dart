@@ -1,4 +1,4 @@
-// ==============================================================================
+﻿// ==============================================================================
 // NIRVANA - Patient Home Screen
 // Description: The primary landing page for elderly patients after device pairing.
 // Claymorphic wellness design with soft dual shadows, pastel tiles, large typography,
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
+import 'package:nirvana/app/theme/nirvana_responsive.dart';
 import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/database/hive_database.dart';
@@ -16,8 +17,54 @@ import 'package:nirvana/features/location_help/location_help.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
 import 'package:nirvana/features/reminders/providers/reminder_providers.dart';
 
-class PatientHomeScreen extends ConsumerWidget {
+import 'widgets/patient_dashboard_widgets.dart';
+
+/// The patient-facing home dashboard.
+///
+/// Layout contract (see the dashboard spec Â§3): the scrollable body lives in a
+/// [SingleChildScrollView] inside a [SafeArea], and the floating SOS control is
+/// anchored to the *viewport* via a [Stack], never placed inside the scroll
+/// content. Every card derives its size from constraints, so no width/height is
+/// hardcoded and nothing overflows from 320px to 480px at up to 130% text scale.
+class PatientHomeScreen extends ConsumerStatefulWidget {
   const PatientHomeScreen({super.key});
+
+  @override
+  ConsumerState<PatientHomeScreen> createState() => _PatientHomeScreenState();
+}
+
+class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
+  /// Scroll threshold (px) past which the SOS pill collapses to a circle.
+  static const double _sosCollapseThreshold = 40.0;
+
+  final ScrollController _scrollController = ScrollController();
+  bool _sosCollapsed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  /// Collapses the SOS control once the body scrolls past a small threshold.
+  /// Only flips state when the boolean actually changes, so this never spams
+  /// rebuilds while scrolling.
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final shouldCollapse =
+        _scrollController.offset > _sosCollapseThreshold;
+    if (shouldCollapse != _sosCollapsed && mounted) {
+      setState(() => _sosCollapsed = shouldCollapse);
+    }
+  }
 
   Future<void> _logout(BuildContext context) async {
     final shouldLogout = await showDialog<bool>(
@@ -51,156 +98,156 @@ class PatientHomeScreen extends ConsumerWidget {
     return 'Good Evening,';
   }
 
+  /// The six launcher entries for the icon grid. Kept as a method so the grid
+  /// stays a dumb layout widget and navigation lives in the screen.
+  List<AppIconItem> _launcherItems() {
+    return [
+      AppIconItem(
+        icon: Icons.extension_rounded,
+        label: 'Games',
+        gradient: ElderColors.clayGradPurple,
+        onTap: () => context.push('/patient/games'),
+      ),
+      AppIconItem(
+        icon: Icons.alarm_rounded,
+        label: 'Reminders',
+        gradient: ElderColors.clayGradTeal,
+        onTap: () => context.push('/patient/reminders'),
+      ),
+      AppIconItem(
+        icon: Icons.photo_album_rounded,
+        label: 'Photos',
+        gradient: ElderColors.clayGradCoral,
+        onTap: () => context.push('/patient/family-photos'),
+      ),
+      AppIconItem(
+        icon: Icons.record_voice_over_rounded,
+        label: 'Ask',
+        gradient: ElderColors.clayGradSky,
+        onTap: () => context.push('/ask-nirvana'),
+      ),
+      AppIconItem(
+        icon: Icons.lock_person_rounded,
+        label: 'Accounts',
+        gradient: ElderColors.clayGradSage,
+        onTap: () => context.push('/patient/social-accounts'),
+      ),
+      AppIconItem(
+        icon: Icons.settings_rounded,
+        label: 'Settings',
+        gradient: ElderColors.clayGradGold,
+        onTap: () => context.push('/patient/settings'),
+      ),
+    ];
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final session = ref.watch(localPatientSessionProvider);
     final preferredName = session?.preferredName ?? 'Friend';
     final greeting = _timeGreeting();
-    final isSharing = ref.watch(locationHelpProvider).isActive;
+
+    // The SOS control clears the system gesture bar by tracking the real bottom
+    // inset rather than a hardcoded offset (spec Â§3 & Â§4).
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final pagePadding = NirvanaSpacing.pageHorizontal(context);
 
     return Scaffold(
-      backgroundColor: Clay3DTheme.canvas,
+      backgroundColor: ElderColors.clayBackground,
       body: ClayBackdrop3D(
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ----------------------------------------------------------------
-                // Header: Warm Greeting & Avatar
-                // ----------------------------------------------------------------
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          // Stack keeps the SOS control anchored to the viewport, ABOVE the
+          // scroll content, so it stays reachable at any scroll offset.
+          child: Stack(
+            children: [
+              // -------------------------------------------------------------
+              // SCROLLABLE BODY â€” content-sized, never height-constrained.
+              // Bottom padding reserves room so the last card is never hidden
+              // behind the floating SOS pill.
+              // -------------------------------------------------------------
+              SingleChildScrollView(
+                controller: _scrollController,
+                padding: EdgeInsets.fromLTRB(
+                  pagePadding,
+                  NirvanaSpacing.pageVertical,
+                  pagePadding,
+                  // 96 = SOS height (60) + breathing room so nothing hides
+                  // behind it, plus the live bottom inset.
+                  96.0 + bottomInset,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
-                              vertical: 4.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color: ElderColors.pastelButtercup,
-                              borderRadius: BorderRadius.circular(14.0),
-                            ),
-                            child: Text(
-                              _formattedDate(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                color: ElderColors.amberDeep,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            greeting,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: ElderColors.textSecondary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            preferredName,
-                            style: const TextStyle(
-                              fontSize: 34,
-                              fontWeight: FontWeight.w900,
-                              color: ElderColors.textPrimary,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ],
-                      ),
+                    // -------------------------------------------------------
+                    // Header â€” date pill + greeting/name + clay icon buttons.
+                    // -------------------------------------------------------
+                    PatientHeader(
+                      dateLabel: _formattedDate(),
+                      greeting: greeting,
+                      patientName: preferredName,
+                      onFavorite: () => context.push('/patient/family-photos'),
+                      onLogout: () => _logout(context),
                     ),
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: ElderColors.primaryContainer,
-                        shape: BoxShape.circle,
-                        boxShadow: NirvanaShadows.float(
-                          tint: ElderColors.primary,
-                        ),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.favorite_rounded,
-                          size: 32,
-                          color: ElderColors.primary,
-                        ),
-                      ),
+                    const SizedBox(height: 22.0),
+
+                    // -------------------------------------------------------
+                    // Daily moment â€” purple gradient clay card.
+                    // -------------------------------------------------------
+                    const DailyMomentCard(
+                      headline: 'You are doing wonderfully today',
+                      supportingText:
+                          'Take your time. Every small step is a good step, and you are not alone.',
+                      icon: Icons.wb_sunny_rounded,
                     ),
-                    IconButton(
-                      onPressed: () => _logout(context),
-                      tooltip: 'Log out',
-                      icon: const Icon(
-                        Icons.logout_rounded,
-                        color: ElderColors.textSecondary,
-                      ),
+                    const SizedBox(height: 20.0),
+
+                    // -------------------------------------------------------
+                    // Next routine / reminder (existing data-driven card).
+                    // -------------------------------------------------------
+                    _UpcomingReminderCard(patientId: session?.patientId ?? ''),
+
+                    // -------------------------------------------------------
+                    // Launcher section.
+                    // -------------------------------------------------------
+                    Text(
+                      'What would you like to do?',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w900,
+                            color: ElderColors.clayInk,
+                          ),
                     ),
+                    const SizedBox(height: 16.0),
+                    AppIconGrid(items: _launcherItems()),
+                    const SizedBox(height: 24.0),
+
+                    // -------------------------------------------------------
+                    // Caregiver reassurance â€” sage clay banner.
+                    // -------------------------------------------------------
+                    const CaregiverBanner(
+                      message:
+                          'Your family can check in on you any time. You are safe and looked after.',
+                    ),
+                    const SizedBox(height: 8.0),
                   ],
                 ),
+              ),
 
-                const SizedBox(height: 24),
-
-                // ----------------------------------------------------------------
-                // EMERGENCY: I'M LOST / I NEED HELP
-                // Placed directly under the greeting so it is the first thing
-                // a worried person reaches for.
-                // ----------------------------------------------------------------
-                HelpButton(
-                  isSharing: isSharing,
+              // -------------------------------------------------------------
+              // FLOATING SOS â€” bottom-right, above the scroll content. Offset
+              // from the real bottom inset so it never collides with gesture
+              // navigation on any device.
+              // -------------------------------------------------------------
+              Positioned(
+                right: pagePadding,
+                bottom: 16.0 + bottomInset,
+                child: FloatingSosButton(
+                  collapsed: _sosCollapsed,
                   onPressed: () => startHelpFlow(context, ref),
                 ),
-                const SizedBox(height: 24),
-
-                // ----------------------------------------------------------------
-                // Today's Wellness Motivation Card
-                // ----------------------------------------------------------------
-                _ClayWellnessCard(),
-                const SizedBox(height: 20),
-
-                // ----------------------------------------------------------------
-                // Next Routine / Reminder Card
-                // ----------------------------------------------------------------
-                _UpcomingReminderCard(patientId: session?.patientId ?? ''),
-                const SizedBox(height: 28),
-
-                // ----------------------------------------------------------------
-                // Quick Access Grid
-                // ----------------------------------------------------------------
-                const Text(
-                  'What would you like to do?',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: ElderColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                _QuickAccessGrid(),
-                const SizedBox(height: 28),
-
-                // ----------------------------------------------------------------
-                // Encouragement Message
-                // ----------------------------------------------------------------
-                SupportiveMessage(
-                  message:
-                      'Remember: your caregiver is always just a touch away, $preferredName.',
-                  icon: Icons.lightbulb_rounded,
-                  backgroundColor: ElderColors.pastelSage,
-                  accentColor: ElderColors.forestDeep,
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -233,273 +280,6 @@ class PatientHomeScreen extends ConsumerWidget {
       'Dec',
     ];
     return '${days[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}';
-  }
-}
-
-// ==============================================================================
-// Claymorphic Wellness Motivation Card
-// ==============================================================================
-
-class _ClayWellnessCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: ElderColors.primary,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-        boxShadow: ElderColors.buttonShadow(color: ElderColors.primary),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'DAILY MOMENT',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'You are doing wonderfully! 🌟',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Keep up your daily activities. Every little step brings peace and joy.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white,
-                    height: 1.4,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 14),
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.4),
-                width: 1.5,
-              ),
-            ),
-            child: const Icon(Icons.spa_rounded, size: 32, color: Colors.white),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ==============================================================================
-// Quick Access Grid with Claymorphic Tiles
-// ==============================================================================
-
-class _QuickAccessGrid extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final tiles = [
-      _ClayQuickTile(
-        icon: Icons.extension_rounded,
-        label: 'Memory Games',
-        tag: 'BRAIN GYM',
-        color: ElderColors.lavenderDeep,
-        bgColor: ElderColors.pastelLavenderBg,
-        onTap: () => context.push('/patient/games'),
-      ),
-      _ClayQuickTile(
-        icon: Icons.alarm_rounded,
-        label: 'My Reminders',
-        tag: 'ROUTINES',
-        color: ElderColors.skyDeep,
-        bgColor: ElderColors.pastelSky,
-        onTap: () => context.push('/patient/reminders'),
-      ),
-      _ClayQuickTile(
-        icon: Icons.lock_person_rounded,
-        label: 'Social Accounts',
-        tag: 'ACCOUNT DETAILS',
-        color: ElderColors.forestDeep,
-        bgColor: ElderColors.pastelSage,
-        onTap: () => context.push('/patient/social-accounts'),
-      ),
-      _ClayQuickTile(
-        icon: Icons.photo_album_rounded,
-        label: 'Family Photos',
-        tag: 'MEMORIES',
-        color: ElderColors.coralDeep,
-        bgColor: ElderColors.pastelPeach,
-        onTap: () => context.push('/patient/family-photos'),
-      ),
-      _ClayQuickTile(
-        icon: Icons.settings_rounded,
-        label: 'Settings',
-        tag: 'PREFERENCES',
-        color: ElderColors.amberDeep,
-        bgColor: ElderColors.pastelButtercup,
-        onTap: () => context.push('/patient/settings'),
-      ),
-      _ClayQuickTile(
-        icon: Icons.record_voice_over_rounded,
-        label: 'Ask NIRVANA',
-        tag: 'AI COMPANION',
-        color: ElderColors.skyDeep,
-        bgColor: ElderColors.pastelSkyBg,
-        onTap: () => context.push('/ask-nirvana'),
-      ),
-    ];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final tileHeight = constraints.maxWidth < 360 ? 196.0 : 188.0;
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            mainAxisExtent: tileHeight,
-          ),
-          itemCount: tiles.length,
-          itemBuilder: (context, index) => tiles[index],
-        );
-      },
-    );
-  }
-}
-
-class _ClayQuickTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String tag;
-  final Color color;
-  final Color bgColor;
-  final VoidCallback onTap;
-
-  const _ClayQuickTile({
-    required this.icon,
-    required this.label,
-    required this.tag,
-    required this.color,
-    required this.bgColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: ElderColors.surface,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-        border: Border.all(color: ElderColors.borderLight, width: 1.5),
-        boxShadow: ElderColors.clayShadow(),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(ElderTheme.cardBorderRadius),
-          onTap: onTap,
-          splashColor: color.withValues(alpha: 0.15),
-          highlightColor: color.withValues(alpha: 0.08),
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        shape: BoxShape.circle,
-                        boxShadow: NirvanaShadows.float(tint: color),
-                      ),
-                      child: Icon(icon, size: 28, color: color),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 16,
-                      color: ElderColors.textMuted.withValues(alpha: 0.5),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 3.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(NirvanaRadii.pill),
-                  ),
-                  child: Text(
-                    tag,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                      color: color,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: ElderColors.textPrimary,
-                    height: 1.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 
@@ -567,15 +347,19 @@ class _UpcomingReminderCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Next Routine',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: ElderColors.skyDeep,
+                  const Expanded(
+                    child: Text(
+                      'Next Routine',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: ElderColors.skyDeep,
+                      ),
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -622,38 +406,34 @@ class _UpcomingReminderCard extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: 18),
-              Row(
+              NirvanaButtonRow(
+                spacing: 12,
                 children: [
-                  Expanded(
-                    child: LargeActionButton(
-                      label: 'Mark Done',
-                      icon: Icons.check_circle_rounded,
-                      variant: LargeActionButtonVariant.sage,
-                      minHeight: 52,
-                      onPressed: () async {
-                        final repo = ref.read(reminderRepositoryProvider);
-                        final notif = ref.read(notificationServiceProvider);
+                  LargeActionButton(
+                    label: 'Mark Done',
+                    icon: Icons.check_circle_rounded,
+                    variant: LargeActionButtonVariant.sage,
+                    minHeight: 52,
+                    onPressed: () async {
+                      final repo = ref.read(reminderRepositoryProvider);
+                      final notif = ref.read(notificationServiceProvider);
 
-                        await repo.completeReminder(
-                          nextReminder.id,
-                          patientId: effectivePatientId,
-                        );
-                        await notif.cancelReminder(nextReminder.notificationId);
+                      await repo.completeReminder(
+                        nextReminder.id,
+                        patientId: effectivePatientId,
+                      );
+                      await notif.cancelReminder(nextReminder.notificationId);
 
-                        ref.invalidate(
-                          activeRemindersProvider(effectivePatientId),
-                        );
-                      },
-                    ),
+                      ref.invalidate(
+                        activeRemindersProvider(effectivePatientId),
+                      );
+                    },
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: LargeActionButton(
-                      label: 'View All',
-                      variant: LargeActionButtonVariant.secondary,
-                      minHeight: 52,
-                      onPressed: () => context.push('/patient/reminders'),
-                    ),
+                  LargeActionButton(
+                    label: 'View All',
+                    variant: LargeActionButtonVariant.secondary,
+                    minHeight: 52,
+                    onPressed: () => context.push('/patient/reminders'),
                   ),
                 ],
               ),

@@ -42,7 +42,7 @@ class ElderGameButton extends StatelessWidget {
       label: label,
       enabled: isEnabled,
       child: Container(
-        constraints: BoxConstraints(minHeight: minHeight, minWidth: 140.0),
+        constraints: BoxConstraints(minHeight: minHeight),
         decoration: BoxDecoration(
           color: isEnabled ? bg : ElderColors.surfaceElevated,
           borderRadius: BorderRadius.circular(ElderTheme.buttonBorderRadius),
@@ -82,6 +82,8 @@ class ElderGameButton extends StatelessWidget {
                     child: Text(
                       label,
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 19.0,
                         fontWeight: FontWeight.w800,

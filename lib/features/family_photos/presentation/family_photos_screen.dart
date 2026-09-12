@@ -75,13 +75,18 @@ class _FamilyPhotosBody extends ConsumerWidget {
       );
     }
 
+    // Give each tile a little more height when the system font scale is large so
+    // the caption never clips against the photo.
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    final aspectRatio = 0.78 / textScale.clamp(1.0, 1.6);
+
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 260,
         mainAxisSpacing: 18,
         crossAxisSpacing: 18,
-        childAspectRatio: 0.78,
+        childAspectRatio: aspectRatio.clamp(0.5, 0.9),
       ),
       itemCount: photos.length,
       itemBuilder: (context, index) => _FamilyPhotoCard(photo: photos[index]),

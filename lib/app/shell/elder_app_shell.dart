@@ -31,14 +31,22 @@ class ElderAppShell extends StatelessWidget {
     final activitiesLabel = l10n?.activitiesNavLabel ?? 'Activities';
     final settingsLabel = l10n?.settingsNavLabel ?? 'Settings';
 
+    // Hide the text label under each icon when the font scale is very large or
+    // the screen is very narrow, so the bar never overflows.
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    final width = MediaQuery.sizeOf(context).width;
+    final showLabels = textScale <= 1.4 && width >= 320;
+
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            top: BorderSide(color: ElderColors.border, width: 2.0),
+        decoration: BoxDecoration(
+          color: ElderColors.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(NirvanaRadii.sheet),
+            topRight: Radius.circular(NirvanaRadii.sheet),
           ),
+          boxShadow: NirvanaShadows.card(),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         child: SafeArea(
@@ -52,6 +60,7 @@ class ElderAppShell extends StatelessWidget {
                 isSelected: currentIndex == 0,
                 icon: Icons.home_rounded,
                 label: homeLabel,
+                showLabel: showLabels,
                 onTap: () => _onTap(0),
               ),
               _buildNavItem(
@@ -60,6 +69,7 @@ class ElderAppShell extends StatelessWidget {
                 isSelected: currentIndex == 1,
                 icon: Icons.extension_rounded,
                 label: activitiesLabel,
+                showLabel: showLabels,
                 onTap: () => _onTap(1),
               ),
               if (navigationShell.route.branches.length > 2)
@@ -69,6 +79,7 @@ class ElderAppShell extends StatelessWidget {
                   isSelected: currentIndex == 2,
                   icon: Icons.settings_rounded,
                   label: settingsLabel,
+                  showLabel: showLabels,
                   onTap: () => _onTap(2),
                 ),
             ],
@@ -84,6 +95,7 @@ class ElderAppShell extends StatelessWidget {
     required bool isSelected,
     required IconData icon,
     required String label,
+    required bool showLabel,
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
@@ -98,10 +110,10 @@ class ElderAppShell extends StatelessWidget {
         label: '$label tab',
         child: Material(
           color: isSelected ? activeBg : Colors.transparent,
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(NirvanaRadii.button),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: BorderRadius.circular(NirvanaRadii.button),
             child: Container(
               constraints: const BoxConstraints(minHeight: 64.0),
               padding: const EdgeInsets.symmetric(
@@ -117,19 +129,25 @@ class ElderAppShell extends StatelessWidget {
                     size: 32.0,
                     color: isSelected ? activeFg : inactiveFg,
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: isSelected
-                          ? FontWeight.w800
-                          : FontWeight.w600,
-                      color: isSelected ? activeFg : inactiveFg,
+                  if (showLabel) ...[
+                    const SizedBox(height: 4.0),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: isSelected
+                              ? FontWeight.w800
+                              : FontWeight.w600,
+                          color: isSelected ? activeFg : inactiveFg,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../../app/theme/elder_theme.dart';
+import '../../../app/theme/nirvana_responsive.dart';
 import '../../../app/widgets/widgets.dart';
 import '../../../core/widgets/voice_helper.dart';
 
@@ -323,8 +324,12 @@ class _ClayHomeContent extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final horizontalPadding = constraints.maxWidth < 500 ? 16.0 : 28.0;
-            final tileWidth =
-                (constraints.maxWidth - (horizontalPadding * 2) - 16) / 2;
+            final columns = constraints.maxWidth < 340 ? 1 : 2;
+            final tileWidth = NirvanaLayout.gridChildWidth(
+              maxWidth: constraints.maxWidth - (horizontalPadding * 2),
+              columns: columns,
+              spacing: 16.0,
+            );
 
             return Stack(
               children: [
@@ -846,43 +851,45 @@ class _ClayActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      height: 166,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(NirvanaRadii.card),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(13, 13, 12, 12),
+          child: Ink(
+            padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
             decoration: BoxDecoration(
               color: _clayCanvasColor,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(NirvanaRadii.card),
               boxShadow: _claySurfaceShadows(),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _ClayIconDisc(icon: icon, color: color),
-                    Icon(Icons.chevron_right_rounded, color: color, size: 30),
-                  ],
-                ),
-                const Spacer(),
-                _ClayTag(text: tag, color: tagColor),
-                const SizedBox(height: 6),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: ElderColors.textPrimary,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 150),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _ClayIconDisc(icon: icon, color: color),
+                      Icon(Icons.chevron_right_rounded, color: color, size: 30),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 14),
+                  _ClayTag(text: tag, color: tagColor),
+                  const SizedBox(height: 6),
+                  Text(
+                    label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: ElderColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

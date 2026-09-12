@@ -640,21 +640,24 @@ class _GameLevelMapScreenState extends ConsumerState<GameLevelMapScreen> {
             ),
             const SizedBox(width: 14.0),
 
-            // Start button
-            ElderGameButton(
-              label: buttonLabel,
-              backgroundColor: currentLevel.themeColor,
-              minHeight: 52.0,
-              onPressed: () {
-                if (allCompleted) {
-                  _confirmReset(context, langCode);
-                } else {
-                  _onLevelTapped(
-                    currentLevel,
-                    progressMap[currentLevel.levelNumber],
-                  );
-                }
-              },
+            // Start button — Flexible so a long translated label wraps
+            // instead of pushing the layout out of bounds.
+            Flexible(
+              child: ElderGameButton(
+                label: buttonLabel,
+                backgroundColor: currentLevel.themeColor,
+                minHeight: 52.0,
+                onPressed: () {
+                  if (allCompleted) {
+                    _confirmReset(context, langCode);
+                  } else {
+                    _onLevelTapped(
+                      currentLevel,
+                      progressMap[currentLevel.levelNumber],
+                    );
+                  }
+                },
+              ),
             ),
           ],
         ),

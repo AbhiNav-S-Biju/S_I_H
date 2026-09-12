@@ -139,7 +139,7 @@ class _CaregiverDashboardScreenState
                         ),
                         child: const Icon(
                           Icons.logout_rounded,
-                          color: Color(0xFFE11D48),
+                          color: ElderColors.gentleErrorPrimary,
                           size: 22,
                         ),
                       ),

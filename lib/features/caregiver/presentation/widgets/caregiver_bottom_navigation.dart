@@ -19,6 +19,9 @@ class CaregiverBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    final showLabels = textScale <= 1.4 && MediaQuery.sizeOf(context).width >= 320;
+
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.fromLTRB(16, 8, 16, 10),
@@ -49,6 +52,7 @@ class CaregiverBottomNavigation extends StatelessWidget {
                   icon: _items[index].$1,
                   label: _items[index].$2,
                   selected: selectedIndex == index,
+                  showLabel: showLabels,
                   onTap: () => onSelected(index),
                 ),
               ),
@@ -63,12 +67,14 @@ class _NavigationItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool selected;
+  final bool showLabel;
   final VoidCallback onTap;
 
   const _NavigationItem({
     required this.icon,
     required this.label,
     required this.selected,
+    this.showLabel = true,
     required this.onTap,
   });
 
@@ -96,17 +102,24 @@ class _NavigationItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(icon, size: 26, color: foreground),
-                  const SizedBox(height: 3),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: foreground,
-                      fontSize: 12,
-                      fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+                  if (showLabel) ...[
+                    const SizedBox(height: 3),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: foreground,
+                          fontSize: 12,
+                          fontWeight:
+                              selected ? FontWeight.w900 : FontWeight.w700,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

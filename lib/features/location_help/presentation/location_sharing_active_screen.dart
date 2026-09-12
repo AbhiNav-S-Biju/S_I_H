@@ -131,126 +131,132 @@ class _LocationSharingActiveScreenState
     return Scaffold(
       backgroundColor: ElderColors.backgroundClay,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ---------------------------------------------------------------
-              // Reassurance header
-              // ---------------------------------------------------------------
-              Container(
-                padding: const EdgeInsets.all(22),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2E7D32),
-                  borderRadius: BorderRadius.circular(
-                    ElderTheme.cardBorderRadius,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.check_circle_rounded,
-                      size: 56,
-                      color: Colors.white,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.sizeOf(context).height -
+                  MediaQuery.paddingOf(context).vertical -
+                  48,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ---------------------------------------------------------------
+                // Reassurance header
+                // ---------------------------------------------------------------
+                Container(
+                  padding: const EdgeInsets.all(22),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2E7D32),
+                    borderRadius: BorderRadius.circular(
+                      ElderTheme.cardBorderRadius,
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Help is on the way',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        size: 56,
                         color: Colors.white,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'You are sharing your location'
-                      '${state.caregiverName != null && state.caregiverName!.isNotEmpty ? ' with ${state.caregiverName}' : ''}.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        height: 1.35,
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Help is on the way',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ---------------------------------------------------------------
-              // Time remaining + accuracy
-              // ---------------------------------------------------------------
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                    ElderTheme.cardBorderRadius,
+                      const SizedBox(height: 8),
+                      Text(
+                        'You are sharing your location'
+                        '${state.caregiverName != null && state.caregiverName!.isNotEmpty ? ' with ${state.caregiverName}' : ''}.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Sharing stops automatically in',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: ElderColors.textSecondary,
-                      ),
+
+                const SizedBox(height: 20),
+
+                // ---------------------------------------------------------------
+                // Time remaining + accuracy
+                // ---------------------------------------------------------------
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                      ElderTheme.cardBorderRadius,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '$minutes min $seconds sec',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: ElderColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          accuracy == null
-                              ? Icons.gps_not_fixed_rounded
-                              : Icons.gps_fixed_rounded,
-                          size: 18,
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Sharing stops automatically in',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                           color: ElderColors.textSecondary,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          accuracyLabel,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '$minutes min $seconds sec',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: ElderColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            accuracy == null
+                                ? Icons.gps_not_fixed_rounded
+                                : Icons.gps_fixed_rounded,
+                            size: 18,
                             color: ElderColors.textSecondary,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 8),
+                          Text(
+                            accuracyLabel,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: ElderColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              const Spacer(),
+                const SizedBox(height: 24),
 
-              // ---------------------------------------------------------------
-              // CALL CARETAKER
-              // ---------------------------------------------------------------
-              SizedBox(
-                height: 72,
-                child: FilledButton.icon(
+                // ---------------------------------------------------------------
+                // CALL CARETAKER
+                // ---------------------------------------------------------------
+                FilledButton.icon(
                   onPressed: () => _callCaregiver(state.caregiverPhone),
                   icon: const Icon(Icons.call_rounded, size: 30),
                   label: const Text(
                     'CALL CARETAKER',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.w900,
@@ -260,25 +266,28 @@ class _LocationSharingActiveScreenState
                   style: FilledButton.styleFrom(
                     backgroundColor: ElderColors.primary,
                     foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(72),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 14),
+                const SizedBox(height: 14),
 
-              // ---------------------------------------------------------------
-              // STOP SHARING
-              // ---------------------------------------------------------------
-              SizedBox(
-                height: 72,
-                child: OutlinedButton.icon(
+                // ---------------------------------------------------------------
+                // STOP SHARING
+                // ---------------------------------------------------------------
+                OutlinedButton.icon(
                   onPressed: state.isStopping ? null : _stopSharing,
                   icon: const Icon(Icons.stop_circle_rounded, size: 30),
                   label: const Text(
                     'STOP SHARING',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.w900,
@@ -286,9 +295,14 @@ class _LocationSharingActiveScreenState
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFD32F2F),
+                    foregroundColor: ElderColors.gentleErrorText,
+                    minimumSize: const Size.fromHeight(72),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     side: const BorderSide(
-                      color: Color(0xFFD32F2F),
+                      color: ElderColors.gentleErrorPrimary,
                       width: 2.5,
                     ),
                     shape: RoundedRectangleBorder(
@@ -296,8 +310,8 @@ class _LocationSharingActiveScreenState
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

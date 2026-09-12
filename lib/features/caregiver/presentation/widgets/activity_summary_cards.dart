@@ -35,20 +35,26 @@ class ActivitySummaryCards extends ConsumerWidget {
 
     final totalActivities = gamesCount + remindersCompletedCount;
 
-    return Row(
-      children: [
-        Expanded(
-          child: _SummaryMetricCard(
+    // Lay the metric cards out in a responsive row that collapses to a single
+    // column only on genuinely tiny screens so the numbers never get squeezed.
+    //
+    // NOTE: [constraints.maxWidth] here is the CONTENT width, already reduced by
+    // the dashboard ListView's horizontal padding (20px each side). A 360dp
+    // phone therefore reports ~320px, so the threshold must be well below 360 —
+    // otherwise three cards needlessly stack into a tall column on every common
+    // phone. Three cards of ~100px only start to crowd below ~320px of content.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 300;
+        final cards = [
+          _SummaryMetricCard(
             title: 'Games completed',
             value: '$gamesCount',
             icon: Icons.extension_rounded,
             clayColor: ElderColors.clayLavender,
             subtitle: 'Sessions',
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _SummaryMetricCard(
+          _SummaryMetricCard(
             title: 'Reminder completion',
             value: totalRemindersCount > 0
                 ? '$remindersCompletedCount/$totalRemindersCount'
@@ -57,18 +63,36 @@ class ActivitySummaryCards extends ConsumerWidget {
             clayColor: ElderColors.claySage,
             subtitle: 'Today\'s routine',
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _SummaryMetricCard(
+          _SummaryMetricCard(
             title: 'Activities completed',
             value: '$totalActivities',
             icon: Icons.auto_awesome_rounded,
             clayColor: ElderColors.clayButtercup,
             subtitle: 'Total done',
           ),
-        ),
-      ],
+        ];
+
+        if (isNarrow) {
+          return Column(
+            children: [
+              for (var i = 0; i < cards.length; i++) ...[
+                if (i > 0) const SizedBox(height: 12),
+                cards[i],
+              ],
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var i = 0; i < cards.length; i++) ...[
+              if (i > 0) const SizedBox(width: 12),
+              Expanded(child: cards[i]),
+            ],
+          ],
+        );
+      },
     );
   }
 }
@@ -91,47 +115,60 @@ class _SummaryMetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElderCard(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       backgroundColor: ElderColors.surface,
+      // Content-sized: the card grows taller if a title wraps, rather than
+      // clipping the label. mainAxisSize.min + a tight cross-axis keeps the
+      // three cards the same height when they sit in a Row.
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: clayColor.withValues(alpha: 0.18),
               borderRadius: BorderRadius.circular(NirvanaRadii.icon),
             ),
             child: Icon(icon, color: clayColor, size: 20),
           ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              color: ElderColors.textPrimary,
+          const SizedBox(height: 10),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                color: ElderColors.textPrimary,
+              ),
             ),
           ),
           const SizedBox(height: 2),
+          // Titles wrap to two lines at ~100px card width instead of being
+          // truncated to an unreadable stub.
           Text(
             title,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
+              height: 1.2,
               color: ElderColors.textPrimary,
             ),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+          const SizedBox(height: 2),
           Text(
             subtitle,
             style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
+              height: 1.2,
               color: ElderColors.textSecondary,
             ),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ],
