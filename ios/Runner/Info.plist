@@ -45,5 +45,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- "I'm Lost / I Need Help" foreground location sharing -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>NIRVANA needs your location so your caregiver can find you when you ask for help. Sharing stops automatically.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+	<string>tel</string>
+	</array>
 </dict>
 </plist>

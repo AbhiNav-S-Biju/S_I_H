@@ -12,6 +12,7 @@ import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/app/widgets/clay_3d/clay_3d.dart';
 import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/database/hive_database.dart';
+import 'package:nirvana/features/location_help/location_help.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
 import 'package:nirvana/features/reminders/providers/reminder_providers.dart';
 
@@ -55,6 +56,7 @@ class PatientHomeScreen extends ConsumerWidget {
     final session = ref.watch(localPatientSessionProvider);
     final preferredName = session?.preferredName ?? 'Friend';
     final greeting = _timeGreeting();
+    final isSharing = ref.watch(locationHelpProvider).isActive;
 
     return Scaffold(
       backgroundColor: Clay3DTheme.canvas,
@@ -145,7 +147,18 @@ class PatientHomeScreen extends ConsumerWidget {
                   ],
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
+
+                // ----------------------------------------------------------------
+                // EMERGENCY: I'M LOST / I NEED HELP
+                // Placed directly under the greeting so it is the first thing
+                // a worried person reaches for.
+                // ----------------------------------------------------------------
+                HelpButton(
+                  isSharing: isSharing,
+                  onPressed: () => startHelpFlow(context, ref),
+                ),
+                const SizedBox(height: 24),
 
                 // ----------------------------------------------------------------
                 // Today's Wellness Motivation Card

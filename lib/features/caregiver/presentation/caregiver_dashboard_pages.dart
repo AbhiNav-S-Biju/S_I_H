@@ -10,6 +10,7 @@ import 'package:nirvana/features/caregiver/presentation/widgets/patient_selector
 import 'package:nirvana/features/caregiver/presentation/widgets/reminder_status_list.dart';
 import 'package:nirvana/features/caregiver/presentation/widgets/seven_day_activity_chart.dart';
 import 'package:nirvana/features/caregiver/presentation/widgets/sync_status_card.dart';
+import 'package:nirvana/features/location_help/location_help.dart';
 
 class CaregiverHomePage extends StatelessWidget {
   const CaregiverHomePage({super.key});
@@ -20,6 +21,9 @@ class CaregiverHomePage extends StatelessWidget {
       children: [
         PatientSelectorWidget(),
         SizedBox(height: 14),
+        // "Patient Needs Help" — renders only while a help request is live.
+        NeedsHelpBanner(),
+        PatientLocationSection(),
         SyncStatusCard(),
         SizedBox(height: 14),
         PatientDevicePanel(),

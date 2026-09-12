@@ -4,5 +4,6 @@
     "supabase/functions"
   ],
   "deno.config": "supabase/functions/deno.json",
-  "deno.unstable": true
+  "deno.unstable": true,
+  "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }

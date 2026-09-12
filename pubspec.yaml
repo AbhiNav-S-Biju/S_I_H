@@ -51,6 +51,11 @@ dependencies:
   cryptography: ^2.7.0
   supabase: ^2.13.4
   image_picker: ^1.1.2
+  # "I'm Lost / I Need Help" live location sharing
+  geolocator: ^13.0.2
+  url_launcher: ^6.3.1
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
 
   # Voice-assisted interaction
   flutter_tts: ^4.1.0

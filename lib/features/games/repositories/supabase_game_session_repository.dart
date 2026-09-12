@@ -72,7 +72,22 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
     }
 
     final sessionId = session.id.isNotEmpty ? session.id : _generateUuid();
-    final effectiveDeviceId = deviceId ?? HiveDatabase.getOrCreateDeviceId();
+
+    // IMPORTANT: the device id must be the one that was registered in
+    // public.patient_devices at pairing time. record_patient_game_session()
+    // rejects any other value, and getOrCreateDeviceId() mints a *random*
+    // fallback when the stored session has no device id — which the server has
+    // never seen. Resolve it from the stored session first so the write is
+    // authorized instead of silently dropped.
+    final effectiveDeviceId = deviceId ??
+        HiveDatabase.currentPatientSession?.deviceId ??
+        HiveDatabase.getOrCreateDeviceId();
+
+    if (effectiveDeviceId.isEmpty) {
+      debugPrint('⚠️ No device id available; cannot record game session.');
+      return;
+    }
+
     final startedAt = session.completedAt
         .subtract(Duration(seconds: session.durationSeconds))
         .toUtc();
@@ -100,9 +115,10 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
     // device-authorized RPC instead of attempting a caregiver-only RLS insert.
     if (client != null && status == NetworkStatus.online) {
       final isAuthenticated = client.auth.currentUser != null;
+
       if (!isAuthenticated) {
         try {
-          await client.rpc(
+          final result = await client.rpc(
             'record_patient_game_session',
             params: {
               'p_patient_id': effectivePatientId,
@@ -110,28 +126,41 @@ class SupabaseGameSessionRepository implements IGameSessionRepository {
               'p_session': payload,
             },
           );
-          debugPrint(
-            '✅ Patient game session recorded through paired-device RPC for patient: $effectivePatientId',
-          );
-          return;
-        } catch (e) {
-          debugPrint(
-            '⚠️ Patient game session RPC failed; queueing sync event: $e',
-          );
-        }
-      }
 
-      if (isAuthenticated) {
+          // The RPC reports its own outcome. Treat an explicit rejection as a
+          // failure rather than assuming the row landed.
+          final map = result is Map
+              ? result.cast<String, dynamic>()
+              : const <String, dynamic>{'success': true};
+
+          if (map['success'] == true) {
+            debugPrint(
+              '✅ Patient game session recorded for patient: $effectivePatientId'
+              '${map['duplicate'] == true ? ' (duplicate ignored)' : ''}',
+            );
+            return;
+          }
+
+          debugPrint(
+            '❌ Game session rejected by server: '
+            '${map['error']} — ${map['message'] ?? ''}',
+          );
+        } catch (e) {
+          // Surface the real reason. Previously this was swallowed into a sync
+          // queue that nothing ever drained, so saves failed completely
+          // silently — no row in the table and no error anywhere.
+          debugPrint('❌ Patient game session RPC failed: $e');
+        }
+      } else {
         // Caregiver-authenticated clients can use the existing RLS insert.
         try {
           await client.from('game_sessions').upsert(payload);
           debugPrint(
             '✅ Game session successfully recorded in Supabase for patient: $effectivePatientId',
           );
+          return;
         } catch (e) {
-          debugPrint(
-            '⚠️ Failed to directly insert game session to Supabase: $e',
-          );
+          debugPrint('❌ Failed to insert game session to Supabase: $e');
         }
       }
     }

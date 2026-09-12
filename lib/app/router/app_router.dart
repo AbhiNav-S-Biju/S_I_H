@@ -142,20 +142,32 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 HiveDatabase.currentPatientSession?.patientId;
 
             if (pairedId != null && pairedId.isNotEmpty) {
-              await ref
-                  .read(gameSessionRepositoryProvider)
-                  .recordGameSession(session: session, patientId: pairedId);
+              final deviceId = HiveDatabase.currentPatientSession?.deviceId;
 
               await ref
-                  .read(caregiverEventNotificationServiceProvider)
-                  .notifyGameCompleted(
+                  .read(gameSessionRepositoryProvider)
+                  .recordGameSession(
+                    session: session,
                     patientId: pairedId,
-                    gameTitle: session.gameType.displayName,
-                    score: session.score,
-                    correctAnswers: session.correctAnswers,
-                    totalQuestions: session.totalQuestions,
-                    gameSessionId: session.id,
+                    deviceId: deviceId,
                   );
+
+              // A notification failure must never prevent the dashboard from
+              // refreshing, so keep it isolated from the save/invalidate flow.
+              try {
+                await ref
+                    .read(caregiverEventNotificationServiceProvider)
+                    .notifyGameCompleted(
+                      patientId: pairedId,
+                      gameTitle: session.gameType.displayName,
+                      score: session.score,
+                      correctAnswers: session.correctAnswers,
+                      totalQuestions: session.totalQuestions,
+                      gameSessionId: session.id,
+                    );
+              } catch (e) {
+                debugPrint('⚠️ Game completion notification failed: $e');
+              }
 
               ref.invalidate(selectedPatientGameHistoryProvider);
               ref.invalidate(selectedPatientSevenDayActivityProvider);
@@ -255,19 +267,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                           .recordGameSession(
                             session: session,
                             patientId: effectivePatientId,
+                            deviceId:
+                                HiveDatabase.currentPatientSession?.deviceId,
                           );
 
-                      // Dispatch caregiver event notification
-                      await ref
-                          .read(caregiverEventNotificationServiceProvider)
-                          .notifyGameCompleted(
-                            patientId: effectivePatientId,
-                            gameTitle: session.gameType.displayName,
-                            score: session.score,
-                            correctAnswers: session.correctAnswers,
-                            totalQuestions: session.totalQuestions,
-                            gameSessionId: session.id,
-                          );
+                      // Dispatch caregiver event notification. Isolated so a
+                      // notification failure cannot block the dashboard refresh.
+                      try {
+                        await ref
+                            .read(caregiverEventNotificationServiceProvider)
+                            .notifyGameCompleted(
+                              patientId: effectivePatientId,
+                              gameTitle: session.gameType.displayName,
+                              score: session.score,
+                              correctAnswers: session.correctAnswers,
+                              totalQuestions: session.totalQuestions,
+                              gameSessionId: session.id,
+                            );
+                      } catch (e) {
+                        debugPrint('⚠️ Game completion notification failed: $e');
+                      }
 
                       // Invalidate caregiver dashboard telemetry providers
                       ref.invalidate(selectedPatientGameHistoryProvider);
