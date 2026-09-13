@@ -16,6 +16,39 @@ enum SocialPlatform {
 
   final String label;
   final IconData icon;
+
+  /// Resolves a stored/remote `platform` value to a [SocialPlatform].
+  ///
+  /// Values written by other clients (or by hand in the Supabase dashboard)
+  /// may use the enum *label* ('Instagram', 'X / Twitter') or a differently
+  /// cased/separated variant of the enum *name* ('instagram', 'LINKEDIN').
+  /// Matching is therefore case- and separator-insensitive so an unusual value
+  /// does not break parsing of an otherwise valid account.
+  ///
+  /// Throws a [FormatException] when [rawPlatform] matches no known platform.
+  static SocialPlatform fromStorage(Object? rawPlatform) {
+    final raw = rawPlatform?.toString().trim() ?? '';
+    if (raw.isEmpty) {
+      throw const FormatException('Missing social platform.');
+    }
+    final normalized = _normalizePlatformToken(raw);
+    for (final platform in SocialPlatform.values) {
+      if (normalized == platform.name.toLowerCase() ||
+          normalized == _normalizePlatformToken(platform.label)) {
+        return platform;
+      }
+    }
+    // A few legacy aliases that predate the current enum names.
+    switch (normalized) {
+      case 'twitter':
+      case 'x':
+        return SocialPlatform.xTwitter;
+    }
+    throw const FormatException('Invalid social platform.');
+  }
+
+  static String _normalizePlatformToken(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'[\s/_-]+'), '');
 }
 
 class SocialMediaAccount {
@@ -53,11 +86,7 @@ class SocialMediaAccount {
   };
 
   factory SocialMediaAccount.fromJson(Map<String, dynamic> json) {
-    final platformName = json['platform'] as String?;
-    final platform = SocialPlatform.values.firstWhere(
-      (value) => value.name == platformName,
-      orElse: () => throw const FormatException('Invalid social platform.'),
-    );
+    final platform = SocialPlatform.fromStorage(json['platform']);
     return SocialMediaAccount(
       id: json['id'] as String,
       platform: platform,

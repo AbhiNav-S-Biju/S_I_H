@@ -17,11 +17,31 @@ import '../../../features/patient/providers/patient_pairing_providers.dart';
 import '../../../features/reminders/models/reminder.dart';
 import '../../../features/reminders/providers/reminder_providers.dart';
 
-class PatientRemindersScreen extends ConsumerWidget {
+class PatientRemindersScreen extends ConsumerStatefulWidget {
   const PatientRemindersScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PatientRemindersScreen> createState() =>
+      _PatientRemindersScreenState();
+}
+
+class _PatientRemindersScreenState
+    extends ConsumerState<PatientRemindersScreen> {
+  /// Schedules local notifications for the patient's reminders once the screen
+  /// is shown, so due reminders raise a system popup even when the reminder was
+  /// created/synced on a different device.
+  Future<void> _syncScheduledNotifications(List<Reminder> reminders) async {
+    try {
+      await ref
+          .read(notificationServiceProvider)
+          .rescheduleAllForPatient(reminders);
+    } catch (e) {
+      debugPrint('⚠️ Could not schedule reminder notifications: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final session = ref.watch(localPatientSessionProvider);
     final patientId = session?.patientId ?? HiveDatabase.pairedPatientId ?? '';
 
@@ -115,6 +135,12 @@ class PatientRemindersScreen extends ConsumerWidget {
               final completedCount = allReminders.where((r) => r.isCompleted).length;
               final totalCount = allReminders.length;
 
+              // Keep the device's scheduled alarms in sync with the reminders
+              // that just loaded, so due reminders raise a popup.
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _syncScheduledNotifications(allReminders);
+              });
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -123,6 +149,10 @@ class PatientRemindersScreen extends ConsumerWidget {
                     completedCount: completedCount,
                     totalCount: totalCount,
                   ),
+                  const SizedBox(height: 24),
+
+                  // 2. Notifications feed — every reminder alert for this patient
+                  _PatientNotificationsSection(reminders: allReminders),
                   const SizedBox(height: 24),
 
                   // 2. Schedule Section Title
@@ -519,6 +549,252 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
   }
 
   static String _formatTimeOfDay(DateTime time) {
+    final hour = time.hour;
+    final minute = time.minute;
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final minuteStr = minute.toString().padLeft(2, '0');
+    return '$displayHour:$minuteStr $period';
+  }
+}
+// ==============================================================================
+// Patient Notifications Section
+// Description: Shows every reminder alert for the patient as a notifications
+// feed — upcoming, due now, snoozed, and completed today. This answers "show
+// all notifications" in the reminders area of the patient dashboard.
+// ==============================================================================
+class _PatientNotificationsSection extends StatelessWidget {
+  final List<Reminder> reminders;
+
+  const _PatientNotificationsSection({required this.reminders});
+
+  @override
+  Widget build(BuildContext context) {
+    // Most recent / upcoming first: reminders still due today come first.
+    final now = DateTime.now();
+    final notifications = reminders.where((r) => !r.isCompleted).toList()
+      ..sort((a, b) {
+        final aTime = a.snoozedUntil ?? a.scheduledAt;
+        final bTime = b.snoozedUntil ?? b.scheduledAt;
+        return aTime.compareTo(bTime);
+      });
+    final completedToday = reminders
+        .where(
+          (r) =>
+              r.isCompleted &&
+              r.completedAt != null &&
+              _isSameDay(r.completedAt!, now),
+        )
+        .toList()
+      ..sort((a, b) => b.completedAt!.compareTo(a.completedAt!));
+
+    final feed = [...notifications, ...completedToday];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClaySlab3D(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.notifications_active_rounded,
+                size: 22,
+                color: Clay3DTheme.lavender,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Notifications',
+                style: GoogleFonts.nunito(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: Clay3DTheme.textDark,
+                ),
+              ),
+              const Spacer(),
+              if (feed.isNotEmpty)
+                ClayPill3D(
+                  color: Clay3DTheme.lavenderLight,
+                  child: Text(
+                    '${feed.length}',
+                    style: GoogleFonts.nunito(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF5D4A8C),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        if (feed.isEmpty)
+          ClayCard3D(
+            padding: const EdgeInsets.all(20),
+            borderRadius: 22,
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.notifications_none_rounded,
+                  size: 30,
+                  color: Clay3DTheme.textMuted,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'No notifications right now. New reminder alerts will appear here.',
+                    style: GoogleFonts.nunito(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                      color: Clay3DTheme.textMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          Column(
+            children: [
+              for (final reminder in feed)
+                _NotificationTile(
+                  reminder: reminder,
+                  now: now,
+                ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  static bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
+class _NotificationTile extends StatelessWidget {
+  final Reminder reminder;
+  final DateTime now;
+
+  const _NotificationTile({required this.reminder, required this.now});
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompleted = reminder.isCompleted;
+    final isSnoozed = reminder.snoozedUntil != null && !isCompleted;
+    final effectiveTime = reminder.snoozedUntil ?? reminder.scheduledAt;
+    final isDue = !isCompleted && !effectiveTime.isAfter(now);
+
+    late final Color iconBg;
+    late final Color iconColor;
+    late final IconData icon;
+    late final String statusLabel;
+    late final Color statusColor;
+
+    if (isCompleted) {
+      iconBg = const Color(0xFFC8E6D9);
+      iconColor = const Color(0xFF1B634B);
+      icon = Icons.check_circle_rounded;
+      statusLabel = 'Completed';
+      statusColor = const Color(0xFF1B634B);
+    } else if (isSnoozed) {
+      iconBg = const Color(0xFFFDE8C0);
+      iconColor = const Color(0xFF8C6212);
+      icon = Icons.snooze_rounded;
+      statusLabel = 'Snoozed';
+      statusColor = const Color(0xFF8C6212);
+    } else if (isDue) {
+      iconBg = const Color(0xFFFAD9D3);
+      iconColor = const Color(0xFFB23A2A);
+      icon = Icons.notifications_active_rounded;
+      statusLabel = 'Due now';
+      statusColor = const Color(0xFFB23A2A);
+    } else {
+      iconBg = Clay3DTheme.tealLight;
+      iconColor = const Color(0xFF1F5C5C);
+      icon = Icons.alarm_rounded;
+      statusLabel = 'Upcoming';
+      statusColor = const Color(0xFF1F5C5C);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: ClayCard3D(
+        padding: const EdgeInsets.all(16),
+        borderRadius: 20,
+        color: isCompleted ? const Color(0xFFEFF8F4) : Clay3DTheme.cardSurface,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: iconBg,
+                shape: BoxShape.circle,
+                boxShadow: Clay3DTheme.cardShadow(blur: 6, offset: 2),
+              ),
+              child: Icon(icon, size: 22, color: iconColor),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          reminder.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: isCompleted
+                                ? Clay3DTheme.textMuted
+                                : Clay3DTheme.textDark,
+                            decoration: isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ClayPill3D(
+                        color: iconBg,
+                        child: Text(
+                          statusLabel,
+                          style: GoogleFonts.nunito(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w900,
+                            color: statusColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_formatTime(effectiveTime)}'
+                    '${reminder.body.isNotEmpty ? ' · ${reminder.body}' : ''}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.nunito(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Clay3DTheme.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _formatTime(DateTime time) {
     final hour = time.hour;
     final minute = time.minute;
     final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);

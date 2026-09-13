@@ -203,6 +203,20 @@ class NotificationService {
     debugPrint('🗑️ Cancelled notification: $notificationId');
   }
 
+  /// (Re)schedules local notifications for every active reminder of a patient.
+  ///
+  /// Reminders are normally scheduled only when a caregiver creates them. A
+  /// patient device that syncs reminders down (or a fresh install) would
+  /// otherwise never fire a popup, so this reconciles the device's scheduled
+  /// alarms with its local reminders. Safe to call on every dashboard load:
+  /// scheduling the same notification id simply replaces the previous entry.
+  Future<void> rescheduleAllForPatient(Iterable<Reminder> reminders) async {
+    for (final reminder in reminders) {
+      if (!reminder.isActive || reminder.isCompleted) continue;
+      await scheduleReminder(reminder);
+    }
+  }
+
   /// Cancels all notifications.
   Future<void> cancelAll() async {
     await _notificationsPlugin.cancelAll();

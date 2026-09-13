@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/social_media_account.dart';
+import 'social_account_encryption_key.dart';
 import 'social_media_account_repository.dart';
 
 class SupabaseSocialMediaAccountRepository
@@ -16,33 +17,21 @@ class SupabaseSocialMediaAccountRepository
     required String deviceId,
     Uuid? uuid,
   }) : _client = client,
-       _secureStorage = secureStorage,
        _deviceId = deviceId,
-       _uuid = uuid ?? const Uuid();
-
-  static const _encryptionKeyStorageKey =
-      'nirvana.social_media_accounts.encryption_key.v1';
+       _uuid = uuid ?? const Uuid(),
+       _keyDerivation = SocialAccountEncryptionKey(storage: secureStorage);
 
   final SupabaseClient _client;
-  final SecureStorageClient _secureStorage;
   final String _deviceId;
   final Uuid _uuid;
   final AesGcm _cipher = AesGcm.with256bits();
 
-  Future<SecretKey> _getEncryptionKey() async {
-    final storedKey = await _secureStorage.read(key: _encryptionKeyStorageKey);
-    if (storedKey != null && storedKey.isNotEmpty) {
-      return SecretKey(base64Decode(storedKey));
-    }
+  /// Derives the shared, per-patient encryption key (see
+  /// [SocialAccountEncryptionKey]).
+  final SocialAccountEncryptionKey _keyDerivation;
 
-    final key = await _cipher.newSecretKey();
-    final keyBytes = await key.extractBytes();
-    await _secureStorage.write(
-      key: _encryptionKeyStorageKey,
-      value: base64Encode(keyBytes),
-    );
-    return key;
-  }
+  Future<SecretKey> _getEncryptionKey(String patientId) =>
+      _keyDerivation.keyFor(patientId);
 
   String _requirePatientId(String patientId) {
     final normalized = patientId.trim();
@@ -52,13 +41,12 @@ class SupabaseSocialMediaAccountRepository
     return normalized;
   }
 
-  SocialMediaAccount _fromRow(Map<String, dynamic> row, SecretKey key) {
+  SocialMediaAccount _fromRow(Map<String, dynamic> row) {
     return SocialMediaAccount(
       id: row['id'] as String,
-      platform: SocialPlatform.values.firstWhere(
-        (platform) => platform.name == row['platform'],
-        orElse: () => throw const FormatException('Invalid social platform.'),
-      ),
+      // Tolerant parsing: rows written by other clients (or by hand) may use a
+      // label or different casing for the platform value.
+      platform: SocialPlatform.fromStorage(row['platform']),
       usernameOrEmail: row['username_or_email'] as String,
       password: '',
     );
@@ -80,7 +68,7 @@ class SupabaseSocialMediaAccountRepository
   @override
   Future<List<SocialMediaAccount>> getAll(String patientId) async {
     final normalizedPatientId = _requirePatientId(patientId);
-    final key = await _getEncryptionKey();
+    final key = await _getEncryptionKey(normalizedPatientId);
     final rows =
         await _client.rpc(
               'get_social_media_accounts_for_device',
@@ -92,20 +80,30 @@ class SupabaseSocialMediaAccountRepository
             as List<dynamic>;
 
     final accounts = <SocialMediaAccount>[];
-    int decryptionFailures = 0;
+    int skippedRows = 0;
     for (final rawRow in rows) {
       final row = Map<String, dynamic>.from(rawRow);
-      final account = _fromRow(row, key);
       try {
+        // Parse inside the try so a single malformed row (bad platform value,
+        // missing column, etc.) is skipped instead of failing the whole load
+        // and silently falling back to the empty local store.
+        final account = _fromRow(row);
         final password = await _decryptPassword(row, key);
         accounts.add(account.copyWith(password: password));
-      } catch (_) {
-        decryptionFailures++;
-        debugPrint('⚠️ Social account decryption failed for account ${account.id} (platform: ${account.platform.name}) - likely created on another device');
+      } catch (error) {
+        skippedRows++;
+        debugPrint(
+          '⚠️ Skipped social account row ${row['id']} (platform: ${row['platform']}) - '
+          'unreadable on this device ($error)',
+        );
       }
     }
-    if (decryptionFailures > 0) {
-      debugPrint('ℹ️ $decryptionFailures social media account(s) could not be decrypted (created on another device or legacy). They are hidden from this device.');
+    if (skippedRows > 0) {
+      debugPrint(
+        'ℹ️ $skippedRows social media account(s) could not be read '
+        '(encrypted with an older key, or malformed). Re-save them to make '
+        'them available across all of this patient\'s devices.',
+      );
     }
     return accounts;
   }
@@ -123,7 +121,7 @@ class SupabaseSocialMediaAccountRepository
       throw const FormatException('Password is required.');
     }
 
-    final key = await _getEncryptionKey();
+    final key = await _getEncryptionKey(normalizedPatientId);
     final box = await _cipher.encrypt(
       utf8.encode(account.password),
       secretKey: key,

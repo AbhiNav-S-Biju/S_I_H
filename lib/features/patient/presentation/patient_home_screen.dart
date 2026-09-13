@@ -15,6 +15,7 @@ import 'package:nirvana/app/widgets/widgets.dart';
 import 'package:nirvana/database/hive_database.dart';
 import 'package:nirvana/features/location_help/location_help.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
+import 'package:nirvana/features/reminders/models/reminder.dart';
 import 'package:nirvana/features/reminders/providers/reminder_providers.dart';
 
 import 'widgets/patient_dashboard_widgets.dart';
@@ -40,10 +41,77 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _sosCollapsed = false;
 
+  /// Guards the one-shot "reminder due" popup so it does not re-fire on rebuild.
+  bool _duePopupChecked = false;
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowDueReminder());
+  }
+
+  /// Shows an in-app notification popup if a reminder is due right now.
+  ///
+  /// The system local notification handles the app-backgrounded case; this
+  /// covers the app being open on the dashboard so the elder still gets a clear,
+  /// large, popup prompt (consistent with the app's accessible design).
+  Future<void> _maybeShowDueReminder() async {
+    if (_duePopupChecked || !mounted) return;
+    _duePopupChecked = true;
+
+    final patientId = ref.read(localPatientSessionProvider)?.patientId;
+    if (patientId == null || patientId.isEmpty) return;
+
+    try {
+      final reminders = await ref.read(
+        activeRemindersProvider(patientId).future,
+      );
+      if (!mounted || reminders.isEmpty) return;
+
+      final now = DateTime.now();
+      // Treat anything due within the last hour and not yet completed as due
+      // now, matching the reminder repository's catch-up window.
+      bool isDueReminder(Reminder r) {
+        final effectiveTime = r.snoozedUntil ?? r.scheduledAt;
+        return r.isActive &&
+            !r.isCompleted &&
+            effectiveTime.isBefore(now) &&
+            now.difference(effectiveTime) < const Duration(hours: 1);
+      }
+
+      final due = reminders.where(isDueReminder).firstOrNull;
+      if (due == null) return;
+
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          icon: const Icon(
+            Icons.notifications_active_rounded,
+            size: 40,
+            color: ElderColors.skyDeep,
+          ),
+          title: Text(due.title),
+          content: Text(
+            due.body.isNotEmpty
+                ? due.body
+                : 'It is time for this routine. You can mark it done when you are ready.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Later'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('View routines'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      debugPrint('⚠️ Could not evaluate due reminders: $e');
+    }
   }
 
   @override
@@ -304,6 +372,20 @@ class _UpcomingReminderCard extends ConsumerWidget {
 
     return remindersAsync.when(
       data: (reminders) {
+        if (reminders.isNotEmpty) {
+          // Reconcile the device's scheduled alarms with the loaded reminders so
+          // due reminders raise a system popup, even when they were created or
+          // synced on another device.
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            try {
+              await ref
+                  .read(notificationServiceProvider)
+                  .rescheduleAllForPatient(reminders);
+            } catch (e) {
+              debugPrint('⚠️ Could not schedule reminder notifications: $e');
+            }
+          });
+        }
         if (reminders.isEmpty) {
           return const SizedBox.shrink();
         }
