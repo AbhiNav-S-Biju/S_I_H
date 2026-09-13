@@ -4,9 +4,13 @@
 // Hive boxes. Mutations generate idempotent sync events queued in SyncEngine.
 // ==============================================================================
 
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/config/supabase_config.dart';
 import '../../../core/network/sync_engine.dart';
+import '../../../database/hive_database.dart';
 import '../../../database/models/hive_reminder.dart';
 import '../../../database/models/hive_reminder_log.dart';
 import '../../../database/models/hive_sync_event.dart';
@@ -93,6 +97,44 @@ class HiveReminderRepository implements IReminderRepository {
     return reminder;
   }
 
+  /// Reports a reminder action to Supabase from a paired patient device.
+  ///
+  /// The device is unauthenticated, so it cannot write `reminder_logs` or
+  /// `caregiver_notifications` directly. `record_reminder_action_for_device` is
+  /// a SECURITY DEFINER RPC that verifies the device pairing, writes the log and
+  /// fans the event out to every linked caregiver — this is what actually
+  /// updates the caregiver portal when the elder completes an alarm.
+  Future<void> _reportActionToCloud({
+    required String patientId,
+    required String reminderId,
+    required String logId,
+    required String action,
+    required DateTime actionTimestamp,
+    required String reminderTitle,
+    DateTime? snoozedUntil,
+  }) async {
+    if (!SupabaseConfig.isConfigured || !HiveDatabase.isDevicePaired) return;
+    try {
+      await Supabase.instance.client.rpc(
+        'record_reminder_action_for_device',
+        params: {
+          'p_patient_id': patientId,
+          'p_device_id': HiveDatabase.getOrCreateDeviceId(),
+          'p_reminder_id': reminderId,
+          'p_log_id': logId,
+          'p_action': action,
+          'p_action_timestamp': actionTimestamp.toUtc().toIso8601String(),
+          'p_reminder_title': reminderTitle,
+          'p_snoozed_until': snoozedUntil?.toUtc().toIso8601String(),
+        },
+      );
+      debugPrint('☁️ Reported reminder action "$action" to caregiver portal.');
+    } catch (e) {
+      // Offline-first: the queued sync event will retry via the SyncEngine.
+      debugPrint('⚠️ Could not report reminder action to Supabase: $e');
+    }
+  }
+
   @override
   Future<void> completeReminder(String reminderId, {String? patientId}) async {
     final hive = _remindersBox.get(reminderId);
@@ -140,11 +182,22 @@ class HiveReminderRepository implements IReminderRepository {
     );
     await _syncEngine.enqueueEvent(logSyncEvent);
 
-    // 3. Dispatch caregiver event notification
+    // 3. Dispatch caregiver event notification (local, best-effort)
     _eventNotificationService?.notifyReminderCompleted(
       patientId: pId,
       reminderTitle: hive.title,
       reminderId: reminderId,
+    );
+
+    // 4. Push the completion to the caregiver portal server-side (works even
+    // for the unauthenticated patient device).
+    await _reportActionToCloud(
+      patientId: pId,
+      reminderId: reminderId,
+      logId: logId,
+      action: ReminderActionType.done.value,
+      actionTimestamp: now,
+      reminderTitle: hive.title,
     );
   }
 
@@ -205,6 +258,17 @@ class HiveReminderRepository implements IReminderRepository {
       reminderTitle: hive.title,
       snoozedUntil: hive.snoozedUntil ?? now.add(delay),
       reminderId: reminderId,
+    );
+
+    // 4. Report the snooze to the caregiver portal server-side.
+    await _reportActionToCloud(
+      patientId: pId,
+      reminderId: reminderId,
+      logId: logId,
+      action: ReminderActionType.snoozed.value,
+      actionTimestamp: now,
+      reminderTitle: hive.title,
+      snoozedUntil: hive.snoozedUntil ?? now.add(delay),
     );
   }
 

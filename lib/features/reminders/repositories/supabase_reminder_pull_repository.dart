@@ -83,7 +83,8 @@ class SupabaseReminderPullRepository {
         completedAt: existing?.completedAt ?? reminder.completedAt,
         snoozedUntil: existing?.snoozedUntil ?? reminder.snoozedUntil,
         notificationId:
-            existing?.notificationId ?? _notificationIdFor(reminder.id),
+            existing?.notificationId ??
+            NotificationService.notificationIdFor(reminder.id),
         recurrenceRule: reminder.recurrenceRule,
       );
       await box.put(merged.id, merged);
@@ -123,7 +124,9 @@ class SupabaseReminderPullRepository {
       isActive: (row['is_active'] as bool?) ?? true,
       isCompleted: false,
       createdAt: DateTime.tryParse(row['created_at'] as String? ?? '') ?? now,
-      notificationId: _notificationIdFor(row['id'] as String),
+      notificationId: NotificationService.notificationIdFor(
+        row['id'] as String,
+      ),
       recurrenceRule: recurrence?.join(','),
     );
   }
@@ -142,7 +145,4 @@ class SupabaseReminderPullRepository {
     }
     return scheduledAt;
   }
-
-  static int _notificationIdFor(String reminderId) =>
-      reminderId.hashCode.abs() % 100000;
 }

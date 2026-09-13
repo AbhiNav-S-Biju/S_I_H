@@ -7,8 +7,12 @@ import 'app/router/app_router.dart';
 import 'app/theme/elder_theme.dart';
 import 'core/config/supabase_config.dart';
 import 'core/network/audio_service.dart';
+import 'core/network/connectivity_monitor.dart';
+import 'core/network/supabase_sync_repository.dart';
+import 'core/network/sync_engine.dart';
 import 'database/hive_database.dart';
 import 'features/caregiver/caregiver.dart';
+import 'features/reminders/repositories/hive_reminder_repository.dart';
 import 'features/reminders/services/notification_service.dart';
 import 'l10n/app_localizations.dart';
 
@@ -23,8 +27,31 @@ Future<void> main() async {
   }
 
   // 2. Initialize local notification service
+  //
+  // The service is given a reminder repository so that tapping/closing a
+  // reminder alarm or its "Done" action can mark the reminder complete and
+  // push the completion to the caregiver portal, even when the app is cold-
+  // started straight from the notification.
   try {
-    final notificationService = NotificationService();
+    final connectivity = ConnectivityMonitor();
+    final syncEngine = SyncEngine(
+      syncQueueBox: HiveDatabase.syncQueueBox,
+      syncRepository: SupabaseSyncRepository(),
+      connectivityMonitor: connectivity,
+    );
+    final reminderRepository = HiveReminderRepository(
+      remindersBox: HiveDatabase.remindersBox,
+      reminderLogsBox: HiveDatabase.reminderLogsBox,
+      syncEngine: syncEngine,
+      eventNotificationService: CaregiverEventNotificationService(
+        repository: SupabaseCaregiverNotificationRepository(
+          connectivityMonitor: connectivity,
+        ),
+      ),
+    );
+    final notificationService = NotificationService(
+      reminderRepository: reminderRepository,
+    );
     await notificationService.initialize().timeout(const Duration(seconds: 4));
   } catch (e) {
     debugPrint('⚠️ NotificationService initialization error: $e');
