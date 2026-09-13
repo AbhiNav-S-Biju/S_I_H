@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
+import 'package:nirvana/l10n/l10n_extension.dart';
 
 import '../models/social_media_account.dart';
 import '../providers/social_media_account_providers.dart';
@@ -117,6 +118,7 @@ class SocialMediaAccountsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final accounts = ref.watch(currentPatientSocialMediaAccountsProvider);
     return Container(
       width: double.infinity,
@@ -132,10 +134,10 @@ class SocialMediaAccountsSection extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Social media accounts',
-                  style: TextStyle(
+                  l10n.socialAccountsTitle,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     color: ElderColors.textPrimary,
@@ -143,29 +145,29 @@ class SocialMediaAccountsSection extends ConsumerWidget {
                 ),
               ),
               IconButton.filledTonal(
-                tooltip: 'Add social media account',
+                tooltip: l10n.addSocialAccountTooltip,
                 onPressed: () => _showEditor(context, ref),
                 icon: const Icon(Icons.add_rounded),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Your account details are protected on this device.',
-            style: TextStyle(color: ElderColors.textSecondary),
+          Text(
+            l10n.socialAccountsSubtitle,
+            style: const TextStyle(color: ElderColors.textSecondary),
           ),
           const SizedBox(height: 14),
           accounts.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Text(
-              'We could not load your saved accounts. Please try again.',
-              style: TextStyle(color: ElderColors.gentleErrorText),
+            error: (_, __) => Text(
+              l10n.socialAccountsLoadError,
+              style: const TextStyle(color: ElderColors.gentleErrorText),
             ),
             data: (items) {
               if (items.isEmpty) {
-                return const Text(
-                  'No social media accounts saved yet.',
-                  style: TextStyle(color: ElderColors.textSecondary),
+                return Text(
+                  l10n.noSocialAccountsSaved,
+                  style: const TextStyle(color: ElderColors.textSecondary),
                 );
               }
               return Column(

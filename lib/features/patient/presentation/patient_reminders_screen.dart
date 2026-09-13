@@ -16,6 +16,7 @@ import '../../../features/caregiver/providers/caregiver_providers.dart';
 import '../../../features/patient/providers/patient_pairing_providers.dart';
 import '../../../features/reminders/models/reminder.dart';
 import '../../../features/reminders/providers/reminder_providers.dart';
+import '../../../l10n/l10n_extension.dart';
 
 class PatientRemindersScreen extends ConsumerStatefulWidget {
   const PatientRemindersScreen({super.key});
@@ -42,6 +43,7 @@ class _PatientRemindersScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final session = ref.watch(localPatientSessionProvider);
     final patientId = session?.patientId ?? HiveDatabase.pairedPatientId ?? '';
 
@@ -88,7 +90,7 @@ class _PatientRemindersScreenState
                   ),
                   borderRadius: 18,
                   child: Text(
-                    'Daily Routines',
+                    l10n.dailyRoutinesTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.nunito(
@@ -159,7 +161,7 @@ class _PatientRemindersScreenState
                   ClaySlab3D(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Text(
-                      'Today\'s Schedule',
+                      l10n.todaysScheduleTitle,
                       style: GoogleFonts.nunito(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -183,7 +185,7 @@ class _PatientRemindersScreenState
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'No reminders for today',
+                            l10n.noRemindersToday,
                             style: GoogleFonts.nunito(
                               fontSize: 18,
                               fontWeight: FontWeight.w900,
@@ -192,7 +194,7 @@ class _PatientRemindersScreenState
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'You are all caught up. Have a peaceful, restful day! 🌸',
+                            l10n.noRemindersTodayBody,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.nunito(
                               fontSize: 14.5,
@@ -255,6 +257,7 @@ class _ClayProgressBanner3D extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final double progress = totalCount > 0 ? (completedCount / totalCount) : 1.0;
     final allDone = totalCount > 0 && completedCount >= totalCount;
 
@@ -286,8 +289,8 @@ class _ClayProgressBanner3D extends StatelessWidget {
               Expanded(
                 child: Text(
                   allDone
-                      ? 'All caught up for today! 🎉'
-                      : '$completedCount of $totalCount Completed',
+                      ? l10n.allCaughtUpToday
+                      : l10n.completedCountLabel(completedCount, totalCount),
                   style: GoogleFonts.nunito(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -312,8 +315,8 @@ class _ClayProgressBanner3D extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             allDone
-                ? 'Great job keeping up with your health routines today.'
-                : 'Take your time and complete each activity as scheduled.',
+                ? l10n.progressAllDoneMessage
+                : l10n.progressInProgressMessage,
             style: GoogleFonts.nunito(
               fontSize: 13.5,
               fontWeight: FontWeight.w600,
@@ -340,6 +343,7 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final isCompleted = reminder.isCompleted;
     final isSnoozed = reminder.snoozedUntil != null && !isCompleted;
 
@@ -400,7 +404,7 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
                     ),
                     if (isCompleted && reminder.completedAt != null)
                       Text(
-                        'Completed today ✓',
+                        l10n.completedTodayLabel,
                         style: GoogleFonts.nunito(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
@@ -409,7 +413,9 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
                       )
                     else if (isSnoozed && reminder.snoozedUntil != null)
                       Text(
-                        'Snoozed until ${_formatTimeOfDay(reminder.snoozedUntil!)}',
+                        l10n.snoozedUntilLabel(
+                          _formatTimeOfDay(reminder.snoozedUntil!),
+                        ),
                         style: GoogleFonts.nunito(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
@@ -452,7 +458,7 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
                 Expanded(
                   flex: 3,
                   child: ClayButton3D(
-                    label: 'Done',
+                    label: l10n.doneButton,
                     icon: Icons.check_rounded,
                     color: Clay3DTheme.teal,
                     minHeight: 48,
@@ -474,7 +480,7 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Wonderful! "${reminder.title}" marked as complete. 🌟',
+                              l10n.reminderMarkedCompleteSnack(reminder.title),
                               style: GoogleFonts.nunito(fontSize: 15, fontWeight: FontWeight.w700),
                             ),
                             backgroundColor: const Color(0xFF1B634B),
@@ -489,7 +495,7 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
                 Expanded(
                   flex: 2,
                   child: ClayButton3D(
-                    label: '15 min',
+                    label: l10n.snooze15MinutesButton,
                     icon: Icons.snooze_rounded,
                     color: const Color(0xFFE5C067),
                     textColor: Clay3DTheme.textDark,
@@ -510,7 +516,7 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Snoozed "${reminder.title}" for 15 minutes. ⏰',
+                              l10n.reminderSnoozedSnack(reminder.title),
                               style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.w700),
                             ),
                             backgroundColor: const Color(0xFF8C6212),
@@ -532,7 +538,7 @@ class _ClayPatientReminderCard3D extends ConsumerWidget {
                   const Icon(Icons.check, size: 16, color: Color(0xFF1B634B)),
                   const SizedBox(width: 6),
                   Text(
-                    'All completed for this schedule',
+                    l10n.allCompletedForSchedule,
                     style: GoogleFonts.nunito(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
@@ -570,6 +576,7 @@ class _PatientNotificationsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     // Most recent / upcoming first: reminders still due today come first.
     final now = DateTime.now();
     final notifications = reminders.where((r) => !r.isCompleted).toList()
@@ -604,7 +611,7 @@ class _PatientNotificationsSection extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                'Notifications',
+                l10n.notificationsSectionTitle,
                 style: GoogleFonts.nunito(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
@@ -642,7 +649,7 @@ class _PatientNotificationsSection extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'No notifications right now. New reminder alerts will appear here.',
+                    l10n.noNotificationsMessage,
                     style: GoogleFonts.nunito(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w600,
@@ -679,6 +686,7 @@ class _NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isCompleted = reminder.isCompleted;
     final isSnoozed = reminder.snoozedUntil != null && !isCompleted;
     final effectiveTime = reminder.snoozedUntil ?? reminder.scheduledAt;
@@ -694,25 +702,25 @@ class _NotificationTile extends StatelessWidget {
       iconBg = const Color(0xFFC8E6D9);
       iconColor = const Color(0xFF1B634B);
       icon = Icons.check_circle_rounded;
-      statusLabel = 'Completed';
+      statusLabel = l10n.notificationStatusCompleted;
       statusColor = const Color(0xFF1B634B);
     } else if (isSnoozed) {
       iconBg = const Color(0xFFFDE8C0);
       iconColor = const Color(0xFF8C6212);
       icon = Icons.snooze_rounded;
-      statusLabel = 'Snoozed';
+      statusLabel = l10n.notificationStatusSnoozed;
       statusColor = const Color(0xFF8C6212);
     } else if (isDue) {
       iconBg = const Color(0xFFFAD9D3);
       iconColor = const Color(0xFFB23A2A);
       icon = Icons.notifications_active_rounded;
-      statusLabel = 'Due now';
+      statusLabel = l10n.notificationStatusDueNow;
       statusColor = const Color(0xFFB23A2A);
     } else {
       iconBg = Clay3DTheme.tealLight;
       iconColor = const Color(0xFF1F5C5C);
       icon = Icons.alarm_rounded;
-      statusLabel = 'Upcoming';
+      statusLabel = l10n.notificationStatusUpcoming;
       statusColor = const Color(0xFF1F5C5C);
     }
 

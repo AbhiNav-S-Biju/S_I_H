@@ -835,6 +835,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Microphone or speech recognition is not ready. You can type below anytime.'**
   String get askNirvanaMicUnavailable;
+
+  /// Time-based greeting on the patient dashboard (morning)
+  ///
+  /// In en, this message translates to:
+  /// **'Good Morning,'**
+  String get goodMorningGreeting;
+
+  /// Time-based greeting on the patient dashboard (afternoon)
+  ///
+  /// In en, this message translates to:
+  /// **'Good Afternoon,'**
+  String get goodAfternoonGreeting;
+
+  /// Time-based greeting on the patient dashboard (evening)
+  ///
+  /// In en, this message translates to:
+  /// **'Good Evening,'**
+  String get goodEveningGreeting;
+
+  /// Fallback name shown when no patient name is available
+  ///
+  /// In en, this message translates to:
+  /// **'Friend'**
+  String get friendlyFallbackName;
+
+  /// Patient dashboard launcher label for Games
+  ///
+  /// In en, this message translates to:
+  /// **'Games'**
+  String get gamesNavLabel;
+
+  /// Patient dashboard launcher label for Reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get remindersNavLabel;
+
+  /// Patient dashboard launcher label for Photos
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photosNavLabel;
+
+  /// Patient dashboard launcher label for Ask NIRVANA
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get askNavLabel;
+
+  /// Patient dashboard launcher label for Social accounts
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts'**
+  String get accountsNavLabel;
+
+  /// Eyebrow label on the daily moment card
+  ///
+  /// In en, this message translates to:
+  /// **'DAILY MOMENT'**
+  String get dailyMomentEyebrow;
+
+  /// Affirmation headline on the daily moment card
+  ///
+  /// In en, this message translates to:
+  /// **'You are doing wonderfully today'**
+  String get dailyMomentHeadline;
+
+  /// Supporting sentence on the daily moment card
+  ///
+  /// In en, this message translates to:
+  /// **'Take your time. Every small step is a good step, and you are not alone.'**
+  String get dailyMomentSupportingText;
+
+  /// Section title above the patient dashboard launcher grid
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to do?'**
+  String get whatWouldYouLikeToDo;
+
+  /// Reassurance banner text on the patient dashboard
+  ///
+  /// In en, this message translates to:
+  /// **'Your family can check in on you any time. You are safe and looked after.'**
+  String get caregiverReassuranceMessage;
+
+  /// Title of the log out confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Log out?'**
+  String get logoutDialogTitle;
+
+  /// Body of the log out confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to log out?'**
+  String get logoutDialogMessage;
+
+  /// Generic cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButton;
+
+  /// Log out button label
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get logoutButton;
+
+  /// Semantics label for the favourites icon button on the dashboard
+  ///
+  /// In en, this message translates to:
+  /// **'Favourites'**
+  String get favouritesTooltip;
+
+  /// Title of the next routine card on the dashboard
+  ///
+  /// In en, this message translates to:
+  /// **'Next Routine'**
+  String get nextRoutineTitle;
+
+  /// Button to mark a reminder done
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Done'**
+  String get markDoneButton;
+
+  /// Button to view all reminders
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAllButton;
+
+  /// Title of the patient reminders screen
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Routines'**
+  String get dailyRoutinesTitle;
+
+  /// Section title for the reminders list
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Schedule'**
+  String get todaysScheduleTitle;
+
+  /// Empty state on the reminders screen
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders for today'**
+  String get noRemindersToday;
+
+  /// Supporting empty state text on the reminders screen
+  ///
+  /// In en, this message translates to:
+  /// **'You are all caught up. Have a peaceful, restful day! 🌸'**
+  String get noRemindersTodayBody;
+
+  /// Progress banner title when all reminders are done
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up for today! 🎉'**
+  String get allCaughtUpToday;
+
+  /// Progress banner count of completed reminders
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total} Completed'**
+  String completedCountLabel(int completed, int total);
+
+  /// Progress banner message when all reminders are done
+  ///
+  /// In en, this message translates to:
+  /// **'Great job keeping up with your health routines today.'**
+  String get progressAllDoneMessage;
+
+  /// Progress banner message while reminders remain
+  ///
+  /// In en, this message translates to:
+  /// **'Take your time and complete each activity as scheduled.'**
+  String get progressInProgressMessage;
+
+  /// Button to mark a reminder as done
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get doneButton;
+
+  /// Button to snooze a reminder for 15 minutes
+  ///
+  /// In en, this message translates to:
+  /// **'15 min'**
+  String get snooze15MinutesButton;
+
+  /// Label on a completed reminder card
+  ///
+  /// In en, this message translates to:
+  /// **'Completed today ✓'**
+  String get completedTodayLabel;
+
+  /// Label on a snoozed reminder card
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed until {time}'**
+  String snoozedUntilLabel(String time);
+
+  /// Pill shown when a reminder is fully completed
+  ///
+  /// In en, this message translates to:
+  /// **'All completed for this schedule'**
+  String get allCompletedForSchedule;
+
+  /// Title of the notifications list on the reminders screen
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsSectionTitle;
+
+  /// Empty state for the patient notifications list
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications right now. New reminder alerts will appear here.'**
+  String get noNotificationsMessage;
+
+  /// Notification status when a reminder is due now
+  ///
+  /// In en, this message translates to:
+  /// **'Due now'**
+  String get notificationStatusDueNow;
+
+  /// Notification status for an upcoming reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get notificationStatusUpcoming;
+
+  /// Notification status for a snoozed reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed'**
+  String get notificationStatusSnoozed;
+
+  /// Notification status for a completed reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get notificationStatusCompleted;
+
+  /// Dismiss button on the reminder due popup
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get reminderDueDialogLater;
+
+  /// Action button on the reminder due popup
+  ///
+  /// In en, this message translates to:
+  /// **'View routines'**
+  String get reminderDueDialogViewRoutines;
+
+  /// Fallback body text for the reminder due popup
+  ///
+  /// In en, this message translates to:
+  /// **'It is time for this routine. You can mark it done when you are ready.'**
+  String get reminderDueFallbackBody;
+
+  /// Title of the social media accounts section
+  ///
+  /// In en, this message translates to:
+  /// **'Social media accounts'**
+  String get socialAccountsTitle;
+
+  /// Subtitle of the social media accounts section
+  ///
+  /// In en, this message translates to:
+  /// **'Your account details are protected on this device.'**
+  String get socialAccountsSubtitle;
+
+  /// Empty state for the social media accounts section
+  ///
+  /// In en, this message translates to:
+  /// **'No social media accounts saved yet.'**
+  String get noSocialAccountsSaved;
+
+  /// Error state for the social media accounts section
+  ///
+  /// In en, this message translates to:
+  /// **'We could not load your saved accounts. Please try again.'**
+  String get socialAccountsLoadError;
+
+  /// Tooltip for the add social account button
+  ///
+  /// In en, this message translates to:
+  /// **'Add social media account'**
+  String get addSocialAccountTooltip;
+
+  /// Title of the social accounts screen
+  ///
+  /// In en, this message translates to:
+  /// **'Social accounts'**
+  String get socialAccountsScreenTitle;
+
+  /// Subtitle of the social accounts screen
+  ///
+  /// In en, this message translates to:
+  /// **'Saved logins for your favourite apps'**
+  String get socialAccountsScreenSubtitle;
+
+  /// Snackbar shown when a reminder is marked done
+  ///
+  /// In en, this message translates to:
+  /// **'Wonderful! \"{title}\" marked as complete. 🌟'**
+  String reminderMarkedCompleteSnack(String title);
+
+  /// Snackbar shown when a reminder is snoozed
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed \"{title}\" for 15 minutes. ⏰'**
+  String reminderSnoozedSnack(String title);
+
+  /// Title of the family photos screen
+  ///
+  /// In en, this message translates to:
+  /// **'Family Photos'**
+  String get familyPhotosTitle;
+
+  /// Short retry button label
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgainShort;
+
+  /// Button to add a family member photo
+  ///
+  /// In en, this message translates to:
+  /// **'Add Family Member'**
+  String get addFamilyMemberButton;
+
+  /// Empty state for the family photos screen
+  ///
+  /// In en, this message translates to:
+  /// **'No family photos yet\nAdd photos of people who are special to you.'**
+  String get noFamilyPhotosMessage;
+
+  /// Snackbar when a family member photo has missing details
+  ///
+  /// In en, this message translates to:
+  /// **'Please add a photo and complete the details.'**
+  String get familyPhotoMissingDetails;
+
+  /// Snackbar after updating a family member
+  ///
+  /// In en, this message translates to:
+  /// **'Family member updated.'**
+  String get familyMemberUpdated;
+
+  /// Snackbar after adding a family member
+  ///
+  /// In en, this message translates to:
+  /// **'Family member added.'**
+  String get familyMemberAdded;
+
+  /// Title of the remove family member dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this family member?'**
+  String get removeFamilyMemberTitle;
+
+  /// Body of the remove family member dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove their photo from your family collection.'**
+  String get removeFamilyMemberMessage;
+
+  /// Remove button label
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeButton;
+
+  /// Title of the edit family member dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Family Member'**
+  String get editFamilyMemberTitle;
+
+  /// Label to add a photo
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add photo'**
+  String get tapToAddPhoto;
+
+  /// Label to choose a different photo
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a different photo'**
+  String get chooseDifferentPhoto;
+
+  /// Validation message for the family member name field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get enterNameValidator;
+
+  /// Validation message for the relationship field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a relationship'**
+  String get enterRelationshipValidator;
+
+  /// Label while saving
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get savingLabel;
+
+  /// Button to save a family member
+  ///
+  /// In en, this message translates to:
+  /// **'Save Family Member'**
+  String get saveFamilyMemberButton;
+
+  /// Button to remove a family member
+  ///
+  /// In en, this message translates to:
+  /// **'Remove family member'**
+  String get removeFamilyMemberButton;
+
+  /// Error state on the family photos screen
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your family photos right now.'**
+  String get familyPhotosLoadError;
+
+  /// Error when no patient is selected
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find the selected patient.'**
+  String get familyPhotosFindPatientError;
+
+  /// Error when adding a family photo fails
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t add this photo right now.'**
+  String get familyPhotosAddError;
+
+  /// Label for the name field
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get nameLabel;
+
+  /// Label for the relationship field
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship'**
+  String get relationshipLabel;
+
+  /// Title of the add family member sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Add Family Member'**
+  String get addFamilyMemberTitle;
 }
 
 class _AppLocalizationsDelegate

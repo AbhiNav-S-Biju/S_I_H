@@ -17,6 +17,8 @@ import 'package:nirvana/features/location_help/location_help.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
 import 'package:nirvana/features/reminders/models/reminder.dart';
 import 'package:nirvana/features/reminders/providers/reminder_providers.dart';
+import 'package:nirvana/l10n/app_localizations.dart';
+import 'package:nirvana/l10n/l10n_extension.dart';
 
 import 'widgets/patient_dashboard_widgets.dart';
 
@@ -81,8 +83,9 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
       }
 
       final due = reminders.where(isDueReminder).firstOrNull;
-      if (due == null) return;
+      if (due == null || !mounted) return;
 
+      final l10n = context.l10n;
       await showDialog<void>(
         context: context,
         builder: (dialogContext) => AlertDialog(
@@ -93,18 +96,16 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
           ),
           title: Text(due.title),
           content: Text(
-            due.body.isNotEmpty
-                ? due.body
-                : 'It is time for this routine. You can mark it done when you are ready.',
+            due.body.isNotEmpty ? due.body : l10n.reminderDueFallbackBody,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Later'),
+              child: Text(l10n.reminderDueDialogLater),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('View routines'),
+              child: Text(l10n.reminderDueDialogViewRoutines),
             ),
           ],
         ),
@@ -135,19 +136,20 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
+    final l10n = context.l10n;
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text('Are you sure you want to log out?'),
+        title: Text(l10n.logoutDialogTitle),
+        content: Text(l10n.logoutDialogMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Log out'),
+            child: Text(l10n.logoutButton),
           ),
         ],
       ),
@@ -159,50 +161,50 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
     if (context.mounted) context.go('/');
   }
 
-  String _timeGreeting() {
+  String _timeGreeting(AppLocalizations l10n) {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning,';
-    if (hour < 17) return 'Good Afternoon,';
-    return 'Good Evening,';
+    if (hour < 12) return l10n.goodMorningGreeting;
+    if (hour < 17) return l10n.goodAfternoonGreeting;
+    return l10n.goodEveningGreeting;
   }
 
   /// The six launcher entries for the icon grid. Kept as a method so the grid
   /// stays a dumb layout widget and navigation lives in the screen.
-  List<AppIconItem> _launcherItems() {
+  List<AppIconItem> _launcherItems(AppLocalizations l10n) {
     return [
       AppIconItem(
         icon: Icons.extension_rounded,
-        label: 'Games',
+        label: l10n.gamesNavLabel,
         gradient: ElderColors.clayGradPurple,
         onTap: () => context.push('/patient/games'),
       ),
       AppIconItem(
         icon: Icons.alarm_rounded,
-        label: 'Reminders',
+        label: l10n.remindersNavLabel,
         gradient: ElderColors.clayGradTeal,
         onTap: () => context.push('/patient/reminders'),
       ),
       AppIconItem(
         icon: Icons.photo_album_rounded,
-        label: 'Photos',
+        label: l10n.photosNavLabel,
         gradient: ElderColors.clayGradCoral,
         onTap: () => context.push('/patient/family-photos'),
       ),
       AppIconItem(
         icon: Icons.record_voice_over_rounded,
-        label: 'Ask',
+        label: l10n.askNavLabel,
         gradient: ElderColors.clayGradSky,
         onTap: () => context.push('/ask-nirvana'),
       ),
       AppIconItem(
         icon: Icons.lock_person_rounded,
-        label: 'Accounts',
+        label: l10n.accountsNavLabel,
         gradient: ElderColors.clayGradSage,
         onTap: () => context.push('/patient/social-accounts'),
       ),
       AppIconItem(
         icon: Icons.settings_rounded,
-        label: 'Settings',
+        label: l10n.settingsNavLabel,
         gradient: ElderColors.clayGradGold,
         onTap: () => context.push('/patient/settings'),
       ),
@@ -211,9 +213,13 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final session = ref.watch(localPatientSessionProvider);
-    final preferredName = session?.preferredName ?? 'Friend';
-    final greeting = _timeGreeting();
+    final preferredName =
+        session?.preferredName.isNotEmpty == true
+            ? session!.preferredName
+            : l10n.friendlyFallbackName;
+    final greeting = _timeGreeting(l10n);
 
     // The SOS control clears the system gesture bar by tracking the real bottom
     // inset rather than a hardcoded offset (spec Â§3 & Â§4).
@@ -262,10 +268,10 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
                     // -------------------------------------------------------
                     // Daily moment â€” purple gradient clay card.
                     // -------------------------------------------------------
-                    const DailyMomentCard(
-                      headline: 'You are doing wonderfully today',
-                      supportingText:
-                          'Take your time. Every small step is a good step, and you are not alone.',
+                    DailyMomentCard(
+                      eyebrow: l10n.dailyMomentEyebrow,
+                      headline: l10n.dailyMomentHeadline,
+                      supportingText: l10n.dailyMomentSupportingText,
                       icon: Icons.wb_sunny_rounded,
                     ),
                     const SizedBox(height: 20.0),
@@ -279,7 +285,7 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
                     // Launcher section.
                     // -------------------------------------------------------
                     Text(
-                      'What would you like to do?',
+                      l10n.whatWouldYouLikeToDo,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontSize: 20.0,
                             fontWeight: FontWeight.w900,
@@ -287,15 +293,14 @@ class _PatientHomeScreenState extends ConsumerState<PatientHomeScreen> {
                           ),
                     ),
                     const SizedBox(height: 16.0),
-                    AppIconGrid(items: _launcherItems()),
+                    AppIconGrid(items: _launcherItems(l10n)),
                     const SizedBox(height: 24.0),
 
                     // -------------------------------------------------------
                     // Caregiver reassurance â€” sage clay banner.
                     // -------------------------------------------------------
-                    const CaregiverBanner(
-                      message:
-                          'Your family can check in on you any time. You are safe and looked after.',
+                    CaregiverBanner(
+                      message: l10n.caregiverReassuranceMessage,
                     ),
                     const SizedBox(height: 8.0),
                   ],
@@ -370,6 +375,7 @@ class _UpcomingReminderCard extends ConsumerWidget {
       activeRemindersProvider(effectivePatientId),
     );
 
+    final l10n = context.l10n;
     return remindersAsync.when(
       data: (reminders) {
         if (reminders.isNotEmpty) {
@@ -429,9 +435,9 @@ class _UpcomingReminderCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Next Routine',
+                      l10n.nextRoutineTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -492,7 +498,7 @@ class _UpcomingReminderCard extends ConsumerWidget {
                 spacing: 12,
                 children: [
                   LargeActionButton(
-                    label: 'Mark Done',
+                    label: l10n.markDoneButton,
                     icon: Icons.check_circle_rounded,
                     variant: LargeActionButtonVariant.sage,
                     minHeight: 52,
@@ -512,7 +518,7 @@ class _UpcomingReminderCard extends ConsumerWidget {
                     },
                   ),
                   LargeActionButton(
-                    label: 'View All',
+                    label: l10n.viewAllButton,
                     variant: LargeActionButtonVariant.secondary,
                     minHeight: 52,
                     onPressed: () => context.push('/patient/reminders'),

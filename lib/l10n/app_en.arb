@@ -483,5 +483,320 @@
   "askNirvanaMicUnavailable": "Microphone or speech recognition is not ready. You can type below anytime.",
   "@askNirvanaMicUnavailable": {
     "description": "Message shown when speech recognition is unavailable"
+  },
+  "goodMorningGreeting": "Good Morning,",
+  "@goodMorningGreeting": {
+    "description": "Time-based greeting on the patient dashboard (morning)"
+  },
+  "goodAfternoonGreeting": "Good Afternoon,",
+  "@goodAfternoonGreeting": {
+    "description": "Time-based greeting on the patient dashboard (afternoon)"
+  },
+  "goodEveningGreeting": "Good Evening,",
+  "@goodEveningGreeting": {
+    "description": "Time-based greeting on the patient dashboard (evening)"
+  },
+  "friendlyFallbackName": "Friend",
+  "@friendlyFallbackName": {
+    "description": "Fallback name shown when no patient name is available"
+  },
+  "gamesNavLabel": "Games",
+  "@gamesNavLabel": {
+    "description": "Patient dashboard launcher label for Games"
+  },
+  "remindersNavLabel": "Reminders",
+  "@remindersNavLabel": {
+    "description": "Patient dashboard launcher label for Reminders"
+  },
+  "photosNavLabel": "Photos",
+  "@photosNavLabel": {
+    "description": "Patient dashboard launcher label for Photos"
+  },
+  "askNavLabel": "Ask",
+  "@askNavLabel": {
+    "description": "Patient dashboard launcher label for Ask NIRVANA"
+  },
+  "accountsNavLabel": "Accounts",
+  "@accountsNavLabel": {
+    "description": "Patient dashboard launcher label for Social accounts"
+  },
+  "dailyMomentEyebrow": "DAILY MOMENT",
+  "@dailyMomentEyebrow": {
+    "description": "Eyebrow label on the daily moment card"
+  },
+  "dailyMomentHeadline": "You are doing wonderfully today",
+  "@dailyMomentHeadline": {
+    "description": "Affirmation headline on the daily moment card"
+  },
+  "dailyMomentSupportingText": "Take your time. Every small step is a good step, and you are not alone.",
+  "@dailyMomentSupportingText": {
+    "description": "Supporting sentence on the daily moment card"
+  },
+  "whatWouldYouLikeToDo": "What would you like to do?",
+  "@whatWouldYouLikeToDo": {
+    "description": "Section title above the patient dashboard launcher grid"
+  },
+  "caregiverReassuranceMessage": "Your family can check in on you any time. You are safe and looked after.",
+  "@caregiverReassuranceMessage": {
+    "description": "Reassurance banner text on the patient dashboard"
+  },
+  "logoutDialogTitle": "Log out?",
+  "@logoutDialogTitle": {
+    "description": "Title of the log out confirmation dialog"
+  },
+  "logoutDialogMessage": "Are you sure you want to log out?",
+  "@logoutDialogMessage": {
+    "description": "Body of the log out confirmation dialog"
+  },
+  "cancelButton": "Cancel",
+  "@cancelButton": {
+    "description": "Generic cancel button label"
+  },
+  "logoutButton": "Log out",
+  "@logoutButton": {
+    "description": "Log out button label"
+  },
+  "favouritesTooltip": "Favourites",
+  "@favouritesTooltip": {
+    "description": "Semantics label for the favourites icon button on the dashboard"
+  },
+  "nextRoutineTitle": "Next Routine",
+  "@nextRoutineTitle": {
+    "description": "Title of the next routine card on the dashboard"
+  },
+  "markDoneButton": "Mark Done",
+  "@markDoneButton": {
+    "description": "Button to mark a reminder done"
+  },
+  "viewAllButton": "View All",
+  "@viewAllButton": {
+    "description": "Button to view all reminders"
+  },
+  "dailyRoutinesTitle": "Daily Routines",
+  "@dailyRoutinesTitle": {
+    "description": "Title of the patient reminders screen"
+  },
+  "todaysScheduleTitle": "Today's Schedule",
+  "@todaysScheduleTitle": {
+    "description": "Section title for the reminders list"
+  },
+  "noRemindersToday": "No reminders for today",
+  "@noRemindersToday": {
+    "description": "Empty state on the reminders screen"
+  },
+  "noRemindersTodayBody": "You are all caught up. Have a peaceful, restful day! 🌸",
+  "@noRemindersTodayBody": {
+    "description": "Supporting empty state text on the reminders screen"
+  },
+  "allCaughtUpToday": "All caught up for today! 🎉",
+  "@allCaughtUpToday": {
+    "description": "Progress banner title when all reminders are done"
+  },
+  "completedCountLabel": "{completed} of {total} Completed",
+  "@completedCountLabel": {
+    "description": "Progress banner count of completed reminders",
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "progressAllDoneMessage": "Great job keeping up with your health routines today.",
+  "@progressAllDoneMessage": {
+    "description": "Progress banner message when all reminders are done"
+  },
+  "progressInProgressMessage": "Take your time and complete each activity as scheduled.",
+  "@progressInProgressMessage": {
+    "description": "Progress banner message while reminders remain"
+  },
+  "doneButton": "Done",
+  "@doneButton": {
+    "description": "Button to mark a reminder as done"
+  },
+  "snooze15MinutesButton": "15 min",
+  "@snooze15MinutesButton": {
+    "description": "Button to snooze a reminder for 15 minutes"
+  },
+  "completedTodayLabel": "Completed today ✓",
+  "@completedTodayLabel": {
+    "description": "Label on a completed reminder card"
+  },
+  "snoozedUntilLabel": "Snoozed until {time}",
+  "@snoozedUntilLabel": {
+    "description": "Label on a snoozed reminder card",
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "allCompletedForSchedule": "All completed for this schedule",
+  "@allCompletedForSchedule": {
+    "description": "Pill shown when a reminder is fully completed"
+  },
+  "notificationsSectionTitle": "Notifications",
+  "@notificationsSectionTitle": {
+    "description": "Title of the notifications list on the reminders screen"
+  },
+  "noNotificationsMessage": "No notifications right now. New reminder alerts will appear here.",
+  "@noNotificationsMessage": {
+    "description": "Empty state for the patient notifications list"
+  },
+  "notificationStatusDueNow": "Due now",
+  "@notificationStatusDueNow": {
+    "description": "Notification status when a reminder is due now"
+  },
+  "notificationStatusUpcoming": "Upcoming",
+  "@notificationStatusUpcoming": {
+    "description": "Notification status for an upcoming reminder"
+  },
+  "notificationStatusSnoozed": "Snoozed",
+  "@notificationStatusSnoozed": {
+    "description": "Notification status for a snoozed reminder"
+  },
+  "notificationStatusCompleted": "Completed",
+  "@notificationStatusCompleted": {
+    "description": "Notification status for a completed reminder"
+  },
+  "reminderDueDialogLater": "Later",
+  "@reminderDueDialogLater": {
+    "description": "Dismiss button on the reminder due popup"
+  },
+  "reminderDueDialogViewRoutines": "View routines",
+  "@reminderDueDialogViewRoutines": {
+    "description": "Action button on the reminder due popup"
+  },
+  "reminderDueFallbackBody": "It is time for this routine. You can mark it done when you are ready.",
+  "@reminderDueFallbackBody": {
+    "description": "Fallback body text for the reminder due popup"
+  },
+  "socialAccountsTitle": "Social media accounts",
+  "@socialAccountsTitle": {
+    "description": "Title of the social media accounts section"
+  },
+  "socialAccountsSubtitle": "Your account details are protected on this device.",
+  "@socialAccountsSubtitle": {
+    "description": "Subtitle of the social media accounts section"
+  },
+  "noSocialAccountsSaved": "No social media accounts saved yet.",
+  "@noSocialAccountsSaved": {
+    "description": "Empty state for the social media accounts section"
+  },
+  "socialAccountsLoadError": "We could not load your saved accounts. Please try again.",
+  "@socialAccountsLoadError": {
+    "description": "Error state for the social media accounts section"
+  },
+  "addSocialAccountTooltip": "Add social media account",
+  "@addSocialAccountTooltip": {
+    "description": "Tooltip for the add social account button"
+  },
+  "socialAccountsScreenTitle": "Social accounts",
+  "@socialAccountsScreenTitle": {
+    "description": "Title of the social accounts screen"
+  },
+  "socialAccountsScreenSubtitle": "Saved logins for your favourite apps",
+  "@socialAccountsScreenSubtitle": {
+    "description": "Subtitle of the social accounts screen"
+  },
+  "reminderMarkedCompleteSnack": "Wonderful! \"{title}\" marked as complete. 🌟",
+  "@reminderMarkedCompleteSnack": {
+    "description": "Snackbar shown when a reminder is marked done",
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "reminderSnoozedSnack": "Snoozed \"{title}\" for 15 minutes. ⏰",
+  "@reminderSnoozedSnack": {
+    "description": "Snackbar shown when a reminder is snoozed",
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "familyPhotosTitle": "Family Photos",
+  "@familyPhotosTitle": {
+    "description": "Title of the family photos screen"
+  },
+  "tryAgainShort": "Try again",
+  "@tryAgainShort": {
+    "description": "Short retry button label"
+  },
+  "addFamilyMemberButton": "Add Family Member",
+  "@addFamilyMemberButton": {
+    "description": "Button to add a family member photo"
+  },
+  "noFamilyPhotosMessage": "No family photos yet\nAdd photos of people who are special to you.",
+  "@noFamilyPhotosMessage": {
+    "description": "Empty state for the family photos screen"
+  },
+  "familyPhotoMissingDetails": "Please add a photo and complete the details.",
+  "@familyPhotoMissingDetails": {
+    "description": "Snackbar when a family member photo has missing details"
+  },
+  "familyMemberUpdated": "Family member updated.",
+  "@familyMemberUpdated": {
+    "description": "Snackbar after updating a family member"
+  },
+  "familyMemberAdded": "Family member added.",
+  "@familyMemberAdded": {
+    "description": "Snackbar after adding a family member"
+  },
+  "removeFamilyMemberTitle": "Remove this family member?",
+  "@removeFamilyMemberTitle": {
+    "description": "Title of the remove family member dialog"
+  },
+  "removeFamilyMemberMessage": "This will remove their photo from your family collection.",
+  "@removeFamilyMemberMessage": {
+    "description": "Body of the remove family member dialog"
+  },
+  "removeButton": "Remove",
+  "@removeButton": {
+    "description": "Remove button label"
+  },
+  "editFamilyMemberTitle": "Edit Family Member",
+  "@editFamilyMemberTitle": {
+    "description": "Title of the edit family member dialog"
+  },
+  "tapToAddPhoto": "Tap to add photo",
+  "@tapToAddPhoto": {
+    "description": "Label to add a photo"
+  },
+  "chooseDifferentPhoto": "Choose a different photo",
+  "@chooseDifferentPhoto": {
+    "description": "Label to choose a different photo"
+  },
+  "enterNameValidator": "Enter a name",
+  "@enterNameValidator": {
+    "description": "Validation message for the family member name field"
+  },
+  "enterRelationshipValidator": "Enter a relationship",
+  "@enterRelationshipValidator": {
+    "description": "Validation message for the relationship field"
+  },
+  "savingLabel": "Saving...",
+  "@savingLabel": {
+    "description": "Label while saving"
+  },
+  "saveFamilyMemberButton": "Save Family Member",
+  "@saveFamilyMemberButton": {
+    "description": "Button to save a family member"
+  },
+  "removeFamilyMemberButton": "Remove family member",
+  "@removeFamilyMemberButton": {
+    "description": "Button to remove a family member"
+  },
+  "familyPhotosLoadError": "We couldn't load your family photos right now.",
+  "@familyPhotosLoadError": {
+    "description": "Error state on the family photos screen"
+  },
+  "familyPhotosFindPatientError": "We couldn't find the selected patient.",
+  "@familyPhotosFindPatientError": {
+    "description": "Error when no patient is selected"
+  },
+  "familyPhotosAddError": "We couldn't add this photo right now.",
+  "@familyPhotosAddError": {
+    "description": "Error when adding a family photo fails"
+  },
+  "nameLabel": "Name",
+  "@nameLabel": {
+    "description": "Label for the name field"
+  },
+  "relationshipLabel": "Relationship",
+  "@relationshipLabel": {
+    "description": "Label for the relationship field"
+  },
+  "addFamilyMemberTitle": "Add Family Member",
+  "@addFamilyMemberTitle": {
+    "description": "Title of the add family member sheet"
   }
 }

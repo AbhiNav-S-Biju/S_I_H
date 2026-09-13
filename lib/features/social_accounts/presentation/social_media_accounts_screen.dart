@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme/elder_theme.dart';
 import '../../../app/theme/nirvana_responsive.dart';
 import '../../../app/widgets/clay_3d/clay_3d.dart';
+import '../../../l10n/l10n_extension.dart';
 import 'social_media_accounts_section.dart';
 
 class SocialMediaAccountsScreen extends StatelessWidget {
@@ -19,8 +20,8 @@ class SocialMediaAccountsScreen extends StatelessWidget {
             children: [
               Builder(
                 builder: (context) => ClayHeader3D(
-                  title: 'Social accounts',
-                  subtitle: 'Saved logins for your favourite apps',
+                  title: context.l10n.socialAccountsScreenTitle,
+                  subtitle: context.l10n.socialAccountsScreenSubtitle,
                   onBack: () {
                     if (context.canPop()) {
                       context.pop();

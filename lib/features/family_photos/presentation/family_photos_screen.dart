@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../app/theme/elder_theme.dart';
+import '../../../l10n/l10n_extension.dart';
 import '../models/family_photo.dart';
 import '../providers/family_photo_providers.dart';
 
@@ -14,21 +15,22 @@ class FamilyPhotosScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final photos = ref.watch(familyPhotosProvider);
     return Scaffold(
       backgroundColor: ElderColors.background,
       appBar: AppBar(
-        title: const Text('Family Photos'),
+        title: Text(l10n.familyPhotosTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       body: photos.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => _MessageState(
-          message: "We couldn't load your family photos right now.",
+          message: l10n.familyPhotosLoadError,
           action: TextButton(
             onPressed: () => ref.invalidate(familyPhotosProvider),
-            child: const Text('Try again'),
+            child: Text(l10n.tryAgainShort),
           ),
         ),
         data: (items) => _FamilyPhotosBody(photos: items),
@@ -36,7 +38,7 @@ class FamilyPhotosScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openEditor(context),
         icon: const Icon(Icons.add_photo_alternate_rounded),
-        label: const Text('Add Family Member'),
+        label: Text(l10n.addFamilyMemberButton),
       ),
     );
   }
@@ -59,9 +61,9 @@ class _FamilyPhotosBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (photos.isEmpty) {
+      final l10n = context.l10n;
       return _MessageState(
-        message:
-            'No family photos yet\nAdd photos of people who are special to you.',
+        message: l10n.noFamilyPhotosMessage,
         action: FilledButton.icon(
           onPressed: () => showModalBottomSheet<void>(
             context: context,
@@ -70,7 +72,7 @@ class _FamilyPhotosBody extends ConsumerWidget {
             builder: (_) => const _FamilyPhotoEditor(),
           ),
           icon: const Icon(Icons.add_photo_alternate_rounded),
-          label: const Text('Add Family Member'),
+          label: Text(l10n.addFamilyMemberButton),
         ),
       );
     }
@@ -247,19 +249,18 @@ class _FamilyPhotoEditorState extends ConsumerState<_FamilyPhotoEditor> {
   }
 
   Future<void> _save() async {
+    final l10n = context.l10n;
     if (!_formKey.currentState!.validate() ||
         (!_editing && _selectedImage == null)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add a photo and complete the details.'),
-        ),
+        SnackBar(content: Text(l10n.familyPhotoMissingDetails)),
       );
       return;
     }
     final patientId = ref.read(familyPhotoPatientIdProvider) ?? '';
     if (patientId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("We couldn't find the selected patient.")),
+        SnackBar(content: Text(l10n.familyPhotosFindPatientError)),
       );
       return;
     }
@@ -291,7 +292,7 @@ class _FamilyPhotoEditorState extends ConsumerState<_FamilyPhotoEditor> {
     setState(() => _saving = false);
     if (saved == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("We couldn't add this photo right now.")),
+        SnackBar(content: Text(l10n.familyPhotosAddError)),
       );
       return;
     }
@@ -299,28 +300,27 @@ class _FamilyPhotoEditorState extends ConsumerState<_FamilyPhotoEditor> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          _editing ? 'Family member updated.' : 'Family member added.',
+          _editing ? l10n.familyMemberUpdated : l10n.familyMemberAdded,
         ),
       ),
     );
   }
 
   Future<void> _delete() async {
+    final l10n = context.l10n;
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Remove this family member?'),
-        content: const Text(
-          'This will remove their photo from your family collection.',
-        ),
+        title: Text(l10n.removeFamilyMemberTitle),
+        content: Text(l10n.removeFamilyMemberMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Remove'),
+            child: Text(l10n.removeButton),
           ),
         ],
       ),
@@ -335,6 +335,7 @@ class _FamilyPhotoEditorState extends ConsumerState<_FamilyPhotoEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final existingImage = widget.photo;
     return SafeArea(
       child: Padding(
@@ -355,7 +356,9 @@ class _FamilyPhotoEditorState extends ConsumerState<_FamilyPhotoEditor> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _editing ? 'Edit Family Member' : 'Add Family Member',
+                    _editing
+                        ? l10n.editFamilyMemberTitle
+                        : l10n.addFamilyMemberTitle,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: ElderColors.textPrimary,
@@ -371,33 +374,33 @@ class _FamilyPhotoEditorState extends ConsumerState<_FamilyPhotoEditor> {
                         : OutlinedButton.icon(
                             onPressed: _choosePhoto,
                             icon: const Icon(Icons.add_a_photo_rounded),
-                            label: const Text('Tap to add photo'),
+                            label: Text(l10n.tapToAddPhoto),
                           ),
                   ),
                   if (_selectedImage != null || existingImage != null)
                     TextButton.icon(
                       onPressed: _choosePhoto,
                       icon: const Icon(Icons.swap_horiz_rounded),
-                      label: const Text('Choose a different photo'),
+                      label: Text(l10n.chooseDifferentPhoto),
                     ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _nameController,
                     textCapitalization: TextCapitalization.words,
-                    decoration: const InputDecoration(labelText: 'Name'),
+                    decoration: InputDecoration(labelText: l10n.nameLabel),
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Enter a name'
+                        ? l10n.enterNameValidator
                         : null,
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _relationshipController,
                     textCapitalization: TextCapitalization.words,
-                    decoration: const InputDecoration(
-                      labelText: 'Relationship',
+                    decoration: InputDecoration(
+                      labelText: l10n.relationshipLabel,
                     ),
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Enter a relationship'
+                        ? l10n.enterRelationshipValidator
                         : null,
                   ),
                   const SizedBox(height: 22),
@@ -410,14 +413,18 @@ class _FamilyPhotoEditorState extends ConsumerState<_FamilyPhotoEditor> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save_rounded),
-                    label: Text(_saving ? 'Saving...' : 'Save Family Member'),
+                    label: Text(
+                      _saving
+                          ? l10n.savingLabel
+                          : l10n.saveFamilyMemberButton,
+                    ),
                   ),
                   if (_editing) ...[
                     const SizedBox(height: 8),
                     TextButton.icon(
                       onPressed: _saving ? null : _delete,
                       icon: const Icon(Icons.delete_outline_rounded),
-                      label: const Text('Remove family member'),
+                      label: Text(l10n.removeFamilyMemberButton),
                     ),
                   ],
                 ],

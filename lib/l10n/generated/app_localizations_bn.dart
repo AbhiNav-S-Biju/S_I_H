@@ -397,4 +397,258 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get askNirvanaMicUnavailable =>
       'মাইক্রোফোন বা স্পীচ রিকগনিশন প্রস্তুত নয়। আপনি নিচে টাইপ করতে পারেন।';
+
+  @override
+  String get goodMorningGreeting => 'Good Morning,';
+
+  @override
+  String get goodAfternoonGreeting => 'Good Afternoon,';
+
+  @override
+  String get goodEveningGreeting => 'Good Evening,';
+
+  @override
+  String get friendlyFallbackName => 'Friend';
+
+  @override
+  String get gamesNavLabel => 'Games';
+
+  @override
+  String get remindersNavLabel => 'Reminders';
+
+  @override
+  String get photosNavLabel => 'Photos';
+
+  @override
+  String get askNavLabel => 'Ask';
+
+  @override
+  String get accountsNavLabel => 'Accounts';
+
+  @override
+  String get dailyMomentEyebrow => 'DAILY MOMENT';
+
+  @override
+  String get dailyMomentHeadline => 'You are doing wonderfully today';
+
+  @override
+  String get dailyMomentSupportingText =>
+      'Take your time. Every small step is a good step, and you are not alone.';
+
+  @override
+  String get whatWouldYouLikeToDo => 'What would you like to do?';
+
+  @override
+  String get caregiverReassuranceMessage =>
+      'Your family can check in on you any time. You are safe and looked after.';
+
+  @override
+  String get logoutDialogTitle => 'Log out?';
+
+  @override
+  String get logoutDialogMessage => 'Are you sure you want to log out?';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get logoutButton => 'Log out';
+
+  @override
+  String get favouritesTooltip => 'Favourites';
+
+  @override
+  String get nextRoutineTitle => 'Next Routine';
+
+  @override
+  String get markDoneButton => 'Mark Done';
+
+  @override
+  String get viewAllButton => 'View All';
+
+  @override
+  String get dailyRoutinesTitle => 'Daily Routines';
+
+  @override
+  String get todaysScheduleTitle => 'Today\'s Schedule';
+
+  @override
+  String get noRemindersToday => 'No reminders for today';
+
+  @override
+  String get noRemindersTodayBody =>
+      'You are all caught up. Have a peaceful, restful day! 🌸';
+
+  @override
+  String get allCaughtUpToday => 'All caught up for today! 🎉';
+
+  @override
+  String completedCountLabel(int completed, int total) {
+    return '$completed of $total Completed';
+  }
+
+  @override
+  String get progressAllDoneMessage =>
+      'Great job keeping up with your health routines today.';
+
+  @override
+  String get progressInProgressMessage =>
+      'Take your time and complete each activity as scheduled.';
+
+  @override
+  String get doneButton => 'Done';
+
+  @override
+  String get snooze15MinutesButton => '15 min';
+
+  @override
+  String get completedTodayLabel => 'Completed today ✓';
+
+  @override
+  String snoozedUntilLabel(String time) {
+    return 'Snoozed until $time';
+  }
+
+  @override
+  String get allCompletedForSchedule => 'All completed for this schedule';
+
+  @override
+  String get notificationsSectionTitle => 'Notifications';
+
+  @override
+  String get noNotificationsMessage =>
+      'No notifications right now. New reminder alerts will appear here.';
+
+  @override
+  String get notificationStatusDueNow => 'Due now';
+
+  @override
+  String get notificationStatusUpcoming => 'Upcoming';
+
+  @override
+  String get notificationStatusSnoozed => 'Snoozed';
+
+  @override
+  String get notificationStatusCompleted => 'Completed';
+
+  @override
+  String get reminderDueDialogLater => 'Later';
+
+  @override
+  String get reminderDueDialogViewRoutines => 'View routines';
+
+  @override
+  String get reminderDueFallbackBody =>
+      'It is time for this routine. You can mark it done when you are ready.';
+
+  @override
+  String get socialAccountsTitle => 'Social media accounts';
+
+  @override
+  String get socialAccountsSubtitle =>
+      'Your account details are protected on this device.';
+
+  @override
+  String get noSocialAccountsSaved => 'No social media accounts saved yet.';
+
+  @override
+  String get socialAccountsLoadError =>
+      'We could not load your saved accounts. Please try again.';
+
+  @override
+  String get addSocialAccountTooltip => 'Add social media account';
+
+  @override
+  String get socialAccountsScreenTitle => 'Social accounts';
+
+  @override
+  String get socialAccountsScreenSubtitle =>
+      'Saved logins for your favourite apps';
+
+  @override
+  String reminderMarkedCompleteSnack(String title) {
+    return 'Wonderful! \"$title\" marked as complete. 🌟';
+  }
+
+  @override
+  String reminderSnoozedSnack(String title) {
+    return 'Snoozed \"$title\" for 15 minutes. ⏰';
+  }
+
+  @override
+  String get familyPhotosTitle => 'Family Photos';
+
+  @override
+  String get tryAgainShort => 'Try again';
+
+  @override
+  String get addFamilyMemberButton => 'Add Family Member';
+
+  @override
+  String get noFamilyPhotosMessage =>
+      'No family photos yet\nAdd photos of people who are special to you.';
+
+  @override
+  String get familyPhotoMissingDetails =>
+      'Please add a photo and complete the details.';
+
+  @override
+  String get familyMemberUpdated => 'Family member updated.';
+
+  @override
+  String get familyMemberAdded => 'Family member added.';
+
+  @override
+  String get removeFamilyMemberTitle => 'Remove this family member?';
+
+  @override
+  String get removeFamilyMemberMessage =>
+      'This will remove their photo from your family collection.';
+
+  @override
+  String get removeButton => 'Remove';
+
+  @override
+  String get editFamilyMemberTitle => 'Edit Family Member';
+
+  @override
+  String get tapToAddPhoto => 'Tap to add photo';
+
+  @override
+  String get chooseDifferentPhoto => 'Choose a different photo';
+
+  @override
+  String get enterNameValidator => 'Enter a name';
+
+  @override
+  String get enterRelationshipValidator => 'Enter a relationship';
+
+  @override
+  String get savingLabel => 'Saving...';
+
+  @override
+  String get saveFamilyMemberButton => 'Save Family Member';
+
+  @override
+  String get removeFamilyMemberButton => 'Remove family member';
+
+  @override
+  String get familyPhotosLoadError =>
+      'We couldn\'t load your family photos right now.';
+
+  @override
+  String get familyPhotosFindPatientError =>
+      'We couldn\'t find the selected patient.';
+
+  @override
+  String get familyPhotosAddError => 'We couldn\'t add this photo right now.';
+
+  @override
+  String get nameLabel => 'Name';
+
+  @override
+  String get relationshipLabel => 'Relationship';
+
+  @override
+  String get addFamilyMemberTitle => 'Add Family Member';
 }
