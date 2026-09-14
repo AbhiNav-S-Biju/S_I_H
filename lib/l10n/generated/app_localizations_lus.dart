@@ -202,111 +202,112 @@ class AppLocalizationsLus extends AppLocalizations {
   String get aboutAppVersion => 'Version 1.0.0 • Hmangaihna nena Enkawlna';
 
   @override
-  String get activitiesTitle => 'Daily Activities';
+  String get activitiesTitle => 'Ni tin thil tih tur';
 
   @override
-  String get activitiesBannerTitle => 'Welcome to Today\'s Fun!';
+  String get activitiesBannerTitle => 'Vawiin lawmnaah kan lo lawm che!';
 
   @override
   String get activitiesBannerSubtitle =>
-      'Choose an enjoyable activity below. Take all the time you like.';
+      'A hnuaia thil tih tur thlang rawh. I hun la rawh.';
 
   @override
-  String get activityPace => 'Activity Pace:';
+  String get activityPace => 'Thil tih tur kalphung:';
 
   @override
-  String get paceGentle => 'Gentle';
+  String get paceGentle => 'Zawi';
 
   @override
-  String get paceStandard => 'Standard';
+  String get paceStandard => 'Pangngai';
 
   @override
-  String get paceChallenge => 'Challenge';
+  String get paceChallenge => 'Harsa';
 
   @override
-  String get gameRememberObjectsTitle => 'Remember Objects';
+  String get gameRememberObjectsTitle => 'Thilte hre reng rawh';
 
   @override
   String get gameRememberObjectsSubtitle =>
-      'Look at the friendly items, then tap what you saw';
+      'Thilte ngaihsak takin en rawh, i hmuh te thlang rawh';
 
   @override
-  String get gameWhoIsThisTitle => 'Who Is This?';
+  String get gameWhoIsThisTitle => 'Hei hi tu nge?';
 
   @override
-  String get gameWhoIsThisSubtitle => 'Recognize familiar faces and loved ones';
+  String get gameWhoIsThisSubtitle => 'Chhungkaw leh hmangaih takte hre rawh';
 
   @override
-  String get gameGroceryMemoryTitle => 'Grocery Memory';
+  String get gameGroceryMemoryTitle => 'Dawai thil lei tur';
 
   @override
   String get gameGroceryMemorySubtitle =>
-      'Collect everyday items from your shopping list';
+      'I dawai thil lei tur list atanga thilte khawm rawh';
 
   @override
-  String get gameJigsawPuzzleTitle => 'Familiar Jigsaw';
+  String get gameJigsawPuzzleTitle => 'Jigsaw hriat tawh';
 
   @override
   String get gameJigsawPuzzleSubtitle =>
-      'Put together comforting pictures piece by piece';
+      'Thlalak nuam takte them tinin chhu rawh';
 
   @override
-  String get playActivityButton => 'Play Activity ➔';
+  String get playActivityButton => 'Thil tih tur tan rawh âž”';
 
   @override
-  String get exitActivityTooltip => 'Exit Activity';
+  String get exitActivityTooltip => 'Thil tih tur chhuahsan rawh';
 
   @override
-  String get leaveActivityTitle => 'Leave Activity?';
+  String get leaveActivityTitle => 'Thil tih tur chhuahsan?';
 
   @override
   String get leaveActivityMessage =>
-      'Are you sure you want to pause and return to the main screen? Your gentle progress is always saved.';
+      'I lai screen-ah kÃ®r duh tak em? I hmasawma vÃªn him a ni.';
 
   @override
-  String get stayAndContinue => 'Stay & Continue';
+  String get stayAndContinue => 'Zawn rawh';
 
   @override
-  String get yesExit => 'Yes, Exit';
+  String get yesExit => 'Aw, chhuah rawh';
 
   @override
-  String get hintButton => 'Hint';
+  String get hintButton => 'Chhinchhiah';
 
   @override
-  String get activityCompletedTitle => 'Activity Completed!';
+  String get activityCompletedTitle => 'Thil tih tur zo ta!';
 
   @override
-  String get finishButton => 'Finish';
+  String get finishButton => 'Tih zo rawh';
 
   @override
   String get rememberObjectsLookCarefully =>
-      'Look at these items carefully. Take all the time you need.';
+      'Heng thilte ngaihsak takin en rawh. I hun la rawh.';
 
   @override
-  String get iAmReadyButton => 'I am Ready ➔';
+  String get iAmReadyButton => 'Ka inpeih ta âž”';
 
   @override
-  String get whichItemsDidYouSee => 'Which items did you see? Tap them below:';
+  String get whichItemsDidYouSee =>
+      'Eng thilte nge i hmuh? A hnuaia te thlang rawh:';
 
   @override
-  String get completeActivityButton => 'Complete Activity ➔';
+  String get completeActivityButton => 'Thil tih tur zo rawh âž”';
 
   @override
-  String get familyAndFriends => 'Family & Friends';
+  String get familyAndFriends => 'Chhungkaw leh thiante';
 
   @override
-  String get shoppingListTitle => 'Your Shopping List';
+  String get shoppingListTitle => 'I dawai thil lei tur list';
 
   @override
   String get shoppingListSubtitle =>
-      'Review these items, then tap \'Start Shopping\' when ready.';
+      'Heng thilte en rawh, i inpeih chuan \'Dawai lei rawh\' hmet rawh.';
 
   @override
-  String get startShoppingButton => 'Start Shopping ➔';
+  String get startShoppingButton => 'Dawai lei rawh âž”';
 
   @override
   String get findItemsOnShelf =>
-      'Tap items from your list to put them in your cart:';
+      'I list atanga thilte i basket-a dah nan hmet rawh:';
 
   @override
   String get landingWelcomeTitle => 'Nirvana-ah kan lo lawm che';
@@ -341,315 +342,430 @@ class AppLocalizationsLus extends AppLocalizations {
   String get caregiverPortalButton => 'Enkawltu Portal-ah lut rawh';
 
   @override
-  String get askNirvanaTitle => 'Ask NIRVANA';
+  String get askNirvanaTitle => 'NIRVANA hi zawt rawh';
 
   @override
-  String get askNirvanaCompanionLabel => 'NIRVANA Companion';
+  String get askNirvanaCompanionLabel => 'NIRVANA thian';
 
   @override
-  String get askNirvanaListening => 'I\'m listening...';
+  String get askNirvanaListening => 'Ka ngaihthlak mek...';
 
   @override
-  String get askNirvanaThinking => 'Let me think...';
+  String get askNirvanaThinking => 'Ka ngaihtuah mek...';
 
   @override
-  String get askNirvanaSpeaking => 'Speaking...';
+  String get askNirvanaSpeaking => 'Ka sawi mek...';
 
   @override
-  String get askNirvanaTapToSpeak => 'Tap to speak';
+  String get askNirvanaTapToSpeak => 'Sawi turin hmet rawh';
 
   @override
-  String get askNirvanaListeningPrompt => 'I\'m listening... (Tap to finish)';
+  String get askNirvanaListeningPrompt =>
+      'Ka ngaihthlak mek... (tih zo turin hmet rawh)';
 
   @override
-  String get askNirvanaSpeakingPrompt => 'Speaking... (Tap to stop)';
+  String get askNirvanaSpeakingPrompt =>
+      'Ka sawi mek... (tih tawp turin hmet rawh)';
 
   @override
-  String get askNirvanaThinkingPrompt => 'Let me think...';
+  String get askNirvanaThinkingPrompt => 'Ka ngaihtuah mek...';
 
   @override
-  String get askNirvanaErrorPrompt =>
-      'I couldn\'t understand that. Please try again.';
+  String get askNirvanaErrorPrompt => 'Ka hrethiam lo. Khawi leh rawh.';
 
   @override
-  String get askNirvanaClearButton => 'Clear';
+  String get askNirvanaClearButton => 'Paih rawh';
 
   @override
-  String get askNirvanaClearTitle => 'Clear Conversation?';
+  String get askNirvanaClearTitle => 'Inbiakna paih?';
 
   @override
   String get askNirvanaClearMessage =>
-      'This will start a fresh, new conversation. Are you sure?';
+      'Hei hian inbiakna thar a tan ang. I nih chiang em?';
 
   @override
-  String get askNirvanaReadAloud => 'Read Aloud';
+  String get askNirvanaReadAloud => 'Aw ri chhuakin chhiar rawh';
 
   @override
-  String get askNirvanaTypeHere => 'Or type here...';
+  String get askNirvanaTypeHere => 'Emaw hetah hian ziak rawh...';
 
   @override
   String get askNirvanaGreeting =>
-      'Hello! I am NIRVANA, your companion. Tap the large microphone below to talk with me, or type your question.';
+      'Chibai! Kei hi NIRVANA, i thian a ni. Inbiak nan a hnuaia microphone lian hmet rawh, emaw i zawtna ziak rawh.';
 
   @override
   String get askNirvanaNoSpeech =>
-      'I didn\'t hear anything. Tap to speak again.';
+      'Engmah ka hre lo. Sawi leh turin hmet rawh.';
 
   @override
   String get askNirvanaMicUnavailable =>
-      'Microphone or speech recognition is not ready. You can type below anytime.';
+      'Microphone emaw speech recognition a inpeih lo. I duh chuan a hnuaiah ziak thei rawh.';
 
   @override
-  String get goodMorningGreeting => 'Good Morning,';
+  String get goodMorningGreeting => 'Tukthleng tha,';
 
   @override
-  String get goodAfternoonGreeting => 'Good Afternoon,';
+  String get goodAfternoonGreeting => 'Chhun tha,';
 
   @override
-  String get goodEveningGreeting => 'Good Evening,';
+  String get goodEveningGreeting => 'Tlai tha,';
 
   @override
-  String get friendlyFallbackName => 'Friend';
+  String get friendlyFallbackName => 'Thian';
 
   @override
-  String get gamesNavLabel => 'Games';
+  String get gamesNavLabel => 'Infiamna';
 
   @override
-  String get remindersNavLabel => 'Reminders';
+  String get remindersNavLabel => 'Hriatrengna';
 
   @override
-  String get photosNavLabel => 'Photos';
+  String get photosNavLabel => 'Thlalak';
 
   @override
-  String get askNavLabel => 'Ask';
+  String get askNavLabel => 'Zawt';
 
   @override
-  String get accountsNavLabel => 'Accounts';
+  String get accountsNavLabel => 'Account';
 
   @override
-  String get dailyMomentEyebrow => 'DAILY MOMENT';
+  String get myRemindersLabel => 'Ka hriatrengna';
 
   @override
-  String get dailyMomentHeadline => 'You are doing wonderfully today';
+  String get dailyTag => 'NI TIN';
+
+  @override
+  String get routinesTag => 'NIKHUA';
+
+  @override
+  String get memoriesTag => 'HRILAWM';
+
+  @override
+  String get preferencesTag => 'THLANG BIK';
+
+  @override
+  String get talkTag => 'BI';
+
+  @override
+  String get addSocialAccountTitle => 'Social media account belh rawh';
+
+  @override
+  String get editAccountTitle => 'Account siamthat rawh';
+
+  @override
+  String get socialAccountSavedCloud => 'Account hi Supabase-ah vÃªn him a ni.';
+
+  @override
+  String get socialAccountSavedLocal =>
+      'He device-ah hian vÃªn him a ni. Cloud sync a awm lo.';
+
+  @override
+  String get socialAccountSaveError =>
+      'He account hi vÃªn him thei a ni lo. Damlo inzawmna leh Supabase set-up en rawh.';
+
+  @override
+  String get deleteAccountTitle => 'Account paih?';
+
+  @override
+  String deleteAccountMessage(String platform, String username) {
+    return '$username tan $platform account paih?';
+  }
+
+  @override
+  String get deleteButton => 'Paih rawh';
+
+  @override
+  String get accountDeletedSnack => 'Account vÃªn him takin paih a ni.';
+
+  @override
+  String get accountDeleteErrorSnack => 'He account hi paih thei a ni lo.';
+
+  @override
+  String get passwordHiddenLabel => 'Password: â€¢â€¢â€¢â€¢';
+
+  @override
+  String get accountActionsTooltip => 'Account thil tih';
+
+  @override
+  String get copyPasswordMenuItem => 'Password copy rawh';
+
+  @override
+  String get editAccountMenuItem => 'Account siamthat rawh';
+
+  @override
+  String get deleteAccountMenuItem => 'Account paih rawh';
+
+  @override
+  String get passwordCopiedSnack => 'Password clipboard-ah copy a ni.';
+
+  @override
+  String get platformLabel => 'Platform';
+
+  @override
+  String get usernameOrEmailLabel => 'Username emaw email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get enterUsernameOrEmailValidator => 'Username emaw email ziak rawh.';
+
+  @override
+  String get enterPasswordValidator => 'Password ziak rawh.';
+
+  @override
+  String get showPasswordTooltip => 'Password en rawh';
+
+  @override
+  String get hidePasswordTooltip => 'Password thup rawh';
+
+  @override
+  String get saveAccountButton => 'Account vÃªn him rawh';
+
+  @override
+  String get savingButton => 'VÃªn him mek';
+
+  @override
+  String get notificationChannelName => 'NIRVANA Enkawl Hriatrengna';
+
+  @override
+  String get notificationChannelDescription =>
+      'Damdawi, tui leh thil tih tur atana hun taka hriattirna';
+
+  @override
+  String get notificationActionDone => 'A zo ta';
+
+  @override
+  String get notificationActionSnooze => '15 min khawtlai';
+
+  @override
+  String get notificationActionLaterToday => 'Vawiin nakinah';
+
+  @override
+  String get couldNotLoadRoutinesError => 'Nikhua la thei a ni lo';
+
+  @override
+  String get dailyMomentEyebrow => 'Ni tin hun';
+
+  @override
+  String get dailyMomentHeadline => 'Vawiin hian i tha hle';
 
   @override
   String get dailyMomentSupportingText =>
-      'Take your time. Every small step is a good step, and you are not alone.';
+      'I hun la rawh. Them khat theuh hi kawng tha a ni, i mal a ni lo.';
 
   @override
-  String get whatWouldYouLikeToDo => 'What would you like to do?';
+  String get whatWouldYouLikeToDo => 'Eng nge i tih duh?';
 
   @override
   String get caregiverReassuranceMessage =>
-      'Your family can check in on you any time. You are safe and looked after.';
+      'I chhungte hian eng lai pawhin i chanchin an zawt thei. I him a ni.';
 
   @override
   String get logoutDialogTitle => 'Log out?';
 
   @override
-  String get logoutDialogMessage => 'Are you sure you want to log out?';
+  String get logoutDialogMessage => 'I log out duh tak em?';
 
   @override
-  String get cancelButton => 'Cancel';
+  String get cancelButton => 'Rem rawh';
 
   @override
   String get logoutButton => 'Log out';
 
   @override
-  String get favouritesTooltip => 'Favourites';
+  String get favouritesTooltip => 'Ngaisak bik';
 
   @override
-  String get nextRoutineTitle => 'Next Routine';
+  String get nextRoutineTitle => 'Nikhua leh';
 
   @override
-  String get markDoneButton => 'Mark Done';
+  String get markDoneButton => 'Tih zo';
 
   @override
-  String get viewAllButton => 'View All';
+  String get viewAllButton => 'Vek en rawh';
 
   @override
-  String get dailyRoutinesTitle => 'Daily Routines';
+  String get dailyRoutinesTitle => 'Ni tin nikhua';
 
   @override
-  String get todaysScheduleTitle => 'Today\'s Schedule';
+  String get todaysScheduleTitle => 'Vawiin hun chhut';
 
   @override
-  String get noRemindersToday => 'No reminders for today';
+  String get noRemindersToday => 'Vawiin hian hriatrengna a awm lo';
 
   @override
   String get noRemindersTodayBody =>
-      'You are all caught up. Have a peaceful, restful day! 🌸';
+      'I thil tih tur zawng zawng i zo ta. Ni nuam tak hmang rawh! ðŸŒ¸';
 
   @override
-  String get allCaughtUpToday => 'All caught up for today! 🎉';
+  String get allCaughtUpToday => 'Vawiin at zawng zawng i zo ta! ðŸŽ‰';
 
   @override
   String completedCountLabel(int completed, int total) {
-    return '$completed of $total Completed';
+    return '$total atanga $completed zo';
   }
 
   @override
   String get progressAllDoneMessage =>
-      'Great job keeping up with your health routines today.';
+      'Vawiin hian i hriselna nikhua i zawm that hle.';
 
   @override
   String get progressInProgressMessage =>
-      'Take your time and complete each activity as scheduled.';
+      'I hun la rawh la, thil tih tur tin hi a hun taka zo rawh.';
 
   @override
-  String get doneButton => 'Done';
+  String get doneButton => 'A zo ta';
 
   @override
   String get snooze15MinutesButton => '15 min';
 
   @override
-  String get completedTodayLabel => 'Completed today ✓';
+  String get completedTodayLabel => 'Vawiin zo âœ“';
 
   @override
   String snoozedUntilLabel(String time) {
-    return 'Snoozed until $time';
+    return '$time thleng khawtlai';
   }
 
   @override
-  String get allCompletedForSchedule => 'All completed for this schedule';
+  String get allCompletedForSchedule => 'He hun chhut atan zawng zawng zo';
 
   @override
-  String get notificationsSectionTitle => 'Notifications';
+  String get notificationsSectionTitle => 'Hriattirna';
 
   @override
   String get noNotificationsMessage =>
-      'No notifications right now. New reminder alerts will appear here.';
+      'Tuna hriattirna a awm lo. Hriatrengna thar a lo chhuah hunah hetah hian a lang ang.';
 
   @override
-  String get notificationStatusDueNow => 'Due now';
+  String get notificationStatusDueNow => 'Tuna ngai';
 
   @override
-  String get notificationStatusUpcoming => 'Upcoming';
+  String get notificationStatusUpcoming => 'Lo thleng tur';
 
   @override
-  String get notificationStatusSnoozed => 'Snoozed';
+  String get notificationStatusSnoozed => 'Khawtlai';
 
   @override
-  String get notificationStatusCompleted => 'Completed';
+  String get notificationStatusCompleted => 'Zo';
 
   @override
-  String get reminderDueDialogLater => 'Later';
+  String get reminderDueDialogLater => 'Nakinah';
 
   @override
-  String get reminderDueDialogViewRoutines => 'View routines';
+  String get reminderDueDialogViewRoutines => 'Nikhua en rawh';
 
   @override
   String get reminderDueFallbackBody =>
-      'It is time for this routine. You can mark it done when you are ready.';
+      'He nikhua hi a hun ta. I inpeih chuan tih zo rawh.';
 
   @override
-  String get socialAccountsTitle => 'Social media accounts';
+  String get socialAccountsTitle => 'Social media account';
 
   @override
   String get socialAccountsSubtitle =>
-      'Your account details are protected on this device.';
+      'I account chanchin hi he device-ah hian vÃªn him a ni.';
 
   @override
-  String get noSocialAccountsSaved => 'No social media accounts saved yet.';
+  String get noSocialAccountsSaved =>
+      'Social media account la vÃªn him a awm lo.';
 
   @override
   String get socialAccountsLoadError =>
-      'We could not load your saved accounts. Please try again.';
+      'I account vÃªn himte kan la thei lo. Khawi leh rawh.';
 
   @override
-  String get addSocialAccountTooltip => 'Add social media account';
+  String get addSocialAccountTooltip => 'Social media account belh rawh';
 
   @override
-  String get socialAccountsScreenTitle => 'Social accounts';
+  String get socialAccountsScreenTitle => 'Social account';
 
   @override
-  String get socialAccountsScreenSubtitle =>
-      'Saved logins for your favourite apps';
+  String get socialAccountsScreenSubtitle => 'I app duh bikte login vÃªn him';
 
   @override
   String reminderMarkedCompleteSnack(String title) {
-    return 'Wonderful! \"$title\" marked as complete. 🌟';
+    return 'Tha hle! \"$title\" zo ta. ðŸŒŸ';
   }
 
   @override
   String reminderSnoozedSnack(String title) {
-    return 'Snoozed \"$title\" for 15 minutes. ⏰';
+    return '\"$title\" hi 15 min khawtlai a ni. â°';
   }
 
   @override
-  String get familyPhotosTitle => 'Family Photos';
+  String get familyPhotosTitle => 'Chhungkaw thlalak';
 
   @override
-  String get tryAgainShort => 'Try again';
+  String get tryAgainShort => 'Khawi leh rawh';
 
   @override
-  String get addFamilyMemberButton => 'Add Family Member';
+  String get addFamilyMemberButton => 'Chhungkaw member belh rawh';
 
   @override
   String get noFamilyPhotosMessage =>
-      'No family photos yet\nAdd photos of people who are special to you.';
+      'Chhungkaw thlalak la awm lo\nI hmangaih takte thlalak belh rawh.';
 
   @override
-  String get familyPhotoMissingDetails =>
-      'Please add a photo and complete the details.';
+  String get familyPhotoMissingDetails => 'Thlalak belhin details tikim rawh.';
 
   @override
-  String get familyMemberUpdated => 'Family member updated.';
+  String get familyMemberUpdated => 'Chhungkaw member thlak danglam a ni.';
 
   @override
-  String get familyMemberAdded => 'Family member added.';
+  String get familyMemberAdded => 'Chhungkaw member belh a ni.';
 
   @override
-  String get removeFamilyMemberTitle => 'Remove this family member?';
+  String get removeFamilyMemberTitle => 'He member hi paih?';
 
   @override
   String get removeFamilyMemberMessage =>
-      'This will remove their photo from your family collection.';
+      'Hei hian i chhungkaw collection atanga an thlalak a paih ang.';
 
   @override
-  String get removeButton => 'Remove';
+  String get removeButton => 'Paih rawh';
 
   @override
-  String get editFamilyMemberTitle => 'Edit Family Member';
+  String get editFamilyMemberTitle => 'Chhungkaw member siamthat rawh';
 
   @override
-  String get tapToAddPhoto => 'Tap to add photo';
+  String get tapToAddPhoto => 'Thlalak belh nan hmet rawh';
 
   @override
-  String get chooseDifferentPhoto => 'Choose a different photo';
+  String get chooseDifferentPhoto => 'Thlalak dang thlang rawh';
 
   @override
-  String get enterNameValidator => 'Enter a name';
+  String get enterNameValidator => 'Hming ziak rawh';
 
   @override
-  String get enterRelationshipValidator => 'Enter a relationship';
+  String get enterRelationshipValidator => 'Inlaichinna ziak rawh';
 
   @override
-  String get savingLabel => 'Saving...';
+  String get savingLabel => 'VÃªn him mek...';
 
   @override
-  String get saveFamilyMemberButton => 'Save Family Member';
+  String get saveFamilyMemberButton => 'Member vÃªn him rawh';
 
   @override
-  String get removeFamilyMemberButton => 'Remove family member';
+  String get removeFamilyMemberButton => 'Chhungkaw member paih rawh';
 
   @override
   String get familyPhotosLoadError =>
-      'We couldn\'t load your family photos right now.';
+      'Tuna i chhungkaw thlalak kan la thei lo.';
 
   @override
-  String get familyPhotosFindPatientError =>
-      'We couldn\'t find the selected patient.';
+  String get familyPhotosFindPatientError => 'Thlan damlo hmuh a ni lo.';
 
   @override
-  String get familyPhotosAddError => 'We couldn\'t add this photo right now.';
+  String get familyPhotosAddError => 'Tuna he thlalak hi kan belh thei lo.';
 
   @override
-  String get nameLabel => 'Name';
+  String get nameLabel => 'Hming';
 
   @override
-  String get relationshipLabel => 'Relationship';
+  String get relationshipLabel => 'Inlaichinna';
 
   @override
-  String get addFamilyMemberTitle => 'Add Family Member';
+  String get addFamilyMemberTitle => 'Chhungkaw member belh rawh';
 }

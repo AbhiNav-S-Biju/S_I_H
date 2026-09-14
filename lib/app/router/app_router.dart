@@ -23,51 +23,100 @@ import '../../features/settings/presentation/language_selector_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/social_accounts/presentation/social_media_accounts_screen.dart';
 import '../shell/elder_app_shell.dart';
+import 'restoring_session_screen.dart';
+import 'session_restore_gate.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   final homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
   final gamesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'games');
 
-  // Landing page is always the initial route — portal selection
-  const initialLocation = '/';
+  // Always start at the splash gate; the redirect below resolves the correct
+  // destination (Welcome, caregiver dashboard, or patient home) once the
+  // persisted session has been restored. This avoids flashing Welcome on
+  // cold start for already-authenticated users.
+  const initialLocation = '/startup';
+
+  // Refresh the redirect whenever the auth/session state changes so that a
+  // session restored *after* first frame still routes correctly.
+  final refreshListenable = ref.watch(sessionRefreshListenableProvider);
 
   final router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
+    refreshListenable: refreshListenable,
     redirect: (context, state) {
-      final authState = ref.read(caregiverAuthProvider);
       final loc = state.matchedLocation;
 
+      final authState = ref.read(caregiverAuthProvider);
+      final authNotifier = ref.read(caregiverAuthProvider.notifier);
+      // Authenticated when a caregiver profile was restored / logged in.
+      final isAuthenticated = authState.value != null;
+      // Still restoring the persisted session (no value yet and not an error).
+      final isRestoring = authNotifier.isRestoring &&
+          !authState.hasValue &&
+          !authState.hasError;
+
+      final isStartup = loc == '/startup';
       final isCaregiverRoute = loc.startsWith('/caregiver');
       final isProtectedCaregiver =
           loc == '/caregiver/dashboard' ||
           loc == '/caregiver/onboarding' ||
           loc == '/caregiver/add-patient';
-      final isAuthenticated = authState.value != null;
 
-      // Guard caregiver dashboard — redirect to login if not authenticated
+      // 1. While the session is still being restored, hold on the splash so we
+      //    never flash the Welcome screen for an authenticated/paired user.
+      if (isRestoring) {
+        return isStartup ? null : '/startup';
+      }
+
+      // 2. Resolve the startup gate now that restore is complete.
+      if (isStartup) {
+        if (isAuthenticated) return '/caregiver/dashboard';
+        if (HiveDatabase.isDevicePaired) return '/patient/home';
+        return '/'; // No session at all -> Welcome
+      }
+
+      // 3. Guard caregiver dashboard — redirect to login if not authenticated
       if (isProtectedCaregiver && !isAuthenticated) {
         return '/caregiver/login';
       }
 
-      // If already authenticated and visiting login/register, skip ahead
+      // 4. If already authenticated and visiting login/register, skip ahead
       if (isCaregiverRoute &&
           (loc == '/caregiver/login' || loc == '/caregiver/register') &&
           isAuthenticated) {
         return '/caregiver/dashboard';
       }
 
-      // If device is already paired and navigating to patient welcome/pairing,
-      // redirect straight to home
+      // 5. If a caregiver session exists, the root Landing ("Welcome to
+      //    NIRVANA") must not be shown — send them to their dashboard.
+      if (loc == '/' && isAuthenticated) {
+        return '/caregiver/dashboard';
+      }
+
+      // 6. If the device is already paired, patient entry routes go straight to
+      //    the patient dashboard for a zero-password launch.
       if (HiveDatabase.isDevicePaired &&
           (loc == '/patient/welcome' || loc == '/patient/pairing')) {
+        return '/patient/home';
+      }
+
+      // 7. A paired patient visiting the bare root Landing is also routed to
+      //    their dashboard instead of the Welcome portal picker.
+      if (loc == '/' && HiveDatabase.isDevicePaired) {
         return '/patient/home';
       }
 
       return null; // no redirect
     },
     routes: [
+      // Startup gate / splash — shown while the session is restored.
+      GoRoute(
+        path: '/startup',
+        builder: (context, state) => const RestoringSessionScreen(),
+      ),
+
       // 0. Landing / Portal Selection
       GoRoute(path: '/', builder: (context, state) => const LandingScreen()),
 

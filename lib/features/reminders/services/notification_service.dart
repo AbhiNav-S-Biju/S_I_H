@@ -5,9 +5,15 @@
 // ==============================================================================
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
+import '../../../database/hive_boxes.dart';
+import '../../../l10n/generated/app_localizations.dart';
+import '../../../l10n/generated/app_localizations_en.dart';
 import '../models/reminder.dart';
 import '../models/reminder_action.dart';
 import '../repositories/reminder_repository.dart';
@@ -17,9 +23,30 @@ class NotificationService {
   final IReminderRepository? _reminderRepository;
 
   static const String channelId = 'nirvana_reminders_channel';
+
+  /// Fallback channel copy used before localizations resolve.
   static const String channelName = 'NIRVANA Care Reminders';
   static const String channelDesc =
       'Timely alerts for medication, hydration, and elder activities';
+
+  /// Resolves the [AppLocalizations] for the language the elder has chosen in
+  /// Settings (persisted in Hive), so notification copy matches the in-app
+  /// language. Falls back to English when the locale is unavailable.
+  static AppLocalizations _localizations() {
+    try {
+      if (Hive.isBoxOpen(HiveBoxes.settings)) {
+        final code =
+            Hive.box<dynamic>(HiveBoxes.settings).get(
+              HiveBoxes.settingsKeyLocale,
+            )
+            as String?;
+        if (code != null && code.isNotEmpty && code != 'en') {
+          return lookupAppLocalizations(Locale(code));
+        }
+      }
+    } catch (_) {}
+    return AppLocalizationsEn();
+  }
 
   /// Deterministic mapping from a reminder id to the integer notification id
   /// used to schedule/cancel its alarm. Every scheduler must use this so a
@@ -144,10 +171,11 @@ class NotificationService {
       }
     }
 
+    final l10n = _localizations();
     final androidDetails = AndroidNotificationDetails(
       channelId,
-      channelName,
-      channelDescription: channelDesc,
+      l10n.notificationChannelName,
+      channelDescription: l10n.notificationChannelDescription,
       importance: Importance.max,
       priority: Priority.high,
       category: AndroidNotificationCategory.reminder,
@@ -158,22 +186,22 @@ class NotificationService {
       enableVibration: true,
       autoCancel: true,
       ongoing: false,
-      actions: const [
+      actions: [
         AndroidNotificationAction(
           NotificationActionIds.done,
-          'Done',
+          l10n.notificationActionDone,
           showsUserInterface: true,
           cancelNotification: true,
         ),
         AndroidNotificationAction(
           NotificationActionIds.snooze15,
-          'Snooze 15 min',
+          l10n.notificationActionSnooze,
           showsUserInterface: false,
           cancelNotification: true,
         ),
         AndroidNotificationAction(
           NotificationActionIds.laterToday,
-          'Later today',
+          l10n.notificationActionLaterToday,
           showsUserInterface: false,
           cancelNotification: true,
         ),

@@ -520,6 +520,158 @@
   "@accountsNavLabel": {
     "description": "Patient dashboard launcher label for Social accounts"
   },
+  "myRemindersLabel": "My Reminders",
+  "@myRemindersLabel": {
+    "description": "Home dashboard launcher label for Reminders"
+  },
+  "dailyTag": "DAILY",
+  "@dailyTag": {
+    "description": "Tag pill label on the daily games launcher tile"
+  },
+  "routinesTag": "ROUTINES",
+  "@routinesTag": {
+    "description": "Tag pill label on the reminders launcher tile"
+  },
+  "memoriesTag": "MEMORIES",
+  "@memoriesTag": {
+    "description": "Tag pill label on the family photos launcher tile"
+  },
+  "preferencesTag": "PREFERENCES",
+  "@preferencesTag": {
+    "description": "Tag pill label on the settings launcher tile"
+  },
+  "talkTag": "TALK",
+  "@talkTag": {
+    "description": "Tag pill label on the Ask NIRVANA launcher tile"
+  },
+  "addSocialAccountTitle": "Add social media account",
+  "@addSocialAccountTitle": {
+    "description": "Title of the add social media account dialog"
+  },
+  "editAccountTitle": "Edit account",
+  "@editAccountTitle": {
+    "description": "Title of the edit social media account dialog"
+  },
+  "socialAccountSavedCloud": "Account saved securely to Supabase.",
+  "@socialAccountSavedCloud": {
+    "description": "Snackbar when a social account is saved to the cloud"
+  },
+  "socialAccountSavedLocal": "Saved securely on this device. Cloud sync is unavailable.",
+  "@socialAccountSavedLocal": {
+    "description": "Snackbar when a social account is saved only locally"
+  },
+  "socialAccountSaveError": "Unable to save this account. Check the patient pairing and Supabase setup.",
+  "@socialAccountSaveError": {
+    "description": "Snackbar error when saving a social account fails"
+  },
+  "deleteAccountTitle": "Delete account?",
+  "@deleteAccountTitle": {
+    "description": "Title of the delete social account dialog"
+  },
+  "deleteAccountMessage": "Remove the {platform} account for {username}?",
+  "@deleteAccountMessage": {
+    "description": "Body of the delete social account dialog",
+    "placeholders": {
+      "platform": { "type": "String" },
+      "username": { "type": "String" }
+    }
+  },
+  "deleteButton": "Delete",
+  "@deleteButton": {
+    "description": "Generic delete button label"
+  },
+  "accountDeletedSnack": "Account deleted securely.",
+  "@accountDeletedSnack": {
+    "description": "Snackbar when a social account is deleted"
+  },
+  "accountDeleteErrorSnack": "Unable to delete this account.",
+  "@accountDeleteErrorSnack": {
+    "description": "Snackbar error when deleting a social account fails"
+  },
+  "passwordHiddenLabel": "Password: ••••",
+  "@passwordHiddenLabel": {
+    "description": "Masked password label on a social account tile"
+  },
+  "accountActionsTooltip": "Account actions",
+  "@accountActionsTooltip": {
+    "description": "Tooltip for the social account popup menu"
+  },
+  "copyPasswordMenuItem": "Copy password",
+  "@copyPasswordMenuItem": {
+    "description": "Menu item to copy a social account password"
+  },
+  "editAccountMenuItem": "Edit account",
+  "@editAccountMenuItem": {
+    "description": "Menu item to edit a social account"
+  },
+  "deleteAccountMenuItem": "Delete account",
+  "@deleteAccountMenuItem": {
+    "description": "Menu item to delete a social account"
+  },
+  "passwordCopiedSnack": "Password copied to clipboard.",
+  "@passwordCopiedSnack": {
+    "description": "Snackbar when a password is copied to the clipboard"
+  },
+  "platformLabel": "Platform",
+  "@platformLabel": {
+    "description": "Label for the platform dropdown in the social account form"
+  },
+  "usernameOrEmailLabel": "Username or email",
+  "@usernameOrEmailLabel": {
+    "description": "Label for the username or email field"
+  },
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Label for the password field"
+  },
+  "enterUsernameOrEmailValidator": "Enter a username or email.",
+  "@enterUsernameOrEmailValidator": {
+    "description": "Validation message for the username or email field"
+  },
+  "enterPasswordValidator": "Enter a password.",
+  "@enterPasswordValidator": {
+    "description": "Validation message for the password field"
+  },
+  "showPasswordTooltip": "Show password",
+  "@showPasswordTooltip": {
+    "description": "Tooltip to reveal the password field"
+  },
+  "hidePasswordTooltip": "Hide password",
+  "@hidePasswordTooltip": {
+    "description": "Tooltip to hide the password field"
+  },
+  "saveAccountButton": "Save account",
+  "@saveAccountButton": {
+    "description": "Button to save a social account"
+  },
+  "savingButton": "Saving",
+  "@savingButton": {
+    "description": "Label shown while a social account is saving"
+  },
+  "notificationChannelName": "NIRVANA Care Reminders",
+  "@notificationChannelName": {
+    "description": "Name of the local notification channel for reminders"
+  },
+  "notificationChannelDescription": "Timely alerts for medication, hydration, and elder activities",
+  "@notificationChannelDescription": {
+    "description": "Description of the local notification channel for reminders"
+  },
+  "notificationActionDone": "Done",
+  "@notificationActionDone": {
+    "description": "Notification action button to mark a reminder done"
+  },
+  "notificationActionSnooze": "Snooze 15 min",
+  "@notificationActionSnooze": {
+    "description": "Notification action button to snooze a reminder"
+  },
+  "notificationActionLaterToday": "Later today",
+  "@notificationActionLaterToday": {
+    "description": "Notification action button to defer a reminder to later today"
+  },
+  "couldNotLoadRoutinesError": "Could not load routines",
+  "@couldNotLoadRoutinesError": {
+    "description": "Error state on the reminders screen when routines fail to load"
+  },
   "dailyMomentEyebrow": "DAILY MOMENT",
   "@dailyMomentEyebrow": {
     "description": "Eyebrow label on the daily moment card"

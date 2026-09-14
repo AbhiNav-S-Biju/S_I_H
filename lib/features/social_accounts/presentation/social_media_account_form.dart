@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:nirvana/l10n/l10n_extension.dart';
+
 import '../models/social_media_account.dart';
 
 class SocialMediaAccountForm extends StatefulWidget {
@@ -63,6 +65,7 @@ class _SocialMediaAccountFormState extends State<SocialMediaAccountForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Form(
       key: _formKey,
       child: Column(
@@ -70,9 +73,9 @@ class _SocialMediaAccountFormState extends State<SocialMediaAccountForm> {
         children: [
           DropdownButtonFormField<SocialPlatform>(
             value: _platform,
-            decoration: const InputDecoration(
-              labelText: 'Platform',
-              prefixIcon: Icon(Icons.public_rounded),
+            decoration: InputDecoration(
+              labelText: l10n.platformLabel,
+              prefixIcon: const Icon(Icons.public_rounded),
             ),
             items: SocialPlatform.values
                 .map(
@@ -94,12 +97,12 @@ class _SocialMediaAccountFormState extends State<SocialMediaAccountForm> {
             enabled: !_isSaving,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Username or email',
-              prefixIcon: Icon(Icons.person_outline_rounded),
+            decoration: InputDecoration(
+              labelText: l10n.usernameOrEmailLabel,
+              prefixIcon: const Icon(Icons.person_outline_rounded),
             ),
             validator: (value) => value == null || value.trim().isEmpty
-                ? 'Enter a username or email.'
+                ? l10n.enterUsernameOrEmailValidator
                 : null,
           ),
           const SizedBox(height: 14),
@@ -110,10 +113,12 @@ class _SocialMediaAccountFormState extends State<SocialMediaAccountForm> {
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _submit(),
             decoration: InputDecoration(
-              labelText: 'Password',
+              labelText: l10n.passwordLabel,
               prefixIcon: const Icon(Icons.lock_outline_rounded),
               suffixIcon: IconButton(
-                tooltip: _obscurePassword ? 'Show password' : 'Hide password',
+                tooltip: _obscurePassword
+                    ? l10n.showPasswordTooltip
+                    : l10n.hidePasswordTooltip,
                 onPressed: _isSaving
                     ? null
                     : () =>
@@ -125,8 +130,9 @@ class _SocialMediaAccountFormState extends State<SocialMediaAccountForm> {
                 ),
               ),
             ),
-            validator: (value) =>
-                value == null || value.isEmpty ? 'Enter a password.' : null,
+            validator: (value) => value == null || value.isEmpty
+                ? l10n.enterPasswordValidator
+                : null,
           ),
           const SizedBox(height: 22),
           Row(
@@ -135,7 +141,7 @@ class _SocialMediaAccountFormState extends State<SocialMediaAccountForm> {
               if (widget.onCancel != null)
                 TextButton(
                   onPressed: _isSaving ? null : widget.onCancel,
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancelButton),
                 ),
               const SizedBox(width: 8),
               FilledButton.icon(
@@ -146,7 +152,9 @@ class _SocialMediaAccountFormState extends State<SocialMediaAccountForm> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.save_rounded),
-                label: Text(_isSaving ? 'Saving' : 'Save account'),
+                label: Text(
+                  _isSaving ? l10n.savingButton : l10n.saveAccountButton,
+                ),
               ),
             ],
           ),

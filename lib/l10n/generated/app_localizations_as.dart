@@ -241,11 +241,11 @@ class AppLocalizationsAs extends AppLocalizations {
       'আপোনাৰ বজাৰৰ তালিকাৰ পৰা সামগ্ৰী বাছক';
 
   @override
-  String get gameJigsawPuzzleTitle => 'Familiar Jigsaw';
+  String get gameJigsawPuzzleTitle => 'পৰিচিত জিগছ\'';
 
   @override
   String get gameJigsawPuzzleSubtitle =>
-      'Put together comforting pictures piece by piece';
+      'শান্তিদায়ক ছবিবোৰ টুকুৰা টুকুৰকৈ জোৰা লগাওক';
 
   @override
   String get playActivityButton => 'কাৰ্যকলাপ আৰম্ভ কৰক ➔';
@@ -395,256 +395,373 @@ class AppLocalizationsAs extends AppLocalizations {
       'মাইক্ৰোফোন বা ভাষণ চিনাক্তিকৰণ প্ৰস্তুত নহয়। আপুনি তলত টাইপ কৰিব পাৰে।';
 
   @override
-  String get goodMorningGreeting => 'Good Morning,';
+  String get goodMorningGreeting => 'শুভ ৰাতিপুৱা,';
 
   @override
-  String get goodAfternoonGreeting => 'Good Afternoon,';
+  String get goodAfternoonGreeting => 'শুভ আবেলি,';
 
   @override
-  String get goodEveningGreeting => 'Good Evening,';
+  String get goodEveningGreeting => 'শুভ সন্ধিয়া,';
 
   @override
-  String get friendlyFallbackName => 'Friend';
+  String get friendlyFallbackName => 'বন্ধু';
 
   @override
-  String get gamesNavLabel => 'Games';
+  String get gamesNavLabel => 'খেল';
 
   @override
-  String get remindersNavLabel => 'Reminders';
+  String get remindersNavLabel => 'মনত পেলোৱা';
 
   @override
-  String get photosNavLabel => 'Photos';
+  String get photosNavLabel => 'ফটো';
 
   @override
-  String get askNavLabel => 'Ask';
+  String get askNavLabel => 'সোধক';
 
   @override
-  String get accountsNavLabel => 'Accounts';
+  String get accountsNavLabel => 'একাউণ্ট';
 
   @override
-  String get dailyMomentEyebrow => 'DAILY MOMENT';
+  String get myRemindersLabel => 'মোৰ মনত পেলোৱা';
 
   @override
-  String get dailyMomentHeadline => 'You are doing wonderfully today';
+  String get dailyTag => 'দৈনিক';
+
+  @override
+  String get routinesTag => 'কাৰ্য';
+
+  @override
+  String get memoriesTag => 'স্মৃতি';
+
+  @override
+  String get preferencesTag => 'পছন্দ';
+
+  @override
+  String get talkTag => 'কথা পাতক';
+
+  @override
+  String get addSocialAccountTitle => 'ছ\'চিয়েল মিডিয়া একাউণ্ট যোগ কৰক';
+
+  @override
+  String get editAccountTitle => 'একাউণ্ট সম্পাদনা কৰক';
+
+  @override
+  String get socialAccountSavedCloud =>
+      'একাউণ্ট Supabase ত সুৰক্ষিতভাৱে সংৰক্ষিত হ\'ল।';
+
+  @override
+  String get socialAccountSavedLocal =>
+      'এই ডিভাইচত সুৰক্ষিতভাৱে সংৰক্ষিত। ক্লাউড ছিংক উপলব্ধ নহয়।';
+
+  @override
+  String get socialAccountSaveError =>
+      'এই একাউণ্ট সংৰক্ষণ কৰিব নোৱাৰিলোঁ। ৰোগীৰ পেয়াৰিং আৰু Supabase ছেটআপ পৰীক্ষা কৰক।';
+
+  @override
+  String get deleteAccountTitle => 'একাউণ্ট মচিবনে?';
+
+  @override
+  String deleteAccountMessage(String platform, String username) {
+    return '$username ৰ বাবে $platform একাউণ্ট মচিবনে?';
+  }
+
+  @override
+  String get deleteButton => 'মচক';
+
+  @override
+  String get accountDeletedSnack => 'একাউণ্ট সুৰক্ষিতভাৱে মচা হ\'ল।';
+
+  @override
+  String get accountDeleteErrorSnack => 'এই একাউণ্ট মচিব নোৱাৰিলোঁ।';
+
+  @override
+  String get passwordHiddenLabel => 'পাছৱৰ্ড: ••••';
+
+  @override
+  String get accountActionsTooltip => 'একাউণ্ট কাৰ্য';
+
+  @override
+  String get copyPasswordMenuItem => 'পাছৱৰ্ড কপি কৰক';
+
+  @override
+  String get editAccountMenuItem => 'একাউণ্ট সম্পাদনা কৰক';
+
+  @override
+  String get deleteAccountMenuItem => 'একাউণ্ট মচক';
+
+  @override
+  String get passwordCopiedSnack => 'পাছৱৰ্ড ক্লিপবৰ্ডত কপি কৰা হ\'ল।';
+
+  @override
+  String get platformLabel => 'প্লেটফৰ্ম';
+
+  @override
+  String get usernameOrEmailLabel => 'ব্যৱহাৰকাৰী নাম বা ইমেইল';
+
+  @override
+  String get passwordLabel => 'পাছৱৰ্ড';
+
+  @override
+  String get enterUsernameOrEmailValidator => 'ব্যৱহাৰকাৰী নাম বা ইমেইল লিখক।';
+
+  @override
+  String get enterPasswordValidator => 'এটা পাছৱৰ্ড লিখক।';
+
+  @override
+  String get showPasswordTooltip => 'পাছৱৰ্ড দেখুৱাওক';
+
+  @override
+  String get hidePasswordTooltip => 'পাছৱৰ্ড লুকুৱাওক';
+
+  @override
+  String get saveAccountButton => 'একাউণ্ট সংৰক্ষণ কৰক';
+
+  @override
+  String get savingButton => 'সংৰক্ষণ কৰি আছে';
+
+  @override
+  String get notificationChannelName => 'NIRVANA যতন মনত পেলোৱা';
+
+  @override
+  String get notificationChannelDescription =>
+      'ঔষধ, পানী আৰু কাৰ্যৰ বাবে সময়মতে সতৰ্কবাণী';
+
+  @override
+  String get notificationActionDone => 'হল';
+
+  @override
+  String get notificationActionSnooze => '১৫ মিনিট স্থগিত';
+
+  @override
+  String get notificationActionLaterToday => 'আজি পিছত';
+
+  @override
+  String get couldNotLoadRoutinesError => 'কাৰ্য ল\'ড কৰিব নোৱাৰিলোঁ';
+
+  @override
+  String get dailyMomentEyebrow => 'আজিৰ মুহূৰ্ত';
+
+  @override
+  String get dailyMomentHeadline => 'আপুনি আজি অসাধাৰণ কৰি আছে';
 
   @override
   String get dailyMomentSupportingText =>
-      'Take your time. Every small step is a good step, and you are not alone.';
+      'সময় লওক। প্ৰতিটো সৰু পদক্ষেপ এটা ভাল পদক্ষেপ, আৰু আপুনি অকলে নহয়।';
 
   @override
-  String get whatWouldYouLikeToDo => 'What would you like to do?';
+  String get whatWouldYouLikeToDo => 'আপুনি কি কৰিব বিচাৰে?';
 
   @override
   String get caregiverReassuranceMessage =>
-      'Your family can check in on you any time. You are safe and looked after.';
+      'আপোনাৰ পৰিয়ালে যিকোনো সময়ত আপোনাৰ খবৰ লব পাৰে। আপুনি সুৰক্ষিত।';
 
   @override
-  String get logoutDialogTitle => 'Log out?';
+  String get logoutDialogTitle => 'লগ আউট কৰিবনে?';
 
   @override
-  String get logoutDialogMessage => 'Are you sure you want to log out?';
+  String get logoutDialogMessage => 'আপুনি সঁচাকৈ লগ আউট কৰিব বিচাৰে নেকি?';
 
   @override
-  String get cancelButton => 'Cancel';
+  String get cancelButton => 'বাতিল';
 
   @override
-  String get logoutButton => 'Log out';
+  String get logoutButton => 'লগ আউট';
 
   @override
-  String get favouritesTooltip => 'Favourites';
+  String get favouritesTooltip => 'প্ৰিয়';
 
   @override
-  String get nextRoutineTitle => 'Next Routine';
+  String get nextRoutineTitle => 'পৰৱৰ্তী কাৰ্য';
 
   @override
-  String get markDoneButton => 'Mark Done';
+  String get markDoneButton => 'সম্পূৰ্ণ কৰক';
 
   @override
-  String get viewAllButton => 'View All';
+  String get viewAllButton => 'সকলো চাওক';
 
   @override
-  String get dailyRoutinesTitle => 'Daily Routines';
+  String get dailyRoutinesTitle => 'দৈনিক কাৰ্য';
 
   @override
-  String get todaysScheduleTitle => 'Today\'s Schedule';
+  String get todaysScheduleTitle => 'আজিৰ সময়সূচী';
 
   @override
-  String get noRemindersToday => 'No reminders for today';
+  String get noRemindersToday => 'আজি কোনো মনত পেলোৱা নাই';
 
   @override
   String get noRemindersTodayBody =>
-      'You are all caught up. Have a peaceful, restful day! 🌸';
+      'আপুনি সকলো সম্পূৰ্ণ কৰিছে। শান্তিপূৰ্ণ দিন কটাওক! 🌸';
 
   @override
-  String get allCaughtUpToday => 'All caught up for today! 🎉';
+  String get allCaughtUpToday => 'আজিৰ সকলো সম্পূৰ্ণ! 🎉';
 
   @override
   String completedCountLabel(int completed, int total) {
-    return '$completed of $total Completed';
+    return '$total ৰ ভিতৰত $completed সম্পূৰ্ণ';
   }
 
   @override
   String get progressAllDoneMessage =>
-      'Great job keeping up with your health routines today.';
+      'আজি আপোনাৰ স্বাস্থ্য কাৰ্য মানি চলাৰ বাবে অসাধাৰণ।';
 
   @override
   String get progressInProgressMessage =>
-      'Take your time and complete each activity as scheduled.';
+      'সময় লওক আৰু প্ৰতিটো কাৰ্য নিৰ্ধাৰিত সময়ত সম্পূৰ্ণ কৰক।';
 
   @override
-  String get doneButton => 'Done';
+  String get doneButton => 'হল';
 
   @override
-  String get snooze15MinutesButton => '15 min';
+  String get snooze15MinutesButton => '১৫ মিনিট';
 
   @override
-  String get completedTodayLabel => 'Completed today ✓';
+  String get completedTodayLabel => 'আজি সম্পূৰ্ণ ✓';
 
   @override
   String snoozedUntilLabel(String time) {
-    return 'Snoozed until $time';
+    return '$time লৈকে স্থগিত';
   }
 
   @override
-  String get allCompletedForSchedule => 'All completed for this schedule';
+  String get allCompletedForSchedule => 'এই সময়সূচীৰ বাবে সকলো সম্পূৰ্ণ';
 
   @override
-  String get notificationsSectionTitle => 'Notifications';
+  String get notificationsSectionTitle => 'জাননী';
 
   @override
   String get noNotificationsMessage =>
-      'No notifications right now. New reminder alerts will appear here.';
+      'এতিয়া কোনো জাননী নাই। নতুন মনত পেলোৱাৰ সতৰ্কবাণী ইয়াত দেখিব।';
 
   @override
-  String get notificationStatusDueNow => 'Due now';
+  String get notificationStatusDueNow => 'এতিয়াই প্ৰয়োজন';
 
   @override
-  String get notificationStatusUpcoming => 'Upcoming';
+  String get notificationStatusUpcoming => 'আগন্তুক';
 
   @override
-  String get notificationStatusSnoozed => 'Snoozed';
+  String get notificationStatusSnoozed => 'স্থগিত';
 
   @override
-  String get notificationStatusCompleted => 'Completed';
+  String get notificationStatusCompleted => 'সম্পূৰ্ণ';
 
   @override
-  String get reminderDueDialogLater => 'Later';
+  String get reminderDueDialogLater => 'পিছত';
 
   @override
-  String get reminderDueDialogViewRoutines => 'View routines';
+  String get reminderDueDialogViewRoutines => 'কাৰ্য চাওক';
 
   @override
   String get reminderDueFallbackBody =>
-      'It is time for this routine. You can mark it done when you are ready.';
+      'এই কাৰ্যৰ সময় হৈছে। সাজু হ\'লে ইয়াক সম্পূৰ্ণ কৰক।';
 
   @override
-  String get socialAccountsTitle => 'Social media accounts';
+  String get socialAccountsTitle => 'ছ\'চিয়েল মিডিয়া একাউণ্ট';
 
   @override
   String get socialAccountsSubtitle =>
-      'Your account details are protected on this device.';
+      'আপোনাৰ একাউণ্টৰ তথ্য এই ডিভাইচত সুৰক্ষিত।';
 
   @override
-  String get noSocialAccountsSaved => 'No social media accounts saved yet.';
+  String get noSocialAccountsSaved =>
+      'এতিয়ালৈকে কোনো ছ\'চিয়েল মিডিয়া একাউণ্ট সংৰক্ষিত নহয়।';
 
   @override
   String get socialAccountsLoadError =>
-      'We could not load your saved accounts. Please try again.';
+      'আমি আপোনাৰ সংৰক্ষিত একাউণ্ট ল\'ড কৰিব নোৱাৰিলোঁ। আকৌ চেষ্টা কৰক।';
 
   @override
-  String get addSocialAccountTooltip => 'Add social media account';
+  String get addSocialAccountTooltip => 'ছ\'চিয়েল মিডিয়া একাউণ্ট যোগ কৰক';
 
   @override
-  String get socialAccountsScreenTitle => 'Social accounts';
+  String get socialAccountsScreenTitle => 'ছ\'চিয়েল একাউণ্ট';
 
   @override
-  String get socialAccountsScreenSubtitle =>
-      'Saved logins for your favourite apps';
+  String get socialAccountsScreenSubtitle => 'আপোনাৰ প্ৰিয় এপৰ সংৰক্ষিত লগইন';
 
   @override
   String reminderMarkedCompleteSnack(String title) {
-    return 'Wonderful! \"$title\" marked as complete. 🌟';
+    return 'অসাধাৰণ! \"$title\" সম্পূৰ্ণ হ\'ল। 🌟';
   }
 
   @override
   String reminderSnoozedSnack(String title) {
-    return 'Snoozed \"$title\" for 15 minutes. ⏰';
+    return '\"$title\" ১৫ মিনিটৰ বাবে স্থগিত কৰা হ\'ল। ⏰';
   }
 
   @override
-  String get familyPhotosTitle => 'Family Photos';
+  String get familyPhotosTitle => 'পৰিয়ালৰ ফটো';
 
   @override
-  String get tryAgainShort => 'Try again';
+  String get tryAgainShort => 'আকৌ চেষ্টা কৰক';
 
   @override
-  String get addFamilyMemberButton => 'Add Family Member';
+  String get addFamilyMemberButton => 'পৰিয়ালৰ সদস্য যোগ কৰক';
 
   @override
   String get noFamilyPhotosMessage =>
-      'No family photos yet\nAdd photos of people who are special to you.';
+      'এতিয়ালৈকে কোনো পৰিয়ালৰ ফটো নাই\nআপোনাৰ প্ৰিয় মানুহৰ ফটো যোগ কৰক।';
 
   @override
   String get familyPhotoMissingDetails =>
-      'Please add a photo and complete the details.';
+      'অনুগ্ৰহ কৰি এটা ফটো যোগ কৰক আৰু বিৱৰণ পূৰণ কৰক।';
 
   @override
-  String get familyMemberUpdated => 'Family member updated.';
+  String get familyMemberUpdated => 'পৰিয়ালৰ সদস্য আপডেট হ\'ল।';
 
   @override
-  String get familyMemberAdded => 'Family member added.';
+  String get familyMemberAdded => 'পৰিয়ালৰ সদস্য যোগ হ\'ল।';
 
   @override
-  String get removeFamilyMemberTitle => 'Remove this family member?';
+  String get removeFamilyMemberTitle => 'এই সদস্যক আঁতৰাবনে?';
 
   @override
   String get removeFamilyMemberMessage =>
-      'This will remove their photo from your family collection.';
+      'ই আপোনাৰ পৰিয়াল সংগ্ৰহৰ পৰা তেওঁলোকৰ ফটো আঁতৰাব।';
 
   @override
-  String get removeButton => 'Remove';
+  String get removeButton => 'আঁতৰাওক';
 
   @override
-  String get editFamilyMemberTitle => 'Edit Family Member';
+  String get editFamilyMemberTitle => 'পৰিয়ালৰ সদস্য সম্পাদনা কৰক';
 
   @override
-  String get tapToAddPhoto => 'Tap to add photo';
+  String get tapToAddPhoto => 'ফটো যোগ কৰিবলৈ টেপ কৰক';
 
   @override
-  String get chooseDifferentPhoto => 'Choose a different photo';
+  String get chooseDifferentPhoto => 'অন্য ফটো বাছনি কৰক';
 
   @override
-  String get enterNameValidator => 'Enter a name';
+  String get enterNameValidator => 'এটা নাম লিখক';
 
   @override
-  String get enterRelationshipValidator => 'Enter a relationship';
+  String get enterRelationshipValidator => 'এটা সম্পৰ্ক লিখক';
 
   @override
-  String get savingLabel => 'Saving...';
+  String get savingLabel => 'সংৰক্ষণ কৰি আছে...';
 
   @override
-  String get saveFamilyMemberButton => 'Save Family Member';
+  String get saveFamilyMemberButton => 'সদস্য সংৰক্ষণ কৰক';
 
   @override
-  String get removeFamilyMemberButton => 'Remove family member';
+  String get removeFamilyMemberButton => 'পৰিয়ালৰ সদস্য আঁতৰাওক';
 
   @override
   String get familyPhotosLoadError =>
-      'We couldn\'t load your family photos right now.';
+      'আমি এতিয়া আপোনাৰ পৰিয়ালৰ ফটো ল\'ড কৰিব নোৱাৰিলোঁ।';
 
   @override
   String get familyPhotosFindPatientError =>
-      'We couldn\'t find the selected patient.';
+      'নিৰ্বাচিত ৰোগীক বিচাৰি পোৱা নগ\'ল।';
 
   @override
-  String get familyPhotosAddError => 'We couldn\'t add this photo right now.';
+  String get familyPhotosAddError => 'আমি এতিয়া এই ফটো যোগ কৰিব নোৱাৰিলোঁ।';
 
   @override
-  String get nameLabel => 'Name';
+  String get nameLabel => 'নাম';
 
   @override
-  String get relationshipLabel => 'Relationship';
+  String get relationshipLabel => 'সম্পৰ্ক';
 
   @override
-  String get addFamilyMemberTitle => 'Add Family Member';
+  String get addFamilyMemberTitle => 'পৰিয়ালৰ সদস্য যোগ কৰক';
 }

@@ -201,111 +201,119 @@ class AppLocalizationsMni extends AppLocalizations {
   String get aboutAppVersion => 'ভার্সন ১.০.০ • নুংশি-চানবা য়েংশিনবা';
 
   @override
-  String get activitiesTitle => 'Daily Activities';
+  String get activitiesTitle =>
+      'à¦¨à§à¦®à¦¿à§Ž à¦–à§à¦¦à¦¿à¦‚à¦—à§€ à¦¥à¦¬à¦•à¦¶à¦¿à¦‚';
 
   @override
-  String get activitiesBannerTitle => 'Welcome to Today\'s Fun!';
+  String get activitiesBannerTitle =>
+      'à¦™à¦¸à¦¿à¦—à§€ à¦¨à§à¦‚à¦™à¦¾à¦‡à¦¬à¦¦à¦¾ à¦“à¦•à¦šà¦°à¦¿!';
 
   @override
   String get activitiesBannerSubtitle =>
-      'Choose an enjoyable activity below. Take all the time you like.';
+      'à¦®à¦–à¦¾à¦¦à¦¾ à¦²à§ˆà¦¬à¦¾ à¦¨à§à¦‚à¦™à¦¾à¦‡à¦°à¦¬à¦¾ à¦¥à¦¬à¦• à¦…à¦®à¦¾ à¦–à¦¨à¦¬à§€à¦¯à¦¼à§à¥¤ à¦…à¦¦à§‹à¦®à¦—à§€ à¦®à¦¤à¦® à¦²à§Œà¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
-  String get activityPace => 'Activity Pace:';
+  String get activityPace =>
+      'à¦¥à¦¬à¦•à§à¦•à§€ à¦šà§Žà¦¨à¦¬à¦—à§€ à¦®à¦°à§‹à¦²:';
 
   @override
-  String get paceGentle => 'Gentle';
+  String get paceGentle => 'à¦¤à¦ªà¦¨à¦¾';
 
   @override
-  String get paceStandard => 'Standard';
+  String get paceStandard => 'à¦®à¦°à§‹à¦² à¦šà¦¾à¦¨à¦¾';
 
   @override
-  String get paceChallenge => 'Challenge';
+  String get paceChallenge => 'à¦¹à§‹à§Žà¦¨à¦¬à¦¾';
 
   @override
-  String get gameRememberObjectsTitle => 'Remember Objects';
+  String get gameRememberObjectsTitle =>
+      'à¦®à¦°à§‹à¦²à¦¶à¦¿à¦‚ à¦¨à§€à¦‚à¦¶à¦¿à¦²à§à¦²à§';
 
   @override
   String get gameRememberObjectsSubtitle =>
-      'Look at the friendly items, then tap what you saw';
+      'à¦®à¦°à§‹à¦²à¦¶à¦¿à¦‚ à¦®à¦ªà§à¦‚ à¦«à¦¾à¦¨à¦¾ à¦¯à¦¼à§‡à¦‚à¦¬à§€à¦¯à¦¼à§, à¦®à¦–à¦¾à¦¦à¦¾ à¦¯à¦¼à§‡à¦‚à¦²à¦¬à¦¾ à¦®à¦°à§‹à¦²à¦¶à¦¿à¦‚ à¦–à¦¨à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get gameWhoIsThisTitle => 'Who Is This?';
+  String get gameWhoIsThisTitle => 'à¦…à¦¸à¦¿ à¦•à¦¨à¦¾ à¦“à¦‡à¦¬à¦—à§‡?';
 
   @override
-  String get gameWhoIsThisSubtitle => 'Recognize familiar faces and loved ones';
+  String get gameWhoIsThisSubtitle =>
+      'à¦‡à¦®à§à¦‚ à¦®à¦¨à§à¦‚ à¦…à¦®à¦¸à§à¦‚ à¦–à¦™à¦¬à¦¾ à¦®à§€à¦¶à¦¿à¦‚ à¦–à¦™à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get gameGroceryMemoryTitle => 'Grocery Memory';
+  String get gameGroceryMemoryTitle => 'à¦šà§Žà¦¥à¦°à¦¬à¦—à§€ à¦²à¦¿à¦·à§à¦Ÿ';
 
   @override
   String get gameGroceryMemorySubtitle =>
-      'Collect everyday items from your shopping list';
+      'à¦šà§Žà¦¥à¦°à¦¬à¦—à§€ à¦²à¦¿à¦·à§à¦Ÿà¦¦à¦—à§€ à¦²à§‡à¦ªà§à¦¤à§à¦•à¦¶à¦¿à¦‚ à¦ªà§à¦¨à§à¦¸à¦¿à¦²à§à¦²à§';
 
   @override
-  String get gameJigsawPuzzleTitle => 'Familiar Jigsaw';
+  String get gameJigsawPuzzleTitle => 'à¦–à¦™à¦¬à¦¾ à¦œà¦¿à¦—à§à¦¸\'';
 
   @override
   String get gameJigsawPuzzleSubtitle =>
-      'Put together comforting pictures piece by piece';
+      'à¦¨à§à¦‚à¦™à¦¾à¦‡à¦°à¦¬à¦¾ à¦«à§‹à¦¤à§‹à¦¶à¦¿à¦‚ à¦…à¦®à¦¾-à¦…à¦®à¦¾à¦¨à¦¾ à¦¶à¦®à§à¦¨à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get playActivityButton => 'Play Activity ➔';
+  String get playActivityButton => 'à¦¥à¦¬à¦• à¦¹à§Œà¦¦à§‹à¦•à¦¸à¦¿ âž”';
 
   @override
-  String get exitActivityTooltip => 'Exit Activity';
+  String get exitActivityTooltip => 'à¦¥à¦¬à¦•à¦¦à¦—à§€ à¦¥à§‹à¦•à¦‰';
 
   @override
-  String get leaveActivityTitle => 'Leave Activity?';
+  String get leaveActivityTitle => 'à¦¥à¦¬à¦• à¦²à§‹à¦¯à¦¼à¦¨à¦¬à¦—à§‡?';
 
   @override
   String get leaveActivityMessage =>
-      'Are you sure you want to pause and return to the main screen? Your gentle progress is always saved.';
+      'à¦…à¦¦à§‹à¦® à¦®à¦–à¦¾à¦—à§€ à¦¸à§à¦•à§à¦°à§€à¦¨à§à¦¦à¦¾ à¦¹à¦žà§à¦œà¦¿à¦²à§à¦²à¦•à¦ªà¦¾ à¦ªà¦¾à¦®à§à¦¬à¦—à§‡? à¦…à¦¦à§‹à¦®à¦—à§€ à¦®à¦–à¦¾ à¦šà§Žà¦²à¦¬à¦¾ à¦²à§ˆà¦–à¦¿à¦—à¦¨à¦¿à¥¤';
 
   @override
-  String get stayAndContinue => 'Stay & Continue';
+  String get stayAndContinue => 'à¦¶à¦¾à¦¨à§à¦¨à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get yesExit => 'Yes, Exit';
+  String get yesExit => 'à¦¹à§‹, à¦¥à§‹à¦•à¦‰';
 
   @override
-  String get hintButton => 'Hint';
+  String get hintButton => 'à¦–à§à¦¦à§‹à¦‚à¦šà¦¾à¦¬à¦¾';
 
   @override
-  String get activityCompletedTitle => 'Activity Completed!';
+  String get activityCompletedTitle => 'à¦¥à¦¬à¦• à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡!';
 
   @override
-  String get finishButton => 'Finish';
+  String get finishButton => 'à¦²à§‹à¦¯à¦¼à¦¨à¦¸à¦¿';
 
   @override
   String get rememberObjectsLookCarefully =>
-      'Look at these items carefully. Take all the time you need.';
+      'à¦®à¦°à§‹à¦²à¦¶à¦¿à¦‚ à¦…à¦¸à¦¿ à¦®à¦ªà§à¦‚ à¦«à¦¾à¦¨à¦¾ à¦¯à¦¼à§‡à¦‚à¦¬à§€à¦¯à¦¼à§à¥¤ à¦…à¦¦à§‹à¦®à¦—à§€ à¦®à¦¤à¦® à¦ªà§à¦®à§à¦¨à¦®à¦• à¦²à§Œà¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
-  String get iAmReadyButton => 'I am Ready ➔';
+  String get iAmReadyButton => 'à¦ à¦¶à¦¾à¦¨à¦¾ à¦²à§ˆà¦°à¦¿ âž”';
 
   @override
-  String get whichItemsDidYouSee => 'Which items did you see? Tap them below:';
+  String get whichItemsDidYouSee =>
+      'à¦…à¦¦à§‹à¦® à¦•à¦°à¦¿à¦—à¦¾ à¦®à¦°à§‹à¦²à¦¶à¦¿à¦‚ à¦¯à¦¼à§‡à¦‚à¦–à¦¿à¦¬à¦—à§‡? à¦®à¦–à¦¾à¦¦à¦¾ à¦–à¦¨à¦¬à§€à¦¯à¦¼à§:';
 
   @override
-  String get completeActivityButton => 'Complete Activity ➔';
+  String get completeActivityButton => 'à¦¥à¦¬à¦• à¦²à§‹à¦¯à¦¼à¦¨à¦¸à¦¿ âž”';
 
   @override
-  String get familyAndFriends => 'Family & Friends';
+  String get familyAndFriends =>
+      'à¦‡à¦®à§à¦‚ à¦…à¦®à¦¸à§à¦‚ à¦®à¦°à§à¦ªà¦¶à¦¿à¦‚';
 
   @override
-  String get shoppingListTitle => 'Your Shopping List';
+  String get shoppingListTitle =>
+      'à¦…à¦¦à§‹à¦®à¦—à§€ à¦šà§Žà¦¥à¦°à¦¬à¦—à§€ à¦²à¦¿à¦·à§à¦Ÿ';
 
   @override
   String get shoppingListSubtitle =>
-      'Review these items, then tap \'Start Shopping\' when ready.';
+      'à¦®à¦°à§‹à¦²à¦¶à¦¿à¦‚ à¦¯à¦¼à§‡à¦‚à¦¬à§€à¦¯à¦¼à§, à¦¶à¦¾à¦¨à¦¾ à¦²à§ˆà¦°à¦¬à¦¾ à¦®à¦¤à§à¦‚à¦¦à¦¾ \'à¦šà§Žà¦¥à¦°à¦¬ à¦¹à§Œà¦¦à§‹à¦•à¦¸à¦¿\' à¦¨à¦®à§à¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
-  String get startShoppingButton => 'Start Shopping ➔';
+  String get startShoppingButton => 'à¦šà§Žà¦¥à¦°à¦¬ à¦¹à§Œà¦¦à§‹à¦•à¦¸à¦¿ âž”';
 
   @override
   String get findItemsOnShelf =>
-      'Tap items from your list to put them in your cart:';
+      'à¦²à¦¿à¦·à§à¦Ÿà¦¦à¦—à§€ à¦®à¦°à§‹à¦²à¦¶à¦¿à¦‚ à¦•à¦¾à¦°à§à¦¤à¦¾ à¦²à§‹à¦‡à¦¸à¦¿à¦²à§à¦²à§:';
 
   @override
   String get landingWelcomeTitle => 'নির্বাণদা ওকচরি';
@@ -341,315 +349,485 @@ class AppLocalizationsMni extends AppLocalizations {
   String get caregiverPortalButton => 'য়েংশিনবগী পোর্টেলদা চংসি';
 
   @override
-  String get askNirvanaTitle => 'Ask NIRVANA';
+  String get askNirvanaTitle => 'NIRVANA à¦¦à¦¾ à¦¹à¦‚à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get askNirvanaCompanionLabel => 'NIRVANA Companion';
+  String get askNirvanaCompanionLabel => 'NIRVANA à¦®à¦°à§à¦ª';
 
   @override
-  String get askNirvanaListening => 'I\'m listening...';
+  String get askNirvanaListening => 'à¦ à¦¤à¦¾à¦¬à¦¾ à¦²à§ˆà¦°à¦¿...';
 
   @override
-  String get askNirvanaThinking => 'Let me think...';
+  String get askNirvanaThinking => 'à¦ à¦–à¦¨à§à¦¨à¦¾ à¦²à§ˆà¦°à¦¿...';
 
   @override
-  String get askNirvanaSpeaking => 'Speaking...';
+  String get askNirvanaSpeaking => 'à¦ à¦¹à¦¾à¦¯à¦¼à§‡à¦‚ à¦²à§ˆà¦°à¦¿...';
 
   @override
-  String get askNirvanaTapToSpeak => 'Tap to speak';
+  String get askNirvanaTapToSpeak =>
+      'à¦¹à¦¾à¦¯à¦¼à§‡à¦‚à¦¨à¦¬à¦¾ à¦¨à¦®à§à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get askNirvanaListeningPrompt => 'I\'m listening... (Tap to finish)';
+  String get askNirvanaListeningPrompt =>
+      'à¦ à¦¤à¦¾à¦¬à¦¾ à¦²à§ˆà¦°à¦¿... (à¦²à§‹à¦¯à¦¼à¦¨à¦¬à¦¾ à¦¨à¦®à§à¦¬à§€à¦¯à¦¼à§)';
 
   @override
-  String get askNirvanaSpeakingPrompt => 'Speaking... (Tap to stop)';
+  String get askNirvanaSpeakingPrompt =>
+      'à¦ à¦¹à¦¾à¦¯à¦¼à§‡à¦‚ à¦²à§ˆà¦°à¦¿... (à¦¥à¦¿à¦‚à¦¨à¦¬à¦¾ à¦¨à¦®à§à¦¬à§€à¦¯à¦¼à§)';
 
   @override
-  String get askNirvanaThinkingPrompt => 'Let me think...';
+  String get askNirvanaThinkingPrompt => 'à¦ à¦–à¦¨à§à¦¨à¦¾ à¦²à§ˆà¦°à¦¿...';
 
   @override
   String get askNirvanaErrorPrompt =>
-      'I couldn\'t understand that. Please try again.';
+      'à¦ à¦–à¦™à¦¦à§‡à¥¤ à¦…à¦®à§à¦• à¦¹à¦¨à§à¦¨à¦¾ à¦¹à§‹à§Žà¦¨à¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
-  String get askNirvanaClearButton => 'Clear';
+  String get askNirvanaClearButton => 'à¦¸à¦¾à¦« à¦¤à§Œà¦¸à¦¿';
 
   @override
-  String get askNirvanaClearTitle => 'Clear Conversation?';
+  String get askNirvanaClearTitle =>
+      'à§±à¦¾à¦°à§‹à¦² à¦¸à¦¾à¦« à¦¤à§Œà¦—à¦¦à¦¬à¦—à§‡?';
 
   @override
   String get askNirvanaClearMessage =>
-      'This will start a fresh, new conversation. Are you sure?';
+      'à¦…à¦¸à¦¿à¦¨à¦¾ à¦…à¦®à§à¦• à¦…à¦®à¦¾ à§±à¦¾à¦°à§‹à¦² à¦¹à§Œà¦¦à§‹à¦•à§à¦•à¦¨à¦¿à¥¤ à¦…à¦¦à§‹à¦® à¦¹à§‹à¦‚à¦¬à¦¦à¦¾ à¦²à§ˆà¦¬à§à¦°à¦¾?';
 
   @override
-  String get askNirvanaReadAloud => 'Read Aloud';
+  String get askNirvanaReadAloud => 'à¦–à§‹à¦‚à¦¨à¦¾ à¦ªà¦¾à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get askNirvanaTypeHere => 'Or type here...';
+  String get askNirvanaTypeHere =>
+      'à¦¨à¦¤à§à¦°à¦—à¦¾ à¦®à¦«à¦®à¦¸à¦¿à¦¦à¦¾ à¦‡à¦¬à§€à¦¯à¦¼à§...';
 
   @override
   String get askNirvanaGreeting =>
-      'Hello! I am NIRVANA, your companion. Tap the large microphone below to talk with me, or type your question.';
+      'à¦–à§à¦°à§à¦®à¦œà¦°à¦¿! à¦ à¦¨à¦¿à¦°à§à¦¬à¦¾à¦£, à¦…à¦¦à§‹à¦®à¦—à§€ à¦®à¦°à§à¦ªà¥¤ à§±à¦¾à¦°à§‹à¦² à¦ªà¦¾à¦¬à¦—à§€à¦¦à¦®à¦• à¦®à¦–à¦¾à¦¦à¦¾ à¦²à§ˆà¦¬à¦¾ à¦®à¦¾à¦‡à¦•à¦¦à¦¾ à¦¨à¦®à§à¦¬à§€à¦¯à¦¼à§, à¦¨à¦¤à§à¦°à¦—à¦¾ à¦…à¦¦à§‹à¦®à¦—à§€ à¦¹à¦‚à¦¬à¦¾ à¦‡à¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
   String get askNirvanaNoSpeech =>
-      'I didn\'t hear anything. Tap to speak again.';
+      'à¦ à¦•à¦°à¦¿à¦—à§à¦® à¦–à¦‚à¦¦à§‡à¥¤ à¦…à¦®à§à¦• à¦¹à¦¨à§à¦¨à¦¾ à¦¹à¦¾à¦¯à¦¼à§‡à¦‚à¦¨à¦¬à¦¾ à¦¨à¦®à§à¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
   String get askNirvanaMicUnavailable =>
-      'Microphone or speech recognition is not ready. You can type below anytime.';
+      'à¦®à¦¾à¦‡à¦•à§à¦°à§‹à¦«à§‹à¦¨ à¦¨à¦¤à§à¦°à¦—à¦¾ à§±à¦¾à¦¹à§ˆ à¦–à¦™à¦¨à¦¬à¦¾ à¦¶à¦¾à¦¨à¦¾ à¦²à§ˆà¦¤à§‡à¥¤ à¦…à¦¦à§‹à¦® à¦®à¦–à¦¾à¦¦à¦¾ à¦‡à¦¬à¦¾ à¦¯à¦¼à¦¾à¦—à¦¨à¦¿à¥¤';
 
   @override
-  String get goodMorningGreeting => 'Good Morning,';
+  String get goodMorningGreeting =>
+      'à¦†à¦¯à¦¼à§à¦•à§à¦•à§€ à¦¯à¦¼à¦¾à¦‡à¦«-à¦ªà¦¾à¦‰à¦œà§‡à¦²,';
 
   @override
-  String get goodAfternoonGreeting => 'Good Afternoon,';
+  String get goodAfternoonGreeting =>
+      'à¦¨à§à¦®à¦¿à§Ž à¦¥à¦¾à¦‚à¦¬à¦—à§€ à¦¯à¦¼à¦¾à¦‡à¦«-à¦ªà¦¾à¦‰à¦œà§‡à¦²,';
 
   @override
-  String get goodEveningGreeting => 'Good Evening,';
+  String get goodEveningGreeting =>
+      'à¦¨à§à¦®à¦¿à¦¦à¦¾à¦‚à¦—à§€ à¦¯à¦¼à¦¾à¦‡à¦«-à¦ªà¦¾à¦‰à¦œà§‡à¦²,';
 
   @override
-  String get friendlyFallbackName => 'Friend';
+  String get friendlyFallbackName => 'à¦®à¦°à§à¦ª';
 
   @override
-  String get gamesNavLabel => 'Games';
+  String get gamesNavLabel => 'à¦¶à¦¾à¦¨à§à¦¨à¦ªà§‹à§Ž';
 
   @override
-  String get remindersNavLabel => 'Reminders';
+  String get remindersNavLabel => 'à¦¨à§€à¦‚à¦¶à¦¿à¦²à§à¦²à¦¬à¦¾';
 
   @override
-  String get photosNavLabel => 'Photos';
+  String get photosNavLabel => 'à¦«à§‹à¦¤à§‹à¦¶à¦¿à¦‚';
 
   @override
-  String get askNavLabel => 'Ask';
+  String get askNavLabel => 'à¦¹à¦‚à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get accountsNavLabel => 'Accounts';
+  String get accountsNavLabel => 'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤à¦¶à¦¿à¦‚';
 
   @override
-  String get dailyMomentEyebrow => 'DAILY MOMENT';
+  String get myRemindersLabel => 'à¦à¦—à§€ à¦¨à§€à¦‚à¦¶à¦¿à¦²à§à¦²à¦¬à¦¾';
 
   @override
-  String get dailyMomentHeadline => 'You are doing wonderfully today';
+  String get dailyTag => 'à¦¨à§à¦®à¦¿à§Ž à¦–à§à¦¦à¦¿à¦‚à¦—à§€';
+
+  @override
+  String get routinesTag => 'à¦¦à¦¿à¦¨à¦šà¦°à§à¦¯à¦¾';
+
+  @override
+  String get memoriesTag => 'à¦¨à§€à¦‚à¦¶à¦¿à¦‚à¦¬à¦¾';
+
+  @override
+  String get preferencesTag => 'à¦–à¦¨à¦—à§Žà¦ªà¦¾';
+
+  @override
+  String get talkTag => 'à§±à¦¾à¦°à§‹à¦² à¦ªà¦¾à¦¬à§€à¦¯à¦¼à§';
+
+  @override
+  String get addSocialAccountTitle =>
+      'à¦¸à§‹à¦¸à§‡à¦² à¦®à¦¿à¦¡à¦¿à¦¯à¦¼à¦¾ à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦¹à¦¾à¦ªà¦¸à¦¿';
+
+  @override
+  String get editAccountTitle =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦¶à§‡à¦®à¦¦à§‹à¦•à¦¸à¦¿';
+
+  @override
+  String get socialAccountSavedCloud =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ Supabase à¦¦à¦¾ à¦¸à§‡à¦«à¦«à¦¨à¦¾ à¦¸à§‡à¦« à¦¤à§Œà¦–à§à¦°à§‡à¥¤';
+
+  @override
+  String get socialAccountSavedLocal =>
+      'à¦¦à¦¿à¦­à¦¾à¦‡à¦¸ à¦…à¦¸à¦¿à¦¦à¦¾ à¦¸à§‡à¦«à¦«à¦¨à¦¾ à¦¸à§‡à¦« à¦¤à§Œà¦–à§à¦°à§‡à¥¤ à¦•à§à¦²à¦¾à¦‰à¦¦ à¦¸à¦¿à¦‚à¦• à¦«à¦‚à¦¦à§‡à¥¤';
+
+  @override
+  String get socialAccountSaveError =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦…à¦¸à¦¿ à¦¸à§‡à¦« à¦¤à§Œà¦¬à¦¾ à¦™à¦¾à¦•à§à¦¤à§‡à¥¤ à¦²à¦¾à¦¯à¦¼à¦¨à¦¾ à¦¨à¦¾à¦¬à¦—à§€ à¦ªà§‡à¦¯à¦¼à¦¾à¦°à¦¿à¦‚ à¦…à¦®à¦¸à§à¦‚ Supabase à¦¸à§‡à¦¤à¦…à¦ª à¦ªà¦°à§€à¦•à§à¦·à¦¾ à¦¤à§Œà¦¬à§€à¦¯à¦¼à§à¥¤';
+
+  @override
+  String get deleteAccountTitle =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦®à¦¥à¦¾à¦‚ à¦¥à¦¾à¦¦à§‹à¦•à§à¦•à¦¦à¦¬à¦—à§‡?';
+
+  @override
+  String deleteAccountMessage(String platform, String username) {
+    return '$username à¦—à§€à¦¦à¦®à¦• $platform à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦®à¦¥à¦¾à¦‚ à¦¥à¦¾à¦¦à§‹à¦•à§à¦•à¦¦à¦¬à¦—à§‡?';
+  }
+
+  @override
+  String get deleteButton => 'à¦¥à¦¾à¦¦à§‹à¦•à§à¦•à§';
+
+  @override
+  String get accountDeletedSnack =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦¸à§‡à¦«à¦«à¦¨à¦¾ à¦¥à¦¾à¦¦à§‹à¦•à¦–à§à¦°à§‡à¥¤';
+
+  @override
+  String get accountDeleteErrorSnack =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦…à¦¸à¦¿ à¦¥à¦¾à¦¦à§‹à¦•à§à¦ªà¦¾ à¦™à¦¾à¦•à§à¦¤à§‡à¥¤';
+
+  @override
+  String get passwordHiddenLabel => 'à¦ªà¦¾à¦¸à§±à¦¾à¦°à§à¦¦: â€¢â€¢â€¢â€¢';
+
+  @override
+  String get accountActionsTooltip =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤à¦—à§€ à¦¥à¦¬à¦•à¦¶à¦¿à¦‚';
+
+  @override
+  String get copyPasswordMenuItem =>
+      'à¦ªà¦¾à¦¸à§±à¦¾à¦°à§à¦¦ à¦•à¦ªà¦¿ à¦¤à§Œà¦¸à¦¿';
+
+  @override
+  String get editAccountMenuItem =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦¶à§‡à¦®à¦¦à§‹à¦•à¦¸à¦¿';
+
+  @override
+  String get deleteAccountMenuItem =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦¥à¦¾à¦¦à§‹à¦•à§à¦•à§';
+
+  @override
+  String get passwordCopiedSnack =>
+      'à¦ªà¦¾à¦¸à§±à¦¾à¦°à§à¦¦ à¦•à§à¦²à¦¿à¦ªà¦¬à§‹à¦°à¦¦à¦¾ à¦•à¦ªà¦¿ à¦¤à§Œà¦–à§à¦°à§‡à¥¤';
+
+  @override
+  String get platformLabel => 'à¦ªà§à¦²à§‡à¦Ÿà¦«à§‹à¦°à§à¦®';
+
+  @override
+  String get usernameOrEmailLabel =>
+      'à¦‡à¦‰à¦œà¦¾à¦°à¦¨à§‡à¦® à¦¨à¦¤à§à¦°à¦—à¦¾ à¦‡à¦®à§‡à¦‡à¦²';
+
+  @override
+  String get passwordLabel => 'à¦ªà¦¾à¦¸à§±à¦¾à¦°à§à¦¦';
+
+  @override
+  String get enterUsernameOrEmailValidator =>
+      'à¦‡à¦‰à¦œà¦¾à¦°à¦¨à§‡à¦® à¦¨à¦¤à§à¦°à¦—à¦¾ à¦‡à¦®à§‡à¦‡à¦² à¦‡à¦¬à§€à¦¯à¦¼à§à¥¤';
+
+  @override
+  String get enterPasswordValidator =>
+      'à¦ªà¦¾à¦¸à§±à¦¾à¦°à§à¦¦ à¦…à¦®à¦¾ à¦‡à¦¬à§€à¦¯à¦¼à§à¥¤';
+
+  @override
+  String get showPasswordTooltip =>
+      'à¦ªà¦¾à¦¸à§±à¦¾à¦°à§à¦¦ à¦‰à¦¬à§€à¦¯à¦¼à§';
+
+  @override
+  String get hidePasswordTooltip =>
+      'à¦ªà¦¾à¦¸à§±à¦¾à¦°à§à¦¦ à¦¥à§à¦ªà§à¦ªà§€à¦¯à¦¼à§';
+
+  @override
+  String get saveAccountButton =>
+      'à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦¸à§‡à¦« à¦¤à§Œà¦¸à¦¿';
+
+  @override
+  String get savingButton => 'à¦¸à§‡à¦« à¦¤à§Œà¦°à¦¿';
+
+  @override
+  String get notificationChannelName =>
+      'NIRVANA à¦¯à¦¼à§‡à¦‚à¦¶à¦¿à¦¨à¦¬à¦—à§€ à¦¨à§€à¦‚à¦¶à¦¿à¦²à§à¦²à¦¬à¦¾';
+
+  @override
+  String get notificationChannelDescription =>
+      'à¦”à¦·à¦¦, à¦‡à¦¸à¦¿à¦‚ à¦…à¦®à¦¸à§à¦‚ à¦¥à¦¬à¦•à¦¶à¦¿à¦‚à¦—à§€à¦¦à¦®à¦• à¦®à¦¤à¦® à¦ªà§à¦¬à¦¦à¦¾ à¦–à§à¦¦à§‹à¦‚à¦¶à¦¿à¦‚';
+
+  @override
+  String get notificationActionDone => 'à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡';
+
+  @override
+  String get notificationActionSnooze =>
+      'à§§à§« à¦®à¦¿à¦¨à¦¿à¦Ÿ à¦¥à¦®à§à¦¸à¦¿';
+
+  @override
+  String get notificationActionLaterToday => 'à¦™à¦¸à¦¿ à¦®à¦–à¦¾à¦¦à¦¾';
+
+  @override
+  String get couldNotLoadRoutinesError =>
+      'à¦¦à¦¿à¦¨à¦šà¦°à§à¦¯à¦¾ à¦²à§‹à¦¦ à¦¤à§Œà¦¬à¦¾ à¦™à¦¾à¦•à§à¦¤à§‡';
+
+  @override
+  String get dailyMomentEyebrow => 'à¦™à¦¸à¦¿à¦—à§€ à¦®à¦¤à¦®';
+
+  @override
+  String get dailyMomentHeadline =>
+      'à¦…à¦¦à§‹à¦® à¦™à¦¸à¦¿ à¦¯à¦¼à¦¾à¦®à§à¦¨à¦¾ à¦«à¦¨à¦¾ à¦¤à§Œà¦°à¦¿';
 
   @override
   String get dailyMomentSupportingText =>
-      'Take your time. Every small step is a good step, and you are not alone.';
+      'à¦…à¦¦à§‹à¦®à¦—à§€ à¦®à¦¤à¦® à¦²à§Œà¦¬à§€à¦¯à¦¼à§à¥¤ à¦–à§à¦¦à¦¿à¦‚ à¦–à§à¦¦à¦¿à¦‚ à¦šà§Žà¦²à¦¬à¦¾ à¦®à¦–à¦² à¦…à¦¸à¦¿ à¦«à¦œà¦¬à¦¾ à¦®à¦–à¦²à¦¨à¦¿, à¦…à¦®à¦¸à§à¦‚ à¦…à¦¦à§‹à¦® à¦…à¦®à¦¤à§à¦¤à¦¾ à¦²à§ˆà¦¤à§‡à¥¤';
 
   @override
-  String get whatWouldYouLikeToDo => 'What would you like to do?';
+  String get whatWouldYouLikeToDo =>
+      'à¦…à¦¦à§‹à¦® à¦•à¦°à¦¿ à¦¤à§Œà¦¬à¦—à§‡ à¦ªà¦¾à¦®à§à¦¬à¦—à§‡?';
 
   @override
   String get caregiverReassuranceMessage =>
-      'Your family can check in on you any time. You are safe and looked after.';
+      'à¦…à¦¦à§‹à¦®à¦—à§€ à¦‡à¦®à§à¦‚à¦¨à¦¾ à¦®à¦¤à¦® à¦ªà§à¦®à§à¦¨à¦®à¦•à§à¦¤à¦¾ à¦…à¦¦à§‹à¦®à¦¬à§ à¦¯à¦¼à§‡à¦‚à¦¶à¦¿à¦²à§à¦²à¦¿à¥¤ à¦…à¦¦à§‹à¦® à¦¸à§‡à¦«à¦«à¦¦à¦¾ à¦²à§ˆà¦°à¦¿à¥¤';
 
   @override
-  String get logoutDialogTitle => 'Log out?';
+  String get logoutDialogTitle => 'à¦²à§‹à¦— à¦†à¦‰à¦¤ à¦¤à§Œà¦—à¦¦à¦¬à¦—à§‡?';
 
   @override
-  String get logoutDialogMessage => 'Are you sure you want to log out?';
+  String get logoutDialogMessage =>
+      'à¦…à¦¦à§‹à¦® à¦¹à§‹à¦‚à¦¬à¦¦à¦¾ à¦²à§‹à¦— à¦†à¦‰à¦¤ à¦¤à§Œà¦—à¦¦à¦¬à¦—à§‡?';
 
   @override
-  String get cancelButton => 'Cancel';
+  String get cancelButton => 'à¦•à¦¨à§à¦¸à§‡à¦² à¦¤à§Œà¦¸à¦¿';
 
   @override
-  String get logoutButton => 'Log out';
+  String get logoutButton => 'à¦²à§‹à¦— à¦†à¦‰à¦¤';
 
   @override
-  String get favouritesTooltip => 'Favourites';
+  String get favouritesTooltip => 'à¦ªà¦¾à¦®à¦œà¦¬à¦¾';
 
   @override
-  String get nextRoutineTitle => 'Next Routine';
+  String get nextRoutineTitle => 'à¦®à¦–à¦¾à¦—à§€ à¦¦à¦¿à¦¨à¦šà¦°à§à¦¯à¦¾';
 
   @override
-  String get markDoneButton => 'Mark Done';
+  String get markDoneButton => 'à¦²à§‹à¦¯à¦¼à¦¨à¦¸à¦¿';
 
   @override
-  String get viewAllButton => 'View All';
+  String get viewAllButton =>
+      'à¦ªà§à¦®à§à¦¨à¦®à¦• à¦¯à¦¼à§‡à¦‚à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get dailyRoutinesTitle => 'Daily Routines';
+  String get dailyRoutinesTitle =>
+      'à¦¨à§à¦®à¦¿à§Ž à¦–à§à¦¦à¦¿à¦‚à¦—à§€ à¦¦à¦¿à¦¨à¦šà¦°à§à¦¯à¦¾';
 
   @override
-  String get todaysScheduleTitle => 'Today\'s Schedule';
+  String get todaysScheduleTitle => 'à¦™à¦¸à¦¿à¦—à§€ à¦¤à¦¾à¦²à¦¿à¦•à¦¾';
 
   @override
-  String get noRemindersToday => 'No reminders for today';
+  String get noRemindersToday =>
+      'à¦™à¦¸à¦¿ à¦¨à§€à¦‚à¦¶à¦¿à¦²à§à¦²à¦¬à¦¾ à¦…à¦®à¦¤à§à¦¤à¦¾ à¦²à§ˆà¦¤à§‡';
 
   @override
   String get noRemindersTodayBody =>
-      'You are all caught up. Have a peaceful, restful day! 🌸';
+      'à¦…à¦¦à§‹à¦® à¦ªà§à¦®à§à¦¨à¦®à¦• à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡à¥¤ à¦¶à¦¾à¦¨à§à¦¨à¦¬à¦¾ à¦¨à§à¦®à¦¿à§Ž à¦šà§Žà¦¥à¦°à¦¬à§€à¦¯à¦¼à§! ðŸŒ¸';
 
   @override
-  String get allCaughtUpToday => 'All caught up for today! 🎉';
+  String get allCaughtUpToday =>
+      'à¦™à¦¸à¦¿à¦—à§€ à¦ªà§à¦®à§à¦¨à¦®à¦• à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡! ðŸŽ‰';
 
   @override
   String completedCountLabel(int completed, int total) {
-    return '$completed of $total Completed';
+    return '$total à¦®à¦¨à§à¦‚à¦¦à¦¾ $completed à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡';
   }
 
   @override
   String get progressAllDoneMessage =>
-      'Great job keeping up with your health routines today.';
+      'à¦™à¦¸à¦¿ à¦…à¦¦à§‹à¦®à¦—à§€ à¦¹à¦•à¦¥à§‡à¦‚à¦¨à¦¬à¦—à§€ à¦¦à¦¿à¦¨à¦šà¦°à§à¦¯à¦¾ à¦²à§‹à¦¯à¦¼à¦¨à¦–à¦¿à¦¬à¦—à§€à¦¦à¦®à¦• à¦¯à¦¼à¦¾à¦®à§à¦¨à¦¾ à¦«à¦¨à¦¾ à¦¤à§Œà¦°à¦¿à¥¤';
 
   @override
   String get progressInProgressMessage =>
-      'Take your time and complete each activity as scheduled.';
+      'à¦…à¦¦à§‹à¦®à¦—à§€ à¦®à¦¤à¦® à¦²à§Œà¦¬à§€à¦¯à¦¼à§ à¦…à¦®à¦¸à§à¦‚ à¦¥à¦¬à¦• à¦ªà§à¦®à§à¦¨à¦®à¦• à¦®à¦¤à¦® à¦ªà§à¦¬à¦¦à¦¾ à¦²à§‹à¦¯à¦¼à¦¨à¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
-  String get doneButton => 'Done';
+  String get doneButton => 'à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡';
 
   @override
-  String get snooze15MinutesButton => '15 min';
+  String get snooze15MinutesButton => 'à§§à§« à¦®à¦¿à¦¨à¦¿à¦Ÿ';
 
   @override
-  String get completedTodayLabel => 'Completed today ✓';
+  String get completedTodayLabel => 'à¦™à¦¸à¦¿ à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡ âœ“';
 
   @override
   String snoozedUntilLabel(String time) {
-    return 'Snoozed until $time';
+    return '$time à¦«à¦¾à¦“à¦¬à¦¾ à¦¥à¦®à§à¦–à§à¦°à§‡';
   }
 
   @override
-  String get allCompletedForSchedule => 'All completed for this schedule';
+  String get allCompletedForSchedule =>
+      'à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦…à¦¸à¦¿à¦—à§€à¦¦à¦®à¦• à¦ªà§à¦®à§à¦¨à¦®à¦• à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡';
 
   @override
-  String get notificationsSectionTitle => 'Notifications';
+  String get notificationsSectionTitle => 'à¦–à§à¦¦à§‹à¦‚à¦¶à¦¿à¦‚';
 
   @override
   String get noNotificationsMessage =>
-      'No notifications right now. New reminder alerts will appear here.';
+      'à¦¹à§Œà¦œà¦¿à¦• à¦–à§à¦¦à§‹à¦‚ à¦…à¦®à¦¤à§à¦¤à¦¾ à¦²à§ˆà¦¤à§‡à¥¤ à¦…à¦®à§à¦• à¦…à¦®à¦¾ à¦¨à§€à¦‚à¦¶à¦¿à¦²à§à¦²à¦¬à¦—à§€ à¦–à§à¦¦à§‹à¦‚à¦¶à¦¿à¦‚ à¦®à¦«à¦®à¦¸à¦¿à¦¦à¦¾ à¦‰à¦—à¦¨à¦¿à¥¤';
 
   @override
-  String get notificationStatusDueNow => 'Due now';
+  String get notificationStatusDueNow =>
+      'à¦¹à§Œà¦œà¦¿à¦• à¦ªà§‹à¦¥à¦¾à¦°à¦¬à¦¾';
 
   @override
-  String get notificationStatusUpcoming => 'Upcoming';
+  String get notificationStatusUpcoming => 'à¦²à¦¾à¦•à§à¦•à¦¦à§Œà¦°à¦¿à¦¬à¦¾';
 
   @override
-  String get notificationStatusSnoozed => 'Snoozed';
+  String get notificationStatusSnoozed => 'à¦¥à¦®à§à¦–à§à¦°à§‡';
 
   @override
-  String get notificationStatusCompleted => 'Completed';
+  String get notificationStatusCompleted => 'à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡';
 
   @override
-  String get reminderDueDialogLater => 'Later';
+  String get reminderDueDialogLater => 'à¦®à¦–à¦¾à¦¦à¦¾';
 
   @override
-  String get reminderDueDialogViewRoutines => 'View routines';
+  String get reminderDueDialogViewRoutines =>
+      'à¦¦à¦¿à¦¨à¦šà¦°à§à¦¯à¦¾ à¦¯à¦¼à§‡à¦‚à¦¬à§€à¦¯à¦¼à§';
 
   @override
   String get reminderDueFallbackBody =>
-      'It is time for this routine. You can mark it done when you are ready.';
+      'à¦¦à¦¿à¦¨à¦šà¦°à§à¦¯à¦¾ à¦…à¦¸à¦¿à¦—à§€ à¦®à¦¤à¦® à¦«à¦¾à¦“à¦°à§‡à¥¤ à¦¶à¦¾à¦¨à¦¾ à¦²à§ˆà¦°à¦¬à¦¾ à¦®à¦¤à§à¦‚à¦¦à¦¾ à¦‡à¦¬à§ à¦²à§‹à¦¯à¦¼à¦¨à¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
-  String get socialAccountsTitle => 'Social media accounts';
+  String get socialAccountsTitle =>
+      'à¦¸à§‹à¦¸à§‡à¦² à¦®à¦¿à¦¦à¦¿à¦¯à¦¼à¦¾ à¦à¦•à¦¾à¦‰à¦¨à§à¦¤à¦¶à¦¿à¦‚';
 
   @override
   String get socialAccountsSubtitle =>
-      'Your account details are protected on this device.';
+      'à¦…à¦¦à§‹à¦®à¦—à§€ à¦à¦•à¦¾à¦‰à¦¨à§à¦¤à¦—à§€ à§±à¦¾à¦°à§‹à¦² à¦¦à¦¿à¦­à¦¾à¦‡à¦¸ à¦…à¦¸à¦¿à¦¦à¦¾ à¦¸à§‡à¦«à¦«à¦¦à¦¾ à¦²à§ˆà¦°à¦¿à¥¤';
 
   @override
-  String get noSocialAccountsSaved => 'No social media accounts saved yet.';
+  String get noSocialAccountsSaved =>
+      'à¦¹à§Œà¦œà¦¿à¦• à¦«à¦¾à¦“à¦¬à¦¾ à¦¸à§‹à¦¸à§‡à¦² à¦®à¦¿à¦¦à¦¿à¦¯à¦¼à¦¾ à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦…à¦®à¦¤à§à¦¤à¦¾ à¦¸à§‡à¦« à¦¤à§Œà¦¦à§‡à¥¤';
 
   @override
   String get socialAccountsLoadError =>
-      'We could not load your saved accounts. Please try again.';
+      'à¦à¦¹à¦¾à¦•à§à¦¨à¦¾ à¦…à¦¦à§‹à¦®à¦—à§€ à¦¸à§‡à¦« à¦¤à§Œà¦–à¦¿à¦¬à¦¾ à¦à¦•à¦¾à¦‰à¦¨à§à¦¤à¦¶à¦¿à¦‚ à¦²à§‹à¦¦ à¦¤à§Œà¦¬à¦¾ à¦™à¦¾à¦•à§à¦¤à§‡à¥¤ à¦…à¦®à§à¦• à¦¹à¦¨à§à¦¨à¦¾ à¦¹à§‹à§Žà¦¨à¦¬à§€à¦¯à¦¼à§à¥¤';
 
   @override
-  String get addSocialAccountTooltip => 'Add social media account';
+  String get addSocialAccountTooltip =>
+      'à¦¸à§‹à¦¸à§‡à¦² à¦®à¦¿à¦¦à¦¿à¦¯à¦¼à¦¾ à¦à¦•à¦¾à¦‰à¦¨à§à¦¤ à¦¹à¦¾à¦ªà¦¸à¦¿';
 
   @override
-  String get socialAccountsScreenTitle => 'Social accounts';
+  String get socialAccountsScreenTitle =>
+      'à¦¸à§‹à¦¸à§‡à¦² à¦à¦•à¦¾à¦‰à¦¨à§à¦¤à¦¶à¦¿à¦‚';
 
   @override
   String get socialAccountsScreenSubtitle =>
-      'Saved logins for your favourite apps';
+      'à¦…à¦¦à§‹à¦®à¦—à§€ à¦ªà¦¾à¦®à¦œà¦¬à¦¾ à¦à¦ªà¦¶à¦¿à¦‚à¦—à§€ à¦¸à§‡à¦« à¦¤à§Œà¦–à¦¿à¦¬à¦¾ à¦²à§‹à¦—à¦¿à¦¨';
 
   @override
   String reminderMarkedCompleteSnack(String title) {
-    return 'Wonderful! \"$title\" marked as complete. 🌟';
+    return 'à¦¯à¦¼à¦¾à¦®à§à¦¨à¦¾ à¦«à¦¨à¦¾ à¦¤à§Œà¦°à¦¿! \"$title\" à¦²à§‹à¦¯à¦¼à¦¨à¦–à§à¦°à§‡à¥¤ ðŸŒŸ';
   }
 
   @override
   String reminderSnoozedSnack(String title) {
-    return 'Snoozed \"$title\" for 15 minutes. ⏰';
+    return '\"$title\" à§§à§« à¦®à¦¿à¦¨à¦¿à¦Ÿà¦—à§€à¦¦à¦®à¦• à¦¥à¦®à§à¦–à§à¦°à§‡à¥¤ â°';
   }
 
   @override
-  String get familyPhotosTitle => 'Family Photos';
+  String get familyPhotosTitle => 'à¦‡à¦®à§à¦‚à¦—à§€ à¦«à§‹à¦¤à§‹à¦¶à¦¿à¦‚';
 
   @override
-  String get tryAgainShort => 'Try again';
+  String get tryAgainShort =>
+      'à¦…à¦®à§à¦• à¦¹à¦¨à§à¦¨à¦¾ à¦¹à§‹à§Žà¦¨à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get addFamilyMemberButton => 'Add Family Member';
+  String get addFamilyMemberButton =>
+      'à¦‡à¦®à§à¦‚à¦—à§€ à¦®à§€ à¦…à¦®à¦¾ à¦¹à¦¾à¦ªà¦¸à¦¿';
 
   @override
   String get noFamilyPhotosMessage =>
-      'No family photos yet\nAdd photos of people who are special to you.';
+      'à¦¹à§Œà¦œà¦¿à¦• à¦«à¦¾à¦“à¦¬à¦¾ à¦‡à¦®à§à¦‚à¦—à§€ à¦«à§‹à¦¤à§‹ à¦…à¦®à¦¤à§à¦¤à¦¾ à¦²à§ˆà¦¤à§‡\nà¦…à¦¦à§‹à¦®à¦—à§€ à¦ªà¦¾à¦®à¦œà¦¬à¦¾ à¦®à§€à¦¶à¦¿à¦‚à¦—à§€ à¦«à§‹à¦¤à§‹ à¦¹à¦¾à¦ªà¦¸à¦¿à¥¤';
 
   @override
   String get familyPhotoMissingDetails =>
-      'Please add a photo and complete the details.';
+      'à¦«à§‹à¦¤à§‹ à¦…à¦®à¦¾ à¦¹à¦¾à¦ªà¦¸à¦¿à¦²à§à¦²à§ à¦…à¦®à¦¸à§à¦‚ à§±à¦¾à¦°à§‹à¦² à¦ªà§à¦¨à§à¦¸à¦¿à¦²à§à¦²à§à¥¤';
 
   @override
-  String get familyMemberUpdated => 'Family member updated.';
+  String get familyMemberUpdated =>
+      'à¦‡à¦®à§à¦‚à¦—à§€ à¦®à§€ à¦…à¦®à¦¾ à¦²à§ˆà¦¹à¦¨à¦–à§à¦°à§‡à¥¤';
 
   @override
-  String get familyMemberAdded => 'Family member added.';
+  String get familyMemberAdded =>
+      'à¦‡à¦®à§à¦‚à¦—à§€ à¦®à§€ à¦…à¦®à¦¾ à¦¹à¦¾à¦ªà¦–à§à¦°à§‡à¥¤';
 
   @override
-  String get removeFamilyMemberTitle => 'Remove this family member?';
+  String get removeFamilyMemberTitle =>
+      'à¦®à§€ à¦…à¦¸à¦¿ à¦²à§Œà¦¥à§‹à¦•à§à¦•à¦¦à¦¬à¦—à§‡?';
 
   @override
   String get removeFamilyMemberMessage =>
-      'This will remove their photo from your family collection.';
+      'à¦…à¦¸à¦¿à¦¨à¦¾ à¦…à¦¦à§‹à¦®à¦—à§€ à¦‡à¦®à§à¦‚à¦—à§€ à¦«à§‹à¦¤à§‹ à¦²à§ˆà¦¬à¦¾à¦•à§à¦¤à¦¦à¦—à§€ à¦®à¦¹à¦¾à¦•à§à¦•à§€ à¦«à§‹à¦¤à§‹ à¦²à§Œà¦¥à§‹à¦•à§à¦•à¦¨à¦¿à¥¤';
 
   @override
-  String get removeButton => 'Remove';
+  String get removeButton => 'à¦²à§Œà¦¥à§‹à¦•à§à¦•à§';
 
   @override
-  String get editFamilyMemberTitle => 'Edit Family Member';
+  String get editFamilyMemberTitle =>
+      'à¦‡à¦®à§à¦‚à¦—à§€ à¦®à§€ à¦¶à§‡à¦®à¦¦à§‹à¦•à¦¸à¦¿';
 
   @override
-  String get tapToAddPhoto => 'Tap to add photo';
+  String get tapToAddPhoto =>
+      'à¦«à§‹à¦¤à§‹ à¦¹à¦¾à¦ªà¦¨à¦¬à¦¾ à¦¨à¦®à§à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get chooseDifferentPhoto => 'Choose a different photo';
+  String get chooseDifferentPhoto =>
+      'à¦…à¦¤à§‹à¦ªà§à¦ªà¦¾ à¦«à§‹à¦¤à§‹ à¦–à¦¨à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get enterNameValidator => 'Enter a name';
+  String get enterNameValidator => 'à¦®à¦¿à¦‚ à¦…à¦®à¦¾ à¦‡à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get enterRelationshipValidator => 'Enter a relationship';
+  String get enterRelationshipValidator =>
+      'à¦®à¦°à§à¦ª-à¦®à¦°à§à¦ª à¦…à¦®à¦¾ à¦‡à¦¬à§€à¦¯à¦¼à§';
 
   @override
-  String get savingLabel => 'Saving...';
+  String get savingLabel => 'à¦¸à§‡à¦« à¦¤à§Œà¦°à¦¿...';
 
   @override
-  String get saveFamilyMemberButton => 'Save Family Member';
+  String get saveFamilyMemberButton => 'à¦®à§€ à¦¸à§‡à¦« à¦¤à§Œà¦¸à¦¿';
 
   @override
-  String get removeFamilyMemberButton => 'Remove family member';
+  String get removeFamilyMemberButton =>
+      'à¦‡à¦®à§à¦‚à¦—à§€ à¦®à§€ à¦²à§Œà¦¥à§‹à¦•à§à¦•à§';
 
   @override
   String get familyPhotosLoadError =>
-      'We couldn\'t load your family photos right now.';
+      'à¦à¦¹à¦¾à¦•à§à¦¨à¦¾ à¦¹à§Œà¦œà¦¿à¦• à¦…à¦¦à§‹à¦®à¦—à§€ à¦‡à¦®à§à¦‚à¦—à§€ à¦«à§‹à¦¤à§‹à¦¶à¦¿à¦‚ à¦²à§‹à¦¦ à¦¤à§Œà¦¬à¦¾ à¦™à¦¾à¦•à§à¦¤à§‡à¥¤';
 
   @override
   String get familyPhotosFindPatientError =>
-      'We couldn\'t find the selected patient.';
+      'à¦–à¦¨à¦–à¦¿à¦¬à¦¾ à¦²à¦¾à¦¯à¦¼à¦¨à¦¾ à¦¨à¦¾à¦¬à¦¾ à¦«à¦‚à¦¦à§‡à¥¤';
 
   @override
-  String get familyPhotosAddError => 'We couldn\'t add this photo right now.';
+  String get familyPhotosAddError =>
+      'à¦à¦¹à¦¾à¦•à§à¦¨à¦¾ à¦¹à§Œà¦œà¦¿à¦• à¦«à§‹à¦¤à§‹ à¦…à¦¸à¦¿ à¦¹à¦¾à¦ªà¦¬à¦¾ à¦™à¦¾à¦•à§à¦¤à§‡à¥¤';
 
   @override
-  String get nameLabel => 'Name';
+  String get nameLabel => 'à¦®à¦¿à¦‚';
 
   @override
-  String get relationshipLabel => 'Relationship';
+  String get relationshipLabel => 'à¦®à¦°à§à¦ª-à¦®à¦°à§à¦ª';
 
   @override
-  String get addFamilyMemberTitle => 'Add Family Member';
+  String get addFamilyMemberTitle =>
+      'à¦‡à¦®à§à¦‚à¦—à§€ à¦®à§€ à¦…à¦®à¦¾ à¦¹à¦¾à¦ªà¦¸à¦¿';
 }

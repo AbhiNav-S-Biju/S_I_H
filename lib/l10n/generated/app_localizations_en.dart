@@ -427,6 +427,122 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountsNavLabel => 'Accounts';
 
   @override
+  String get myRemindersLabel => 'My Reminders';
+
+  @override
+  String get dailyTag => 'DAILY';
+
+  @override
+  String get routinesTag => 'ROUTINES';
+
+  @override
+  String get memoriesTag => 'MEMORIES';
+
+  @override
+  String get preferencesTag => 'PREFERENCES';
+
+  @override
+  String get talkTag => 'TALK';
+
+  @override
+  String get addSocialAccountTitle => 'Add social media account';
+
+  @override
+  String get editAccountTitle => 'Edit account';
+
+  @override
+  String get socialAccountSavedCloud => 'Account saved securely to Supabase.';
+
+  @override
+  String get socialAccountSavedLocal =>
+      'Saved securely on this device. Cloud sync is unavailable.';
+
+  @override
+  String get socialAccountSaveError =>
+      'Unable to save this account. Check the patient pairing and Supabase setup.';
+
+  @override
+  String get deleteAccountTitle => 'Delete account?';
+
+  @override
+  String deleteAccountMessage(String platform, String username) {
+    return 'Remove the $platform account for $username?';
+  }
+
+  @override
+  String get deleteButton => 'Delete';
+
+  @override
+  String get accountDeletedSnack => 'Account deleted securely.';
+
+  @override
+  String get accountDeleteErrorSnack => 'Unable to delete this account.';
+
+  @override
+  String get passwordHiddenLabel => 'Password: ••••';
+
+  @override
+  String get accountActionsTooltip => 'Account actions';
+
+  @override
+  String get copyPasswordMenuItem => 'Copy password';
+
+  @override
+  String get editAccountMenuItem => 'Edit account';
+
+  @override
+  String get deleteAccountMenuItem => 'Delete account';
+
+  @override
+  String get passwordCopiedSnack => 'Password copied to clipboard.';
+
+  @override
+  String get platformLabel => 'Platform';
+
+  @override
+  String get usernameOrEmailLabel => 'Username or email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get enterUsernameOrEmailValidator => 'Enter a username or email.';
+
+  @override
+  String get enterPasswordValidator => 'Enter a password.';
+
+  @override
+  String get showPasswordTooltip => 'Show password';
+
+  @override
+  String get hidePasswordTooltip => 'Hide password';
+
+  @override
+  String get saveAccountButton => 'Save account';
+
+  @override
+  String get savingButton => 'Saving';
+
+  @override
+  String get notificationChannelName => 'NIRVANA Care Reminders';
+
+  @override
+  String get notificationChannelDescription =>
+      'Timely alerts for medication, hydration, and elder activities';
+
+  @override
+  String get notificationActionDone => 'Done';
+
+  @override
+  String get notificationActionSnooze => 'Snooze 15 min';
+
+  @override
+  String get notificationActionLaterToday => 'Later today';
+
+  @override
+  String get couldNotLoadRoutinesError => 'Could not load routines';
+
+  @override
   String get dailyMomentEyebrow => 'DAILY MOMENT';
 
   @override

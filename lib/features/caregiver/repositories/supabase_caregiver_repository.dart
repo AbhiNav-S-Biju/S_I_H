@@ -209,11 +209,16 @@ class SupabaseCaregiverRepository
     final user = activeClient?.auth.currentUser;
     if (user != null) {
       try {
+        // Bound the profile lookup so a slow/hanging network never blocks the
+        // startup session restore. On timeout we fall through to the catch and
+        // build a profile from the persisted auth user metadata instead, so an
+        // already-authenticated caregiver still lands on the dashboard.
         final profileData = await activeClient
             ?.from('profiles')
             .select()
             .eq('id', user.id)
-            .maybeSingle();
+            .maybeSingle()
+            .timeout(const Duration(seconds: 4));
 
         _cachedProfile = CaregiverProfile(
           id: user.id,

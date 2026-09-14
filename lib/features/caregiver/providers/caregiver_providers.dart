@@ -57,10 +57,29 @@ final caregiverEventNotificationServiceProvider =
     });
 
 /// Caregiver Authentication StateNotifier
+///
+/// The state carries an extra "restoring" signal so the router can wait for the
+/// persisted Supabase session to be read back before deciding which route to
+/// show. Without it, the app would momentarily see `null` (no user) and flash
+/// the Welcome screen even though a valid session exists on disk.
 class CaregiverAuthNotifier
     extends StateNotifier<AsyncValue<CaregiverProfile?>> {
   final ICaregiverRepository _repository;
   final CaregiverPushNotificationService _pushService;
+
+  /// True while the persisted session is still being restored on startup.
+  /// Consumers (notably the router) must not treat a `null` value as
+  /// "logged out" until this becomes false.
+  bool _isRestoring = true;
+  bool get isRestoring => _isRestoring;
+
+  /// Fires on every auth/session transition (restore complete, login, logout).
+  /// The router listens to this via `refreshListenable` so it re-evaluates its
+  /// redirect the moment the session state changes — deterministically, even
+  /// when the restored value is `null` (which is not a normal `state` change).
+  final ValueNotifier<int> sessionRevision = ValueNotifier<int>(0);
+
+  void _bumpSessionRevision() => sessionRevision.value++;
 
   CaregiverAuthNotifier(
     this._repository, [
@@ -70,12 +89,31 @@ class CaregiverAuthNotifier
     _init();
   }
 
+  @override
+  void dispose() {
+    sessionRevision.dispose();
+    super.dispose();
+  }
+
   Future<void> _init() async {
-    final current = await _repository.getCurrentCaregiver();
-    if (current != null) {
-      state = AsyncValue.data(current);
-      // Synchronize push token for active session
-      _syncPushToken(current.id);
+    try {
+      // Safety bound so a slow backend can never trap the user on the startup
+      // splash; after this the app proceeds as "not signed in" and the router
+      // resolves to the Welcome screen.
+      final current = await _repository
+          .getCurrentCaregiver()
+          .timeout(const Duration(seconds: 8), onTimeout: () => null);
+      if (current != null) {
+        state = AsyncValue.data(current);
+        // Synchronize push token for active session
+        _syncPushToken(current.id);
+      }
+    } catch (e) {
+      debugPrint('⚠️ Caregiver session restore error: $e');
+    } finally {
+      _isRestoring = false;
+      // Signal restore-finished so the router re-evaluates its redirect.
+      _bumpSessionRevision();
     }
   }
 
@@ -89,6 +127,7 @@ class CaregiverAuthNotifier
   }
 
   Future<void> login(String email, String password) async {
+    _isRestoring = false;
     state = const AsyncValue.loading();
     try {
       final profile = await _repository.login(email: email, password: password);
@@ -96,6 +135,8 @@ class CaregiverAuthNotifier
       _syncPushToken(profile.id);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    } finally {
+      _bumpSessionRevision();
     }
   }
 
@@ -105,6 +146,7 @@ class CaregiverAuthNotifier
     required String fullName,
     String? phone,
   }) async {
+    _isRestoring = false;
     state = const AsyncValue.loading();
     try {
       final profile = await _repository.register(
@@ -117,18 +159,26 @@ class CaregiverAuthNotifier
       _syncPushToken(profile.id);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    } finally {
+      _bumpSessionRevision();
     }
   }
 
   Future<void> logout() async {
+    _isRestoring = false;
     state = const AsyncValue.loading();
     try {
       await _pushService.unregisterDeviceToken();
     } catch (e) {
       debugPrint('⚠️ Error unregistering push token on logout: $e');
     }
-    await _repository.logout();
+    try {
+      await _repository.logout();
+    } catch (e) {
+      debugPrint('⚠️ Error signing out caregiver session: $e');
+    }
     state = const AsyncValue.data(null);
+    _bumpSessionRevision();
   }
 }
 

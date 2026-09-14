@@ -12,6 +12,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nirvana/database/hive_database.dart';
 import 'package:nirvana/features/patient/providers/patient_pairing_providers.dart';
+import 'package:nirvana/l10n/app_localizations.dart';
+import 'package:nirvana/l10n/l10n_extension.dart';
 
 // ==============================================================================
 // Design Tokens & Color Palette
@@ -87,19 +89,20 @@ class PatientDashboard extends ConsumerWidget {
   const PatientDashboard({super.key});
 
   Future<void> _logout(BuildContext context) async {
+    final l10n = context.l10n;
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text('Are you sure you want to log out?'),
+        title: Text(l10n.logoutDialogTitle),
+        content: Text(l10n.logoutDialogMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Log out'),
+            child: Text(l10n.logoutButton),
           ),
         ],
       ),
@@ -111,20 +114,21 @@ class PatientDashboard extends ConsumerWidget {
     if (context.mounted) context.go('/');
   }
 
-  String _timeGreeting() {
+  String _timeGreeting(AppLocalizations l10n) {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning,';
-    if (hour < 17) return 'Good Afternoon,';
-    return 'Good Evening,';
+    if (hour < 12) return l10n.goodMorningGreeting;
+    if (hour < 17) return l10n.goodAfternoonGreeting;
+    return l10n.goodEveningGreeting;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final session = ref.watch(localPatientSessionProvider);
     final patientName = session?.preferredName.isNotEmpty == true
         ? session!.preferredName
-        : 'dundu';
-    final greeting = _timeGreeting();
+        : l10n.friendlyFallbackName;
+    final greeting = _timeGreeting(l10n);
 
     return Scaffold(
       backgroundColor: _DashboardPalette.canvas,
@@ -162,11 +166,11 @@ class PatientDashboard extends ConsumerWidget {
                   const SizedBox(height: 28.0),
 
                   // 3. Section Title inside raised clay slab
-                  const _SectionTitleSlab(title: 'What would you like to do?'),
+                  _SectionTitleSlab(title: l10n.whatWouldYouLikeToDo),
                   const SizedBox(height: 18.0),
 
                   // 4. Action Grid
-                  _buildActionGrid(context),
+                  _buildActionGrid(context, l10n),
 
                   const SizedBox(height: 48.0),
                 ],
@@ -178,7 +182,7 @@ class PatientDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionGrid(BuildContext context) {
+  Widget _buildActionGrid(BuildContext context, AppLocalizations l10n) {
     return LayoutBuilder(
       builder: (context, constraints) {
         const spacing = 16.0;
@@ -195,35 +199,35 @@ class PatientDashboard extends ConsumerWidget {
             tokenType: ClayTokenType.puzzle,
             tokenColor: _DashboardPalette.tokenLavender,
             tag: null,
-            title: 'Memory Games',
+            title: l10n.dailyActivitiesCardTitle,
             onTap: () => context.push('/patient/games'),
           ),
           _ActionCardItem(
             tokenType: ClayTokenType.clock,
             tokenColor: _DashboardPalette.tokenTeal,
-            tag: 'ROUTINES',
-            title: 'My Reminders',
+            tag: l10n.routinesTag,
+            title: l10n.myRemindersLabel,
             onTap: () => context.push('/patient/reminders'),
           ),
           _ActionCardItem(
             tokenType: ClayTokenType.photoFrame,
             tokenColor: _DashboardPalette.tokenCoral,
-            tag: 'MEMORIES',
-            title: 'Family Photos',
+            tag: l10n.memoriesTag,
+            title: l10n.familyPhotosTitle,
             onTap: () => context.push('/patient/family-photos'),
           ),
           _ActionCardItem(
             tokenType: ClayTokenType.gear,
             tokenColor: _DashboardPalette.tokenOlive,
-            tag: 'PREFERENCES',
-            title: 'Settings',
+            tag: l10n.preferencesTag,
+            title: l10n.settingsNavLabel,
             onTap: () => context.push('/patient/settings'),
           ),
           _ActionCardItem(
             tokenType: ClayTokenType.chatBubble,
             tokenColor: _DashboardPalette.tokenLavender,
             tag: null,
-            title: 'Ask NIRVANA',
+            title: l10n.askNirvanaTitle,
             onTap: () => context.push('/ask-nirvana'),
           ),
         ];
@@ -341,10 +345,10 @@ class _DashboardHeader extends StatelessWidget {
         ),
         Semantics(
           button: true,
-          label: 'Log out',
+          label: context.l10n.logoutButton,
           child: IconButton(
             onPressed: onLogout,
-            tooltip: 'Log out',
+            tooltip: context.l10n.logoutButton,
             iconSize: 28.0,
             padding: const EdgeInsets.all(12.0),
             constraints: const BoxConstraints(minWidth: 56.0, minHeight: 56.0),
@@ -425,7 +429,7 @@ class _DailyMomentBanner3D extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        'DAILY MOMENT',
+                        context.l10n.dailyMomentEyebrow,
                         style: GoogleFonts.nunito(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w900,
@@ -441,7 +445,7 @@ class _DailyMomentBanner3D extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            'You are doing wonderfully!',
+                            context.l10n.dailyMomentHeadline,
                             style: GoogleFonts.nunito(
                               fontSize: 18.5,
                               fontWeight: FontWeight.w900,
@@ -461,7 +465,7 @@ class _DailyMomentBanner3D extends StatelessWidget {
 
                     // Subtitle
                     Text(
-                      'Keep up your daily activities. Every little step brings peace and joy.',
+                      context.l10n.dailyMomentSupportingText,
                       style: GoogleFonts.nunito(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,

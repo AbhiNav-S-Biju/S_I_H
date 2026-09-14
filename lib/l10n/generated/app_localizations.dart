@@ -890,6 +890,228 @@ abstract class AppLocalizations {
   /// **'Accounts'**
   String get accountsNavLabel;
 
+  /// Home dashboard launcher label for Reminders
+  ///
+  /// In en, this message translates to:
+  /// **'My Reminders'**
+  String get myRemindersLabel;
+
+  /// Tag pill label on the daily games launcher tile
+  ///
+  /// In en, this message translates to:
+  /// **'DAILY'**
+  String get dailyTag;
+
+  /// Tag pill label on the reminders launcher tile
+  ///
+  /// In en, this message translates to:
+  /// **'ROUTINES'**
+  String get routinesTag;
+
+  /// Tag pill label on the family photos launcher tile
+  ///
+  /// In en, this message translates to:
+  /// **'MEMORIES'**
+  String get memoriesTag;
+
+  /// Tag pill label on the settings launcher tile
+  ///
+  /// In en, this message translates to:
+  /// **'PREFERENCES'**
+  String get preferencesTag;
+
+  /// Tag pill label on the Ask NIRVANA launcher tile
+  ///
+  /// In en, this message translates to:
+  /// **'TALK'**
+  String get talkTag;
+
+  /// Title of the add social media account dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Add social media account'**
+  String get addSocialAccountTitle;
+
+  /// Title of the edit social media account dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Edit account'**
+  String get editAccountTitle;
+
+  /// Snackbar when a social account is saved to the cloud
+  ///
+  /// In en, this message translates to:
+  /// **'Account saved securely to Supabase.'**
+  String get socialAccountSavedCloud;
+
+  /// Snackbar when a social account is saved only locally
+  ///
+  /// In en, this message translates to:
+  /// **'Saved securely on this device. Cloud sync is unavailable.'**
+  String get socialAccountSavedLocal;
+
+  /// Snackbar error when saving a social account fails
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save this account. Check the patient pairing and Supabase setup.'**
+  String get socialAccountSaveError;
+
+  /// Title of the delete social account dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account?'**
+  String get deleteAccountTitle;
+
+  /// Body of the delete social account dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the {platform} account for {username}?'**
+  String deleteAccountMessage(String platform, String username);
+
+  /// Generic delete button label
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteButton;
+
+  /// Snackbar when a social account is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted securely.'**
+  String get accountDeletedSnack;
+
+  /// Snackbar error when deleting a social account fails
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to delete this account.'**
+  String get accountDeleteErrorSnack;
+
+  /// Masked password label on a social account tile
+  ///
+  /// In en, this message translates to:
+  /// **'Password: ••••'**
+  String get passwordHiddenLabel;
+
+  /// Tooltip for the social account popup menu
+  ///
+  /// In en, this message translates to:
+  /// **'Account actions'**
+  String get accountActionsTooltip;
+
+  /// Menu item to copy a social account password
+  ///
+  /// In en, this message translates to:
+  /// **'Copy password'**
+  String get copyPasswordMenuItem;
+
+  /// Menu item to edit a social account
+  ///
+  /// In en, this message translates to:
+  /// **'Edit account'**
+  String get editAccountMenuItem;
+
+  /// Menu item to delete a social account
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccountMenuItem;
+
+  /// Snackbar when a password is copied to the clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'Password copied to clipboard.'**
+  String get passwordCopiedSnack;
+
+  /// Label for the platform dropdown in the social account form
+  ///
+  /// In en, this message translates to:
+  /// **'Platform'**
+  String get platformLabel;
+
+  /// Label for the username or email field
+  ///
+  /// In en, this message translates to:
+  /// **'Username or email'**
+  String get usernameOrEmailLabel;
+
+  /// Label for the password field
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// Validation message for the username or email field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a username or email.'**
+  String get enterUsernameOrEmailValidator;
+
+  /// Validation message for the password field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a password.'**
+  String get enterPasswordValidator;
+
+  /// Tooltip to reveal the password field
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get showPasswordTooltip;
+
+  /// Tooltip to hide the password field
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get hidePasswordTooltip;
+
+  /// Button to save a social account
+  ///
+  /// In en, this message translates to:
+  /// **'Save account'**
+  String get saveAccountButton;
+
+  /// Label shown while a social account is saving
+  ///
+  /// In en, this message translates to:
+  /// **'Saving'**
+  String get savingButton;
+
+  /// Name of the local notification channel for reminders
+  ///
+  /// In en, this message translates to:
+  /// **'NIRVANA Care Reminders'**
+  String get notificationChannelName;
+
+  /// Description of the local notification channel for reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Timely alerts for medication, hydration, and elder activities'**
+  String get notificationChannelDescription;
+
+  /// Notification action button to mark a reminder done
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get notificationActionDone;
+
+  /// Notification action button to snooze a reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 15 min'**
+  String get notificationActionSnooze;
+
+  /// Notification action button to defer a reminder to later today
+  ///
+  /// In en, this message translates to:
+  /// **'Later today'**
+  String get notificationActionLaterToday;
+
+  /// Error state on the reminders screen when routines fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load routines'**
+  String get couldNotLoadRoutinesError;
+
   /// Eyebrow label on the daily moment card
   ///
   /// In en, this message translates to:

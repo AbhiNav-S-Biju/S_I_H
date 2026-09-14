@@ -20,12 +20,13 @@ class SocialMediaAccountsSection extends ConsumerWidget {
   }) async {
     final patientId = ref.read(localPatientSessionProvider)?.patientId;
     if (patientId == null || patientId.isEmpty) return;
+    final l10n = context.l10n;
     final repository = ref.read(socialMediaAccountRepositoryProvider);
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(
-          account == null ? 'Add social media account' : 'Edit account',
+          account == null ? l10n.addSocialAccountTitle : l10n.editAccountTitle,
         ),
         content: SingleChildScrollView(
           child: SocialMediaAccountForm(
@@ -43,8 +44,8 @@ class SocialMediaAccountsSection extends ConsumerWidget {
                       content: Text(
                         repository is CloudFirstSocialMediaAccountRepository &&
                                 repository.usedLocalFallback
-                            ? 'Saved securely on this device. Cloud sync is unavailable.'
-                            : 'Account saved securely to Supabase.',
+                            ? l10n.socialAccountSavedLocal
+                            : l10n.socialAccountSavedCloud,
                       ),
                     ),
                   );
@@ -52,10 +53,8 @@ class SocialMediaAccountsSection extends ConsumerWidget {
               } catch (_) {
                 if (dialogContext.mounted) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Unable to save this account. Check the patient pairing and Supabase setup.',
-                      ),
+                    SnackBar(
+                      content: Text(l10n.socialAccountSaveError),
                     ),
                   );
                 }
@@ -74,22 +73,25 @@ class SocialMediaAccountsSection extends ConsumerWidget {
   ) async {
     final patientId = ref.read(localPatientSessionProvider)?.patientId;
     if (patientId == null || patientId.isEmpty) return;
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete account?'),
+        title: Text(l10n.deleteAccountTitle),
         content: Text(
-          'Remove the ${account.platform.label} account for '
-          '${account.usernameOrEmail}?',
+          l10n.deleteAccountMessage(
+            account.platform.label,
+            account.usernameOrEmail,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Delete'),
+            child: Text(l10n.deleteButton),
           ),
         ],
       ),
@@ -104,13 +106,13 @@ class SocialMediaAccountsSection extends ConsumerWidget {
       ref.invalidate(currentPatientSocialMediaAccountsProvider);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Account deleted securely.')),
+          SnackBar(content: Text(l10n.accountDeletedSnack)),
         );
       }
     } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to delete this account.')),
+          SnackBar(content: Text(l10n.accountDeleteErrorSnack)),
         );
       }
     }
@@ -205,7 +207,7 @@ class _SocialMediaAccountTile extends StatelessWidget {
     await Clipboard.setData(ClipboardData(text: account.password));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Password copied to clipboard.')),
+      SnackBar(content: Text(context.l10n.passwordCopiedSnack)),
     );
   }
 
@@ -234,7 +236,6 @@ class _SocialMediaAccountTile extends StatelessWidget {
               children: [
                 Text(
                   account.platform.label,
-                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 3),
                 Text(
@@ -248,9 +249,9 @@ class _SocialMediaAccountTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                const Text(
-                  'Password: ••••••••',
-                  style: TextStyle(
+                Text(
+                  context.l10n.passwordHiddenLabel,
+                  style: const TextStyle(
                     color: ElderColors.textSecondary,
                     fontSize: 12,
                   ),
@@ -259,7 +260,7 @@ class _SocialMediaAccountTile extends StatelessWidget {
             ),
           ),
           PopupMenuButton<_AccountAction>(
-            tooltip: 'Account actions',
+            tooltip: context.l10n.accountActionsTooltip,
             onSelected: (action) {
               switch (action) {
                 case _AccountAction.copyPassword:
@@ -270,18 +271,18 @@ class _SocialMediaAccountTile extends StatelessWidget {
                   onDelete();
               }
             },
-            itemBuilder: (context) => const [
+            itemBuilder: (context) => [
               PopupMenuItem(
                 value: _AccountAction.copyPassword,
-                child: Text('Copy password'),
+                child: Text(context.l10n.copyPasswordMenuItem),
               ),
               PopupMenuItem(
                 value: _AccountAction.edit,
-                child: Text('Edit account'),
+                child: Text(context.l10n.editAccountMenuItem),
               ),
               PopupMenuItem(
                 value: _AccountAction.delete,
-                child: Text('Delete account'),
+                child: Text(context.l10n.deleteAccountMenuItem),
               ),
             ],
           ),

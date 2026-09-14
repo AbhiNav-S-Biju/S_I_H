@@ -106,10 +106,17 @@ class HiveDatabase {
     }
   }
 
-  /// Returns true if the device has a valid, active paired session
+  /// Returns true if the device has a valid, active paired session.
+  ///
+  /// Defensive: never throws if Hive is not yet initialized (e.g. in a unit
+  /// test or very early startup access) — it simply reports "not paired".
   static bool get isDevicePaired {
-    final session = currentPatientSession;
-    return session != null && session.isPaired && session.isActive;
+    try {
+      final session = currentPatientSession;
+      return session != null && session.isPaired && session.isActive;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Returns the paired patient ID if an active paired session exists

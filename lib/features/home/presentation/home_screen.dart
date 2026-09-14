@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../../app/theme/elder_theme.dart';
+import '../../../database/hive_database.dart';
 import '../../../app/theme/nirvana_responsive.dart';
 import '../../../app/widgets/widgets.dart';
 import '../../../core/widgets/voice_helper.dart';
@@ -351,7 +352,11 @@ class _ClayHomeContent extends StatelessWidget {
                       const SizedBox(height: 20),
                       _ClayMoment(onTap: () => context.push('/ask-nirvana')),
                       const SizedBox(height: 22),
-                      const _ClaySectionTitle(),
+                      _ClaySectionTitle(
+                        title:
+                            l10n?.whatWouldYouLikeToDo ??
+                            'What would you like to do?',
+                      ),
                       const SizedBox(height: 16),
                       Wrap(
                         spacing: 16,
@@ -362,7 +367,7 @@ class _ClayHomeContent extends StatelessWidget {
                             icon: Icons.extension_rounded,
                             color: ElderColors.clayLavender,
                             tagColor: ElderColors.primaryLight,
-                            tag: 'DAILY',
+                            tag: l10n?.dailyTag ?? 'DAILY',
                             label:
                                 l10n?.dailyActivitiesCardTitle ??
                                 'Memory Games',
@@ -373,8 +378,8 @@ class _ClayHomeContent extends StatelessWidget {
                             icon: Icons.schedule_rounded,
                             color: ElderColors.claySky,
                             tagColor: ElderColors.pastelSky,
-                            tag: 'ROUTINES',
-                            label: 'My Reminders',
+                            tag: l10n?.routinesTag ?? 'ROUTINES',
+                            label: l10n?.myRemindersLabel ?? 'My Reminders',
                             onTap: () => context.push('/patient/reminders'),
                           ),
                           _ClayActionTile(
@@ -382,17 +387,17 @@ class _ClayHomeContent extends StatelessWidget {
                             icon: Icons.person_rounded,
                             color: ElderColors.clayPeach,
                             tagColor: ElderColors.pastelPeach,
-                            tag: 'MEMORIES',
-                            label: 'Family Photos',
-                            onTap: () => context.push('/ask-nirvana'),
+                            tag: l10n?.memoriesTag ?? 'MEMORIES',
+                            label: l10n?.familyPhotosTitle ?? 'Family Photos',
+                            onTap: () => context.push('/patient/family-photos'),
                           ),
                           _ClayActionTile(
                             width: tileWidth,
                             icon: Icons.settings_rounded,
                             color: ElderColors.clayButtercup,
                             tagColor: ElderColors.pastelButtercup,
-                            tag: 'PREFERENCES',
-                            label: 'Settings',
+                            tag: l10n?.preferencesTag ?? 'PREFERENCES',
+                            label: l10n?.settingsNavLabel ?? 'Settings',
                             onTap: () => context.push('/settings'),
                           ),
                           _ClayActionTile(
@@ -400,8 +405,8 @@ class _ClayHomeContent extends StatelessWidget {
                             icon: Icons.chat_bubble_rounded,
                             color: ElderColors.clayLavender,
                             tagColor: ElderColors.primaryLight,
-                            tag: 'TALK',
-                            label: 'Ask NIRVANA',
+                            tag: l10n?.talkTag ?? 'TALK',
+                            label: l10n?.askNirvanaTitle ?? 'Ask NIRVANA',
                             onTap: () => context.push('/ask-nirvana'),
                           ),
                         ],
@@ -411,7 +416,9 @@ class _ClayHomeContent extends StatelessWidget {
                         child: TextButton.icon(
                           onPressed: () => context.push('/caregiver/login'),
                           icon: const Icon(Icons.family_restroom_rounded),
-                          label: const Text('Caregiver Portal'),
+                          label: Text(
+                            l10n?.caregiverPortalTitle ?? 'Caregiver Portal',
+                          ),
                         ),
                       ),
                     ],
@@ -642,6 +649,11 @@ class _ClayGreeting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final patientName =
+        (HiveDatabase.currentPatientSession?.preferredName.isNotEmpty ?? false)
+        ? HiveDatabase.currentPatientSession!.preferredName
+        : (l10n?.friendlyFallbackName ?? 'Friend');
     return Row(
       children: [
         Expanded(
@@ -664,7 +676,7 @@ class _ClayGreeting extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'son',
+                  patientName,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w900,
                     color: ElderColors.textPrimary,
@@ -736,6 +748,7 @@ class _ClayMoment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -754,13 +767,14 @@ class _ClayMoment extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _ClayTag(
-                      text: 'DAILY MOMENT',
+                    _ClayTag(
+                      text: l10n?.dailyMomentEyebrow ?? 'DAILY MOMENT',
                       color: ElderColors.primaryLight,
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      'You are doing wonderfully! ✨',
+                      l10n?.dailyMomentHeadline ??
+                          'You are doing wonderfully today',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -769,7 +783,8 @@ class _ClayMoment extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Keep up your daily activities. Every little\nstep brings peace and joy.',
+                      l10n?.dailyMomentSupportingText ??
+                          'Take your time. Every small step is a good step, and you are not alone.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 13,
                         height: 1.35,
@@ -788,7 +803,7 @@ class _ClayMoment extends StatelessWidget {
                   boxShadow: _claySurfaceShadows(tint: ElderColors.primaryDark),
                 ),
                 child: IconButton(
-                  tooltip: 'Listen',
+                  tooltip: l10n?.askNirvanaReadAloud ?? 'Listen',
                   onPressed: onTap,
                   icon: const Icon(
                     Icons.volume_up_rounded,
@@ -805,7 +820,9 @@ class _ClayMoment extends StatelessWidget {
 }
 
 class _ClaySectionTitle extends StatelessWidget {
-  const _ClaySectionTitle();
+  const _ClaySectionTitle({required this.title});
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -817,7 +834,7 @@ class _ClaySectionTitle extends StatelessWidget {
         boxShadow: _claySurfaceShadows(),
       ),
       child: Text(
-        'What would you like to do?',
+        title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
           fontSize: 18,
           fontWeight: FontWeight.w900,
