@@ -136,6 +136,146 @@ class SupabasePairingRepository implements IPairingRepository {
     debugPrint('⚠️ Offline — revokeDevice skipped (no connectivity)');
   }
 
+  @override
+  Future<PatientContactInfo> getPatientContact(String patientId) async {
+    final client = _activeClient;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (client == null || status != NetworkStatus.online || !_uuidRegex.hasMatch(patientId)) {
+      return PatientContactInfo(patientId: patientId, patientName: 'Loved One');
+    }
+
+    // The RPC enforces the caregiver -> patient relationship server-side and is
+    // the only path by which a patient phone number reaches the client.
+    final response = await client.rpc(
+      'get_patient_contact_for_caregiver',
+      params: {'p_patient_id': patientId},
+    );
+
+    final map = (response as Map).cast<String, dynamic>();
+    if (map['success'] != true) {
+      // Includes UNAUTHORIZED / PATIENT_NOT_FOUND. Never leak which it was.
+      return PatientContactInfo(patientId: patientId, patientName: 'Loved One');
+    }
+
+    return PatientContactInfo.fromRpcResponse(map);
+  }
+
+  @override
+  Future<PasscodeSmsResult> sendPasscodeSms({
+    required String patientId,
+    required String code,
+    String? pairingCodeId,
+  }) async {
+    final client = _activeClient;
+    final status = await _connectivityMonitor.checkStatus();
+
+    if (client == null || status != NetworkStatus.online) {
+      return const PasscodeSmsResult(
+        status: PasscodeSmsStatus.failure,
+        message: 'No internet connection. Please check your network.',
+      );
+    }
+
+    if (client.auth.currentUser == null) {
+      return const PasscodeSmsResult(
+        status: PasscodeSmsStatus.unauthorized,
+        message: 'Please sign in again to send a passcode.',
+      );
+    }
+
+    if (!_uuidRegex.hasMatch(patientId)) {
+      return const PasscodeSmsResult(
+        status: PasscodeSmsStatus.failure,
+        message: 'Invalid patient identifier.',
+      );
+    }
+
+    final trimmedCode = code.trim();
+    if (trimmedCode.isEmpty) {
+      return const PasscodeSmsResult(
+        status: PasscodeSmsStatus.staleCode,
+        message: 'Generate a passcode first.',
+      );
+    }
+
+    // Validate phone-number format up-front so the user gets immediate, clear
+    // feedback instead of a round trip that can only fail.
+    final contact = await getPatientContact(patientId);
+    if (!contact.hasPatientPhone) {
+      return const PasscodeSmsResult(
+        status: PasscodeSmsStatus.noPhone,
+        message: 'Phone number not available',
+      );
+    }
+    if (!_isPlausiblePhoneNumber(contact.patientPhone!)) {
+      return const PasscodeSmsResult(
+        status: PasscodeSmsStatus.failure,
+        message:
+            'The patient\'s phone number is not valid. Please update it and try again.',
+      );
+    }
+
+    // Claim the send: verifies server-side that this IS the current passcode and
+    // that it has not already been sent. Prevents duplicate/old-code sends.
+    final claimResponse = await client.rpc(
+      'claim_passcode_sms_send',
+      params: {'p_patient_id': patientId, 'p_code': trimmedCode},
+    );
+
+    final claim = (claimResponse as Map).cast<String, dynamic>();
+    final claimStatus = claim['status'] as String? ?? '';
+
+    if (claimStatus != 'CLAIMED') {
+      return PasscodeSmsResult.fromErrorCode(claimStatus);
+    }
+
+    final claimedCodeId = (claim['pairing_code_id'] as String?) ?? pairingCodeId;
+
+    // Invoke the secure backend function. Credentials live in Edge Function
+    // secrets only — never in this client.
+    try {
+      final functionResponse = await client.functions.invoke(
+        'send-passcode-sms',
+        body: {
+          'patient_id': patientId,
+          'code': trimmedCode,
+          if (claimedCodeId != null) 'pairing_code_id': claimedCodeId,
+        },
+      );
+
+      final data = functionResponse.data;
+      final resultMap = data is Map ? data.cast<String, dynamic>() : null;
+
+      if (functionResponse.status == 200 && resultMap?['success'] == true) {
+        return PasscodeSmsResult(
+          status: PasscodeSmsStatus.sent,
+          sentToMasked: resultMap?['sent_to_masked'] as String?,
+        );
+      }
+
+      final errorCode = resultMap?['error'] as String? ?? '';
+      if (errorCode.isNotEmpty) {
+        return PasscodeSmsResult.fromErrorCode(errorCode);
+      }
+      return PasscodeSmsResult.fromErrorCode('HTTP_${functionResponse.status}');
+    } catch (e) {
+      // Only the exception type is logged — never the passcode or phone number.
+      debugPrint('⚠️ send-passcode-sms invocation error: ${e.runtimeType}');
+      return const PasscodeSmsResult(
+        status: PasscodeSmsStatus.failure,
+        message: 'Could not send the passcode. Please try again.',
+      );
+    }
+  }
+
+  /// Lenient E.164-ish check: optional '+', then 8-15 digits once separators are
+  /// stripped. Matches the server-side normalization rules.
+  bool _isPlausiblePhoneNumber(String raw) {
+    final digits = raw.replaceAll(RegExp(r'\D'), '');
+    return digits.length >= 8 && digits.length <= 15;
+  }
+
   /// Generates a pseudo-random 6-digit demo code for offline mode
   String _generateLocalDemoCode() {
     final now = DateTime.now();

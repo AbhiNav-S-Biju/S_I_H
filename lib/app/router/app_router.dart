@@ -51,7 +51,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(caregiverAuthProvider);
       final authNotifier = ref.read(caregiverAuthProvider.notifier);
       // Authenticated when a caregiver profile was restored / logged in.
-      final isAuthenticated = authState.value != null;
+      //
+      // Use `valueOrNull`, NOT `.value`: reading `.value` on an AsyncError
+      // rethrows the stored error, which would crash every redirect triggered
+      // after a failed login/registration instead of simply routing as
+      // unauthenticated.
+      final isAuthenticated = authState.valueOrNull != null;
       // Still restoring the persisted session (no value yet and not an error).
       final isRestoring = authNotifier.isRestoring &&
           !authState.hasValue &&
@@ -359,7 +364,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       '👉 Caregiver notification tapped: ${payload.notificationType} for patient: ${payload.patientId}',
     );
     final authState = ref.read(caregiverAuthProvider);
-    if (authState.value != null) {
+    // valueOrNull (not .value) — .value rethrows on an AsyncError state.
+    if (authState.valueOrNull != null) {
       if (payload.patientId != null && payload.patientId!.isNotEmpty) {
         final assigned = ref.read(assignedPatientsProvider).value;
         if (assigned != null) {

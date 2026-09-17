@@ -190,6 +190,24 @@ class StubPairingRepository implements IPairingRepository {
 
   @override
   Future<void> revokeDevice(String deviceId) async {}
+
+  @override
+  Future<PatientContactInfo> getPatientContact(String patientId) async =>
+      PatientContactInfo(
+        patientId: patientId,
+        patientName: 'Loved One',
+        patientPhone: '+91 98765 43210',
+      );
+
+  @override
+  Future<PasscodeSmsResult> sendPasscodeSms({
+    required String patientId,
+    required String code,
+    String? pairingCodeId,
+  }) async => const PasscodeSmsResult(
+    status: PasscodeSmsStatus.sent,
+    sentToMasked: '****3210',
+  );
 }
 
 void main() {

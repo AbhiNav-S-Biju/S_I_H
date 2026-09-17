@@ -13,7 +13,10 @@ if (file("google-services.json").exists()) {
 android {
     namespace = "com.nirvana.app.nirvana"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Several plugins (just_audio, url_launcher_android, webview_flutter_android,
+    // ...) require NDK 27.0.12077973 or higher. Pinning it here keeps the release
+    // build working instead of failing on the plugin NDK check.
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true

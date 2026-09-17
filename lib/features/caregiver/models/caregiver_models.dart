@@ -571,6 +571,106 @@ class PairingCodeInfo {
   }
 }
 
+/// Patient contact details as resolved server-side for an authorized caregiver.
+///
+/// [patientPhone] is null when the patient has no registered phone number — the
+/// UI must surface that explicitly rather than failing silently.
+class PatientContactInfo {
+  final String patientId;
+  final String patientName;
+  final String? patientPhone;
+  final String? caregiverPhone;
+
+  const PatientContactInfo({
+    required this.patientId,
+    required this.patientName,
+    this.patientPhone,
+    this.caregiverPhone,
+  });
+
+  bool get hasPatientPhone =>
+      patientPhone != null && patientPhone!.trim().isNotEmpty;
+
+  factory PatientContactInfo.fromRpcResponse(Map<String, dynamic> map) {
+    final phone = (map['patient_phone'] as String?)?.trim();
+    final caregiver = (map['caregiver_phone'] as String?)?.trim();
+    return PatientContactInfo(
+      patientId: map['patient_id'] as String? ?? '',
+      patientName: map['patient_name'] as String? ?? 'Loved One',
+      patientPhone: (phone == null || phone.isEmpty) ? null : phone,
+      caregiverPhone: (caregiver == null || caregiver.isEmpty)
+          ? null
+          : caregiver,
+    );
+  }
+}
+
+/// Outcome of a "Send Passcode via SMS" attempt.
+enum PasscodeSmsStatus {
+  sent,
+  duplicate,
+  staleCode,
+  noPhone,
+  unauthorized,
+  providerNotConfigured,
+  failure,
+}
+
+class PasscodeSmsResult {
+  final PasscodeSmsStatus status;
+
+  /// Masked recipient, e.g. `****6789`. The full number is never returned.
+  final String? sentToMasked;
+  final String? message;
+
+  const PasscodeSmsResult({
+    required this.status,
+    this.sentToMasked,
+    this.message,
+  });
+
+  bool get isSuccess => status == PasscodeSmsStatus.sent;
+
+  /// Maps a server error token to a user-facing outcome. Kept in one place so
+  /// the UI never invents its own error semantics.
+  factory PasscodeSmsResult.fromErrorCode(String code) {
+    switch (code) {
+      case 'ALREADY_SENT':
+        return const PasscodeSmsResult(
+          status: PasscodeSmsStatus.duplicate,
+          message: 'This passcode was already sent.',
+        );
+      case 'STALE_CODE':
+        return const PasscodeSmsResult(
+          status: PasscodeSmsStatus.staleCode,
+          message:
+              'This passcode has expired. Please generate a new one and try again.',
+        );
+      case 'NO_PHONE':
+        return const PasscodeSmsResult(
+          status: PasscodeSmsStatus.noPhone,
+          message: 'Phone number not available',
+        );
+      case 'UNAUTHORIZED':
+        return const PasscodeSmsResult(
+          status: PasscodeSmsStatus.unauthorized,
+          message: 'You are not authorized to send a passcode for this patient.',
+        );
+      case 'PROVIDER_NOT_CONFIGURED':
+        return const PasscodeSmsResult(
+          status: PasscodeSmsStatus.providerNotConfigured,
+          message:
+              'SMS service is not configured yet. Please contact support.',
+        );
+      default:
+        return const PasscodeSmsResult(
+          status: PasscodeSmsStatus.failure,
+          message: 'Could not send the passcode. Please try again.',
+        );
+    }
+  }
+}
+
 /// Information about a patient device linked to a patient
 class PatientDeviceSummary {
   final String id;

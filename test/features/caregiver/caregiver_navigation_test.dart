@@ -153,6 +153,24 @@ class MockPairingRepository implements IPairingRepository {
 
   @override
   Future<void> revokeDevice(String deviceId) async {}
+
+  @override
+  Future<PatientContactInfo> getPatientContact(String patientId) async =>
+      PatientContactInfo(
+        patientId: patientId,
+        patientName: 'Loved One',
+        patientPhone: '+91 98765 43210',
+      );
+
+  @override
+  Future<PasscodeSmsResult> sendPasscodeSms({
+    required String patientId,
+    required String code,
+    String? pairingCodeId,
+  }) async => const PasscodeSmsResult(
+    status: PasscodeSmsStatus.sent,
+    sentToMasked: '****3210',
+  );
 }
 
 void main() {
@@ -256,7 +274,10 @@ void main() {
       // Caregiver Dashboard Screen displayed
       expect(find.text('Caregiver Dashboard'), findsOneWidget);
       expect(find.text('Welcome, Sarah Jenkins'), findsOneWidget);
-      expect(find.textContaining('Elena Rostova'), findsOneWidget);
+      // The patient appears in both the patient selector and the Patient
+      // Information section, so assert presence rather than a single match.
+      expect(find.textContaining('Elena Rostova'), findsWidgets);
+      expect(find.text('Patient Information'), findsOneWidget);
     });
 
     testWidgets('Test 4: Logout -> Landing Screen', (

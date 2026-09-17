@@ -15,6 +15,23 @@
             <action android:name="android.intent.action.DIAL"/>
             <data android:scheme="tel"/>
         </intent>
+        <!--
+            Needed so the native SMS composer can be resolved on Android 11+.
+            This is package-visibility only: opening the pre-filled composer
+            requires NO SMS permission (we never send SMS programmatically).
+
+            The app launches `sms:<number>?body=<encoded text>` via
+            ACTION_SENDTO. `smsto:` is also declared so a device whose only SMS
+            app filters on that scheme can still be resolved.
+        -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="sms"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="smsto"/>
+        </intent>
     </queries>
 
     <application

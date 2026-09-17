@@ -17,6 +17,7 @@ import '../repositories/supabase_caregiver_repository.dart';
 import '../repositories/supabase_pairing_repository.dart';
 import '../services/caregiver_event_notification_service.dart';
 import '../services/caregiver_push_notification_service.dart';
+import '../services/sms_service.dart';
 
 /// Caregiver Push Notification Service provider
 final caregiverPushNotificationServiceProvider =
@@ -491,6 +492,60 @@ final patientLinkedDeviceProvider =
       final repo = ref.watch(pairingRepositoryProvider);
       return repo.getLinkedDevice(selected.id);
     });
+
+/// Resolves the selected patient's registered phone number for the caregiver's
+/// Patient Information section. Server-side RPC enforces the caregiver ->
+/// patient relationship, so unrelated numbers are never returned.
+final patientContactProvider =
+    FutureProvider.autoDispose<PatientContactInfo?>((ref) async {
+      final selected = ref.watch(selectedPatientProvider);
+      if (selected == null) return null;
+      final repo = ref.watch(pairingRepositoryProvider);
+      return repo.getPatientContact(selected.id);
+    });
+
+/// Production SMS transport, ready to swap in when a paid provider is wired up.
+///
+/// It routes through the Supabase Edge Function (which holds the provider
+/// credentials server-side) via [IPairingRepository.sendPasscodeSms], and maps
+/// the backend's status onto the transport-neutral [SmsSendResult].
+///
+/// The UI depends only on [SmsService] (see [smsServiceProvider]), so switching
+/// the MVP native composer for this backend requires no UI change:
+///
+///   smsServiceProvider -> BackendSmsService(ref.read(backendSmsServiceProvider))
+final backendSmsServiceProvider = Provider<BackendSmsService>((ref) {
+  final repo = ref.watch(pairingRepositoryProvider);
+  return BackendSmsService((request) async {
+    final result = await repo.sendPasscodeSms(
+      patientId: request.patientId,
+      code: request.passcode,
+    );
+    if (result.isSuccess) {
+      return SmsSendResult.backendSent(maskedRecipient: result.sentToMasked);
+    }
+    return SmsSendResult.failure(
+      _mapBackendFailure(result.status),
+      message: result.message,
+    );
+  });
+});
+
+/// Translates a backend status into a transport-neutral failure reason.
+SmsFailureReason _mapBackendFailure(PasscodeSmsStatus status) {
+  switch (status) {
+    case PasscodeSmsStatus.noPhone:
+      return SmsFailureReason.noPhoneNumber;
+    case PasscodeSmsStatus.unauthorized:
+      return SmsFailureReason.unauthorized;
+    case PasscodeSmsStatus.duplicate:
+    case PasscodeSmsStatus.staleCode:
+    case PasscodeSmsStatus.providerNotConfigured:
+    case PasscodeSmsStatus.failure:
+    case PasscodeSmsStatus.sent:
+      return SmsFailureReason.backendFailure;
+  }
+}
 
 // ==============================================================================
 // CAREGIVER NOTIFICATION PROVIDERS

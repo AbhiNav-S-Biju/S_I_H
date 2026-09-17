@@ -6,10 +6,13 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nirvana/app/theme/elder_theme.dart';
 import 'package:nirvana/features/caregiver/models/caregiver_models.dart';
 import 'package:nirvana/features/caregiver/providers/caregiver_providers.dart';
+import 'package:nirvana/features/caregiver/services/sms_service.dart';
+import 'package:nirvana/features/caregiver/utils/phone_format.dart';
 
 class PatientDevicePanel extends ConsumerStatefulWidget {
   const PatientDevicePanel({super.key});
@@ -21,6 +24,9 @@ class PatientDevicePanel extends ConsumerStatefulWidget {
 class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
   Timer? _countdownTimer;
   int _remainingSeconds = 0;
+
+  /// True while an SMS hand-off is in flight (contact lookup + composer launch).
+  bool _isSendingPasscode = false;
 
   @override
   void dispose() {
@@ -52,10 +58,92 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
   }
 
   Future<void> _generateCode(String patientId) async {
+    // A brand-new passcode replaces the previous one entirely — the actions row
+    // always acts on whatever `pairingCodeProvider` now holds, so an old
+    // passcode can never be copied or sent once regenerated.
     await ref.read(pairingCodeProvider.notifier).generate(patientId);
     final code = ref.read(pairingCodeProvider).code;
     if (code != null && mounted) {
       _startCountdown(code.expiresAt);
+    }
+  }
+
+  /// Copies the currently displayed passcode to the clipboard.
+  Future<void> _copyPasscode(PairingCodeInfo code) async {
+    await Clipboard.setData(ClipboardData(text: code.code));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Passcode copied to clipboard')),
+    );
+  }
+
+  /// Opens the SMS flow for the CURRENTLY displayed passcode.
+  ///
+  /// Delivery goes through [SmsService]; on MVP that is the free native SMS
+  /// composer. We never send SMS programmatically from the client, and success
+  /// here means the composer opened — not that a message was delivered.
+  Future<void> _sendPasscodeSms(
+    PatientSummary patient,
+    PairingCodeInfo code,
+  ) async {
+    if (_remainingSeconds <= 0 || code.isExpired) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'This passcode has expired. Generate a new one to send it.',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    final contact = await ref.read(patientContactProvider.future);
+
+    setState(() => _isSendingPasscode = true);
+
+    final result = await ref
+        .read(smsServiceProvider)
+        .sendPasscode(
+          PasscodeSmsRequest(
+            patientId: patient.id,
+            patientName: patient.preferredName ?? patient.fullName,
+            patientPhone: contact?.patientPhone,
+            passcode: code.code,
+          ),
+        );
+
+    if (!mounted) return;
+    setState(() => _isSendingPasscode = false);
+
+    if (result.isSuccess) {
+      // Honest wording: the composer was opened; the caregiver still sends it.
+      final isComposer =
+          result.channel == SmsDeliveryChannel.nativeComposer;
+      final to = result.maskedRecipient != null
+          ? 'To ${result.maskedRecipient}'
+          : null;
+      final text = isComposer
+          ? 'SMS composer opened. Press Send to deliver the passcode.'
+          : 'Passcode sent successfully.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: ElderColors.successText,
+          duration: const Duration(seconds: 4),
+          content: Text(to == null ? text : '$text $to'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: ElderColors.gentleErrorPrimary,
+          duration: const Duration(seconds: 4),
+          content: Text(
+            result.message ?? 'Could not send the passcode. Please try again.',
+          ),
+        ),
+      );
     }
   }
 
@@ -122,6 +210,7 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
 
     final deviceAsync = ref.watch(patientLinkedDeviceProvider);
     final pairingState = ref.watch(pairingCodeProvider);
+    final contactAsync = ref.watch(patientContactProvider);
 
     return Container(
       width: double.infinity,
@@ -185,6 +274,16 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
             const Divider(height: 1),
             const SizedBox(height: 16),
 
+            // Patient Information — name, registered phone, send actions.
+            _PatientInformationSection(
+              contactAsync: contactAsync,
+              patientName: selected.preferredName ?? selected.fullName,
+            ),
+
+            const SizedBox(height: 18),
+            const Divider(height: 1),
+            const SizedBox(height: 16),
+
             // Device status
             _DeviceStatusSection(
               deviceAsync: deviceAsync,
@@ -209,6 +308,15 @@ class _PatientDevicePanelState extends ConsumerState<PatientDevicePanel> {
                 patientName: selected.preferredName ?? selected.fullName,
                 remainingSeconds: _remainingSeconds,
                 formattedCountdown: _formatCountdown(_remainingSeconds),
+              ),
+              const SizedBox(height: 12),
+              // Copy the passcode, or hand it to the SMS flow for the patient.
+              PasscodeActionsRow(
+                passcode: pairingState.code!.code,
+                isSending: _isSendingPasscode,
+                onCopy: () => _copyPasscode(pairingState.code!),
+                onSend: () =>
+                    _sendPasscodeSms(selected, pairingState.code!),
               ),
             ],
 
@@ -639,3 +747,352 @@ class _ErrorBanner extends StatelessWidget {
     );
   }
 }
+// ==============================================================================
+// PATIENT INFORMATION + PASSCODE SMS WIDGETS
+// ==============================================================================
+
+/// Clean, caregiver/elder-friendly "Patient Information" block.
+///
+/// Shows the patient name and registered phone number with country-code
+/// formatting, plus a Copy Number action. When no number is on file it states
+/// "Phone number not available" explicitly (never fails silently) and points
+/// the caregiver at the onboarding flow to add one.
+class _PatientInformationSection extends StatelessWidget {
+  final AsyncValue<PatientContactInfo?> contactAsync;
+  final String patientName;
+
+  const _PatientInformationSection({
+    required this.contactAsync,
+    required this.patientName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: ElderColors.primaryContainer,
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: const Icon(
+                Icons.badge_outlined,
+                color: ElderColors.primary,
+                size: 19,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'Patient Information',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: ElderColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        _InfoRow(label: 'Name', value: patientName),
+
+        const SizedBox(height: 12),
+
+        contactAsync.when(
+          loading: () => const _InfoRow(
+            label: 'Phone',
+            value: 'Loading…',
+            isMuted: true,
+          ),
+          error: (_, __) => const _PhoneUnavailable(),
+          data: (contact) {
+            final phone = contact?.patientPhone;
+            if (contact == null || phone == null || phone.trim().isEmpty) {
+              return const _PhoneUnavailable();
+            }
+            return _PhoneAvailable(phone: phone);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isMuted;
+
+  const _InfoRow({
+    required this.label,
+    required this.value,
+    this.isMuted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 74,
+          child: Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: ElderColors.textSecondary,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: isMuted
+                  ? ElderColors.textMuted
+                  : ElderColors.textPrimary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Shown when the patient has no registered phone number on file.
+class _PhoneUnavailable extends StatelessWidget {
+  const _PhoneUnavailable();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(
+          width: 74,
+          child: Text(
+            'Phone:',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: ElderColors.textSecondary,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: ElderColors.supportiveBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: ElderColors.supportiveBorder),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.phone_disabled_rounded,
+                      size: 15,
+                      color: ElderColors.supportiveText,
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      'Phone number not available',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: ElderColors.supportiveText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Add a phone number for this patient from "Add Loved One" '
+                '(Emergency Contact Phone) to enable passcode SMS.',
+                style: TextStyle(fontSize: 13, color: ElderColors.textMuted),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Shown when a phone number exists — with country-code formatting + copy.
+class _PhoneAvailable extends StatelessWidget {
+  final String phone;
+
+  const _PhoneAvailable({required this.phone});
+
+  @override
+  Widget build(BuildContext context) {
+    final formatted = PhoneFormat.format(phone);
+    final isValid = PhoneFormat.isValid(phone);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              width: 74,
+              child: Text(
+                'Phone:',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: ElderColors.textSecondary,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                formatted,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: ElderColors.textPrimary,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (!isValid) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: ElderColors.gentleErrorBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: ElderColors.gentleErrorBorder),
+            ),
+            child: const Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  size: 16,
+                  color: ElderColors.gentleErrorPrimary,
+                ),
+                SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'This phone number looks invalid. Update it before sending.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: ElderColors.gentleErrorText,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Actions attached to the currently-generated passcode:
+///   [ Copy Passcode ]  [ Send Passcode ]
+///
+/// Public (not `_`-private) so it can be exercised directly in widget tests.
+/// Feedback is delivered via SnackBar by the parent, so this widget never
+/// renders a success state it did not observe — it cannot fake an SMS result.
+class PasscodeActionsRow extends StatelessWidget {
+  /// The exact passcode currently displayed. Copied/sent verbatim.
+  final String passcode;
+
+  final bool isSending;
+  final VoidCallback onCopy;
+  final VoidCallback onSend;
+
+  const PasscodeActionsRow({
+    super.key,
+    required this.passcode,
+    required this.onCopy,
+    required this.onSend,
+    this.isSending = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            key: const Key('copy_passcode_button'),
+            onPressed: passcode.isEmpty ? null : onCopy,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, 48),
+              foregroundColor: ElderColors.primary,
+              side: const BorderSide(color: ElderColors.border),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            icon: const Icon(Icons.copy_rounded, size: 18),
+            label: const Text(
+              'Copy Passcode',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: ElevatedButton.icon(
+            key: const Key('send_passcode_button'),
+            onPressed: (passcode.isEmpty || isSending) ? null : onSend,
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(0, 48),
+              backgroundColor: ElderColors.primary,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: ElderColors.border,
+              disabledForegroundColor: ElderColors.textMuted,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            icon: isSending
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.sms_rounded, size: 18),
+            label: Text(
+              isSending ? 'Opening…' : 'Send Passcode',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+

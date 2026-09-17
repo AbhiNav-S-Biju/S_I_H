@@ -100,8 +100,10 @@ class _CaregiverRegisterScreenState
       );
 
       final authState = ref.read(caregiverAuthProvider);
-      if (authState.value != null && mounted) {
+      // valueOrNull (not .value) — .value rethrows on an AsyncError state.
+      if (authState.valueOrNull != null && mounted) {
         context.go('/caregiver/onboarding');
+        return;
       }
 
       if (authState.hasError && mounted) {
@@ -116,22 +118,47 @@ class _CaregiverRegisterScreenState
     }
   }
 
+  /// Maps the raw auth/provider error to a clear, actionable message.
+  ///
+  /// Deliberately conservative: it only claims "email already exists" when the
+  /// error explicitly says so. Anything unrecognised is surfaced verbatim rather
+  /// than being flattened into a misleading guess — that is what made a real
+  /// failure look like a duplicate-email problem.
   String _friendlyError(String raw) {
-    if (raw.contains('already registered') ||
-        raw.contains('already been registered') ||
-        raw.contains('User already registered')) {
-      return 'An account with this email already exists. Please sign in.';
+    final lower = raw.toLowerCase();
+
+    if (lower.contains('user_already_exists') ||
+        lower.contains('already registered') ||
+        lower.contains('already been registered')) {
+      return 'An account with this email already exists. Please sign in instead, '
+          'or use a different email address.';
     }
-    if (raw.contains('invalid email') || raw.contains('Invalid email')) {
+    if (lower.contains('invalid email') || lower.contains('email_address_invalid')) {
       return 'That email address does not appear to be valid.';
     }
-    if (raw.contains('weak password') || raw.contains('Password should be')) {
+    if (lower.contains('weak password') ||
+        lower.contains('password should be') ||
+        lower.contains('password is too short')) {
       return 'Password is too weak. Use at least 8 characters with uppercase and numbers.';
     }
-    if (raw.contains('network') || raw.contains('SocketException')) {
+    if (lower.contains('signup') && lower.contains('disabled')) {
+      return 'New sign-ups are currently disabled on the server. Please contact support.';
+    }
+    if (lower.contains('rate limit') || lower.contains('too many requests')) {
+      return 'Too many attempts. Please wait a minute and try again.';
+    }
+    if (lower.contains('network') ||
+        lower.contains('socket') ||
+        lower.contains('connection')) {
       return 'No internet connection. Please check your network.';
     }
-    return 'Registration failed. Please try again.';
+
+    // Unknown failure: show what actually happened so it can be diagnosed,
+    // instead of a confident-but-wrong message.
+    final detail = raw.replaceFirst(RegExp(r'^Exception:\s*'), '').trim();
+    return detail.isEmpty
+        ? 'Registration failed. Please try again.'
+        : 'Registration failed: $detail';
   }
 
   @override
