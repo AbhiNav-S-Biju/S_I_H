@@ -1,0 +1,14 @@
+# The built web demo bundle under web_demo/ is committed verbatim and served
+# directly by GitHub Pages. Git's default text normalisation (CRLF on Windows)
+# would corrupt the binary artefacts — notably the CanvasKit .wasm files, which
+# are loaded as raw bytes by the browser.
+#
+# Mark everything in the published bundle as binary so it is stored and checked
+# out byte-for-byte, whatever platform the commit or the checkout happens on.
+web_demo/** -text -diff
+
+# Be explicit about the ones that would break most visibly, for clarity.
+web_demo/canvaskit/*.wasm binary
+web_demo/canvaskit/*.js binary
+web_demo/*.js binary
+web_demo/assets/** binary

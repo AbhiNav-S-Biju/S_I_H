@@ -19,6 +19,10 @@ Future<void> main(List<String> args) async {
 
   await for (final req in server) {
     var rel = Uri.decodeComponent(req.uri.path);
+    // The bundle is built with --base-href /S_I_H/, so strip that prefix the
+    // way GitHub Pages does before mapping the request onto a file.
+    final prefix = args.length > 2 ? args[2] : '/S_I_H/';
+    if (rel.startsWith(prefix)) rel = rel.substring(prefix.length);
     if (rel.startsWith('/')) rel = rel.substring(1);
     if (rel.isEmpty) rel = 'index.html';
 
