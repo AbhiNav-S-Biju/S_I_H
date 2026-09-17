@@ -1,0 +1,79 @@
+name: Release APK
+
+# Builds a release APK on a clean runner and attaches it to a GitHub Release,
+# which is what the README's "📱 Download APK" link points at.
+#
+# Two ways to trigger this:
+#   1. Manually  -> Actions tab -> "Release APK" -> Run workflow
+#   2. Push a tag -> `git tag v1.0.0 && git push origin v1.0.0`
+#
+# The Release is created with the workflow's own GITHUB_TOKEN, so no personal
+# access token has to be stored anywhere.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      apk_path:
+        description: 'Optional: path to a prebuilt APK to attach instead of building'
+        required: false
+        default: ''
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release-apk:
+    name: Build & publish APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Rename APK for a friendly download
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk nirvana-release.apk
+          ls -lh nirvana-release.apk
+
+      - name: Resolve tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: "NIRVANA ${{ steps.meta.outputs.tag }} — Android APK"
+          body_path: RELEASE_NOTES.md
+          files: nirvana-release.apk
+          draft: false
+          prerelease: false
