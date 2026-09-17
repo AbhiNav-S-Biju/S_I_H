@@ -43,9 +43,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Pin the Flutter version. `channel: stable` floats, and a newer stable
+      # (3.47.x) requires Gradle >= 8.14.0 while this project pins 8.10.2 —
+      # so the tag build broke the moment Flutter shipped a release.
+      # 3.32.4 is the version this project is developed and verified against.
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.32.4'
           channel: stable
           cache: true
       # The Android SDK ships with the ubuntu-latest image, but the licences
