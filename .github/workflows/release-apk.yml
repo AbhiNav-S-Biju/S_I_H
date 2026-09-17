@@ -8,7 +8,8 @@ name: Release APK
 #   2. Push a tag -> `git tag v1.0.0 && git push origin v1.0.0`
 #
 # The Release is created with the workflow's own GITHUB_TOKEN, so no personal
-# access token has to be stored anywhere.
+# access token needs to be stored. The runner also accepts the preinstalled
+# Android SDK licences so an unattended build works on a clean machine.
 
 on:
   workflow_dispatch:
@@ -47,7 +48,12 @@ jobs:
         with:
           channel: stable
           cache: true
-
+      # The Android SDK ships with the ubuntu-latest image, but the licences
+      # must be accepted before Gradle will resolve the platform it needs.
+      - name: Accept Android licences
+        run: yes | flutter doctor --android-licenses || true
+      - name: Verify toolchain
+        run: flutter doctor -v
       - name: Install dependencies
         run: flutter pub get
 

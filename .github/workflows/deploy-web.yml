@@ -35,11 +35,12 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Show toolchain
+        run: flutter doctor -v
       - name: Install dependencies
         run: flutter pub get
-
       - name: Build web (release)
-        run: flutter build web --release --base-href /S_I_H/ --pwa-strategy=none
+        run: flutter build web --release --base-href /S_I_H/ --pwa-strategy=none --verbose
 
       - name: Add SPA + Pages safety files
         run: |
