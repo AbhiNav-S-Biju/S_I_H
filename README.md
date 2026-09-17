@@ -2,7 +2,8 @@
 > **▶️ [LAUNCH LIVE DEMO](https://abhinav-s-biju.github.io/S_I_H/)** ← open this in your browser. No install, no signup.
 >
 > **📱 [DOWNLOAD APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/latest)** ← Android phone / emulator.
-
+>
+> **🎬 [WATCH DEMO VIDEO](docs/DEMO_VIDEO.md)** ← backup walkthrough if the demo links are blocked.
 
 ---
 
