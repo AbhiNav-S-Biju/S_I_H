@@ -1,0 +1,73 @@
+name: Deploy Live Demo (Flutter Web → GitHub Pages)
+
+# Publishes the NIRVANA prototype as a live Web demo at
+# https://abhinav-s-biju.github.io/S_I_H/
+#
+# The build is self-hosted by the runner, so the deployed bundle pulls the
+# CanvasKit renderer from the runner instead of an external CDN.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build web bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web (release)
+        run: flutter build web --release --base-href /S_I_H/ --pwa-strategy=none
+
+      - name: Add SPA + Pages safety files
+        run: |
+          # GitHub Pages has no server-side rewrite, so deep links such as
+          # /S_I_H/caregiver/dashboard would 404 on a hard refresh.
+          # 404.html mirrors index.html and the app router resolves the path.
+          cp build/web/index.html build/web/404.html
+          # Skip Jekyll processing so underscore-prefixed asset dirs survive.
+          touch build/web/.nojekyll
+          # Required for `enablement: true` in actions/configure-pages.
+          ls -la build/web
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

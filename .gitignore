@@ -119,3 +119,7 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 # Widget Preview related
 .widget_preview/
+
+# Local build helper output
+build_web.log
+build_apk.log
