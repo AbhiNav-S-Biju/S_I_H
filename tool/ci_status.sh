@@ -23,6 +23,8 @@ if [ "${1:-}" = "--logs" ]; then
   RUN_ID=$(gh run list --repo AbhiNav-S-Biju/S_I_H --workflow release-apk.yml \
     --limit 1 --json databaseId --jq '.[0].databaseId')
   echo
-  echo "=== Failed log for run $RUN_ID ==="
-  gh run view "$RUN_ID" --repo AbhiNav-S-Biju/S_I_H --log-failed 2>&1 | tail -40
+  echo "=== Failed log for run $RUN_ID (filtered) ==="
+  gh run view "$RUN_ID" --repo AbhiNav-S-Biju/S_I_H --log-failed 2>&1 \
+    | grep -iE 'error|validation|422|403|already_exists|not permitted|resource not|Unexpected|##\[' \
+    | head -30
 fi
