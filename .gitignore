@@ -1,7 +1,11 @@
 # Miscellaneous
 *.class
-*.lock
 *.log
+# NOTE: *.lock is deliberately NOT ignored. Dart's pubspec.lock must be
+# committed so that CI and every developer resolve the exact same dependency
+# versions. Without it, `flutter pub get` on a fresh machine (or a CI runner)
+# picks up newer transitive packages and the web/APK build can break on code
+# that builds fine locally.
 *.pyc
 *.swp
 .buildlog/
