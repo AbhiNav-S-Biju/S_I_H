@@ -6,7 +6,7 @@
 
 ## 📱 NIRVANA — Android APK (prototype)
 
-Download **`nirvana-release.apk`** below.
+Download **`app-release.apk`** below.
 
 ### Install
 1. Transfer the `.apk` to an Android device (Android 7.0 / API 24 or newer).

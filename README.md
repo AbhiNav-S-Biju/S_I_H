@@ -1,7 +1,7 @@
 # 🚀 TRY NIRVANA — Live Demo
 > **▶️ [LAUNCH LIVE DEMO](https://abhinav-s-biju.github.io/S_I_H/)** ← open this in your browser. No install, no signup.
 >
-> **📱 [DOWNLOAD APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/latest)** ← Android phone / emulator.
+> **📱 [DOWNLOAD APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/download/v1.0.0/app-release.apk)** ← tapping this downloads the file directly. ([all releases](https://github.com/AbhiNav-S-Biju/S_I_H/releases))
 >
 > **🎬 [WATCH DEMO VIDEO](docs/DEMO_VIDEO.md)** ← backup walkthrough if the demo links are blocked.
 
@@ -66,7 +66,7 @@ Runs the real Flutter app compiled to WebAssembly — no install. Best experienc
 
 ### Option 2 — Android APK *(full native experience)*
 
-**👉 [Download APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/latest)** — grab the `nirvana-release.apk` asset.
+**👉 [Download APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/download/v1.0.0/app-release.apk)** — downloads `app-release.apk` directly (~71 MB).
 
 1. Download the `.apk` on an Android device (Android 7.0 / API 24 or newer).
 2. Tap it and allow *"Install from unknown sources"* when prompted.
@@ -90,8 +90,8 @@ flutter build apk --release # produces build/app/outputs/flutter-apk/app-release
 2. **🐙 Open this GitHub repo** — you're here.
 3. **📖 Read this README** — the feature and architecture summary above.
 4. **▶️ Launch the [Live Demo](https://abhinav-s-biju.github.io/S_I_H/)** — try a game and the caregiver portal.
-5. **📱 If the browser build is limited, install the [APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/latest)** — see the offline reminders and live location sharing for real.
-6. **🎬 Fallback: the [demo video](https://github.com/AbhiNav-S-Biju/S_I_H/releases/latest)** — a 2-minute recorded walkthrough if nothing else is reachable.
+5. **📱 If the browser build is limited, install the [APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/download/v1.0.0/app-release.apk)** — see the offline reminders and live location sharing for real.
+6. **🎬 Fallback: the [demo video](docs/DEMO_VIDEO.md)** — a 2-minute recorded walkthrough if nothing else is reachable.
 
 **Put it on airplane mode during the demo.** The elder app keeps working. That is the whole point.
 

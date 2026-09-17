@@ -64,12 +64,6 @@ jobs:
 
       - name: Build release APK
         run: flutter build apk --release
-
-      - name: Rename APK for a friendly download
-        run: |
-          cp build/app/outputs/flutter-apk/app-release.apk nirvana-release.apk
-          ls -lh nirvana-release.apk
-
       - name: Resolve tag
         id: meta
         run: |
@@ -78,13 +72,16 @@ jobs:
           else
             echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
           fi
-
+      # The asset keeps its build name, `app-release.apk`. The README links
+      # straight to /releases/download/<tag>/app-release.apk so the click is a
+      # direct download rather than a trip through the release web page —
+      # renaming the asset here would break that link.
       - name: Publish GitHub Release with APK
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           name: "NIRVANA ${{ steps.meta.outputs.tag }} — Android APK"
           body_path: RELEASE_NOTES.md
-          files: nirvana-release.apk
+          files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
