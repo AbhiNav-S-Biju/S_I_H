@@ -2,8 +2,7 @@
 > **▶️ [LAUNCH LIVE DEMO](https://abhinav-s-biju.github.io/S_I_H/)** ← open this in your browser. No install, no signup.
 >
 > **📱 [DOWNLOAD APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/latest)** ← Android phone / emulator.
->
-> **🎬 [WATCH 2-MIN DEMO VIDEO](https://github.com/AbhiNav-S-Biju/S_I_H/releases/latest)** ← backup walkthrough if the demo link is blocked.
+
 
 ---
 
@@ -107,7 +106,7 @@ flutter build apk --release # produces build/app/outputs/flutter-apk/app-release
 ---
 
 ## 👥 Team
-Built for the **Smart India Hackathon** by team **S_I_H**.
+Built for the **Smart India Hackathon** by team **Memento**.
 
 ---
 
