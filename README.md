@@ -3,7 +3,7 @@
 >
 > **📱 [DOWNLOAD APK](https://github.com/AbhiNav-S-Biju/S_I_H/releases/download/v1.0.0/app-release.apk)** ← tapping this downloads the file directly. ([all releases](https://github.com/AbhiNav-S-Biju/S_I_H/releases))
 >
-> **🎬 [WATCH DEMO VIDEO](docs/DEMO_VIDEO.md)** ← backup walkthrough if the demo links are blocked.
+> **🎬 [WATCH DEMO VIDEO](docs/DEMO_VIDEO.md)** ← backup walkthrough if the demo links are blocked.[Coming soon]
 
 ---
 
