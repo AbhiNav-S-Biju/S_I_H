@@ -1,0 +1,18 @@
+{
+  "question_id": "2608",
+  "title": "Count the Digits That Divide a Number",
+  "title_slug": "count-the-digits-that-divide-a-number",
+  "difficulty": "Easy",
+  "language": "java",
+  "url": "https://leetcode.com/problems/count-the-digits-that-divide-a-number/",
+  "tags": [
+    "Math"
+  ],
+  "description": "<p>Given an integer <code>num</code>, return <em>the number of digits in <code>num</code> that divide </em><code>num</code>.</p>\n\n<p>An integer <code>val</code> divides <code>nums</code> if <code>nums % val == 0</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong>Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> num = 7\n<strong>Output:</strong> 1\n<strong>Explanation:</strong> 7 divides itself, hence the answer is 1.\n</pre>\n\n<p><strong>Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> num = 121\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> 121 is divisible by 1, but not 2. Since 1 occurs twice as a digit, we return 2.\n</pre>\n\n<p><strong>Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> num = 1248\n<strong>Output:</strong> 4\n<strong>Explanation:</strong> 1248 is divisible by all of its digits, hence the answer is 4.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= num &lt;= 10<sup>9</sup></code></li>\n\t<li><code>num</code> does not contain <code>0</code> as one of its digits.</li>\n</ul>",
+  "examples": "",
+  "constraints": "",
+  "synced_at": "2026-09-22T20:38:10.625Z",
+  "platform": "leetcode",
+  "platformId": "leetcode",
+  "problemId": "2608"
+}
