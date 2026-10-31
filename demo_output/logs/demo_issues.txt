@@ -1,0 +1,69 @@
+==============================================================================
+NIRVANA — DEMO WALKTHROUGH ISSUES LOG
+Only genuine issues encountered DURING the live walkthrough are listed here.
+No application or backend code was modified to work around any of them.
+==============================================================================
+
+==============================================================================
+ISSUE #1 — Caregiver sign-in fails against the live backend (BLOCKER)
+==============================================================================
+SCREEN:   Caregiver & Family Portal — Login (screenshots/13_caregiver_login_error.png)
+EXPECTED: With the documented seed demo account
+          (caregiver.demo@nirvana-care.org) the caregiver should authenticate
+          and land on the Caregiver Dashboard.
+ACTUAL:   Pressing "Sign In to Dashboard" returns an error banner and no session
+          is created. The dashboard, patient monitoring, game history and
+          caregiver reminders are therefore all unreachable.
+ERROR:    {"code":"unexpected_failure","message":"Database error querying schema"}
+SEVERITY: Blocker (entire caregiver experience + patient pairing impossible)
+WORKAROUND: None applied (must not modify backend/config). Reproduced
+          independently of the app via a direct REST call to
+          POST https://<project>.supabase.co/auth/v1/token?grant_type=password
+          which returns HTTP 500 with the same "Database error querying schema".
+          => The remote Supabase project's auth schema is broken / not migrated
+             for this deployment. The app code is behaving correctly.
+
+==============================================================================
+ISSUE #2 — Patient dashboard is pairing-gated; no offline path (EXPECTED DESIGN)
+==============================================================================
+SCREEN:   Patient Welcome -> Enter Your Code (screenshots/02_patient_welcome.png,
+          screenshots/03_patient_pairing.png)
+EXPECTED: n/a — this is by design, recorded for completeness.
+ACTUAL:   The router redirects /patient/welcome and /patient/pairing to
+          /patient/home ONLY when HiveDatabase.isDevicePaired is true. Pairing
+          needs a 6-digit code produced by a logged-in caregiver through the
+          Supabase RPC `generate_patient_pairing_code` (and requires the network).
+          Because ISSUE #1 blocks caregiver login, no pairing code can be
+          generated, so the patient dashboard / games / reminders / Ask NIRVANA /
+          family photos / settings cannot be reached in this environment.
+ERROR:    (no on-screen error; guard is silent by design)
+SEVERITY: Environmental / by design (not an app defect)
+WORKAROUND: None applied.
+
+==============================================================================
+ISSUE #3 — Bundled debug APK is ARM64-only; crashes on x86_64 emulators
+==============================================================================
+SCREEN:   App startup (before any UI); failure occurred at process launch.
+EXPECTED: The prebuilt build/app/outputs/flutter-apk/app-debug.apk should run on
+          the target device/emulator.
+ACTUAL:   On the x86_64 emulator the process died immediately with:
+          java.lang.UnsatisfiedLinkError: dlopen failed: "libflutter.so" is for
+          EM_AARCH64 (183) instead of EM_X86_64 (62)
+          and Android killed the app ("repeated failure to freeze binder").
+ERROR:    UnsatisfiedLinkError: libflutter.so is for EM_AARCH64 instead of EM_X86_64
+SEVERITY: Major (blocks launch on x86_64 emulators; fine on ARM64 phones)
+WORKAROUND: Rebuilt a debug APK for the emulator ABI without touching source:
+          `flutter build apk --debug --target-platform android-x64`
+          The produced APK contains lib/x86_64/libflutter.so and launched fine.
+
+==============================================================================
+NON-ISSUE NOTES (environment, recorded for transparency)
+==============================================================================
+- The Android emulator used has NAT networking where ICMP ping is blocked but
+  TCP/TLS works. Network was verified reachable (a raw 443 request returned an
+  HTTP response from the edge). This is not an app issue.
+- google_fonts (Nunito) cannot be fetched on a first cold boot with no DNS yet;
+  the app falls back gracefully and the UI still renders. Not an app defect.
+- The demo credentials used are the ones already documented in the repo's
+  supabase/seed.sql (a non-secret test fixture). Passwords were kept obscured in
+  every retained screenshot.

@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+ <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* ==================================================================
+         NIRVANA — brag video, vertical 1080x1920, 40s, 9 scenes
+         Palette, clay surface treatment AND ambient background all taken
+         directly from the app:
+           lib/app/theme/elder_theme.dart   (colors / shadows / radii)
+           lib/features/home/presentation/home_screen.dart  (_ClayBackground)
+         ================================================================== */
+      @font-face {
+        font-family: "Nunito";
+        src: local("Nunito"), local("Segoe UI"), local("Arial Rounded MT Bold");
+        font-weight: 100 900;
+      }
+
+      :root {
+        /* exact app canvas + surfaces */
+        --canvas: #f3efe6;
+        --sand: #f3ece2;
+        --sand-alt: #ede3d4;
+        --surface: #f4ecdd;
+        --surface-elev: #fdfaf6;
+        --ink: #3a2f2a;
+        --ink-soft: #7c6f60;
+        --ink-muted: #8a7d68;
+
+        /* clay tokens from elder_theme.dart */
+        --lav: #9b8ec4;
+        --lav-deep: #6b5ea8;
+        --lav-bg: #f0edfb;
+
+        --sky: #7ba8c4;
+        --sky-deep: #3f6d8b;
+        --sky-bg: #edf5f9;
+
+        --butter: #c8a96e;
+        --butter-deep: #8b6e3c;
+        --butter-bg: #fbf3e2;
+
+        --sage: #7ba89a;
+        --sage-deep: #3d6b5e;
+        --sage-bg: #ebf5f2;
+
+        --peach: #d4897a;
+        --peach-deep: #a85a4a;
+        --peach-bg: #fbefec;
+        --peach-border: #edc4bc;
+
+        /* app ambient background accents */
+        --primary: #9b8ec4;
+        --primary-light: #c8c0e6;
+        --primary-dark: #6b5ea8;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--canvas);
+        font-family: Nunito, "Segoe UI", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--canvas);
+      }
+
+      /* ---- App ambient background: faithful port of _ClayBackground ----
+         sand canvas + lavender clay circle / half-dome bottom-right +
+         buttercup pill + cloud + scattered clay bubbles. */
+      .amb {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .clay {
+        background: var(--surface);
+        border-radius: 34px;
+        box-shadow:
+          0 22px 44px rgba(58, 47, 42, 0.13),
+          0 6px 14px rgba(58, 47, 42, 0.06),
+          -10px -10px 24px rgba(251, 246, 236, 0.95);
+      }
+
+      .pills {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+      }
+
+      .eyebrow {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+      }
+
+      .h1 {
+        font-size: 124px;
+        font-weight: 900;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+      }
+
+      .h2 {
+        font-size: 72px;
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+      }
+
+      .body {
+        font-size: 40px;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--ink-soft);
+      }
+
+      .caption {
+        font-size: 34px;
+        font-weight: 700;
+        color: var(--ink-muted);
+      }
+
+      .stage-wrap {
+        position: absolute;
+        inset: 0;
+        padding: 150px 74px 260px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* ---- reusable clay bubbles (radial gradient + dual shadow) ---- */
+      .bubble {
+        position: absolute;
+        border-radius: 50%;
+      }
+    </style>
+ </head>
+ <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="40"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- ================================================================
+           SCENE 1 — Hook: the greeting (0.0 – 4.5s)
+           ================================================================ -->
+      <section id="s1" class="scene clip" data-start="0" data-duration="4.5" data-track-index="0" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:200px;height:200px;right:-44px;bottom:-52px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div style="position:absolute;right:-38px;bottom:-62px;width:164px;height:82px;border-radius:90px 90px 0 0;background:rgba(107,94,168,0.28);"></div>
+          <div style="position:absolute;right:44px;bottom:52px;width:80px;height:14px;border-radius:999px;background:var(--butter);transform:rotate(-0.2rad);"></div>
+          <div class="bubble" style="width:34px;height:34px;right:12px;top:300px;background:radial-gradient(circle at 32% 28%, #a9cbc0, #7ba89a 55%, #5c8377);"></div>
+          <div class="bubble" style="width:26px;height:26px;right:30px;top:352px;background:radial-gradient(circle at 32% 28%, #e6b7ac, #d4897a 55%, #b06f61);"></div>
+          <div class="bubble" style="width:16px;height:16px;left:60px;bottom:120px;background:radial-gradient(circle at 32% 28%, #e6b7ac, #d4897a 55%, #b06f61);"></div>
+        </div>
+
+        <div class="stage-wrap" style="gap: 56px;">
+          <div id="s1-greet" class="clay" style="padding: 42px 48px; display: flex; align-items: center; gap: 26px;">
+            <div style="width: 112px; height: 112px; border-radius: 50%; background: linear-gradient(135deg, #ffffff, var(--lav-bg)); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 22px rgba(107, 94, 168, 0.18); flex: 0 0 auto;">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21s-7.5-4.6-9.7-9.1C.7 8.6 2.4 5 5.9 5c2 0 3.2 1.1 3.9 2.1C10.5 6.1 11.7 5 13.7 5c3.5 0 5.2 3.6 3.6 6.9C15.1 16.4 12 21 12 21z" fill="#9b8ec4"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-size: 32px; font-weight: 700; color: var(--ink-soft);">Good morning,</div>
+              <div id="s1-name" style="font-size: 58px; font-weight: 900; color: var(--ink); margin-top: 2px;">Friend</div>
+            </div>
+          </div>
+
+          <div style="padding-left: 6px;">
+            <div id="s1-claim" class="h1" style="max-width: 920px;">
+              It never says<br />&ldquo;failed&rdquo;.
+            </div>
+            <div id="s1-sub" class="body" style="margin-top: 26px; max-width: 840px; color: var(--ink-muted);">
+              Feedback is &ldquo;Wonderful Effort!&rdquo;
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 2 — The elder home (4.5 – 9.5s)
+           ================================================================ -->
+      <section id="s2" class="scene clip" data-start="4.5" data-duration="5.0" data-track-index="1" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:170px;height:170px;right:-40px;bottom:-46px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div style="position:absolute;right:-34px;bottom:-56px;width:140px;height:70px;border-radius:90px 90px 0 0;background:rgba(107,94,168,0.28);"></div>
+          <div class="bubble" style="width:30px;height:30px;left:-6px;top:250px;background:radial-gradient(circle at 32% 28%, #a9cbc0, #7ba89a 55%, #5c8377);"></div>
+          <div class="bubble" style="width:22px;height:22px;right:18px;top:330px;background:radial-gradient(circle at 32% 28%, #e6b7ac, #d4897a 55%, #b06f61);"></div>
+        </div>
+
+        <div class="stage-wrap" style="justify-content: center;">
+          <div class="eyebrow" id="s2-eyebrow">The elder's app</div>
+          <div class="h2" id="s2-head" style="margin-top: 22px;">What would you like to do?</div>
+
+          <div id="s2-grid" style="margin-top: 90px; display: grid; grid-template-columns: 1fr 1fr; gap: 34px;">
+            <div class="tile clay" data-i="0" style="padding: 38px; border-radius: 32px;">
+              <div class="pills" style="background: var(--lav-bg); color: var(--lav-deep); padding: 11px 24px; font-size: 23px;">DAILY</div>
+              <div style="margin-top: 24px; display: flex; align-items: center; gap: 20px;">
+                <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--lav-bg); display: flex; align-items: center; justify-content: center;">
+                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><path d="M9 3h6a2 2 0 0 1 2 2h1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1a2 2 0 0 1 2-2z" stroke="#6b5ea8" stroke-width="1.9"/><path d="M9 12h6M9 16h4" stroke="#6b5ea8" stroke-width="1.9" stroke-linecap="round"/></svg>
+                </div>
+                <div style="font-size: 40px; font-weight: 900; color: var(--ink); line-height: 1.1;">Memory<br />Games</div>
+              </div>
+            </div>
+
+            <div class="tile clay" data-i="1" style="padding: 38px; border-radius: 32px;">
+              <div class="pills" style="background: var(--sky-bg); color: var(--sky-deep); padding: 11px 24px; font-size: 23px;">ROUTINES</div>
+              <div style="margin-top: 24px; display: flex; align-items: center; gap: 20px;">
+                <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--sky-bg); display: flex; align-items: center; justify-content: center;">
+                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#3f6d8b" stroke-width="1.9"/><path d="M12 7.5V12l3 2" stroke="#3f6d8b" stroke-width="1.9" stroke-linecap="round"/></svg>
+                </div>
+                <div style="font-size: 40px; font-weight: 900; color: var(--ink); line-height: 1.1;">My<br />Reminders</div>
+              </div>
+            </div>
+
+            <div class="tile clay" data-i="2" style="padding: 38px; border-radius: 32px;">
+              <div class="pills" style="background: var(--peach-bg); color: var(--peach-deep); padding: 11px 24px; font-size: 23px;">MEMORIES</div>
+              <div style="margin-top: 24px; display: flex; align-items: center; gap: 20px;">
+                <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--peach-bg); display: flex; align-items: center; justify-content: center;">
+                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.6" stroke="#a85a4a" stroke-width="1.9"/><path d="M5 20c.8-3.6 3.6-5.6 7-5.6s6.2 2 7 5.6" stroke="#a85a4a" stroke-width="1.9" stroke-linecap="round"/></svg>
+                </div>
+                <div style="font-size: 40px; font-weight: 900; color: var(--ink); line-height: 1.1;">Family<br />Photos</div>
+              </div>
+            </div>
+
+            <div class="tile clay" data-i="3" style="padding: 38px; border-radius: 32px;">
+              <div class="pills" style="background: var(--butter-bg); color: var(--butter-deep); padding: 11px 24px; font-size: 23px;">TALK</div>
+              <div style="margin-top: 24px; display: flex; align-items: center; gap: 20px;">
+                <div style="width: 70px; height: 70px; border-radius: 20px; background: var(--butter-bg); display: flex; align-items: center; justify-content: center;">
+                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-3.2-6.4" stroke="#8b6e3c" stroke-width="1.9" stroke-linecap="round"/><path d="M8 11h8M8 15h5" stroke="#8b6e3c" stroke-width="1.9" stroke-linecap="round"/></svg>
+                </div>
+                <div style="font-size: 40px; font-weight: 900; color: var(--ink); line-height: 1.1;">Ask<br />NIRVANA</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="s2-note" class="caption" style="margin-top: 60px;">Large touch targets · calm, familiar layout</div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 3 — Daily Activities, the games hub (9.5 – 14.5s)
+           Real hub: title, welcome banner, 4 game cards with real emojis.
+           ================================================================ -->
+      <section id="s3" class="scene clip" data-start="9.5" data-duration="5.0" data-track-index="2" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:150px;height:150px;right:-36px;bottom:-40px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div class="bubble" style="width:26px;height:26px;left:8px;top:240px;background:radial-gradient(circle at 32% 28%, #a9cbc0, #7ba89a 55%, #5c8377);"></div>
+          <div class="bubble" style="width:18px;height:18px;right:26px;top:320px;background:radial-gradient(circle at 32% 28%, #e6b7ac, #d4897a 55%, #b06f61);"></div>
+        </div>
+
+        <div class="stage-wrap" style="justify-content: center;">
+          <div class="eyebrow" id="s3-eyebrow">Cognitive games</div>
+          <div class="h2" id="s3-head" style="margin-top: 14px; font-size: 64px;">Daily Activities</div>
+
+          <div id="s3-banner" class="clay" style="margin-top: 22px; padding: 22px 28px; border-radius: 26px; background: var(--butter-bg); display: flex; align-items: center; gap: 18px;">
+            <span style="font-size: 38px;">☀️</span>
+            <span style="font-size: 30px; font-weight: 800; color: var(--butter-deep);">Welcome to Today's Fun!</span>
+          </div>
+
+          <div id="s3-cards" style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 22px;">
+            <div class="gcard clay" data-i="0" style="padding: 26px 18px; border-radius: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;">
+              <div style="width: 96px; height: 96px; border-radius: 20px; background: var(--sage-bg); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 48px;">🍎</div>
+              <div style="font-size: 31px; font-weight: 900; color: var(--ink); line-height: 1.2;">Remember<br />Objects</div>
+              <div style="font-size: 24px; font-weight: 600; color: var(--ink-muted);">Find items on the shelf</div>
+            </div>
+            <div class="gcard clay" data-i="1" style="padding: 26px 18px; border-radius: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;">
+              <div style="width: 96px; height: 96px; border-radius: 20px; background: var(--peach-bg); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 48px;">👵</div>
+              <div style="font-size: 31px; font-weight: 900; color: var(--ink); line-height: 1.2;">Who Is<br />This?</div>
+              <div style="font-size: 24px; font-weight: 600; color: var(--ink-muted);">Recognize family faces</div>
+            </div>
+            <div class="gcard clay" data-i="2" style="padding: 26px 18px; border-radius: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;">
+              <div style="width: 96px; height: 96px; border-radius: 20px; background: var(--butter-bg); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 48px;">🛒</div>
+              <div style="font-size: 31px; font-weight: 900; color: var(--ink); line-height: 1.2;">Grocery<br />Memory</div>
+              <div style="font-size: 24px; font-weight: 600; color: var(--ink-muted);">Remember the shopping list</div>
+            </div>
+            <div class="gcard clay" data-i="3" style="padding: 26px 18px; border-radius: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;">
+              <div style="width: 96px; height: 96px; border-radius: 20px; background: var(--lav-bg); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 48px;">🧩</div>
+              <div style="font-size: 31px; font-weight: 900; color: var(--ink); line-height: 1.2;">Jigsaw</div>
+              <div style="font-size: 24px; font-weight: 600; color: var(--ink-muted);">Complete the picture</div>
+            </div>
+          </div>
+
+          <div id="s3-note" class="caption" style="margin-top: 28px;">Engagement activities — never a clinical test</div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 4 — Grocery Memory, mid-round (14.5 – 19.5s)
+           ================================================================ -->
+      <section id="s4" class="scene clip" data-start="14.5" data-duration="5.0" data-track-index="3" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:150px;height:150px;right:-36px;bottom:-40px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div class="bubble" style="width:24px;height:24px;left:10px;top:260px;background:radial-gradient(circle at 32% 28%, #a9cbc0, #7ba89a 55%, #5c8377);"></div>
+        </div>
+
+        <div class="stage-wrap" style="justify-content: center;">
+          <div class="eyebrow" id="s4-eyebrow">Grocery Memory</div>
+          <div class="h2" id="s4-head" style="margin-top: 16px; font-size: 64px;">Find these on the shelf:</div>
+
+          <div id="s4-list" style="margin-top: 44px; display: flex; gap: 16px; flex-wrap: wrap;">
+            <div class="list-chip clay" style="padding: 15px 24px; border-radius: 20px; display: flex; align-items: center; gap: 14px;">
+              <img src="assets/shelf/rice.png" alt="" style="width: 46px; height: 46px; object-fit: contain;" />
+              <span style="font-size: 30px; font-weight: 800; color: var(--ink);">Rice</span>
+            </div>
+            <div class="list-chip clay" style="padding: 15px 24px; border-radius: 20px; display: flex; align-items: center; gap: 14px;">
+              <img src="assets/shelf/tea.png" alt="" style="width: 46px; height: 46px; object-fit: contain;" />
+              <span style="font-size: 30px; font-weight: 800; color: var(--ink);">Tea</span>
+            </div>
+            <div class="list-chip clay" style="padding: 15px 24px; border-radius: 20px; display: flex; align-items: center; gap: 14px;">
+              <img src="assets/shelf/milk.png" alt="" style="width: 46px; height: 46px; object-fit: contain;" />
+              <span style="font-size: 30px; font-weight: 800; color: var(--ink);">Milk</span>
+            </div>
+          </div>
+
+          <div id="s4-shelf" style="margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px;">
+            <div class="shelf-cell clay" data-name="onion" style="padding: 20px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <img src="assets/shelf/onion.png" alt="" style="width: 118px; height: 118px; object-fit: contain;" />
+              <span style="font-size: 27px; font-weight: 700; color: var(--ink-soft);">Onion</span>
+            </div>
+            <div class="shelf-cell clay" data-name="tomato" id="s4-wrong" style="padding: 20px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <img src="assets/shelf/tomato.png" alt="" style="width: 118px; height: 118px; object-fit: contain;" />
+              <span style="font-size: 27px; font-weight: 700; color: var(--ink-soft);">Tomato</span>
+            </div>
+            <div class="shelf-cell clay" data-name="tea" style="padding: 20px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <img src="assets/shelf/tea.png" alt="" style="width: 118px; height: 118px; object-fit: contain;" />
+              <span style="font-size: 27px; font-weight: 700; color: var(--ink-soft);">Tea</span>
+            </div>
+            <div class="shelf-cell clay" data-name="potato" style="padding: 20px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <img src="assets/shelf/potato.png" alt="" style="width: 118px; height: 118px; object-fit: contain;" />
+              <span style="font-size: 27px; font-weight: 700; color: var(--ink-soft);">Potato</span>
+            </div>
+            <div class="shelf-cell clay" data-name="carrot" style="padding: 20px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <img src="assets/shelf/carrot.png" alt="" style="width: 118px; height: 118px; object-fit: contain;" />
+              <span style="font-size: 27px; font-weight: 700; color: var(--ink-soft);">Carrot</span>
+            </div>
+            <div class="shelf-cell clay" data-name="apple" style="padding: 20px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <img src="assets/shelf/apple.png" alt="" style="width: 118px; height: 118px; object-fit: contain;" />
+              <span style="font-size: 27px; font-weight: 700; color: var(--ink-soft);">Apple</span>
+            </div>
+          </div>
+
+          <div id="s4-feedback" class="clay" style="margin-top: 30px; padding: 28px 34px; border-radius: 28px; display: flex; align-items: center; gap: 22px; background: var(--sage-bg); opacity: 0;">
+            <div style="width: 72px; height: 72px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(61,107,94,0.15); flex: 0 0 auto;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#3d6b5e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 52px; font-weight: 900; color: var(--sage-deep);">Wonderful Effort!</div>
+              <div style="font-size: 28px; font-weight: 600; color: var(--ink-soft); margin-top: 4px;">No timers. No &ldquo;wrong&rdquo;.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 5 — Pictures from home / Jigsaw (19.5 – 24.0s)
+           Real puzzle levels from lib/features/games/models/game_level.dart
+           ================================================================ -->
+      <section id="s5" class="scene clip" data-start="19.5" data-duration="4.5" data-track-index="4" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:150px;height:150px;right:-36px;bottom:-40px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div class="bubble" style="width:22px;height:22px;left:12px;bottom:150px;background:radial-gradient(circle at 32% 28%, #e6b7ac, #d4897a 55%, #b06f61);"></div>
+        </div>
+
+        <div class="stage-wrap" style="justify-content: center;">
+          <div class="eyebrow" id="s5-eyebrow">Jigsaw · familiar places</div>
+          <div class="h2" id="s5-head" style="margin-top: 16px;">Pictures from home</div>
+          <div class="body" id="s5-sub" style="margin-top: 12px; font-size: 32px; color: var(--ink-muted);">Scenes from the North East of India — pictures to piece together</div>
+
+          <div id="s5-grid" style="margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px;">
+            <div class="jlevel clay" data-i="0" style="border-radius: 26px; overflow: hidden;">
+              <img src="assets/puzzle/puzzle_kaziranga_rhino.png" alt="Kaziranga One-Horned Rhino" style="width: 100%; height: 210px; object-fit: cover; display: block;" />
+              <div style="padding: 16px 18px; font-size: 26px; font-weight: 800; color: var(--ink);">Kaziranga Rhino</div>
+            </div>
+            <div class="jlevel clay" data-i="1" style="border-radius: 26px; overflow: hidden;">
+              <img src="assets/puzzle/puzzle_tawang_monastery.png" alt="Tawang Himalayan Monastery" style="width: 100%; height: 210px; object-fit: cover; display: block;" />
+              <div style="padding: 16px 18px; font-size: 26px; font-weight: 800; color: var(--ink);">Tawang Monastery</div>
+            </div>
+            <div class="jlevel clay" data-i="2" style="border-radius: 26px; overflow: hidden;">
+              <img src="assets/puzzle/puzzle_seven_sisters.png" alt="Seven Sisters Heritage" style="width: 100%; height: 210px; object-fit: cover; display: block;" />
+              <div style="padding: 16px 18px; font-size: 26px; font-weight: 800; color: var(--ink);">Seven Sisters</div>
+            </div>
+            <div class="jlevel clay" data-i="3" style="border-radius: 26px; overflow: hidden;">
+              <img src="assets/puzzle/puzzle_meghalaya_falls.png" alt="Cherrapunji Waterfalls" style="width: 100%; height: 210px; object-fit: cover; display: block;" />
+              <div style="padding: 16px 18px; font-size: 26px; font-weight: 800; color: var(--ink);">Cherrapunji Falls</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 6 — Reminders (24.0 – 28.5s)
+           ================================================================ -->
+      <section id="s6" class="scene clip" data-start="24.0" data-duration="4.5" data-track-index="5" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:160px;height:160px;right:-38px;bottom:-44px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div style="position:absolute;right:-32px;bottom:-52px;width:130px;height:66px;border-radius:90px 90px 0 0;background:rgba(107,94,168,0.28);"></div>
+          <div class="bubble" style="width:24px;height:24px;left:14px;top:280px;background:radial-gradient(circle at 32% 28%, #a9cbc0, #7ba89a 55%, #5c8377);"></div>
+        </div>
+
+        <div class="stage-wrap" style="justify-content: center;">
+          <div class="eyebrow" id="s6-eyebrow">Reminders</div>
+          <div class="h2" id="s6-head" style="margin-top: 16px;">A gentle nudge, on time.</div>
+
+          <div id="s6-reminder" class="clay" style="margin-top: 76px; padding: 50px; border-radius: 34px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 22px;">
+                <div style="width: 84px; height: 84px; border-radius: 24px; background: var(--sky-bg); display: flex; align-items: center; justify-content: center;">
+                  <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="#3f6d8b" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="#3f6d8b" stroke-width="2"/></svg>
+                </div>
+                <div>
+                  <div style="font-size: 56px; font-weight: 900; color: var(--ink);">Medicines</div>
+                  <div style="font-size: 32px; font-weight: 600; color: var(--ink-muted);">Every day · 8:00 AM</div>
+                </div>
+              </div>
+              <div class="pills" style="background: var(--sage-bg); color: var(--sage-deep); padding: 11px 22px; font-size: 23px;">OFFLINE</div>
+            </div>
+
+            <div style="margin-top: 34px; display: flex; gap: 16px;">
+              <div class="act-btn clay" style="flex: 1.1; padding: 26px; text-align: center; border-radius: 24px; background: var(--sage); color: #ffffff; font-size: 34px; font-weight: 900;">Done</div>
+              <div class="act-btn clay" style="flex: 1.3; padding: 26px; text-align: center; border-radius: 24px; font-size: 30px; font-weight: 800; color: var(--ink);">Snooze 15 min</div>
+              <div class="act-btn clay" style="flex: 1.2; padding: 26px; text-align: center; border-radius: 24px; font-size: 30px; font-weight: 800; color: var(--ink);">Later today</div>
+            </div>
+          </div>
+
+          <div id="s6-note" class="caption" style="margin-top: 56px;">Scheduled on-device — accurate even when the phone is asleep</div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 7 — Family & familiarity (28.5 – 33.0s)
+           ================================================================ -->
+      <section id="s7" class="scene clip" data-start="28.5" data-duration="4.5" data-track-index="6" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:160px;height:160px;right:-38px;bottom:-44px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div class="bubble" style="width:24px;height:24px;left:14px;top:270px;background:radial-gradient(circle at 32% 28%, #e6b7ac, #d4897a 55%, #b06f61);"></div>
+        </div>
+
+        <div class="stage-wrap" style="justify-content: center;">
+          <div class="eyebrow" id="s7-eyebrow">Who Is This?</div>
+          <div class="h2" id="s7-head" style="margin-top: 16px;">Familiar faces</div>
+          <div class="body" id="s7-sub" style="margin-top: 12px; font-size: 32px; color: var(--ink-muted);">The elder's own family and everyday objects — not generic drills</div>
+
+          <div id="s7-card" class="clay" style="margin-top: 62px; padding: 40px; border-radius: 32px; display: flex; gap: 30px; align-items: center;">
+            <div style="width: 170px; height: 170px; border-radius: 28px; background: var(--peach-bg); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; box-shadow: inset 0 0 0 3px var(--peach-border);">
+              <svg width="86" height="86" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#a85a4a" stroke-width="1.9"/><path d="M4.5 20c1-4 4-6.2 7.5-6.2S18.5 16 19.5 20" stroke="#a85a4a" stroke-width="1.9" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="pills" style="background: var(--peach-bg); color: var(--peach-deep); padding: 9px 20px; font-size: 21px;">FAMILY</div>
+              <div style="font-size: 46px; font-weight: 900; color: var(--ink); margin-top: 14px;">Granddaughter</div>
+              <div style="font-size: 30px; font-weight: 600; color: var(--ink-soft); margin-top: 10px; line-height: 1.4; max-width: 560px;">
+                &ldquo;She brings a bright new generation of memories and loves painting!&rdquo;
+              </div>
+            </div>
+          </div>
+
+          <div id="s7-strip" style="margin-top: 44px; display: flex; gap: 20px;">
+            <div class="clay" style="flex: 1; border-radius: 24px; overflow: hidden;">
+              <img src="assets/family.jpg" alt="A family gathering" style="width: 100%; height: 170px; object-fit: cover; display: block;" />
+              <div style="padding: 14px 18px; font-size: 24px; font-weight: 800; color: var(--ink);">Family Photos album</div>
+            </div>
+            <div class="clay" style="flex: 1; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 22px; background: var(--butter-bg);">
+              <span style="font-size: 50px;">🎙️</span>
+              <div style="font-size: 25px; font-weight: 800; color: var(--butter-deep); text-align: center;">Voice-assisted — tap to hear</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 8 — Local-first → caregiver (33.0 – 37.5s)
+           ================================================================ -->
+      <section id="s8" class="scene clip" data-start="33.0" data-duration="4.5" data-track-index="7" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:150px;height:150px;right:-36px;bottom:-40px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div class="bubble" style="width:22px;height:22px;left:10px;top:250px;background:radial-gradient(circle at 32% 28%, #a9cbc0, #7ba89a 55%, #5c8377);"></div>
+        </div>
+
+        <div class="stage-wrap" style="justify-content: center;">
+          <div class="eyebrow" id="s8-eyebrow">Offline-first by design</div>
+          <div class="h2" id="s8-head" style="margin-top: 14px; font-size: 56px;">The elder never waits<br />on the network.</div>
+
+          <div id="s8-pipe" style="margin-top: 30px; display: flex; flex-direction: column; gap: 14px;">
+            <div class="pipe clay" data-i="0" style="padding: 18px 26px; border-radius: 24px; display: flex; align-items: center; gap: 20px;">
+              <div style="width: 58px; height: 58px; border-radius: 16px; background: var(--butter-bg); display: flex; align-items: center; justify-content: center;">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="6" rx="7" ry="3" stroke="#8b6e3c" stroke-width="1.8"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6" stroke="#8b6e3c" stroke-width="1.8"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" stroke="#8b6e3c" stroke-width="1.8"/></svg>
+              </div>
+              <div>
+                <div style="font-size: 31px; font-weight: 900; color: var(--ink);">Hive — local, on-device</div>
+                <div style="font-size: 23px; font-weight: 600; color: var(--ink-muted);">Single source of truth</div>
+              </div>
+            </div>
+            <div class="pipe clay" data-i="1" style="padding: 18px 26px; border-radius: 24px; display: flex; align-items: center; gap: 20px;">
+              <div style="width: 58px; height: 58px; border-radius: 16px; background: var(--sky-bg); display: flex; align-items: center; justify-content: center;">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 4v10M8 10l4 4 4-4" stroke="#3f6d8b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18h14" stroke="#3f6d8b" stroke-width="1.9" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div style="font-size: 31px; font-weight: 900; color: var(--ink);">Sync queue — idempotent events</div>
+                <div style="font-size: 23px; font-weight: 600; color: var(--ink-muted);">UUID events replay when the network returns</div>
+              </div>
+            </div>
+            <div class="pipe clay" data-i="2" style="padding: 18px 26px; border-radius: 24px; display: flex; align-items: center; gap: 20px;">
+              <div style="width: 58px; height: 58px; border-radius: 16px; background: var(--sage-bg); display: flex; align-items: center; justify-content: center;">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="6" rx="2" stroke="#3d6b5e" stroke-width="1.8"/><rect x="3" y="14" width="18" height="6" rx="2" stroke="#3d6b5e" stroke-width="1.8"/><path d="M7 7h.01M7 17h.01" stroke="#3d6b5e" stroke-width="2.2" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div style="font-size: 31px; font-weight: 900; color: var(--ink);">Supabase — PostgreSQL + RLS</div>
+                <div style="font-size: 23px; font-weight: 600; color: var(--ink-muted);">Role-separated patient / caregiver data</div>
+              </div>
+            </div>
+            <div class="pipe clay" data-i="3" style="padding: 18px 26px; border-radius: 24px; display: flex; align-items: center; gap: 20px;">
+              <div style="width: 58px; height: 58px; border-radius: 16px; background: var(--lav-bg); display: flex; align-items: center; justify-content: center;">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.4" stroke="#6b5ea8" stroke-width="1.8"/><circle cx="17" cy="9" r="2.6" stroke="#6b5ea8" stroke-width="1.8"/><path d="M3.5 19c.7-3.2 2.9-5 5.5-5s4.8 1.8 5.5 5M14 18c.5-2 1.6-3.2 3-3.2s2.6 1.2 3.1 3.2" stroke="#6b5ea8" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div style="font-size: 31px; font-weight: 900; color: var(--ink);">Caregiver dashboard</div>
+                <div style="font-size: 23px; font-weight: 600; color: var(--ink-muted);">Visibility, not surveillance</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="s8-dash" class="clay" style="margin-top: 26px; padding: 30px; border-radius: 32px; background: var(--surface-elev);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="font-size: 30px; font-weight: 900; color: var(--ink);">Caregiver Dashboard</div>
+              <div class="pills" style="background: var(--sage-bg); color: var(--sage-deep); padding: 9px 18px; font-size: 20px;">SYNC HEALTHY</div>
+            </div>
+
+            <div id="s8-metrics" style="margin-top: 22px; display: flex; gap: 14px;">
+              <div class="metric clay" style="flex: 1; padding: 18px; border-radius: 22px; text-align: center; background: var(--lav-bg);">
+                <div style="font-size: 40px; font-weight: 900; color: var(--lav-deep);">12</div>
+                <div style="font-size: 21px; font-weight: 800; color: var(--ink);">Games<br />completed</div>
+              </div>
+              <div class="metric clay" style="flex: 1; padding: 18px; border-radius: 22px; text-align: center; background: var(--sage-bg);">
+                <div style="font-size: 40px; font-weight: 900; color: var(--sage-deep);">5/6</div>
+                <div style="font-size: 21px; font-weight: 800; color: var(--ink);">Reminder<br />completion</div>
+              </div>
+              <div class="metric clay" style="flex: 1; padding: 18px; border-radius: 22px; text-align: center; background: var(--butter-bg);">
+                <div style="font-size: 40px; font-weight: 900; color: var(--butter-deep);">17</div>
+                <div style="font-size: 21px; font-weight: 800; color: var(--ink);">Activities<br />completed</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 24px; font-weight: 800; color: var(--ink-soft);">7-Day Activity View</div>
+            <div style="margin-top: 12px; display: flex; align-items: flex-end; gap: 15px; height: 110px;">
+              <div class="bar" style="width: 42px; background: var(--lav); border-radius: 12px; height: 58%;"></div>
+              <div class="bar" style="width: 42px; background: var(--lav); border-radius: 12px; height: 82%;"></div>
+              <div class="bar" style="width: 42px; background: var(--lav); border-radius: 12px; height: 44%;"></div>
+              <div class="bar" style="width: 42px; background: var(--lav); border-radius: 12px; height: 96%;"></div>
+              <div class="bar" style="width: 42px; background: var(--lav); border-radius: 12px; height: 70%;"></div>
+              <div class="bar" style="width: 42px; background: var(--lav); border-radius: 12px; height: 88%;"></div>
+              <div class="bar" style="width: 42px; background: var(--peach); border-radius: 12px; height: 62%;"></div>
+            </div>
+            <div style="margin-top: 12px; font-size: 22px; font-weight: 700; color: var(--lav-deep);">Participation, not a clinical assessment</div>
+          </div>
+
+          <div id="s8-map" class="clay" style="margin-top: 24px; padding: 0; border-radius: 30px; overflow: hidden; position: relative; height: 200px; background: #e8efe8;">
+            <div style="position: absolute; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(123,168,154,0.35), transparent 55%), radial-gradient(circle at 70% 70%, rgba(155,142,196,0.28), transparent 55%);"></div>
+            <div style="position: absolute; inset: 0; opacity: 0.35; background-image: linear-gradient(rgba(58,47,42,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(58,47,42,0.12) 1px, transparent 1px); background-size: 60px 60px;"></div>
+            <div style="position: absolute; left: 40px; top: 32px; font-size: 30px; font-weight: 900; color: var(--ink);">I'm Lost / I Need Help</div>
+            <div style="position: absolute; left: 40px; top: 76px; font-size: 23px; font-weight: 600; color: var(--ink-soft); max-width: 480px;">One tap shares a live location with the caregiver.</div>
+            <div id="s8-pin" style="position: absolute; right: 110px; bottom: 46px; opacity: 0;">
+              <svg width="72" height="72" viewBox="0 0 24 24" fill="none">
+                <path d="M12 22s7-6.3 7-12A7 7 0 0 0 5 10c0 5.7 7 12 7 12z" fill="#d4897a" stroke="#a85a4a" stroke-width="1.4"/>
+                <circle cx="12" cy="10" r="2.6" fill="#ffffff"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SCENE 9 — Outro / name lock (37.5 – 40.0s)
+           ================================================================ -->
+      <section id="s9" class="scene clip" data-start="37.5" data-duration="2.5" data-track-index="8" data-layout-allow-overflow>
+        <div class="amb">
+          <div class="bubble" style="width:200px;height:200px;right:-44px;bottom:-52px;background:radial-gradient(circle at 32% 28%, #c8c0e6, #9b8ec4 55%, #7a6bab);"></div>
+          <div style="position:absolute;right:-38px;bottom:-62px;width:164px;height:82px;border-radius:90px 90px 0 0;background:rgba(107,94,168,0.28);"></div>
+          <div style="position:absolute;right:44px;bottom:52px;width:80px;height:14px;border-radius:999px;background:var(--butter);transform:rotate(-0.2rad);"></div>
+          <div class="bubble" style="width:34px;height:34px;left:-6px;top:250px;background:radial-gradient(circle at 32% 28%, #a9cbc0, #7ba89a 55%, #5c8377);"></div>
+          <div class="bubble" style="width:26px;height:26px;right:24px;top:330px;background:radial-gradient(circle at 32% 28%, #e6b7ac, #d4897a 55%, #b06f61);"></div>
+        </div>
+        <div class="stage-wrap" style="align-items: center; text-align: center;">
+          <div id="s9-mark" style="width: 136px; height: 136px; border-radius: 50%; background: linear-gradient(135deg, #ffffff, var(--lav-bg)); display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 30px rgba(107,94,168,0.20); opacity: 0;">
+            <svg width="68" height="68" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.6-9.7-9.1C.7 8.6 2.4 5 5.9 5c2 0 3.2 1.1 3.9 2.1C10.5 6.1 11.7 5 13.7 5c3.5 0 5.2 3.6 3.6 6.9C15.1 16.4 12 21 12 21z" fill="#9b8ec4"/></svg>
+          </div>
+          <div id="s9-name" class="h1" style="margin-top: 40px; letter-spacing: 0.06em; opacity: 0;">NIRVANA</div>
+          <div id="s9-line" class="body" style="margin-top: 30px; max-width: 880px; font-size: 40px; line-height: 1.35; color: var(--ink-soft); opacity: 0;">
+            Calm technology for the people<br />who raised us.
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           AUDIO — music bed on track 10, SFX from track 11 up
+           Music cue source: bundled preset
+             happy-beats-business-moves-vol-12-by-ende-dot-app.music-cues.json
+           ================================================================ -->
+      <audio id="music" data-start="0" data-duration="40" data-track-index="10" data-volume="0.30"
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+
+      <!-- S1 hook -->
+      <audio id="sfx-s1" data-start="0.45" data-duration="0.11" data-track-index="11" data-volume="0.55"
+        src="assets/sfx/interface/drop_001.ogg"></audio>
+
+      <!-- S2 elder home: four tiles + tap -->
+      <audio id="sfx-s2a" data-start="5.20" data-duration="0.10" data-track-index="12" data-volume="0.5"
+        src="assets/sfx/ui/click1.ogg"></audio>
+      <audio id="sfx-s2b" data-start="5.72" data-duration="0.09" data-track-index="13" data-volume="0.5"
+        src="assets/sfx/ui/click3.ogg"></audio>
+      <audio id="sfx-s2c" data-start="6.24" data-duration="0.10" data-track-index="14" data-volume="0.5"
+        src="assets/sfx/ui/click1.ogg"></audio>
+      <audio id="sfx-s2d" data-start="6.76" data-duration="0.09" data-track-index="15" data-volume="0.5"
+        src="assets/sfx/ui/click3.ogg"></audio>
+      <audio id="sfx-s2e" data-start="7.55" data-duration="0.06" data-track-index="16" data-volume="0.5"
+        src="assets/sfx/ui/mouseclick1.ogg"></audio>
+
+      <!-- S3 games hub: 4 cards -->
+      <audio id="sfx-s3a" data-start="10.35" data-duration="0.60" data-track-index="17" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+      <audio id="sfx-s3b" data-start="10.90" data-duration="0.60" data-track-index="18" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+      <audio id="sfx-s3c" data-start="11.45" data-duration="0.60" data-track-index="19" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+      <audio id="sfx-s3d" data-start="12.00" data-duration="0.60" data-track-index="20" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+
+      <!-- S4 grocery: wrong pick + the gentle chime -->
+      <audio id="sfx-s4a" data-start="15.90" data-duration="0.06" data-track-index="21" data-volume="0.5"
+        src="assets/sfx/ui/mouseclick1.ogg"></audio>
+      <audio id="sfx-s4b" data-start="16.95" data-duration="0.21" data-track-index="22" data-volume="0.5"
+        src="assets/sfx/impact/impactGlass_light_001.ogg"></audio>
+
+      <!-- S5 jigsaw: 4 level cards -->
+      <audio id="sfx-s5a" data-start="20.40" data-duration="0.60" data-track-index="23" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+      <audio id="sfx-s5b" data-start="20.85" data-duration="0.60" data-track-index="24" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+      <audio id="sfx-s5c" data-start="21.30" data-duration="0.60" data-track-index="25" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+      <audio id="sfx-s5d" data-start="21.75" data-duration="0.60" data-track-index="26" data-volume="0.42"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+
+      <!-- S6 reminder: card + three buttons -->
+      <audio id="sfx-s6a" data-start="24.45" data-duration="0.11" data-track-index="27" data-volume="0.5"
+        src="assets/sfx/interface/drop_002.ogg"></audio>
+      <audio id="sfx-s6b" data-start="25.55" data-duration="0.09" data-track-index="28" data-volume="0.4"
+        src="assets/sfx/ui/click3.ogg"></audio>
+      <audio id="sfx-s6c" data-start="25.95" data-duration="0.10" data-track-index="29" data-volume="0.4"
+        src="assets/sfx/ui/click1.ogg"></audio>
+      <audio id="sfx-s6d" data-start="26.35" data-duration="0.09" data-track-index="30" data-volume="0.4"
+        src="assets/sfx/ui/click3.ogg"></audio>
+
+      <!-- S7 family: card + album strip -->
+      <audio id="sfx-s7a" data-start="29.20" data-duration="0.60" data-track-index="31" data-volume="0.45"
+        src="assets/sfx/casino/card-slide-1.ogg"></audio>
+      <audio id="sfx-s7b" data-start="30.30" data-duration="0.11" data-track-index="32" data-volume="0.45"
+        src="assets/sfx/interface/drop_001.ogg"></audio>
+
+      <!-- S8 pipeline ticks, dashboard, pin -->
+      <audio id="sfx-s8a" data-start="33.45" data-duration="0.10" data-track-index="33" data-volume="0.4"
+        src="assets/sfx/ui/click1.ogg"></audio>
+      <audio id="sfx-s8b" data-start="33.80" data-duration="0.09" data-track-index="34" data-volume="0.4"
+        src="assets/sfx/ui/click3.ogg"></audio>
+      <audio id="sfx-s8c" data-start="34.15" data-duration="0.10" data-track-index="35" data-volume="0.4"
+        src="assets/sfx/ui/click1.ogg"></audio>
+      <audio id="sfx-s8d" data-start="34.50" data-duration="0.09" data-track-index="36" data-volume="0.4"
+        src="assets/sfx/ui/click3.ogg"></audio>
+      <audio id="sfx-s8e" data-start="35.60" data-duration="0.14" data-track-index="37" data-volume="0.5"
+        src="assets/sfx/impact/impactSoft_medium_003.ogg"></audio>
+
+      <!-- S9 outro bell -->
+      <audio id="sfx-s9" data-start="37.85" data-duration="0.13" data-track-index="38" data-volume="0.5"
+        src="assets/sfx/interface/bong_001.ogg"></audio>
+    </div>
+
+    <script>
+      /* ====================================================================
+         Timeline — one paused root registered on window.__timelines["main"].
+         Scenes swap on data-start / data-duration (the framework owns scene
+         visibility); we animate CONTENT within each scene only.
+
+         Music cue source: bundled preset
+           assets/music/cues/happy-beats-business-moves-vol-12-by-ende-dot-app.music-cues.json
+           (109.96 BPM). Strong-cue locks (<=3, +/-0.15s):
+         Background shapes drift slowly throughout.
+         ==================================================================== */
+      const tl = gsap.timeline({ paused: true });
+
+      /* ambient drift on every scene's decorative bubbles (deterministic) */
+      const ambScenes = ["#s1", "#s2", "#s3", "#s4", "#s5", "#s6", "#s7", "#s8", "#s9"];
+      ambScenes.forEach((s, i) => {
+        const bubbles = s + " .bubble";
+        tl.fromTo(bubbles, { y: 0 }, { y: 26, duration: 6, ease: "sine.inOut", yoyo: true, repeat: 1 }, i * 4.5);
+      });
+
+      /* ---------------- SCENE 1 : Hook (0.0 – 4.5) ----------------
+         Frame 0 IS the poster, so the hook is fully composed at t=0. */
+      tl.fromTo("#s1-greet", { y: 14, scale: 0.99 }, { y: 0, scale: 1, duration: 0.5, ease: "power2.out" }, 0);
+      tl.fromTo("#s1-claim", { y: 16 }, { y: 0, duration: 0.6, ease: "power2.out" }, 0);
+      tl.fromTo("#s1-sub", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.45);
+      tl.to("#s1 .stage-wrap", { opacity: 0, duration: 0.32 }, 4.10);
+
+      /* ---------------- SCENE 2 : Elder home (4.5 – 9.5) ---------------- */
+      tl.fromTo("#s2-eyebrow", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 4.52);
+      tl.fromTo("#s2-head", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 4.62);
+
+      const tileTimes = [5.18, 5.70, 6.22, 6.74];
+      tileTimes.forEach((t, i) => {
+        tl.fromTo("#s2-grid .tile[data-i='" + i + "']", { opacity: 0, y: 34, scale: 0.94 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.5)" }, t);
+      });
+
+      tl.fromTo("#s2-note", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 7.30);
+      tl.to("#s2-grid .tile[data-i='0']", { scale: 0.94, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.inOut" }, 7.55);
+      tl.to("#s2 .stage-wrap", { opacity: 0, duration: 0.32 }, 9.10);
+
+      /* ---------------- SCENE 3 : Games hub (9.5 – 14.5) ---------------- */
+      tl.fromTo("#s3-eyebrow", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 9.52);
+      tl.fromTo("#s3-head", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4 }, 9.62);
+      tl.fromTo("#s3-banner", { opacity: 0, y: 22, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 10.05);
+
+      const gcardTimes = [10.35, 10.90, 11.45, 12.00];
+      gcardTimes.forEach((t, i) => {
+        tl.fromTo("#s3-cards .gcard[data-i='" + i + "']", { opacity: 0, y: 30, scale: 0.94 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, t);
+      });
+      tl.fromTo("#s3-note", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 13.10);
+      tl.to("#s3 .stage-wrap", { opacity: 0, duration: 0.32 }, 14.10);
+
+      /* ---------------- SCENE 4 : Grocery Memory (14.5 – 19.5) ---------------- */
+      tl.fromTo("#s4-eyebrow", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 14.52);
+      tl.fromTo("#s4-head", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4 }, 14.62);
+
+      tl.fromTo("#s4-list .list-chip", { opacity: 0, y: 20, scale: 0.94 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.34, stagger: 0.14, ease: "power2.out" }, 14.95);
+      tl.fromTo("#s4-shelf .shelf-cell", { opacity: 0, scale: 0.9 },
+        { opacity: 1, scale: 1, duration: 0.32, stagger: 0.08, ease: "back.out(1.4)" }, 15.30);
+
+      // simulated wrong pick, then the gentle corrective card
+      tl.to("#s4-shelf .shelf-cell[data-name='tomato']", { scale: 0.93, duration: 0.14, yoyo: true, repeat: 1, ease: "power2.inOut" }, 15.90);
+      tl.fromTo("#s4-feedback", { opacity: 0, y: 30, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.4)" }, 16.85);
+      tl.to("#s4 .stage-wrap", { opacity: 0, duration: 0.32 }, 19.10);
+
+      /* ---------------- SCENE 5 : Jigsaw (19.5 – 24.0) ---------------- */
+      tl.fromTo("#s5-eyebrow", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 19.52);
+      tl.fromTo("#s5-head", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4 }, 19.62);
+      tl.fromTo("#s5-sub", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4 }, 19.80);
+
+      const jTimes = [20.35, 20.80, 21.25, 21.70];
+      jTimes.forEach((t, i) => {
+        tl.fromTo("#s5-grid .jlevel[data-i='" + i + "']", { opacity: 0, y: 26, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, t);
+      });
+      tl.to("#s5 .stage-wrap", { opacity: 0, duration: 0.32 }, 23.60);
+
+      /* ---------------- SCENE 6 : Reminders (24.0 – 28.5) ---------------- */
+      tl.fromTo("#s6-eyebrow", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 24.02);
+      tl.fromTo("#s6-head", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4 }, 24.12);
+      tl.fromTo("#s6-reminder", { opacity: 0, y: 36, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 24.40);
+      tl.fromTo("#s6-reminder .act-btn", { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.3, stagger: 0.4, ease: "power2.out" }, 25.50);
+      tl.fromTo("#s6-note", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 26.70);
+      tl.to("#s6 .stage-wrap", { opacity: 0, duration: 0.32 }, 28.10);
+
+      /* ---------------- SCENE 7 : Family (28.5 – 33.0) ---------------- */
+      tl.fromTo("#s7-eyebrow", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 28.52);
+      tl.fromTo("#s7-head", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4 }, 28.62);
+      tl.fromTo("#s7-sub", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4 }, 28.80);
+      tl.fromTo("#s7-card", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 29.15);
+      tl.fromTo("#s7-strip", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 30.25);
+      tl.to("#s7 .stage-wrap", { opacity: 0, duration: 0.32 }, 32.60);
+
+      /* ---------------- SCENE 8 : Local-first → caregiver (33.0 – 37.5) ---------------- */
+      tl.fromTo("#s8-eyebrow", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 33.02);
+      tl.fromTo("#s8-head", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4 }, 33.12);
+
+      const pipeTimes = [33.42, 33.77, 34.12, 34.47];
+      pipeTimes.forEach((t, i) => {
+        tl.fromTo("#s8-pipe .pipe[data-i='" + i + "']", { opacity: 0, x: -40 },
+          { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, t);
+      });
+
+      tl.fromTo("#s8-dash", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 34.95);
+      tl.fromTo("#s8-metrics .metric", { opacity: 0, y: 16, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.35, stagger: 0.14, ease: "back.out(1.4)" }, 35.25);
+      tl.fromTo("#s8-dash .bar", { scaleY: 0, transformOrigin: "bottom center" },
+        { scaleY: 1, duration: 0.45, stagger: 0.05, ease: "power2.out" }, 35.55);
+      tl.fromTo("#s8-map", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.42 }, 35.90);
+      tl.fromTo("#s8-pin", { opacity: 0, scale: 0.4, y: -20 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "back.out(1.8)" }, 36.10);
+      tl.to("#s8 .stage-wrap", { opacity: 0, duration: 0.32 }, 37.10);
+
+      /* ---------------- SCENE 9 : Outro (37.5 – 40.0) ---------------- */
+      tl.fromTo("#s9-mark", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 37.58);
+      tl.fromTo("#s9-name", { opacity: 0, y: 34, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 37.72);
+      tl.fromTo("#s9-line", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 38.10);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+ </body>
+</html>

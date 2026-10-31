@@ -1,0 +1,3 @@
+NIRVANA is a memory-support companion for elders — cognitive games, offline reminders, familiar family photos, and an "Ask NIRVANA" chat, with a separate caregiver dashboard for participation and reminder activity. It never says "failed".
+
+Built with Flutter, Riverpod, GoRouter, Hive (offline-first), and Supabase + PostgreSQL with role-separated data. (Prototype — it supports games and reminders; it does not diagnose or treat dementia.)
