@@ -1,22 +1,23 @@
 // ==============================================================================
 // NIRVANA - Supabase Client Configuration
-// Description: Place your Supabase project credentials here
+// Description: Credentials are injected at build time, never committed.
+//
+// Copy `.env.example` to `.env`, fill in your values, then run/build with:
+//   flutter run --dart-define-from-file=.env
+//   flutter build apk --dart-define-from-file=.env
 // ==============================================================================
 
 class SupabaseConfig {
-  /// 1. Replace with your Supabase Project URL
-  /// Found in: Supabase Dashboard -> Project Settings -> API -> Project URL
-  /// Example: 'https://abcdefghijklm.supabase.co'
-  static const String supabaseUrl = 'https://hclnjdhnvyhiwsdtcakw.supabase.co';
+  /// Supabase Project URL (Dashboard -> Project Settings -> API -> Project URL)
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
 
-  /// 2. Replace with your Supabase 'anon' (public) key
-  /// Found in: Supabase Dashboard -> Project Settings -> API -> Project API Keys -> 'anon' 'public'
+  /// Supabase 'anon' (public) key
+  /// (Dashboard -> Project Settings -> API -> Project API Keys -> 'anon' 'public')
   /// IMPORTANT: NEVER use the 'service_role' key in Flutter!
   static const String supabaseAnonKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjbG5qZGhudnloaXdzZHRjYWt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3OTg0MjAsImV4cCI6MjEwNDM3NDQyMH0.hgKVpw0DM1F41xU_TTPMI1o-yV20UwRwjL_WnkFMVG0';
+      String.fromEnvironment('SUPABASE_ANON_KEY');
 
-  /// Helper flag to check if the user has replaced placeholder credentials
+  /// True once both values were supplied via --dart-define / --dart-define-from-file
   static bool get isConfigured =>
-      supabaseUrl != 'https://YOUR_PROJECT_ID.supabase.co' &&
-      supabaseAnonKey != 'YOUR_SUPABASE_ANON_KEY';
+      supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
 }

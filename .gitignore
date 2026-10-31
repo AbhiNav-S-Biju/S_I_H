@@ -127,3 +127,6 @@ app.*.symbols
 # Local build helper output
 build_web.log
 build_apk.log
+
+# Local secrets (use .env.example as a template)
+.env
